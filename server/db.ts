@@ -655,3 +655,40 @@ export async function updateOfficeStatus(officeId: number, status: string) {
     .set({ status: status as any, updatedAt: new Date() })
     .where(eq(sanadOffices.id, officeId));
 }
+
+
+// ============================================================================
+// OFFICE DASHBOARD HELPERS
+// ============================================================================
+
+/**
+ * Get statistics for an office dashboard
+ */
+export async function getOfficeStatistics(officeId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const now = new Date();
+  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  // Get all bookings for this office
+  const allBookings = await db
+    .select()
+    .from(bookings)
+    .where(eq(bookings.officeId, officeId));
+
+  // Calculate statistics
+  const totalBookings = allBookings.length;
+  const pendingBookings = allBookings.filter(b => b.status === "pending").length;
+  const monthlyBookings = allBookings.filter(b => 
+    b.createdAt >= firstDayOfMonth
+  ).length;
+  const uniqueCustomers = new Set(allBookings.map(b => b.userId)).size;
+
+  return {
+    totalBookings,
+    pendingBookings,
+    monthlyBookings,
+    uniqueCustomers,
+  };
+}

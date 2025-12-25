@@ -15,6 +15,7 @@ import BookingsList from "./pages/BookingsList";
 import BookOffice from "./pages/BookOffice";
 import MyDocuments from "./pages/MyDocuments";
 import AdminDashboard from "./pages/AdminDashboard";
+import OfficeDashboard from "./pages/OfficeDashboard";
 
 function Router() {
   return (
@@ -40,6 +41,9 @@ function Router() {
       
       {/* Admin */}
       <Route path="/admin" component={AdminDashboard} />
+      
+      {/* Office Dashboard */}
+      <Route path="/office-dashboard" component={OfficeDashboard} />
       
       {/* 404 */}
       <Route path="/404" component={NotFound} />

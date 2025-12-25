@@ -263,4 +263,18 @@ export const sanadOfficeRouter = router({
     .query(async ({ input }) => {
       return await db.getSanadOfficeServices(input.officeId);
     }),
+
+  // Get the first office owned by current user (for dashboard)
+  getMyOffice: protectedProcedure.query(async ({ ctx }) => {
+    const user = ctx.user!;
+    const offices = await db.getSanadOfficesByOwnerId(user.id);
+    return offices[0] || null;
+  }),
+
+  // Get statistics for an office
+  getOfficeStats: protectedProcedure
+    .input(z.object({ officeId: z.number() }))
+    .query(async ({ input }) => {
+      return await db.getOfficeStatistics(input.officeId);
+    }),
 });
