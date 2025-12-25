@@ -116,10 +116,12 @@ export default function OfficeProfile() {
 
             {isAuthenticated && (
               <Button asChild size="lg" className="bg-gradient-accent">
-                <a href={`/book/${office.id}`} className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  Book Service
-                </a>
+                <Link href={`/offices/${slug}/book`}>
+                  <a className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    Book Service
+                  </a>
+                </Link>
               </Button>
             )}
           </div>
