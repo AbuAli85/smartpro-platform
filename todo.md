@@ -15,106 +15,106 @@
 ## FEATURE 1: Document Template Library with PDF Generation
 
 ### Backend Implementation
-- [ ] Extend document_templates table with field definitions (JSON schema)
-- [ ] Add template categories (employment, noc, business, legal, immigration)
-- [ ] Create template field types (text, number, date, dropdown, checkbox, signature)
-- [ ] Install PDF generation library (jsPDF or pdfkit)
-- [ ] Build PDF template renderer
-- [ ] Add tRPC procedures for template CRUD
-- [ ] Add tRPC procedure for document generation
-- [ ] Store generated PDFs in S3
+- [x] Extend document_templates table with field definitions (JSON schema)
+- [x] Add template categories (employment, noc, business, legal, immigration)
+- [x] Create template field types (text, number, date, dropdown, checkbox, signature)
+- [x] Install PDF generation library (jsPDF or pdfkit)
+- [x] Build PDF template renderer
+- [x] Add tRPC procedures for template CRUD
+- [x] Add tRPC procedure for document generation
+- [x] Store generated PDFs in S3
 
 ### Frontend Implementation
-- [ ] Create template browser page with category filters
-- [ ] Build template card component with preview
-- [ ] Create template detail page
-- [ ] Build dynamic form generator component
-- [ ] Add form field components (text, date, dropdown, etc.)
-- [ ] Implement form validation
-- [ ] Add PDF preview modal
-- [ ] Create download PDF functionality
-- [ ] Build user's generated documents page
+- [x] Create template browser page with category filters
+- [x] Build template card component with preview
+- [x] Create template detail page
+- [x] Build dynamic form generator component
+- [x] Add form field components (text, date, dropdown, etc.)
+- [x] Implement form validation
+- [x] Add PDF preview modal
+- [x] Create download PDF functionality
+- [x] Build user's generated documents page
 
 ### Real Templates to Add (15 templates)
-- [ ] Employment Contract (English)
-- [ ] Employment Contract (Arabic)
-- [ ] No Objection Certificate - General
-- [ ] NOC for Visa Transfer
-- [ ] NOC for Bank Account Opening
-- [ ] Business License Application
-- [ ] Commercial Registration Form
-- [ ] Tenancy Contract
-- [ ] Power of Attorney
-- [ ] Partnership Agreement
-- [ ] Salary Certificate
-- [ ] Experience Certificate
-- [ ] Work Permit Application
-- [ ] Tax Registration Form
-- [ ] Company Board Resolution
+- [x] Employment Contract (English)
+- [x] Employment Contract (Arabic)
+- [x] No Objection Certificate - General
+- [x] NOC for Visa Transfer
+- [x] NOC for Bank Account Opening
+- [x] Business License Application
+- [x] Commercial Registration Form
+- [x] Tenancy Contract
+- [x] Power of Attorney
+- [x] Partnership Agreement
+- [x] Salary Certificate
+- [x] Experience Certificate
+- [x] Work Permit Application
+- [x] Tax Registration Form
+- [x] Company Board Resolution (14 templates seeded)
 
 ## FEATURE 2: Booking Workflow with Calendar
 
 ### Backend Implementation
-- [ ] Extend bookings table with time_slot, duration, status fields
-- [ ] Create office_availability table (office_id, day_of_week, start_time, end_time)
-- [ ] Add booking status enum (pending, confirmed, in_progress, completed, cancelled)
-- [ ] Build availability checking logic
-- [ ] Create booking conflict detection
-- [ ] Add tRPC procedures for availability queries
-- [ ] Add tRPC procedures for booking management
-- [ ] Implement booking notifications
+- [x] Extend bookings table with time_slot, duration, status fields
+- [x] Create office_availability table (office_id, day_of_week, start_time, end_time)
+- [x] Add booking status enum (pending, confirmed, in_progress, completed, cancelled)
+- [x] Build availability checking logic
+- [x] Create booking conflict detection
+- [x] Add tRPC procedures for availability queries
+- [x] Add tRPC procedures for booking management
+- [x] Implement booking notifications
 
 ### Frontend Implementation
-- [ ] Create service selection page
-- [ ] Build calendar component with react-big-calendar or similar
-- [ ] Display available time slots
-- [ ] Create booking form with service details
-- [ ] Add date and time picker
-- [ ] Build booking confirmation page
-- [ ] Create user's bookings dashboard
-- [ ] Build office's booking management page
-- [ ] Add booking status badges
-- [ ] Implement cancel/reschedule functionality
+- [x] Create service selection page
+- [x] Build calendar component with react-big-calendar or similar
+- [x] Display available time slots
+- [x] Create booking form with service details
+- [x] Add date and time picker
+- [x] Build booking confirmation page
+- [x] Create user's bookings dashboard
+- [x] Build office's booking management page
+- [x] Add booking status badges
+- [x] Implement cancel/reschedule functionality
 
 ### Notification System
-- [ ] Set up email notification service
-- [ ] Create booking confirmation email template
-- [ ] Create booking reminder email template
-- [ ] Add in-app notification component
-- [ ] Build notification center in navigation
-- [ ] Store notifications in database
+- [x] Set up email notification service
+- [x] Create booking confirmation email template
+- [x] Create booking reminder email template
+- [x] Add in-app notification component (toast notifications)
+- [ ] Build notification center in navigation (future)
+- [ ] Store notifications in database (future)
 
 ## FEATURE 3: Admin Dashboard (MOCIP Oversight)
 
 ### Backend Implementation
-- [ ] Add admin role to user table
-- [ ] Create admin authorization middleware
-- [ ] Add office verification status (pending, verified, rejected)
-- [ ] Build analytics aggregation queries
-- [ ] Create admin activity log
-- [ ] Add tRPC admin procedures (protected)
-- [ ] Build office verification workflow
-- [ ] Create compliance monitoring queries
+- [x] Add admin role to user table
+- [x] Create admin authorization middleware
+- [x] Add office verification status (pending, verified, rejected)
+- [x] Build analytics aggregation queries
+- [x] Create admin activity log
+- [x] Add tRPC admin procedures (protected)
+- [x] Build office verification workflow
+- [x] Create compliance monitoring queries
 
 ### Frontend Implementation
-- [ ] Create admin dashboard layout with sidebar
-- [ ] Build dashboard overview page with key metrics
-- [ ] Create office verification queue page
-- [ ] Build office review page with approve/reject
-- [ ] Add analytics dashboard with charts (Chart.js or Recharts)
-- [ ] Create user management page
-- [ ] Build compliance monitoring page
-- [ ] Add activity log viewer
-- [ ] Create reports and exports page
+- [x] Create admin dashboard layout with sidebar
+- [x] Build dashboard overview page with key metrics
+- [x] Create office verification queue page
+- [x] Build office review page with approve/reject
+- [x] Add analytics dashboard with charts (Chart.js or Recharts)
+- [x] Create user management page
+- [x] Build compliance monitoring page
+- [ ] Add activity log viewer (future)
+- [ ] Create reports and exports page (future)
 
 ### Analytics & Metrics
-- [ ] Total offices by region and status
-- [ ] Total bookings and revenue trends
-- [ ] Most popular services
-- [ ] User growth metrics
-- [ ] Office performance ratings
-- [ ] Document generation statistics
-- [ ] Compliance status overview
+- [x] Total offices by region and status
+- [x] Total bookings and revenue trends
+- [x] Most popular services
+- [x] User growth metrics
+- [x] Office performance ratings
+- [x] Document generation statistics
+- [x] Compliance status overview
 
 ## Testing & Quality Assurance
 - [ ] Write unit tests for template generation
