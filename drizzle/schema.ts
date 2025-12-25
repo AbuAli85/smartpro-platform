@@ -81,6 +81,10 @@ export const sanadOffices = mysqlTable("sanad_offices", {
   autoAcceptBookings: boolean("autoAcceptBookings").default(false).notNull(),
   workingHours: json("workingHours"),
   
+  // Cancellation Policy
+  cancellationWindowHours: int("cancellationWindowHours").default(24).notNull(),
+  cancellationPenaltyPercent: int("cancellationPenaltyPercent").default(0).notNull(),
+  
   // Media
   logoUrl: text("logoUrl"),
   coverImageUrl: text("coverImageUrl"),
@@ -157,7 +161,7 @@ export const sanadOfficeServices = mysqlTable("sanad_office_services", {
   // Status
   isActive: boolean("isActive").default(true).notNull(),
   
-  // Audit
+  // Metadata
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
@@ -280,6 +284,13 @@ export const bookings = mysqlTable("bookings", {
   
   // Status
   status: mysqlEnum("status", ["pending", "confirmed", "in_progress", "completed", "cancelled"]).default("pending").notNull(),
+  
+  // Cancellation
+  cancellationReason: text("cancellationReason"),
+  cancelledBy: int("cancelledBy"), // User ID who cancelled
+  cancelledAt: timestamp("cancelledAt"),
+  cancellationPenalty: decimal("cancellationPenalty", { precision: 10, scale: 3 }),
+  refundAmount: decimal("refundAmount", { precision: 10, scale: 3 }),
   
   // Pricing
   price: decimal("price", { precision: 10, scale: 3 }),

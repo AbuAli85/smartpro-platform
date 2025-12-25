@@ -4,6 +4,7 @@ import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import * as db from "../db";
 import { notifyOwner } from "../_core/notification";
 import { sendBookingConfirmationEmail, sendBookingReminderSMS } from "../_core/emailSms";
+import { calculateCancellation, cancelBooking } from "../cancellationPolicy";
 
 export const bookingRouter = router({
   // Get available time slots for a specific date
@@ -231,5 +232,50 @@ export const reviewRouter = router({
     .input(z.object({ officeId: z.number() }))
     .query(async ({ input }) => {
       return await db.getOfficeReviews(input.officeId);
+    }),
+
+  // Calculate cancellation refund/penalty
+  calculateCancellation: protectedProcedure
+    .input(z.object({ bookingId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const user = ctx.user!;
+      return await calculateCancellation(input.bookingId, user.id);
+    }),
+
+  // Cancel booking
+  cancelBooking: protectedProcedure
+    .input(
+      z.object({
+        bookingId: z.number(),
+        reason: z.string().min(10, "Please provide a cancellation reason"),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = ctx.user!;
+      const result = await cancelBooking(input.bookingId, user.id, input.reason);
+
+      if (!result.success) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: result.message,
+        });
+      }
+
+      // Log activity
+      await db.logActivity({
+        userId: user.id,
+        action: "cancelled",
+        entityType: "booking",
+        entityId: input.bookingId,
+        description: `Cancelled booking #${input.bookingId}`,
+      });
+
+      // Notify owner
+      await notifyOwner({
+        title: "Booking Cancelled",
+        content: `Booking #${input.bookingId} has been cancelled. Refund: ${result.result?.refundAmount} OMR`,
+      });
+
+      return result;
     }),
 });

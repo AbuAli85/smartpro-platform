@@ -265,3 +265,35 @@
 - [x] Add validation for time ranges
 - [x] Integrate into office dashboard
 - [x] Test availability editor functionality
+
+
+## Advanced Platform Features
+### Booking Cancellation Policy
+- [x] Extend bookings table with cancellation fields
+- [x] Add cancellation policy configuration to offices
+- [x] Implement cancellation window validation logic
+- [x] Build refund calculation system
+- [x] Add penalty fee calculation
+- [ ] Create cancellation request UI (CancellationDialog component created, needs tRPC type fix)
+- [ ] Add cancellation history tracking (schema ready, needs implementation)
+- [ ] Send cancellation notifications (notification system ready, needs integration)
+
+### Review and Rating System
+- [ ] Create reviews table schema
+- [ ] Add rating fields to offices table
+- [ ] Build review submission form
+- [ ] Implement rating calculation logic
+- [ ] Display reviews on office profiles
+- [ ] Add review moderation for admins
+- [ ] Show average ratings in office cards
+- [ ] Add review sorting and filtering
+
+### Analytics Export
+- [ ] Install CSV generation library
+- [ ] Create export data formatting functions
+- [ ] Build CSV export endpoint
+- [ ] Add Excel export functionality
+- [ ] Create export UI in admin dashboard
+- [ ] Add date range filters for exports
+- [ ] Include all key metrics in exports
+- [ ] Test export functionality
