@@ -2,6 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import * as db from "../db";
+import { notifyOwner } from "../_core/notification";
 
 export const bookingRouter = router({
   // Get available time slots for a specific date
@@ -79,6 +80,12 @@ export const bookingRouter = router({
         entityType: "booking",
         entityId: bookingId,
         description: `Created booking at ${office.officeName}`,
+      });
+
+      // Send notification to platform owner
+      await notifyOwner({
+        title: "New Booking Created",
+        content: `${user.name} created a booking at ${office.officeName} for ${input.scheduledDate ? new Date(input.scheduledDate).toLocaleDateString() : 'unscheduled date'}`,
       });
 
       return { id: bookingId };

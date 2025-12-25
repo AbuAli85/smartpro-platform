@@ -11,9 +11,14 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
-  TrendingUp,
   AlertTriangle,
 } from "lucide-react";
+import {
+  BookingTrendsChart,
+  DocumentGenerationChart,
+  ServiceDistributionChart,
+  OfficePerformanceChart,
+} from "@/components/AnalyticsCharts";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 
@@ -180,68 +185,10 @@ export default function AdminDashboard() {
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Platform Growth</CardTitle>
-                  <CardDescription>Monthly registration trends</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-64 flex items-center justify-center text-gray-400">
-                    <div className="text-center">
-                      <TrendingUp className="h-12 w-12 mx-auto mb-2" />
-                      <p>Chart visualization placeholder</p>
-                      <p className="text-sm">Integrate with Chart.js or similar</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Service Usage</CardTitle>
-                  <CardDescription>Most popular services</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Business Registration</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-[#003366]" style={{ width: "85%" }}></div>
-                        </div>
-                        <span className="text-sm font-semibold">85%</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Document Attestation</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-[#003366]" style={{ width: "72%" }}></div>
-                        </div>
-                        <span className="text-sm font-semibold">72%</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">License Renewal</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-[#003366]" style={{ width: "68%" }}></div>
-                        </div>
-                        <span className="text-sm font-semibold">68%</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Tax Filing</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-[#003366]" style={{ width: "54%" }}></div>
-                        </div>
-                        <span className="text-sm font-semibold">54%</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <BookingTrendsChart />
+              <DocumentGenerationChart />
+              <ServiceDistributionChart />
+              <OfficePerformanceChart />
             </div>
           </TabsContent>
 
