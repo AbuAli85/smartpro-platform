@@ -3,10 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Navigation } from "@/components/Navigation";
 import { Building2, FileText, Calendar, Shield, Zap, Users } from "lucide-react";
+import { StructuredData, getSmartProOrganizationSchema } from "@/components/StructuredData";
+import { CanonicalURL } from "@/components/CanonicalURL";
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <>
+      <CanonicalURL path="/" />
+      <StructuredData type="organization" data={getSmartProOrganizationSchema()} />
+      <div className="min-h-screen flex flex-col">
       <Navigation />
 
       {/* Hero Section */}
@@ -192,6 +197,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
-    </div>
+      </div>
+    </>
   );
 }

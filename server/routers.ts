@@ -4,7 +4,8 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { sanadOfficeRouter } from "./routers/sanadOffice";
 import { documentTemplateRouter } from "./routers/documentTemplate";
-import { bookingRouter, reviewRouter } from "./routers/booking";
+import { bookingRouter } from "./routers/booking";
+import { sitemapRouter } from "./routers/sitemap";
 
 export const appRouter = router({
   system: systemRouter,
@@ -24,7 +25,7 @@ export const appRouter = router({
   sanadOffice: sanadOfficeRouter,
   documentTemplate: documentTemplateRouter,
   booking: bookingRouter,
-  review: reviewRouter,
+  sitemap: sitemapRouter,
 });
 
 export type AppRouter = typeof appRouter;

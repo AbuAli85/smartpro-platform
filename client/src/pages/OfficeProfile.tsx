@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { Building2, MapPin, Phone, Mail, Globe, Star, Calendar, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { CanonicalURL } from "@/components/CanonicalURL";
 
 export default function OfficeProfile() {
   const [, params] = useRoute("/offices/:slug");
@@ -14,10 +15,8 @@ export default function OfficeProfile() {
   const { isAuthenticated } = useAuth();
 
   const { data: office, isLoading } = trpc.sanadOffice.getBySlug.useQuery({ slug });
-  const { data: reviews } = trpc.review.getOfficeReviews.useQuery(
-    { officeId: office?.id || 0 },
-    { enabled: !!office?.id }
-  );
+  // TODO: Re-enable reviews once review router is implemented
+  const reviews: any[] = [];
 
   if (isLoading) {
     return (
@@ -49,7 +48,9 @@ export default function OfficeProfile() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <>
+      <CanonicalURL path={`/offices/${slug}`} />
+      <div className="min-h-screen flex flex-col bg-background">
       <Navigation />
 
       <div className="container py-8">
@@ -214,6 +215,7 @@ export default function OfficeProfile() {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
