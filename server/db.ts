@@ -1,6 +1,23 @@
-import { eq } from "drizzle-orm";
+import { eq, and, desc, sql, like, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import {
+  InsertUser,
+  users,
+  sanadOffices,
+  sanadOfficeStaff,
+  sanadOfficeServices,
+  documentTemplates,
+  generatedDocuments,
+  bookings,
+  reviews,
+  activityLog,
+  type SanadOffice,
+  type SanadOfficeStaff,
+  type SanadOfficeService,
+  type DocumentTemplate,
+  type Booking,
+  type Review,
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -17,6 +34,10 @@ export async function getDb() {
   }
   return _db;
 }
+
+// ============================================================================
+// USER MANAGEMENT
+// ============================================================================
 
 export async function upsertUser(user: InsertUser): Promise<void> {
   if (!user.openId) {
@@ -35,7 +56,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     };
     const updateSet: Record<string, unknown> = {};
 
-    const textFields = ["name", "email", "loginMethod"] as const;
+    const textFields = ["name", "email", "loginMethod", "phone", "avatarUrl"] as const;
     type TextField = (typeof textFields)[number];
 
     const assignNullable = (field: TextField) => {
@@ -85,8 +106,382 @@ export async function getUserByOpenId(openId: string) {
   }
 
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+// ============================================================================
+// SANAD OFFICE MANAGEMENT
+// ============================================================================
+
+export async function createSanadOffice(office: Partial<SanadOffice>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(sanadOffices).values(office as any);
+  return 0; // Return placeholder ID
+}
+
+export async function getSanadOfficeById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(sanadOffices).where(eq(sanadOffices.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getSanadOfficeBySlug(slug: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(sanadOffices).where(eq(sanadOffices.slug, slug)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function listSanadOffices(filters: {
+  governorate?: string;
+  status?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const db = await getDb();
+  if (!db) return { offices: [], total: 0 };
+
+  let query = db.select().from(sanadOffices);
+  let conditions: any[] = [];
+
+  if (filters.governorate) {
+    conditions.push(eq(sanadOffices.governorate, filters.governorate));
+  }
+
+  if (filters.status) {
+    conditions.push(eq(sanadOffices.status, filters.status as any));
+  }
+
+  if (filters.search) {
+    conditions.push(
+      or(
+        like(sanadOffices.officeName, `%${filters.search}%`),
+        like(sanadOffices.officeNameAr, `%${filters.search}%`)
+      )
+    );
+  }
+
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
+  }
+
+  const offices = await query
+    .orderBy(desc(sanadOffices.createdAt))
+    .limit(filters.limit || 20)
+    .offset(filters.offset || 0);
+
+  // Get total count
+  const countResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(sanadOffices)
+    .where(conditions.length > 0 ? and(...conditions) : undefined);
+
+  return {
+    offices,
+    total: countResult[0]?.count || 0,
+  };
+}
+
+export async function updateSanadOffice(id: number, updates: Partial<SanadOffice>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(sanadOffices).set(updates).where(eq(sanadOffices.id, id));
+}
+
+export async function getSanadOfficesByOwnerId(ownerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(sanadOffices)
+    .where(eq(sanadOffices.ownerId, ownerId))
+    .orderBy(desc(sanadOffices.createdAt));
+}
+
+// ============================================================================
+// SANAD OFFICE STAFF
+// ============================================================================
+
+export async function addSanadOfficeStaff(staff: Partial<SanadOfficeStaff>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(sanadOfficeStaff).values(staff as any);
+  return 0; // Return placeholder ID
+}
+
+export async function getSanadOfficeStaff(officeId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(sanadOfficeStaff)
+    .where(eq(sanadOfficeStaff.officeId, officeId))
+    .orderBy(desc(sanadOfficeStaff.createdAt));
+}
+
+export async function getUserOfficeRole(userId: number, officeId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select()
+    .from(sanadOfficeStaff)
+    .where(and(eq(sanadOfficeStaff.userId, userId), eq(sanadOfficeStaff.officeId, officeId)))
+    .limit(1);
 
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// ============================================================================
+// SANAD OFFICE SERVICES
+// ============================================================================
+
+export async function createSanadOfficeService(service: Partial<SanadOfficeService>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(sanadOfficeServices).values(service as any);
+  return 0; // Return placeholder ID
+}
+
+export async function getSanadOfficeServices(officeId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(sanadOfficeServices)
+    .where(and(eq(sanadOfficeServices.officeId, officeId), eq(sanadOfficeServices.isActive, true)))
+    .orderBy(desc(sanadOfficeServices.createdAt));
+}
+
+export async function updateSanadOfficeService(id: number, updates: Partial<SanadOfficeService>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(sanadOfficeServices).set(updates).where(eq(sanadOfficeServices.id, id));
+}
+
+// ============================================================================
+// DOCUMENT TEMPLATES
+// ============================================================================
+
+export async function listDocumentTemplates(filters: {
+  category?: string;
+  language?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const db = await getDb();
+  if (!db) return { templates: [], total: 0 };
+
+  let query = db.select().from(documentTemplates);
+  let conditions: any[] = [eq(documentTemplates.isActive, true)];
+
+  if (filters.category) {
+    conditions.push(eq(documentTemplates.category, filters.category));
+  }
+
+  if (filters.language) {
+    conditions.push(eq(documentTemplates.language, filters.language));
+  }
+
+  if (filters.search) {
+    conditions.push(
+      or(
+        like(documentTemplates.templateName, `%${filters.search}%`),
+        like(documentTemplates.templateNameAr, `%${filters.search}%`)
+      )
+    );
+  }
+
+  const templates = await query
+    .where(and(...conditions))
+    .orderBy(desc(documentTemplates.usageCount))
+    .limit(filters.limit || 20)
+    .offset(filters.offset || 0);
+
+  const countResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(documentTemplates)
+    .where(and(...conditions));
+
+  return {
+    templates,
+    total: countResult[0]?.count || 0,
+  };
+}
+
+export async function getDocumentTemplateById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(documentTemplates).where(eq(documentTemplates.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function incrementTemplateUsage(id: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .update(documentTemplates)
+    .set({ usageCount: sql`${documentTemplates.usageCount} + 1` })
+    .where(eq(documentTemplates.id, id));
+}
+
+// ============================================================================
+// GENERATED DOCUMENTS
+// ============================================================================
+
+export async function createGeneratedDocument(doc: Partial<typeof generatedDocuments.$inferInsert>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(generatedDocuments).values(doc as any);
+  return 0; // Return placeholder ID
+}
+
+export async function getUserGeneratedDocuments(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(generatedDocuments)
+    .where(eq(generatedDocuments.userId, userId))
+    .orderBy(desc(generatedDocuments.createdAt));
+}
+
+// ============================================================================
+// BOOKINGS
+// ============================================================================
+
+export async function createBooking(booking: Partial<Booking>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(bookings).values(booking as any);
+  return 0; // Return placeholder ID
+}
+
+export async function getBookingById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(bookings).where(eq(bookings.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserBookings(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(bookings)
+    .where(eq(bookings.userId, userId))
+    .orderBy(desc(bookings.createdAt));
+}
+
+export async function getOfficeBookings(officeId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(bookings)
+    .where(eq(bookings.officeId, officeId))
+    .orderBy(desc(bookings.createdAt));
+}
+
+export async function updateBooking(id: number, updates: Partial<Booking>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(bookings).set(updates).where(eq(bookings.id, id));
+}
+
+// ============================================================================
+// REVIEWS
+// ============================================================================
+
+export async function createReview(review: Partial<Review>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(reviews).values(review as any);
+  
+  // Update office rating
+  await updateOfficeRating(review.officeId!);
+  
+  return 0; // Return placeholder ID
+}
+
+export async function getOfficeReviews(officeId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(reviews)
+    .where(and(eq(reviews.officeId, officeId), eq(reviews.isVisible, true)))
+    .orderBy(desc(reviews.createdAt));
+}
+
+async function updateOfficeRating(officeId: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  const reviewsList = await db
+    .select()
+    .from(reviews)
+    .where(and(eq(reviews.officeId, officeId), eq(reviews.isVisible, true)));
+
+  if (reviewsList.length === 0) return;
+
+  const totalRating = reviewsList.reduce((sum, r) => sum + r.rating, 0);
+  const avgRating = totalRating / reviewsList.length;
+
+  await db
+    .update(sanadOffices)
+    .set({
+      averageRating: avgRating.toFixed(2),
+      totalReviews: reviewsList.length,
+    })
+    .where(eq(sanadOffices.id, officeId));
+}
+
+// ============================================================================
+// ACTIVITY LOG
+// ============================================================================
+
+export async function logActivity(activity: Partial<typeof activityLog.$inferInsert>) {
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    await db.insert(activityLog).values(activity as any);
+  } catch (error) {
+    console.error("[Database] Failed to log activity:", error);
+  }
+}

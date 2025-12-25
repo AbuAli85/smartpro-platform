@@ -1,28 +1,349 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, json, index, uniqueIndex } from "drizzle-orm/mysql-core";
 
 /**
- * Core user table backing auth flow.
- * Extend this file with additional tables as your product grows.
- * Columns use camelCase to match both database fields and generated types.
+ * SmartPro Platform - Complete Database Schema
+ * A unified platform connecting SMEs with Sanad offices for business services
  */
+
+// ============================================================================
+// USERS & AUTHENTICATION
+// ============================================================================
+
 export const users = mysqlTable("users", {
-  /**
-   * Surrogate primary key. Auto-incremented numeric value managed by the database.
-   * Use this for relations between tables.
-   */
   id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
+  phone: varchar("phone", { length: 20 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  role: mysqlEnum("role", ["user", "admin", "sanad_owner", "sanad_staff", "sme_owner", "gig_worker", "government_official"]).default("user").notNull(),
+  avatarUrl: text("avatarUrl"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
-});
+}, (table) => ({
+  emailIdx: index("email_idx").on(table.email),
+  roleIdx: index("role_idx").on(table.role),
+}));
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+// ============================================================================
+// SANAD OFFICES
+// ============================================================================
+
+export const sanadOffices = mysqlTable("sanad_offices", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Basic information
+  officeName: varchar("officeName", { length: 255 }).notNull(),
+  officeNameAr: varchar("officeNameAr", { length: 255 }),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  
+  // Registration details
+  commercialRegistration: varchar("commercialRegistration", { length: 100 }).notNull().unique(),
+  tradeLicense: varchar("tradeLicense", { length: 100 }),
+  taxRegistration: varchar("taxRegistration", { length: 100 }),
+  
+  // Contact information
+  email: varchar("email", { length: 320 }).notNull(),
+  phone: varchar("phone", { length: 20 }).notNull(),
+  whatsapp: varchar("whatsapp", { length: 20 }),
+  website: text("website"),
+  
+  // Location
+  governorate: varchar("governorate", { length: 100 }).notNull(),
+  wilayat: varchar("wilayat", { length: 100 }).notNull(),
+  addressLine1: text("addressLine1").notNull(),
+  addressLine2: text("addressLine2"),
+  postalCode: varchar("postalCode", { length: 20 }),
+  locationLat: decimal("locationLat", { precision: 10, scale: 7 }),
+  locationLng: decimal("locationLng", { precision: 10, scale: 7 }),
+  
+  // Business details
+  description: text("description"),
+  descriptionAr: text("descriptionAr"),
+  yearEstablished: int("yearEstablished"),
+  employeeCount: int("employeeCount").default(1).notNull(),
+  
+  // Status and verification
+  status: mysqlEnum("status", ["pending", "active", "suspended", "inactive"]).default("pending").notNull(),
+  verificationStatus: mysqlEnum("verificationStatus", ["unverified", "pending_verification", "verified", "rejected"]).default("unverified").notNull(),
+  verifiedAt: timestamp("verifiedAt"),
+  verifiedBy: int("verifiedBy"),
+  
+  // Owner
+  ownerId: int("ownerId").notNull(),
+  
+  // Settings
+  acceptsOnlineBookings: boolean("acceptsOnlineBookings").default(true).notNull(),
+  autoAcceptBookings: boolean("autoAcceptBookings").default(false).notNull(),
+  workingHours: json("workingHours"),
+  
+  // Media
+  logoUrl: text("logoUrl"),
+  coverImageUrl: text("coverImageUrl"),
+  images: json("images").$type<string[]>(),
+  
+  // Analytics
+  totalOrders: int("totalOrders").default(0).notNull(),
+  completedOrders: int("completedOrders").default(0).notNull(),
+  averageRating: decimal("averageRating", { precision: 3, scale: 2 }).default("0.00").notNull(),
+  totalReviews: int("totalReviews").default(0).notNull(),
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  createdBy: int("createdBy"),
+  updatedBy: int("updatedBy"),
+}, (table) => ({
+  ownerIdx: index("owner_idx").on(table.ownerId),
+  statusIdx: index("status_idx").on(table.status),
+  governorateIdx: index("governorate_idx").on(table.governorate),
+  verificationIdx: index("verification_idx").on(table.verificationStatus),
+}));
+
+export type SanadOffice = typeof sanadOffices.$inferSelect;
+export type InsertSanadOffice = typeof sanadOffices.$inferInsert;
+
+// ============================================================================
+// SANAD OFFICE STAFF
+// ============================================================================
+
+export const sanadOfficeStaff = mysqlTable("sanad_office_staff", {
+  id: int("id").autoincrement().primaryKey(),
+  officeId: int("officeId").notNull(),
+  userId: int("userId").notNull(),
+  role: mysqlEnum("role", ["owner", "manager", "staff", "viewer"]).default("staff").notNull(),
+  permissions: json("permissions").$type<string[]>(),
+  status: mysqlEnum("status", ["active", "inactive", "invited"]).default("invited").notNull(),
+  invitedAt: timestamp("invitedAt"),
+  joinedAt: timestamp("joinedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  officeIdx: index("office_idx").on(table.officeId),
+  userIdx: index("user_idx").on(table.userId),
+  uniqueOfficeUser: uniqueIndex("unique_office_user").on(table.officeId, table.userId),
+}));
+
+export type SanadOfficeStaff = typeof sanadOfficeStaff.$inferSelect;
+export type InsertSanadOfficeStaff = typeof sanadOfficeStaff.$inferInsert;
+
+// ============================================================================
+// SANAD OFFICE SERVICES
+// ============================================================================
+
+export const sanadOfficeServices = mysqlTable("sanad_office_services", {
+  id: int("id").autoincrement().primaryKey(),
+  officeId: int("officeId").notNull(),
+  
+  // Service details
+  serviceName: varchar("serviceName", { length: 255 }).notNull(),
+  serviceNameAr: varchar("serviceNameAr", { length: 255 }),
+  category: varchar("category", { length: 100 }).notNull(),
+  description: text("description"),
+  descriptionAr: text("descriptionAr"),
+  
+  // Pricing
+  price: decimal("price", { precision: 10, scale: 3 }),
+  currency: varchar("currency", { length: 3 }).default("OMR").notNull(),
+  priceType: mysqlEnum("priceType", ["fixed", "hourly", "custom"]).default("fixed").notNull(),
+  
+  // Delivery
+  estimatedDeliveryDays: int("estimatedDeliveryDays"),
+  
+  // Status
+  isActive: boolean("isActive").default(true).notNull(),
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  officeIdx: index("office_idx").on(table.officeId),
+  categoryIdx: index("category_idx").on(table.category),
+  activeIdx: index("active_idx").on(table.isActive),
+}));
+
+export type SanadOfficeService = typeof sanadOfficeServices.$inferSelect;
+export type InsertSanadOfficeService = typeof sanadOfficeServices.$inferInsert;
+
+// ============================================================================
+// DOCUMENT TEMPLATES
+// ============================================================================
+
+export const documentTemplates = mysqlTable("document_templates", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Template details
+  templateName: varchar("templateName", { length: 255 }).notNull(),
+  templateNameAr: varchar("templateNameAr", { length: 255 }),
+  category: varchar("category", { length: 100 }).notNull(),
+  description: text("description"),
+  descriptionAr: text("descriptionAr"),
+  
+  // Template content
+  templateContent: text("templateContent").notNull(), // HTML or JSON template
+  variables: json("variables").$type<Array<{name: string; label: string; type: string; required: boolean}>>().notNull(),
+  
+  // Metadata
+  language: varchar("language", { length: 10 }).default("en").notNull(),
+  isOfficial: boolean("isOfficial").default(false).notNull(), // Government-approved template
+  isPremium: boolean("isPremium").default(false).notNull(),
+  
+  // Usage stats
+  usageCount: int("usageCount").default(0).notNull(),
+  
+  // Status
+  isActive: boolean("isActive").default(true).notNull(),
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  createdBy: int("createdBy"),
+}, (table) => ({
+  categoryIdx: index("category_idx").on(table.category),
+  languageIdx: index("language_idx").on(table.language),
+  activeIdx: index("active_idx").on(table.isActive),
+}));
+
+export type DocumentTemplate = typeof documentTemplates.$inferSelect;
+export type InsertDocumentTemplate = typeof documentTemplates.$inferInsert;
+
+// ============================================================================
+// GENERATED DOCUMENTS
+// ============================================================================
+
+export const generatedDocuments = mysqlTable("generated_documents", {
+  id: int("id").autoincrement().primaryKey(),
+  templateId: int("templateId").notNull(),
+  userId: int("userId").notNull(),
+  officeId: int("officeId"),
+  bookingId: int("bookingId"),
+  
+  // Document details
+  documentName: varchar("documentName", { length: 255 }).notNull(),
+  filledData: json("filledData").notNull(), // User-provided values for variables
+  fileUrl: text("fileUrl").notNull(), // S3 URL to generated PDF
+  fileKey: varchar("fileKey", { length: 255 }).notNull(),
+  
+  // Status
+  status: mysqlEnum("status", ["draft", "generated", "delivered"]).default("generated").notNull(),
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  templateIdx: index("template_idx").on(table.templateId),
+  userIdx: index("user_idx").on(table.userId),
+  officeIdx: index("office_idx").on(table.officeId),
+  bookingIdx: index("booking_idx").on(table.bookingId),
+}));
+
+export type GeneratedDocument = typeof generatedDocuments.$inferSelect;
+export type InsertGeneratedDocument = typeof generatedDocuments.$inferInsert;
+
+// ============================================================================
+// BOOKINGS
+// ============================================================================
+
+export const bookings = mysqlTable("bookings", {
+  id: int("id").autoincrement().primaryKey(),
+  officeId: int("officeId").notNull(),
+  serviceId: int("serviceId"),
+  userId: int("userId").notNull(), // SME owner
+  
+  // Booking details
+  bookingType: varchar("bookingType", { length: 50 }).default("service").notNull(),
+  serviceDescription: text("serviceDescription"),
+  requirements: text("requirements"),
+  
+  // Scheduling
+  preferredDate: timestamp("preferredDate"),
+  scheduledDate: timestamp("scheduledDate"),
+  completedDate: timestamp("completedDate"),
+  
+  // Status
+  status: mysqlEnum("status", ["pending", "confirmed", "in_progress", "completed", "cancelled"]).default("pending").notNull(),
+  
+  // Pricing
+  price: decimal("price", { precision: 10, scale: 3 }),
+  currency: varchar("currency", { length: 3 }).default("OMR").notNull(),
+  paymentStatus: mysqlEnum("paymentStatus", ["unpaid", "paid", "refunded"]).default("unpaid").notNull(),
+  
+  // Communication
+  notes: text("notes"),
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  officeIdx: index("office_idx").on(table.officeId),
+  userIdx: index("user_idx").on(table.userId),
+  statusIdx: index("status_idx").on(table.status),
+  dateIdx: index("date_idx").on(table.scheduledDate),
+}));
+
+export type Booking = typeof bookings.$inferSelect;
+export type InsertBooking = typeof bookings.$inferInsert;
+
+// ============================================================================
+// REVIEWS
+// ============================================================================
+
+export const reviews = mysqlTable("reviews", {
+  id: int("id").autoincrement().primaryKey(),
+  officeId: int("officeId").notNull(),
+  bookingId: int("bookingId"),
+  userId: int("userId").notNull(),
+  
+  // Review content
+  rating: int("rating").notNull(), // 1-5
+  reviewText: text("reviewText"),
+  
+  // Response
+  responseText: text("responseText"),
+  respondedAt: timestamp("respondedAt"),
+  respondedBy: int("respondedBy"),
+  
+  // Status
+  isVisible: boolean("isVisible").default(true).notNull(),
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  officeIdx: index("office_idx").on(table.officeId),
+  userIdx: index("user_idx").on(table.userId),
+  bookingIdx: index("booking_idx").on(table.bookingId),
+  visibleIdx: index("visible_idx").on(table.isVisible),
+}));
+
+export type Review = typeof reviews.$inferSelect;
+export type InsertReview = typeof reviews.$inferInsert;
+
+// ============================================================================
+// ACTIVITY LOG
+// ============================================================================
+
+export const activityLog = mysqlTable("activity_log", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"),
+  action: varchar("action", { length: 100 }).notNull(),
+  entityType: varchar("entityType", { length: 50 }),
+  entityId: int("entityId"),
+  description: text("description"),
+  metadata: json("metadata"),
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  userIdx: index("user_idx").on(table.userId),
+  entityIdx: index("entity_idx").on(table.entityType, table.entityId),
+  actionIdx: index("action_idx").on(table.action),
+  dateIdx: index("date_idx").on(table.createdAt),
+}));
+
+export type ActivityLog = typeof activityLog.$inferSelect;
+export type InsertActivityLog = typeof activityLog.$inferInsert;
