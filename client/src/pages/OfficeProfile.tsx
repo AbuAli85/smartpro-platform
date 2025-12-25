@@ -15,8 +15,10 @@ export default function OfficeProfile() {
   const { isAuthenticated } = useAuth();
 
   const { data: office, isLoading } = trpc.sanadOffice.getBySlug.useQuery({ slug });
-  // TODO: Re-enable reviews once review router is implemented
-  const reviews: any[] = [];
+  const { data: reviews } = (trpc.booking as any).getOfficeReviews.useQuery(
+    { officeId: office?.id || 0 },
+    { enabled: !!office?.id }
+  );
 
   if (isLoading) {
     return (

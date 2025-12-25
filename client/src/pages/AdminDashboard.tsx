@@ -12,6 +12,7 @@ import {
   XCircle,
   Clock,
   AlertTriangle,
+  Download,
 } from "lucide-react";
 import {
   BookingTrendsChart,
@@ -21,6 +22,8 @@ import {
 } from "@/components/AnalyticsCharts";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
+import { exportToCSV, exportToExcel, exportMultiSheetExcel } from "@/lib/exportUtils";
+import { toast } from "sonner";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -184,6 +187,82 @@ export default function AdminDashboard() {
 
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Platform Analytics</CardTitle>
+                    <CardDescription>
+                      Export reports for offline analysis and stakeholder presentations
+                    </CardDescription>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        // Export comprehensive analytics report
+                        const timestamp = new Date().toISOString().split('T')[0];
+                        toast.success("Exporting analytics report...");
+                        // This would fetch actual data from backend
+                        exportMultiSheetExcel(
+                          [
+                            {
+                              name: "Bookings",
+                              data: [{ "Total Bookings": stats?.totalBookings || 0, "This Month": stats?.bookingsThisMonth || 0 }],
+                            },
+                            {
+                              name: "Documents",
+                              data: [{ "Total Documents": stats?.totalDocuments || 0 }],
+                            },
+                            {
+                              name: "Offices",
+                              data: [{ "Total Offices": stats?.totalOffices || 0, "Active": stats?.activeOffices || 0 }],
+                            },
+                          ],
+                          `smartpro-analytics-${timestamp}`
+                        );
+                      }}
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Export Excel
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const timestamp = new Date().toISOString().split('T')[0];
+                        toast.success("Exporting summary report...");
+                        exportToCSV(
+                          [
+                            {
+                              Metric: "Total Bookings",
+                              Value: stats?.totalBookings || 0,
+                            },
+                            {
+                              Metric: "Total Documents",
+                              Value: stats?.totalDocuments || 0,
+                            },
+                            {
+                              Metric: "Total Offices",
+                              Value: stats?.totalOffices || 0,
+                            },
+                            {
+                              Metric: "Active Offices",
+                              Value: stats?.activeOffices || 0,
+                            },
+                          ],
+                          `smartpro-summary-${timestamp}`
+                        );
+                      }}
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Export CSV
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <BookingTrendsChart />
               <DocumentGenerationChart />
