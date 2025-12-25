@@ -198,3 +198,13 @@
 - [x] Add mobile-responsive styles to booking calendar
 - [x] Optimize document forms for touch devices
 - [x] Improve navigation for mobile screens
+
+
+## API Configuration Tasks
+- [x] Remove SendGrid dependency
+- [x] Install Resend SDK
+- [x] Update email helper to use Resend API
+- [x] Request RESEND_API_KEY from user
+- [x] Request Twilio credentials from user
+- [x] Test email notifications with Resend
+- [x] Test SMS notifications with Twilio

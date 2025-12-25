@@ -1,12 +1,13 @@
-import sgMail from "@sendgrid/mail";
+import { Resend } from "resend";
 import twilio from "twilio";
 
-// Initialize SendGrid (optional - only if API key is provided)
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-const SENDGRID_FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || "noreply@smartpro.om";
+// Initialize Resend (optional - only if API key is provided)
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "SmartPro <noreply@smartpro.om>";
 
-if (SENDGRID_API_KEY) {
-  sgMail.setApiKey(SENDGRID_API_KEY);
+let resendClient: Resend | null = null;
+if (RESEND_API_KEY) {
+  resendClient = new Resend(RESEND_API_KEY);
 }
 
 // Initialize Twilio (optional - only if credentials are provided)
@@ -20,7 +21,7 @@ if (TWILIO_ACCOUNT_SID && TWILIO_AUTH_TOKEN) {
 }
 
 /**
- * Send email notification
+ * Send email notification using Resend
  */
 export async function sendEmail(params: {
   to: string;
@@ -28,20 +29,27 @@ export async function sendEmail(params: {
   text: string;
   html?: string;
 }): Promise<boolean> {
-  if (!SENDGRID_API_KEY) {
-    console.warn("SendGrid API key not configured. Email not sent.");
+  if (!resendClient) {
+    console.warn("Resend API key not configured. Email not sent.");
+    console.log(`[Email Preview] To: ${params.to}, Subject: ${params.subject}`);
     return false;
   }
 
   try {
-    await sgMail.send({
+    const { data, error } = await resendClient.emails.send({
+      from: RESEND_FROM_EMAIL,
       to: params.to,
-      from: SENDGRID_FROM_EMAIL,
       subject: params.subject,
       text: params.text,
       html: params.html || params.text,
     });
-    console.log(`Email sent to ${params.to}`);
+
+    if (error) {
+      console.error("Error sending email via Resend:", error);
+      return false;
+    }
+
+    console.log(`Email sent to ${params.to} via Resend (ID: ${data?.id})`);
     return true;
   } catch (error) {
     console.error("Error sending email:", error);
@@ -58,16 +66,17 @@ export async function sendSMS(params: {
 }): Promise<boolean> {
   if (!twilioClient || !TWILIO_PHONE_NUMBER) {
     console.warn("Twilio not configured. SMS not sent.");
+    console.log(`[SMS Preview] To: ${params.to}, Message: ${params.message}`);
     return false;
   }
 
   try {
-    await twilioClient.messages.create({
+    const message = await twilioClient.messages.create({
       body: params.message,
       from: TWILIO_PHONE_NUMBER,
       to: params.to,
     });
-    console.log(`SMS sent to ${params.to}`);
+    console.log(`SMS sent to ${params.to} (SID: ${message.sid})`);
     return true;
   } catch (error) {
     console.error("Error sending SMS:", error);
