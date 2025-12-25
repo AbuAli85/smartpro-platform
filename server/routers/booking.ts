@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import * as db from "../db";
 import { notifyOwner } from "../_core/notification";
+import { sendBookingConfirmationEmail, sendBookingReminderSMS } from "../_core/emailSms";
 
 export const bookingRouter = router({
   // Get available time slots for a specific date
@@ -87,6 +88,18 @@ export const bookingRouter = router({
         title: "New Booking Created",
         content: `${user.name} created a booking at ${office.officeName} for ${input.scheduledDate ? new Date(input.scheduledDate).toLocaleDateString() : 'unscheduled date'}`,
       });
+
+      // Send email confirmation to user
+      if (user.email) {
+        await sendBookingConfirmationEmail({
+          userEmail: user.email,
+          userName: user.name || "User",
+          officeName: office.officeName,
+          scheduledDate: input.scheduledDate ? new Date(input.scheduledDate).toLocaleDateString() : "TBD",
+          scheduledTime: input.scheduledTime || "TBD",
+          serviceDescription: input.serviceDescription,
+        });
+      }
 
       return { id: bookingId };
     }),

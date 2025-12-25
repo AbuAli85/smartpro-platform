@@ -4,6 +4,7 @@ import { protectedProcedure, router } from "../_core/trpc";
 import * as db from "../db";
 import { sql } from "drizzle-orm";
 import { notifyOwner } from "../_core/notification";
+import { sendOfficeVerificationEmail } from "../_core/emailSms";
 
 // Admin-only procedure
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -51,6 +52,15 @@ export const adminRouter = router({
         content: `${office?.officeName || 'Office'} has been approved and is now active on the platform.`,
       });
 
+      // Send email to office
+      if (office?.email) {
+        await sendOfficeVerificationEmail({
+          officeEmail: office.email,
+          officeName: office.officeName,
+          status: "approved",
+        });
+      }
+
       return { success: true };
     }),
 
@@ -81,6 +91,16 @@ export const adminRouter = router({
         title: "Office Rejected",
         content: `${office?.officeName || 'Office'} registration was rejected. Reason: ${input.reason}`,
       });
+
+      // Send email to office
+      if (office?.email) {
+        await sendOfficeVerificationEmail({
+          officeEmail: office.email,
+          officeName: office.officeName,
+          status: "rejected",
+          reason: input.reason,
+        });
+      }
 
       return { success: true };
     }),
