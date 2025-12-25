@@ -12,7 +12,9 @@ import MyOffices from "./pages/MyOffices";
 import Templates from "./pages/Templates";
 import TemplateDetail from "./pages/TemplateDetail";
 import BookingsList from "./pages/BookingsList";
+import BookOffice from "./pages/BookOffice";
 import MyDocuments from "./pages/MyDocuments";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function Router() {
   return (
@@ -30,10 +32,14 @@ function Router() {
       <Route path="/templates/:id" component={TemplateDetail} />
       
       {/* Bookings */}
+      <Route path="/offices/:slug/book" component={BookOffice} />
       <Route path="/bookings" component={BookingsList} />
       
       {/* Documents */}
       <Route path="/documents" component={MyDocuments} />
+      
+      {/* Admin */}
+      <Route path="/admin" component={AdminDashboard} />
       
       {/* 404 */}
       <Route path="/404" component={NotFound} />

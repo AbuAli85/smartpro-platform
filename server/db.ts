@@ -1,4 +1,4 @@
-import { eq, and, desc, sql, like, or } from "drizzle-orm";
+import { and, desc, eq, like, or, sql, gte, lte, not } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser,
@@ -11,6 +11,7 @@ import {
   bookings,
   reviews,
   activityLog,
+  officeAvailability,
   type SanadOffice,
   type SanadOfficeStaff,
   type SanadOfficeService,
@@ -490,3 +491,167 @@ export async function logActivity(activity: Partial<typeof activityLog.$inferIns
   }
 }
 
+
+// ============================================================================
+// OFFICE AVAILABILITY
+// ============================================================================
+
+export async function getOfficeAvailability(officeId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(officeAvailability)
+    .where(and(
+      eq(officeAvailability.officeId, officeId),
+      eq(officeAvailability.isActive, true)
+    ))
+    .orderBy(officeAvailability.dayOfWeek);
+}
+
+export async function setOfficeAvailability(data: {
+  officeId: number;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  slotDuration?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(officeAvailability).values(data as any);
+}
+
+// ============================================================================
+// BOOKING HELPERS
+// ============================================================================
+
+export async function getAvailableTimeSlots(officeId: number, date: Date) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const dayOfWeek = date.getDay();
+  
+  // Get office availability for this day
+  const availability = await db
+    .select()
+    .from(officeAvailability)
+    .where(and(
+      eq(officeAvailability.officeId, officeId),
+      eq(officeAvailability.dayOfWeek, dayOfWeek),
+      eq(officeAvailability.isActive, true)
+    ))
+    .limit(1);
+  
+  if (availability.length === 0) return [];
+  
+  const { startTime, endTime, slotDuration } = availability[0];
+  
+  // Get existing bookings for this date
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(date);
+  endOfDay.setHours(23, 59, 59, 999);
+  
+  const existingBookings = await db
+    .select()
+    .from(bookings)
+    .where(and(
+      eq(bookings.officeId, officeId),
+      gte(bookings.scheduledDate, startOfDay),
+      lte(bookings.scheduledDate, endOfDay),
+      not(eq(bookings.status, "cancelled"))
+    ));
+  
+  // Generate time slots
+  const slots = [];
+  const [startHour, startMinute] = startTime.split(":").map(Number);
+  const [endHour, endMinute] = endTime.split(":").map(Number);
+  
+  let currentTime = startHour * 60 + startMinute; // Convert to minutes
+  const endTimeMinutes = endHour * 60 + endMinute;
+  
+  while (currentTime < endTimeMinutes) {
+    const hour = Math.floor(currentTime / 60);
+    const minute = currentTime % 60;
+    const timeStr = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+    
+    // Check if this slot is already booked
+    const isBooked = existingBookings.some(booking => booking.scheduledTime === timeStr);
+    
+    slots.push({
+      time: timeStr,
+      available: !isBooked,
+    });
+    
+    currentTime += slotDuration;
+  }
+  
+  return slots;
+}
+
+export async function updateBookingStatus(bookingId: number, status: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(bookings)
+    .set({ status: status as any, updatedAt: new Date() })
+    .where(eq(bookings.id, bookingId));
+}
+
+// ============================================================================
+// ADMIN FUNCTIONS
+// ============================================================================
+
+export async function getAdminStats() {
+  const db = await getDb();
+  if (!db) return null;
+
+  const [
+    totalOffices,
+    activeOffices,
+    totalUsers,
+    totalDocuments,
+    totalBookings,
+  ] = await Promise.all([
+    db.select({ count: sql<number>`count(*)` }).from(sanadOffices),
+    db.select({ count: sql<number>`count(*)` }).from(sanadOffices).where(eq(sanadOffices.status, "active")),
+    db.select({ count: sql<number>`count(*)` }).from(users),
+    db.select({ count: sql<number>`count(*)` }).from(generatedDocuments),
+    db.select({ count: sql<number>`count(*)` }).from(bookings),
+  ]);
+
+  return {
+    totalOffices: Number(totalOffices[0]?.count || 0),
+    activeOffices: Number(activeOffices[0]?.count || 0),
+    totalUsers: Number(totalUsers[0]?.count || 0),
+    totalDocuments: Number(totalDocuments[0]?.count || 0),
+    totalBookings: Number(totalBookings[0]?.count || 0),
+    newUsersThisMonth: 0, // TODO: Calculate
+    documentsThisMonth: 0, // TODO: Calculate
+    bookingsThisMonth: 0, // TODO: Calculate
+  };
+}
+
+export async function getPendingOffices() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(sanadOffices)
+    .where(eq(sanadOffices.status, "pending"))
+    .orderBy(desc(sanadOffices.createdAt));
+}
+
+export async function updateOfficeStatus(officeId: number, status: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(sanadOffices)
+    .set({ status: status as any, updatedAt: new Date() })
+    .where(eq(sanadOffices.id, officeId));
+}

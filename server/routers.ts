@@ -6,6 +6,7 @@ import { sanadOfficeRouter } from "./routers/sanadOffice";
 import { documentTemplateRouter } from "./routers/documentTemplate";
 import { bookingRouter } from "./routers/booking";
 import { sitemapRouter } from "./routers/sitemap";
+import { adminRouter } from "./routers/admin";
 
 export const appRouter = router({
   system: systemRouter,
@@ -26,6 +27,7 @@ export const appRouter = router({
   documentTemplate: documentTemplateRouter,
   booking: bookingRouter,
   sitemap: sitemapRouter,
+  admin: adminRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -1,9 +1,23 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { protectedProcedure, router } from "../_core/trpc";
+import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import * as db from "../db";
 
 export const bookingRouter = router({
+  // Get available time slots for a specific date
+  getAvailableSlots: publicProcedure
+    .input(
+      z.object({
+        officeId: z.number(),
+        date: z.string(), // ISO date string
+      })
+    )
+    .query(async ({ input }) => {
+      const date = new Date(input.date);
+      const slots = await db.getAvailableTimeSlots(input.officeId, date);
+      return slots;
+    }),
+
   // Create a new booking
   create: protectedProcedure
     .input(
@@ -13,6 +27,9 @@ export const bookingRouter = router({
         serviceDescription: z.string().min(10, "Please describe the service you need"),
         requirements: z.string().optional(),
         preferredDate: z.date().optional(),
+        scheduledDate: z.string().optional(), // ISO date string
+        scheduledTime: z.string().optional(), // e.g., "09:00"
+        duration: z.number().default(60),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -28,6 +45,20 @@ export const bookingRouter = router({
         });
       }
 
+      // If scheduled date/time provided, verify availability
+      if (input.scheduledDate && input.scheduledTime) {
+        const date = new Date(input.scheduledDate);
+        const slots = await db.getAvailableTimeSlots(input.officeId, date);
+        const requestedSlot = slots.find((s) => s.time === input.scheduledTime);
+
+        if (!requestedSlot || !requestedSlot.available) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "This time slot is no longer available",
+          });
+        }
+      }
+
       // Create the booking
       const bookingId = await db.createBooking({
         officeId: input.officeId,
@@ -36,6 +67,9 @@ export const bookingRouter = router({
         serviceDescription: input.serviceDescription,
         requirements: input.requirements,
         preferredDate: input.preferredDate,
+        scheduledDate: input.scheduledDate ? new Date(input.scheduledDate) : undefined,
+        scheduledTime: input.scheduledTime,
+        duration: input.duration,
         status: office.autoAcceptBookings ? "confirmed" : "pending",
       });
 

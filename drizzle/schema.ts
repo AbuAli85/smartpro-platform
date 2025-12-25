@@ -274,6 +274,8 @@ export const bookings = mysqlTable("bookings", {
   // Scheduling
   preferredDate: timestamp("preferredDate"),
   scheduledDate: timestamp("scheduledDate"),
+  scheduledTime: varchar("scheduledTime", { length: 10 }), // e.g., "09:00"
+  duration: int("duration").default(60), // Duration in minutes
   completedDate: timestamp("completedDate"),
   
   // Status
@@ -359,3 +361,35 @@ export const activityLog = mysqlTable("activity_log", {
 
 export type ActivityLog = typeof activityLog.$inferSelect;
 export type InsertActivityLog = typeof activityLog.$inferInsert;
+
+// ============================================================================
+// OFFICE AVAILABILITY
+// ============================================================================
+
+export const officeAvailability = mysqlTable("office_availability", {
+  id: int("id").autoincrement().primaryKey(),
+  officeId: int("officeId").notNull(),
+  
+  // Day of week (0 = Sunday, 6 = Saturday)
+  dayOfWeek: int("dayOfWeek").notNull(), // 0-6
+  
+  // Time slots
+  startTime: varchar("startTime", { length: 10 }).notNull(), // e.g., "09:00"
+  endTime: varchar("endTime", { length: 10 }).notNull(), // e.g., "17:00"
+  
+  // Slot configuration
+  slotDuration: int("slotDuration").default(60).notNull(), // Minutes per slot
+  
+  // Status
+  isActive: boolean("isActive").default(true).notNull(),
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  officeIdx: index("office_idx").on(table.officeId),
+  dayIdx: index("day_idx").on(table.dayOfWeek),
+}));
+
+export type OfficeAvailability = typeof officeAvailability.$inferSelect;
+export type InsertOfficeAvailability = typeof officeAvailability.$inferInsert;
