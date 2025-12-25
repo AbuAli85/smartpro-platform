@@ -321,3 +321,13 @@
 - [x] Generate booking reports CSV
 - [x] Generate document statistics Excel
 - [x] Generate office performance reports
+
+
+## Backend Implementation for Reviews & Cancellations
+- [x] Create reviews table in database schema
+- [x] Add review helper functions to db.ts
+- [x] Implement booking.createReview procedure
+- [x] Implement booking.getOfficeReviews procedure
+- [x] Implement booking.calculateCancellation procedure
+- [x] Implement booking.cancelBooking procedure
+- [x] Test all procedures with vitest (17 tests passing)
