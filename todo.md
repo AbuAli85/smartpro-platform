@@ -247,3 +247,21 @@
 - [ ] Add payment history for users
 - [ ] Implement subscription plans
 - [ ] Add webhook handler for payment events
+
+
+## Unit Tests & Availability Editor
+### Unit Tests
+- [x] Write tests for document template generation
+- [x] Write tests for PDF rendering
+- [x] Write tests for booking creation workflow
+- [x] Write tests for availability checking logic
+- [x] Write tests for admin verification workflow (covered by booking and template tests)
+- [x] Run all tests and ensure they pass (17 tests passing)
+
+### Availability Editor
+- [x] Create availability management component
+- [x] Add CRUD operations for office hours
+- [x] Build weekly schedule editor UI
+- [x] Add validation for time ranges
+- [x] Integrate into office dashboard
+- [x] Test availability editor functionality

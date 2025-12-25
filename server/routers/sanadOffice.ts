@@ -277,4 +277,49 @@ export const sanadOfficeRouter = router({
     .query(async ({ input }) => {
       return await db.getOfficeStatistics(input.officeId);
     }),
+
+  // Availability management
+  getAvailability: publicProcedure
+    .input(z.object({ officeId: z.number() }))
+    .query(async ({ input }) => {
+      return await db.getOfficeAvailability(input.officeId);
+    }),
+
+  createAvailability: protectedProcedure
+    .input(
+      z.object({
+        officeId: z.number(),
+        dayOfWeek: z.number().min(0).max(6),
+        startTime: z.string(),
+        endTime: z.string(),
+        slotDuration: z.number(),
+        isActive: z.boolean(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      await db.createOfficeAvailability(input);
+      return { success: true };
+    }),
+
+  updateAvailability: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        startTime: z.string().optional(),
+        endTime: z.string().optional(),
+        slotDuration: z.number().optional(),
+        isActive: z.boolean().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      await db.updateOfficeAvailability(input.id, input);
+      return { success: true };
+    }),
+
+  deleteAvailability: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      await db.deleteOfficeAvailability(input.id);
+      return { success: true };
+    }),
 });

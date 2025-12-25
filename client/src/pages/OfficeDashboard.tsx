@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Users, TrendingUp, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import AvailabilityEditor from "@/components/AvailabilityEditor";
 
 export default function OfficeDashboard() {
   const [selectedTab, setSelectedTab] = useState("bookings");
@@ -247,13 +248,7 @@ export default function OfficeDashboard() {
                 <CardDescription>Set your working hours and available time slots</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-12">
-                  <Clock className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 mb-4">Availability management coming soon</p>
-                  <p className="text-sm text-gray-400">
-                    Currently using default hours: Sunday-Thursday, 9:00 AM - 5:00 PM
-                  </p>
-                </div>
+                <AvailabilityEditor officeId={myOffice.id} />
               </CardContent>
             </Card>
           </TabsContent>

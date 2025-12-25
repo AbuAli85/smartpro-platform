@@ -692,3 +692,38 @@ export async function getOfficeStatistics(officeId: number) {
     uniqueCustomers,
   };
 }
+
+
+/**
+ * Create office availability schedule
+ */
+export async function createOfficeAvailability(data: Partial<typeof officeAvailability.$inferInsert>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(officeAvailability).values(data as any);
+  return 0;
+}
+
+/**
+ * Update office availability schedule
+ */
+export async function updateOfficeAvailability(id: number, updates: Partial<typeof officeAvailability.$inferInsert>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(officeAvailability)
+    .set(updates as any)
+    .where(eq(officeAvailability.id, id));
+}
+
+/**
+ * Delete office availability schedule
+ */
+export async function deleteOfficeAvailability(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.delete(officeAvailability).where(eq(officeAvailability.id, id));
+}
