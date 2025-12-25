@@ -366,8 +366,12 @@ export async function getUserGeneratedDocuments(userId: number) {
   if (!db) return [];
 
   return await db
-    .select()
+    .select({
+      document: generatedDocuments,
+      template: documentTemplates,
+    })
     .from(generatedDocuments)
+    .leftJoin(documentTemplates, eq(generatedDocuments.templateId, documentTemplates.id))
     .where(eq(generatedDocuments.userId, userId))
     .orderBy(desc(generatedDocuments.createdAt));
 }
@@ -485,3 +489,4 @@ export async function logActivity(activity: Partial<typeof activityLog.$inferIns
     console.error("[Database] Failed to log activity:", error);
   }
 }
+

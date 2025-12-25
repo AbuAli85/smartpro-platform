@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import * as db from "../db";
 import { storagePut } from "../storage";
+import { generatePDF } from "../pdfGenerator";
 
 export const documentTemplateRouter = router({
   // List all document templates
@@ -76,14 +77,18 @@ export const documentTemplateRouter = router({
         });
       }
 
-      // TODO: Generate PDF from template and filled data
-      // For now, create a placeholder
+      // Generate PDF from template and filled data
+      const pdfBuffer = await generatePDF({
+        template,
+        filledData: input.filledData,
+        language: template.language as "en" | "ar",
+      });
+
+      // Upload to S3
       const fileKey = `documents/${user.id}/${Date.now()}-${input.documentName}.pdf`;
-      const placeholderContent = `Generated document: ${input.documentName}`;
-      
       const { url } = await storagePut(
         fileKey,
-        placeholderContent,
+        pdfBuffer,
         "application/pdf"
       );
 

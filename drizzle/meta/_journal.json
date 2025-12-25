@@ -15,6 +15,13 @@
       "when": 1766692247514,
       "tag": "0001_worried_sway",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1766695311685,
+      "tag": "0002_fair_imperial_guard",
+      "breakpoints": true
     }
   ]
 }

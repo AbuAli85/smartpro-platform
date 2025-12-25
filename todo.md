@@ -7,81 +7,144 @@
 - [x] 8 page components (offices, templates, bookings, documents)
 - [x] Multi-language infrastructure (English/Arabic)
 - [x] Professional navigation and routing
+- [x] Multi-step office registration form with validation
+- [x] File uploads for CR, trade license, tax registration
+- [x] S3 integration for document storage
+- [x] SEO optimization (meta tags, JSON-LD, sitemap, canonical URLs)
 
-## Phase 6: Office Registration Form (Complete)
-- [x] Build multi-step registration form with validation
-- [x] Add file upload for CR document
-- [x] Add file upload for trade license
-- [x] Add file upload for tax registration
-- [x] Implement form validation with Zod
-- [x] Integrate with S3 for document storage
-- [x] Connect to verification workflow
-- [x] Add success/error handling
+## FEATURE 1: Document Template Library with PDF Generation
 
-## Phase 7: Document Template Library (Not Started)
-- [ ] Create template data structure with 20+ real templates
-- [ ] Build template listing page with categories
-- [ ] Implement template detail view
-- [ ] Create dynamic form builder for template fields
-- [ ] Build PDF generation engine
-- [ ] Integrate with S3 for PDF storage
-- [ ] Add template preview functionality
-- [ ] Implement document generation workflow
+### Backend Implementation
+- [ ] Extend document_templates table with field definitions (JSON schema)
+- [ ] Add template categories (employment, noc, business, legal, immigration)
+- [ ] Create template field types (text, number, date, dropdown, checkbox, signature)
+- [ ] Install PDF generation library (jsPDF or pdfkit)
+- [ ] Build PDF template renderer
+- [ ] Add tRPC procedures for template CRUD
+- [ ] Add tRPC procedure for document generation
+- [ ] Store generated PDFs in S3
 
-## Phase 8: Admin Dashboard (Not Started)
-- [ ] Create admin layout with sidebar navigation
-- [ ] Build dashboard overview with key metrics
-- [ ] Implement office verification workflow
-- [ ] Create office verification queue
-- [ ] Add approve/reject functionality
-- [ ] Build platform analytics page
-- [ ] Create user management interface
-- [ ] Add activity monitoring and logs
-- [ ] Implement compliance reporting tools
+### Frontend Implementation
+- [ ] Create template browser page with category filters
+- [ ] Build template card component with preview
+- [ ] Create template detail page
+- [ ] Build dynamic form generator component
+- [ ] Add form field components (text, date, dropdown, etc.)
+- [ ] Implement form validation
+- [ ] Add PDF preview modal
+- [ ] Create download PDF functionality
+- [ ] Build user's generated documents page
+
+### Real Templates to Add (15 templates)
+- [ ] Employment Contract (English)
+- [ ] Employment Contract (Arabic)
+- [ ] No Objection Certificate - General
+- [ ] NOC for Visa Transfer
+- [ ] NOC for Bank Account Opening
+- [ ] Business License Application
+- [ ] Commercial Registration Form
+- [ ] Tenancy Contract
+- [ ] Power of Attorney
+- [ ] Partnership Agreement
+- [ ] Salary Certificate
+- [ ] Experience Certificate
+- [ ] Work Permit Application
+- [ ] Tax Registration Form
+- [ ] Company Board Resolution
+
+## FEATURE 2: Booking Workflow with Calendar
+
+### Backend Implementation
+- [ ] Extend bookings table with time_slot, duration, status fields
+- [ ] Create office_availability table (office_id, day_of_week, start_time, end_time)
+- [ ] Add booking status enum (pending, confirmed, in_progress, completed, cancelled)
+- [ ] Build availability checking logic
+- [ ] Create booking conflict detection
+- [ ] Add tRPC procedures for availability queries
+- [ ] Add tRPC procedures for booking management
+- [ ] Implement booking notifications
+
+### Frontend Implementation
+- [ ] Create service selection page
+- [ ] Build calendar component with react-big-calendar or similar
+- [ ] Display available time slots
+- [ ] Create booking form with service details
+- [ ] Add date and time picker
+- [ ] Build booking confirmation page
+- [ ] Create user's bookings dashboard
+- [ ] Build office's booking management page
+- [ ] Add booking status badges
+- [ ] Implement cancel/reschedule functionality
+
+### Notification System
+- [ ] Set up email notification service
+- [ ] Create booking confirmation email template
+- [ ] Create booking reminder email template
+- [ ] Add in-app notification component
+- [ ] Build notification center in navigation
+- [ ] Store notifications in database
+
+## FEATURE 3: Admin Dashboard (MOCIP Oversight)
+
+### Backend Implementation
+- [ ] Add admin role to user table
+- [ ] Create admin authorization middleware
+- [ ] Add office verification status (pending, verified, rejected)
+- [ ] Build analytics aggregation queries
+- [ ] Create admin activity log
+- [ ] Add tRPC admin procedures (protected)
+- [ ] Build office verification workflow
+- [ ] Create compliance monitoring queries
+
+### Frontend Implementation
+- [ ] Create admin dashboard layout with sidebar
+- [ ] Build dashboard overview page with key metrics
+- [ ] Create office verification queue page
+- [ ] Build office review page with approve/reject
+- [ ] Add analytics dashboard with charts (Chart.js or Recharts)
+- [ ] Create user management page
+- [ ] Build compliance monitoring page
+- [ ] Add activity log viewer
+- [ ] Create reports and exports page
+
+### Analytics & Metrics
+- [ ] Total offices by region and status
+- [ ] Total bookings and revenue trends
+- [ ] Most popular services
+- [ ] User growth metrics
+- [ ] Office performance ratings
+- [ ] Document generation statistics
+- [ ] Compliance status overview
+
+## Testing & Quality Assurance
+- [ ] Write unit tests for template generation
+- [ ] Write unit tests for PDF generation
+- [ ] Write unit tests for booking workflow
+- [ ] Write unit tests for admin operations
+- [ ] Test all templates with sample data
+- [ ] Test booking calendar with edge cases
+- [ ] Test admin verification workflow
+- [ ] Cross-browser testing
+- [ ] Mobile responsiveness testing
 
 ## Future Enhancements
-- [ ] Complete RTL layout implementation
-- [ ] Add language switcher to navigation
-- [ ] Implement booking workflow with payments
-- [ ] Add email notifications
-- [ ] Build mobile app version
+- [ ] Payment integration (Stripe or local gateway)
+- [ ] SMS notifications via Twilio
+- [ ] Complete RTL layout for Arabic
+- [ ] Mobile app version
+- [ ] API integration with MOCIP, MOL, ROP
+- [ ] Expand to 50+ document templates
+- [ ] Add e-signature functionality
+- [ ] Build gig economy platform for freelance services
 
-## SEO Improvements
-- [x] Add meta keywords to homepage
-- [x] Optimize title length (30-60 characters)
-- [x] Add meta description (50-160 characters)
-- [x] Add Open Graph tags for social sharing
 
-## Advanced SEO Features
-- [x] Add JSON-LD structured data for Organization schema
-- [x] Add JSON-LD structured data for LocalBusiness schema
-- [x] Create XML sitemap generator
-- [x] Generate static sitemap.xml
-- [x] Add canonical URLs to all pages
-- [ ] Test structured data with Google Rich Results Test
-
-## Document Template Library
-- [ ] Create 20-50 real business document templates
-- [ ] Build dynamic form builder for template fields
-- [ ] Implement PDF generation engine
-- [ ] Add template categories and search
-- [ ] Create template preview functionality
-- [ ] Build document generation workflow
-
-## Booking Workflow
-- [ ] Implement calendar integration
-- [ ] Build service selection interface
-- [ ] Create time slot booking system
-- [ ] Integrate payment processing
-- [ ] Add automated email notifications
-- [ ] Add SMS notifications
-- [ ] Build booking management dashboard
-
-## Admin Dashboard
-- [ ] Create admin authentication and authorization
-- [ ] Build office verification workflow
-- [ ] Implement platform analytics dashboard
-- [ ] Add user management tools
-- [ ] Create compliance monitoring system
-- [ ] Build activity log viewer
-- [ ] Add reporting tools
+## Progress Update - Document Templates
+- [x] Extended document_templates table with enhanced field definitions
+- [x] Installed jsPDF library for PDF generation
+- [x] Created PDF generation utility with specialized templates
+- [x] Seeded 14 real business document templates
+- [x] Updated tRPC router with PDF generation
+- [x] Build template browser frontend page
+- [x] Create dynamic form generator component
+- [x] Build document generation UI
+- [x] Create user's generated documents page (using MyDocuments)

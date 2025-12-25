@@ -9,8 +9,8 @@ import OfficesList from "./pages/OfficesList";
 import OfficeProfile from "./pages/OfficeProfile";
 import CreateOffice from "./pages/CreateOffice";
 import MyOffices from "./pages/MyOffices";
-import TemplatesList from "./pages/TemplatesList";
-import TemplateView from "./pages/TemplateView";
+import Templates from "./pages/Templates";
+import TemplateDetail from "./pages/TemplateDetail";
 import BookingsList from "./pages/BookingsList";
 import MyDocuments from "./pages/MyDocuments";
 
@@ -26,8 +26,8 @@ function Router() {
       <Route path="/my-offices" component={MyOffices} />
       
       {/* Document Templates */}
-      <Route path="/templates" component={TemplatesList} />
-      <Route path="/templates/:id" component={TemplateView} />
+      <Route path="/templates" component={Templates} />
+      <Route path="/templates/:id" component={TemplateDetail} />
       
       {/* Bookings */}
       <Route path="/bookings" component={BookingsList} />

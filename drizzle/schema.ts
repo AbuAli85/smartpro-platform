@@ -185,7 +185,19 @@ export const documentTemplates = mysqlTable("document_templates", {
   
   // Template content
   templateContent: text("templateContent").notNull(), // HTML or JSON template
-  variables: json("variables").$type<Array<{name: string; label: string; type: string; required: boolean}>>().notNull(),
+  variables: json("variables").$type<Array<{
+    name: string;
+    label: string;
+    labelAr?: string;
+    type: 'text' | 'number' | 'date' | 'email' | 'phone' | 'textarea' | 'dropdown' | 'checkbox' | 'radio';
+    required: boolean;
+    placeholder?: string;
+    placeholderAr?: string;
+    options?: string[]; // For dropdown/radio
+    validation?: string; // Regex pattern
+    defaultValue?: string;
+  }>>().notNull(),
+  tags: json("tags").$type<string[]>(), // For search and filtering
   
   // Metadata
   language: varchar("language", { length: 10 }).default("en").notNull(),
