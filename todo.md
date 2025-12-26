@@ -1286,3 +1286,73 @@
 - [ ] Generate PDF report with formatted layout
 - [ ] Add export button to Chat Analytics page
 - [ ] Write unit tests for export generation
+
+
+## Final Chat System Completion
+
+### Frontend Translation UI
+- [x] Add translate button to each message bubble in ChatInbox
+- [x] Create language toggle in message composer (auto-translate ON/OFF)
+- [x] Implement translation state management per message
+- [x] Show original and translated text with divider
+- [x] Add Languages icon to translation UI
+- [x] Handle translation loading states (disabled button during translation)
+- [x] Add error handling for failed translations (toast notification)
+- [x] Store translated text in message state
+- [ ] Write unit tests for translation UI
+
+### Chat Export & Reporting
+- [ ] Create ExportDialog component with filters
+- [ ] Add date range picker for export
+- [ ] Add staff member filter dropdown
+- [ ] Add tags filter multi-select
+- [ ] Add resolution status filter
+- [ ] Build CSV generation function for conversations
+- [ ] Build PDF generation function with formatted layout
+- [ ] Add export button to Chat Analytics page
+- [ ] Handle large dataset exports with pagination
+- [ ] Show export progress indicator
+- [ ] Write unit tests for export generation
+
+### Auto-scheduling Integration
+- [ ] Create inactivity detection function in db.ts
+- [ ] Check last message timestamp for each conversation
+- [ ] Automatically schedule 24h follow-up when inactive
+- [ ] Automatically schedule 48h follow-up when still inactive
+- [ ] Integrate with existing follow-up system
+- [ ] Add manual override to skip auto-scheduling
+- [ ] Show scheduled follow-up indicator in conversation list
+- [ ] Add cancel scheduled follow-up button
+- [ ] Send notification when follow-up is auto-scheduled
+- [ ] Write unit tests for auto-scheduling logic
+
+
+## Chat Export & Reporting Feature ✅
+### Backend Implementation
+- [x] Add tags field to chat_conversations table (JSON field)
+- [x] Create getConversationsForExport function in db.ts
+- [x] Create export router with CSV and Excel export procedures
+- [x] Implement filtering by date range, staff member, tags, and status
+- [x] Generate CSV format with conversation metadata
+- [x] Generate Excel format with base64 encoding
+- [x] Integrate export router into main appRouter
+
+### Frontend Implementation
+- [x] Create ExportDialog component with filter options
+- [x] Add date range picker for custom date filtering
+- [x] Add staff member dropdown filter
+- [x] Add status filter (active/closed/archived)
+- [x] Add format selection (CSV/Excel)
+- [x] Implement file download functionality
+- [x] Add export button to ChatInbox page header
+- [x] Integrate ExportDialog with office staff data
+
+### Export Features
+- [x] Conversation ID, customer name, customer email
+- [x] Conversation status and tags
+- [x] Assigned staff member name
+- [x] Created date and last message timestamp
+- [x] Message count per conversation
+- [x] Resolution time calculation (for closed conversations)
+- [x] Customizable filters for compliance reporting
+- [x] Both CSV and Excel format support

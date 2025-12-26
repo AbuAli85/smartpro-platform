@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageCircle, Send, Search, Archive, CheckCheck, MessageSquareText, Paperclip, Download, FileIcon, UserPlus, Image as ImageIcon, Clock } from "lucide-react";
+import { MessageCircle, Send, Search, Archive, CheckCheck, MessageSquareText, Paperclip, Download, FileIcon, UserPlus, Image as ImageIcon, Clock, Languages } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -25,6 +25,7 @@ import { AvailabilityToggle } from "@/components/AvailabilityToggle";
 import { RatingModal } from "@/components/RatingModal";
 import { TransferDialog } from "@/components/TransferDialog";
 import { TransferHistory } from "@/components/TransferHistory";
+import { ExportDialog } from "@/components/ExportDialog";
 
 interface Message {
   id: number;
@@ -33,6 +34,8 @@ interface Message {
   message: string;
   createdAt: Date;
   isRead: boolean;
+  translatedText?: string;
+  detectedLanguage?: string;
 }
 
 interface Conversation {
@@ -143,10 +146,21 @@ export default function ChatInbox() {
   const [ratingConversationId, setRatingConversationId] = useState<number | null>(null);
   const [ratingStaffId, setRatingStaffId] = useState<number | undefined>();
   const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
-  const [isTransferHistoryOpen, setIsTransferHistoryOpen] = useState(false);
+    const [showTransferHistory, setShowTransferHistory] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+  const [translatingMessageId, setTranslatingMessageId] = useState<number | null>(null);
+  const [autoTranslate, setAutoTranslate] = useState(false);
+  
+  const translateMutation = trpc.chat.translateMessage.useMutation();
 
   // Get user's offices
   const { data: userOffices } = trpc.officeOwner.getMyOffices.useQuery();
+  
+  // Get office staff for export
+  const { data: officeStaff } = trpc.chatAssignment.getOfficeStaff.useQuery(
+    { officeId: userOffices?.[0]?.id! },
+    { enabled: !!userOffices?.[0]?.id }
+  );
   
   // Get user's conversations (for office owners)
   const { data: conversations, refetch: refetchConversations } = trpc.chat.getConversations.useQuery(
@@ -398,7 +412,16 @@ export default function ChatInbox() {
             <h1 className="text-3xl font-bold">Chat Inbox</h1>
             <p className="text-muted-foreground">Manage conversations with customers</p>
           </div>
-          <AvailabilityToggle />
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsExportDialogOpen(true)}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Export Conversations
+            </Button>
+            <AvailabilityToggle />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -499,7 +522,7 @@ export default function ChatInbox() {
                       <Button 
                         variant="ghost" 
                         size="icon"
-                        onClick={() => setIsTransferHistoryOpen(true)}
+                        onClick={() => setShowTransferHistory(true)}
                         title="Transfer history"
                       >
                         <Clock className="h-5 w-5" />
@@ -595,7 +618,18 @@ export default function ChatInbox() {
                                   <Download className="h-3 w-3" />
                                 </div>
                               ) : (
-                                <p className="text-sm whitespace-pre-wrap break-words">{msg.message}</p>
+                                <div>
+                                  <p className="text-sm whitespace-pre-wrap break-words">{msg.message}</p>
+                                  {msg.translatedText && (
+                                    <div className="mt-2 pt-2 border-t border-border/50">
+                                      <div className="flex items-center gap-1 mb-1">
+                                        <Languages className="h-3 w-3 opacity-70" />
+                                        <span className="text-xs opacity-70">Translation:</span>
+                                      </div>
+                                      <p className="text-sm whitespace-pre-wrap break-words opacity-90">{msg.translatedText}</p>
+                                    </div>
+                                  )}
+                                </div>
                               )}
                               <div className="flex items-center gap-1 mt-1">
                                 <p className="text-xs opacity-70">
@@ -606,6 +640,35 @@ export default function ChatInbox() {
                                 </p>
                                 {msg.senderType === "office" && msg.isRead && (
                                   <CheckCheck className="h-3 w-3 opacity-70" />
+                                )}
+                                {(msg as any).messageType !== "file" && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-5 px-1 ml-auto"
+                                    onClick={async () => {
+                                      setTranslatingMessageId(msg.id);
+                                      try {
+                                        const targetLang = msg.detectedLanguage === "ar" ? "en" : "ar";
+                                        const result = await translateMutation.mutateAsync({
+                                          text: msg.message,
+                                          targetLanguage: targetLang,
+                                        });
+                                        setMessages(prev => prev.map(m => 
+                                          m.id === msg.id 
+                                            ? { ...m, translatedText: result.translatedText, detectedLanguage: result.detectedLanguage }
+                                            : m
+                                        ));
+                                      } catch (error) {
+                                        toast.error("Translation failed");
+                                      } finally {
+                                        setTranslatingMessageId(null);
+                                      }
+                                    }}
+                                    disabled={translatingMessageId === msg.id}
+                                  >
+                                    <Languages className="h-3 w-3" />
+                                  </Button>
                                 )}
                               </div>
                             </div>
@@ -656,6 +719,15 @@ export default function ChatInbox() {
                     )}
                     
                     <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setAutoTranslate(!autoTranslate)}
+                        title={autoTranslate ? "Auto-translate: ON" : "Auto-translate: OFF"}
+                        className={autoTranslate ? "bg-primary/10" : ""}
+                      >
+                        <Languages className="h-4 w-4" />
+                      </Button>
                       <Button
                         variant="outline"
                         size="icon"
@@ -767,8 +839,18 @@ export default function ChatInbox() {
       {selectedConversation && (
         <TransferHistory
           conversationId={selectedConversation.conversation.id}
-          isOpen={isTransferHistoryOpen}
-          onClose={() => setIsTransferHistoryOpen(false)}
+          isOpen={showTransferHistory}
+          onClose={() => setShowTransferHistory(false)}
+        />
+      )}
+      
+      {/* Export Dialog */}
+      {userOffices?.[0] && officeStaff && (
+        <ExportDialog
+          open={isExportDialogOpen}
+          onOpenChange={setIsExportDialogOpen}
+          officeId={userOffices[0].id}
+          staffMembers={officeStaff.map((s: any) => ({ userId: s.userId, name: s.name }))}
         />
       )}
     </div>

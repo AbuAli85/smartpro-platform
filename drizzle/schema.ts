@@ -585,6 +585,9 @@ export const chatConversations = mysqlTable("chat_conversations", {
   // Status
   status: mysqlEnum("status", ["active", "closed", "archived"]).default("active").notNull(),
   
+  // Tags for categorization
+  tags: json("tags").$type<string[]>(),
+  
   // Last message info for sorting
   lastMessageAt: timestamp("lastMessageAt").defaultNow().notNull(),
   lastMessagePreview: varchar("lastMessagePreview", { length: 255 }),

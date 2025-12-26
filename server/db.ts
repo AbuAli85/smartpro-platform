@@ -3199,3 +3199,68 @@ export async function sendFileMessage(data: {
   
   return message;
 }
+
+// Chat Export
+export async function getConversationsForExport(filters: {
+  officeId: number;
+  startDate?: string;
+  endDate?: string;
+  staffUserId?: number;
+  tags?: string[];
+  status?: "active" | "closed" | "archived";
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { chatConversations, chatAssignments, chatMessages } = await import("../drizzle/schema");
+
+  // Build base query
+  let query = db
+    .select({
+      id: chatConversations.id,
+      status: chatConversations.status,
+      tags: chatConversations.tags,
+      createdAt: chatConversations.createdAt,
+      lastMessageAt: chatConversations.lastMessageAt,
+      customerName: users.name,
+      customerEmail: users.email,
+      assignedStaffName: sql<string>`(SELECT name FROM user WHERE id = ${chatAssignments.assignedToUserId})`,
+      messageCount: sql<number>`(SELECT COUNT(*) FROM chat_messages WHERE conversation_id = ${chatConversations.id})`,
+      resolutionTimeHours: sql<number>`CASE WHEN ${chatConversations.status} = 'closed' THEN TIMESTAMPDIFF(HOUR, ${chatConversations.createdAt}, ${chatConversations.lastMessageAt}) ELSE NULL END`,
+    })
+    .from(chatConversations)
+    .leftJoin(users, eq(chatConversations.userId, users.id))
+    .leftJoin(chatAssignments, eq(chatConversations.id, chatAssignments.conversationId));
+
+  // Apply filters
+  const conditions: any[] = [eq(chatConversations.officeId, filters.officeId)];
+
+  if (filters.startDate) {
+    conditions.push(gte(chatConversations.createdAt, new Date(filters.startDate)));
+  }
+
+  if (filters.endDate) {
+    conditions.push(lte(chatConversations.createdAt, new Date(filters.endDate)));
+  }
+
+  if (filters.staffUserId) {
+    conditions.push(eq(chatAssignments.assignedToUserId, filters.staffUserId));
+  }
+
+  if (filters.status) {
+    conditions.push(eq(chatConversations.status, filters.status));
+  }
+
+  const results = await query.where(and(...conditions));
+
+  // Filter by tags if provided (since tags is a JSON field)
+  if (filters.tags && filters.tags.length > 0) {
+    return results.filter((conv: any) => {
+      if (!conv.tags) return false;
+      const convTags = typeof conv.tags === 'string' ? JSON.parse(conv.tags) : conv.tags;
+      return filters.tags!.some(tag => convTags.includes(tag));
+    });
+  }
+
+  return results;
+}
