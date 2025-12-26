@@ -44,6 +44,21 @@ export const appRouter = router({
         await db.updateUserLanguagePreference(user.id, input.language);
         return { success: true, language: input.language };
       }),
+    updateNotificationPreferences: protectedProcedure
+      .input(z.object({
+        preferences: z.object({
+          email: z.boolean(),
+          sms: z.boolean(),
+          confirmations: z.boolean(),
+          reminders: z.boolean(),
+          marketing: z.boolean(),
+        }),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const user = ctx.user!;
+        await db.updateUserNotificationPreferences(user.id, input.preferences);
+        return { success: true };
+      }),
     updateProfile: protectedProcedure
       .input(
         z.object({

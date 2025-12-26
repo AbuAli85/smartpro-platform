@@ -31,6 +31,7 @@ import StaffManagement from "./pages/StaffManagement";
 import StaffPerformance from "./pages/StaffPerformance";
 import FollowUpSettings from "./pages/FollowUpSettings";
 import ContentTranslation from "./pages/ContentTranslation";
+import NotificationPreferences from "./pages/NotificationPreferences";
 import { useNotifications } from "./hooks/useNotifications";
 
 function Router() {
@@ -64,6 +65,7 @@ function Router() {
       
       {/* Profile */}
       <Route path="/profile" component={Profile} />
+      <Route path="/notifications" component={NotificationPreferences} />
       
       {/* Loyalty */}
       <Route path="/loyalty" component={LoyaltyDashboard} />

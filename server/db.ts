@@ -3284,3 +3284,35 @@ export async function updateUserLanguagePreference(userId: number, language: str
     throw error;
   }
 }
+
+
+// ============================================================================
+// NOTIFICATION PREFERENCES
+// ============================================================================
+
+export async function updateUserNotificationPreferences(
+  userId: number,
+  preferences: {
+    email: boolean;
+    sms: boolean;
+    confirmations: boolean;
+    reminders: boolean;
+    marketing: boolean;
+  }
+) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update notification preferences: database not available");
+    return;
+  }
+
+  try {
+    await db
+      .update(users)
+      .set({ notificationPreferences: preferences })
+      .where(eq(users.id, userId));
+  } catch (error) {
+    console.error("[Database] Failed to update notification preferences:", error);
+    throw error;
+  }
+}

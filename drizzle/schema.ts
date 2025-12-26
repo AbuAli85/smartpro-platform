@@ -19,6 +19,13 @@ export const users = mysqlTable("users", {
   role: mysqlEnum("role", ["user", "admin", "sanad_owner", "sanad_staff", "sme_owner", "gig_worker", "government_official"]).default("user").notNull(),
   avatarUrl: text("avatarUrl"),
   preferredLanguage: varchar("preferredLanguage", { length: 10 }).default("en"),
+  notificationPreferences: json("notificationPreferences").$type<{
+    email: boolean;
+    sms: boolean;
+    confirmations: boolean;
+    reminders: boolean;
+    marketing: boolean;
+  }>(),
   referralCode: varchar("referralCode", { length: 20 }).unique(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

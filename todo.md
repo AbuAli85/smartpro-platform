@@ -1630,3 +1630,35 @@
 - [ ] Add navigation link to preferences page
 - [ ] Test notification preferences functionality
 - [ ] Update notification helpers to respect user preferences
+
+
+## Notification Preferences & Translation Mutations (Phase 8)
+### Phase 1: Notification Preferences Page
+- [ ] Add notificationPreferences JSON field to user schema
+- [ ] Create NotificationPreferences page component
+- [ ] Add email notifications toggle
+- [ ] Add SMS notifications toggle
+- [ ] Add notification type preferences (confirmations, reminders, marketing)
+- [ ] Create tRPC mutation for updating notification preferences
+- [ ] Add navigation link to preferences page in sidebar
+- [ ] Test notification preferences functionality
+- [ ] Update notification helpers to respect user preferences
+
+### Phase 2: Translation Management Mutations
+- [ ] Create updateOfficeTranslation tRPC mutation
+- [ ] Create updateTemplateTranslation tRPC mutation
+- [ ] Add database update functions for office translations
+- [ ] Add database update functions for template translations
+- [ ] Connect ContentTranslation page to real mutations
+- [ ] Add error handling for translation updates
+- [ ] Test translation management with real data
+
+### Phase 3: End-to-End Notification Testing
+- [ ] Create test user with English preference
+- [ ] Create test user with Arabic preference
+- [ ] Test booking confirmation email in English
+- [ ] Test booking confirmation email in Arabic
+- [ ] Test status update SMS in English
+- [ ] Test status update SMS in Arabic
+- [ ] Verify RTL formatting in Arabic emails
+- [ ] Document any issues found
