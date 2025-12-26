@@ -24,6 +24,7 @@ import { chatRatingsRouter } from "./routers/chatRatings";
 import { chatTransferRouter } from "./routers/chatTransfer";
 import { followUpRouter } from "./routers/followUp";
 import { exportRouter } from "./routers/export";
+import { bulkTranslationRouter } from "./routers/bulkTranslation";
 
 export const appRouter = router({
   system: systemRouter,
@@ -106,6 +107,7 @@ export const appRouter = router({
   chatTransfer: chatTransferRouter,
   followUp: followUpRouter,
   export: exportRouter,
+  bulkTranslation: bulkTranslationRouter,
 });
 
 export type AppRouter = typeof appRouter;

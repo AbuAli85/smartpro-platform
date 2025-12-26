@@ -9,6 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Loader2, Save, Languages } from "lucide-react";
+import BulkImport from "@/components/BulkImport";
+import TranslationQualityBadge from "@/components/TranslationQualityBadge";
 
 export default function ContentTranslation() {
   const { t } = useLanguage();
@@ -117,6 +119,9 @@ export default function ContentTranslation() {
         </TabsList>
 
         <TabsContent value="offices" className="space-y-6">
+          {/* Bulk Import */}
+          <BulkImport type="offices" data={offices} />
+          
           <Card>
             <CardHeader>
               <CardTitle>{t("admin.manageOfficeTranslations")}</CardTitle>
@@ -134,24 +139,48 @@ export default function ContentTranslation() {
                     <span>{t("common.loading")}</span>
                   </div>
                 ) : (
-                  <select
-                    id="office-select"
-                    className="w-full rounded-md border border-input bg-background px-3 py-2"
-                    value={selectedOfficeId || ""}
-                    onChange={(e) => handleOfficeSelect(Number(e.target.value))}
-                  >
-                    <option value="">{t("admin.selectOffice")}</option>
-                    {offices.map((office: any) => (
-                      <option key={office.id} value={office.id}>
-                        {office.officeName}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="space-y-3">
+                    <select
+                      id="office-select"
+                      className="w-full rounded-md border border-input bg-background px-3 py-2"
+                      value={selectedOfficeId || ""}
+                      onChange={(e) => handleOfficeSelect(Number(e.target.value))}
+                    >
+                      <option value="">{t("admin.selectOffice")}</option>
+                      {offices.map((office: any) => (
+                        <option key={office.id} value={office.id}>
+                          {office.officeName}
+                        </option>
+                      ))}
+                    </select>
+                    
+                    {/* Translation Quality Overview */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <div className="text-sm text-muted-foreground">
+                        {t("admin.complete")}: {offices.filter((o: any) => o.officeNameAr && o.descriptionAr).length}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {t("admin.partial")}: {offices.filter((o: any) => (o.officeNameAr || o.descriptionAr) && !(o.officeNameAr && o.descriptionAr)).length}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {t("admin.missing")}: {offices.filter((o: any) => !o.officeNameAr && !o.descriptionAr).length}
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
 
               {selectedOfficeId && (
                 <>
+                  {/* Translation Quality Badge */}
+                  <div className="flex items-center justify-between">
+                    <Label>{t("admin.completionStatus")}</Label>
+                    <TranslationQualityBadge
+                      nameAr={officeNameAr}
+                      descriptionAr={officeDescriptionAr}
+                    />
+                  </div>
+
                   {/* Arabic Name */}
                   <div className="space-y-2">
                     <Label htmlFor="office-name-ar">{t("admin.officeNameArabic")}</Label>
@@ -205,6 +234,9 @@ export default function ContentTranslation() {
         </TabsContent>
 
         <TabsContent value="templates" className="space-y-6">
+          {/* Bulk Import */}
+          <BulkImport type="templates" data={templates} />
+          
           <Card>
             <CardHeader>
               <CardTitle>{t("admin.manageTemplateTranslations")}</CardTitle>
@@ -222,24 +254,48 @@ export default function ContentTranslation() {
                     <span>{t("common.loading")}</span>
                   </div>
                 ) : (
-                  <select
-                    id="template-select"
-                    className="w-full rounded-md border border-input bg-background px-3 py-2"
-                    value={selectedTemplateId || ""}
-                    onChange={(e) => handleTemplateSelect(Number(e.target.value))}
-                  >
-                    <option value="">{t("admin.selectTemplate")}</option>
-                    {templates.map((template: any) => (
-                      <option key={template.id} value={template.id}>
-                        {template.templateName}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="space-y-3">
+                    <select
+                      id="template-select"
+                      className="w-full rounded-md border border-input bg-background px-3 py-2"
+                      value={selectedTemplateId || ""}
+                      onChange={(e) => handleTemplateSelect(Number(e.target.value))}
+                    >
+                      <option value="">{t("admin.selectTemplate")}</option>
+                      {templates.map((template: any) => (
+                        <option key={template.id} value={template.id}>
+                          {template.templateName}
+                        </option>
+                      ))}
+                    </select>
+                    
+                    {/* Translation Quality Overview */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <div className="text-sm text-muted-foreground">
+                        {t("admin.complete")}: {templates.filter((tmpl: any) => tmpl.templateNameAr && tmpl.descriptionAr).length}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {t("admin.partial")}: {templates.filter((tmpl: any) => (tmpl.templateNameAr || tmpl.descriptionAr) && !(tmpl.templateNameAr && tmpl.descriptionAr)).length}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {t("admin.missing")}: {templates.filter((tmpl: any) => !tmpl.templateNameAr && !tmpl.descriptionAr).length}
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
 
               {selectedTemplateId && (
                 <>
+                  {/* Translation Quality Badge */}
+                  <div className="flex items-center justify-between">
+                    <Label>{t("admin.completionStatus")}</Label>
+                    <TranslationQualityBadge
+                      nameAr={templateNameAr}
+                      descriptionAr={templateDescriptionAr}
+                    />
+                  </div>
+
                   {/* Arabic Name */}
                   <div className="space-y-2">
                     <Label htmlFor="template-name-ar">{t("admin.templateNameArabic")}</Label>
