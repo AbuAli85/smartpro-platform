@@ -4,10 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Building2, FileText, Calendar, Shield, Zap, Users } from "lucide-react";
 import { StructuredData, getSmartProOrganizationSchema } from "@/components/StructuredData";
 import { CanonicalURL } from "@/components/CanonicalURL";
-import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Home() {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
 
   return (
     <>
@@ -43,10 +43,10 @@ export default function Home() {
         <div className="container">
           <div className="mx-auto max-w-2xl text-center mb-16">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Everything You Need for Business Services
+              {t("home.title")}
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              A unified platform connecting SMEs with professional Sanad offices
+              {t("home.subtitle")}
             </p>
           </div>
 
@@ -64,7 +64,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Button asChild variant="link" className="p-0">
-                  <Link href="/offices">Explore offices →</Link>
+                  <Link href="/offices">{t("home.exploreOffices")} →</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -82,7 +82,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Button asChild variant="link" className="p-0">
-                  <Link href="/templates">Browse templates →</Link>
+                  <Link href="/templates">{t("home.browseTemplates")} →</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -100,7 +100,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Button asChild variant="link" className="p-0">
-                  <Link href="/offices">Book a service →</Link>
+                  <Link href="/offices">{t("home.bookService")} →</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -124,9 +124,9 @@ export default function Home() {
                 <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                   <Zap className="w-6 h-6 text-primary" />
                 </div>
-                <CardTitle>Fast & Efficient</CardTitle>
+                <CardTitle>{t("home.fast")}</CardTitle>
                 <CardDescription>
-                  Reduce processing time from weeks to days with automated workflows and digital processes
+                  {t("home.fastDesc")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -137,9 +137,9 @@ export default function Home() {
                 <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center mb-4">
                   <Users className="w-6 h-6 text-accent" />
                 </div>
-                <CardTitle>Trusted by SMEs</CardTitle>
+                <CardTitle>{t("home.trusted")}</CardTitle>
                 <CardDescription>
-                  Join thousands of Omani businesses using SmartPro for their business service needs
+                  {t("home.trustedDesc")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -152,17 +152,17 @@ export default function Home() {
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Ready to Transform Your Business Services?
+              {t("home.cta")}
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Join SmartPro today and experience the future of business services in Oman
+              {t("home.ctaDesc")}
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <Button asChild size="lg">
-                <Link href="/offices">Get Started</Link>
+                <Link href="/offices">{t("home.getStarted")}</Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <a href="#features">Learn More</a>
+                <a href="#features">{t("home.learnMore")}</a>
               </Button>
             </div>
           </div>

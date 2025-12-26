@@ -1376,3 +1376,19 @@
 - [ ] Add RTL layout support for Arabic language
 - [ ] Translate form validation messages
 - [ ] Translate error and success toast messages
+
+
+## Bilingual UI Fixes (Arabic/English)
+- [x] Create language context provider for global language state
+- [x] Implement language toggle button in main navigation
+- [x] Add RTL layout support for Arabic language
+- [x] Create translation dictionary for all UI text
+- [x] Fix navigation menu to use consistent translations
+- [x] Translate Home page content
+- [ ] Translate all button labels and form fields across all pages
+- [ ] Translate page titles and headings in remaining pages
+- [ ] Translate footer content
+- [x] Add language persistence in localStorage
+- [x] Test RTL layout with Arabic content
+- [x] Ensure proper text alignment in RTL mode
+- [ ] Fix icon positions in RTL layout

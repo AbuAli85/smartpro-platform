@@ -30,14 +30,14 @@ import { trpc } from "@/lib/trpc";
 import { NotificationBadge } from "@/components/NotificationBadge";
 import { NotificationDropdown } from "./NotificationDropdown";
 import { LanguageToggle } from "./LanguageToggle";
-import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SidebarProps {
   className?: string;
 }
 
 export function Sidebar({ className }: SidebarProps) {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const [location] = useLocation();
   const { user, logout } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -51,21 +51,21 @@ export function Sidebar({ className }: SidebarProps) {
 
   const navigation = [
     { name: t("nav.home"), href: "/", icon: Home },
-    { name: t("nav.offices"), href: "/offices", icon: Building2 },
-    { name: t("nav.documents"), href: "/templates", icon: FileText },
-    { name: t("nav.bookings"), href: "/bookings", icon: Calendar, requiresAuth: true },
+    { name: t("nav.sanadOffices"), href: "/offices", icon: Building2 },
+    { name: t("nav.documentTemplates"), href: "/templates", icon: FileText },
+    { name: t("nav.myBookings"), href: "/bookings", icon: Calendar, requiresAuth: true },
     { name: t("nav.myOffices"), href: "/my-offices", icon: Briefcase, requiresAuth: true },
-    { name: "Owner Dashboard", href: "/owner/dashboard", icon: Shield, requiresAuth: true },
-    { name: "Chat Inbox", href: "/owner/chat", icon: MessageCircle, requiresAuth: true },
-    { name: "Chat Analytics", href: "/owner/chat-analytics", icon: TrendingUp, requiresAuth: true },
-    { name: "Canned Responses", href: "/owner/canned-responses", icon: MessageSquareText, requiresAuth: true },
-    { name: "Staff Management", href: "/owner/staff", icon: Users, requiresAuth: true },
-    { name: "Staff Performance", href: "/owner/staff-performance", icon: Activity, requiresAuth: true },
-    { name: "Follow-up Settings", href: "/owner/follow-up-settings", icon: Clock, requiresAuth: true },
-    { name: t("nav.loyalty"), href: "/loyalty", icon: Award, requiresAuth: true },
-    { name: t("nav.refer"), href: "/refer", icon: Gift, requiresAuth: true },
+    { name: t("nav.ownerDashboard"), href: "/owner/dashboard", icon: Shield, requiresAuth: true },
+    { name: t("nav.chatInbox"), href: "/owner/chat", icon: MessageCircle, requiresAuth: true },
+    { name: t("nav.chatAnalytics"), href: "/owner/chat-analytics", icon: TrendingUp, requiresAuth: true },
+    { name: t("nav.cannedResponses"), href: "/owner/canned-responses", icon: MessageSquareText, requiresAuth: true },
+    { name: t("nav.staffManagement"), href: "/owner/staff", icon: Users, requiresAuth: true },
+    { name: t("nav.staffPerformance"), href: "/owner/staff-performance", icon: Activity, requiresAuth: true },
+    { name: t("nav.followUpSettings"), href: "/owner/follow-up-settings", icon: Clock, requiresAuth: true },
+    { name: t("nav.loyaltyRewards"), href: "/loyalty", icon: Award, requiresAuth: true },
+    { name: t("nav.referFriends"), href: "/refer", icon: Gift, requiresAuth: true },
     { name: t("nav.analytics"), href: "/analytics", icon: BarChart3, requiresAuth: true },
-    { name: t("nav.profile"), href: "/profile", icon: User, requiresAuth: true },
+    { name: t("nav.userProfile"), href: "/profile", icon: User, requiresAuth: true },
   ];
 
   // Add admin link if user is admin
