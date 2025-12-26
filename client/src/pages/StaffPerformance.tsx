@@ -1,5 +1,8 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import {
   Table,
   TableBody,
@@ -12,6 +15,8 @@ import { TrendingUp, Clock, CheckCircle, MessageSquare, Award } from "lucide-rea
 import { trpc } from "@/lib/trpc";
 
 export default function StaffPerformance() {
+  const [dateRange, setDateRange] = useState<7 | 30 | 90>(30);
+  
   // Get user's office
   const { data: userOffices } = trpc.officeOwner.getMyOffices.useQuery();
   const officeId = userOffices?.[0]?.id;
@@ -19,6 +24,12 @@ export default function StaffPerformance() {
   // Get performance metrics
   const { data: metrics, isLoading } = trpc.chatAssignment.getPerformanceMetrics.useQuery(
     { officeId: officeId! },
+    { enabled: !!officeId }
+  );
+
+  // Get performance trends
+  const { data: trends } = trpc.chatAssignment.getPerformanceTrends.useQuery(
+    { officeId: officeId!, days: dateRange },
     { enabled: !!officeId }
   );
 
@@ -75,11 +86,36 @@ export default function StaffPerformance() {
 
   return (
     <div className="container py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">Staff Performance Dashboard</h1>
-        <p className="text-muted-foreground">
-          Track team performance metrics and identify areas for improvement
-        </p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Staff Performance Dashboard</h1>
+          <p className="text-muted-foreground">
+            Track team performance metrics and identify areas for improvement
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant={dateRange === 7 ? "default" : "outline"}
+            size="sm"
+            onClick={() => setDateRange(7)}
+          >
+            7 Days
+          </Button>
+          <Button
+            variant={dateRange === 30 ? "default" : "outline"}
+            size="sm"
+            onClick={() => setDateRange(30)}
+          >
+            30 Days
+          </Button>
+          <Button
+            variant={dateRange === 90 ? "default" : "outline"}
+            size="sm"
+            onClick={() => setDateRange(90)}
+          >
+            90 Days
+          </Button>
+        </div>
       </div>
 
       {/* Team Overview Cards */}
@@ -138,6 +174,94 @@ export default function StaffPerformance() {
                   <p className="text-2xl font-bold">{teamStats.avgResolutionRate}%</p>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Performance Trends Charts */}
+      {trends && trends.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          {/* Response Time Trend */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5" />
+                Response Time Trend
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={trends}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="date" 
+                    tick={{ fontSize: 12 }}
+                    tickFormatter={(value) => {
+                      const date = new Date(value);
+                      return `${date.getMonth() + 1}/${date.getDate()}`;
+                    }}
+                  />
+                  <YAxis 
+                    label={{ value: 'Minutes', angle: -90, position: 'insideLeft' }}
+                    tick={{ fontSize: 12 }}
+                  />
+                  <Tooltip 
+                    labelFormatter={(value) => new Date(value).toLocaleDateString()}
+                    formatter={(value: number) => [`${value} min`, 'Avg Response Time']}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="avgResponseTime" 
+                    stroke="#f59e0b" 
+                    strokeWidth={2}
+                    dot={{ r: 3 }}
+                    activeDot={{ r: 5 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          {/* Resolution Rate Trend */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5" />
+                Resolution Rate Trend
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={trends}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="date" 
+                    tick={{ fontSize: 12 }}
+                    tickFormatter={(value) => {
+                      const date = new Date(value);
+                      return `${date.getMonth() + 1}/${date.getDate()}`;
+                    }}
+                  />
+                  <YAxis 
+                    label={{ value: 'Percentage', angle: -90, position: 'insideLeft' }}
+                    tick={{ fontSize: 12 }}
+                    domain={[0, 100]}
+                  />
+                  <Tooltip 
+                    labelFormatter={(value) => new Date(value).toLocaleDateString()}
+                    formatter={(value: number) => [`${value}%`, 'Resolution Rate']}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="resolutionRate" 
+                    stroke="#8b5cf6" 
+                    strokeWidth={2}
+                    dot={{ r: 3 }}
+                    activeDot={{ r: 5 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </CardContent>
           </Card>
         </div>

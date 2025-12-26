@@ -172,4 +172,14 @@ export const chatAssignmentRouter = router({
     .query(async ({ input }) => {
       return await db.getStaffPerformanceMetrics(input.officeId, input.staffUserId);
     }),
+
+  // Get performance trends over time
+  getPerformanceTrends: protectedProcedure
+    .input(z.object({
+      officeId: z.number(),
+      days: z.number().default(30),
+    }))
+    .query(async ({ input }) => {
+      return await db.getStaffPerformanceTrends(input.officeId, input.days);
+    }),
 });

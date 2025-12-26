@@ -21,6 +21,7 @@ import { formatDistanceToNow } from "date-fns";
 import { requestNotificationPermission, sendChatNotification, canSendNotifications } from "@/lib/notifications";
 import { useLocation } from "wouter";
 import { FileGallery } from "@/components/FileGallery";
+import { AvailabilityToggle } from "@/components/AvailabilityToggle";
 
 interface Message {
   id: number;
@@ -344,9 +345,12 @@ export default function ChatInbox() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold">Chat Inbox</h1>
-          <p className="text-muted-foreground">Manage conversations with customers</p>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Chat Inbox</h1>
+            <p className="text-muted-foreground">Manage conversations with customers</p>
+          </div>
+          <AvailabilityToggle />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -2654,6 +2654,137 @@ export async function getStaffPerformanceMetrics(officeId: number, staffUserId?:
   return metrics;
 }
 
+export async function getStaffPerformanceTrends(officeId: number, days: number = 30) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { officeStaff, chatAssignments, chatMessages, chatConversations, users } = await import("../drizzle/schema");
+  
+  // Calculate start date
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+  
+  // Get staff members
+  const staff = await db
+    .select({
+      userId: officeStaff.userId,
+      userName: users.name,
+    })
+    .from(officeStaff)
+    .leftJoin(users, eq(officeStaff.userId, users.id))
+    .where(and(
+      eq(officeStaff.officeId, officeId),
+      eq(officeStaff.isActive, true)
+    ));
+  
+  // Generate daily data points
+  const trends = [];
+  for (let i = 0; i < days; i++) {
+    const date = new Date();
+    date.setDate(date.getDate() - (days - i - 1));
+    date.setHours(0, 0, 0, 0);
+    
+    const nextDate = new Date(date);
+    nextDate.setDate(nextDate.getDate() + 1);
+    
+    // Calculate metrics for this day
+    let totalResponseTime = 0;
+    let responseCount = 0;
+    let totalConversations = 0;
+    let closedConversations = 0;
+    
+    for (const s of staff) {
+      // Get assignments for this day
+      const assignments = await db
+        .select({
+          conversationId: chatAssignments.conversationId,
+          status: chatConversations.status,
+        })
+        .from(chatAssignments)
+        .leftJoin(chatConversations, eq(chatAssignments.conversationId, chatConversations.id))
+        .where(and(
+          eq(chatAssignments.assignedToUserId, s.userId),
+          sql`${chatAssignments.assignedAt} >= ${date}`,
+          sql`${chatAssignments.assignedAt} < ${nextDate}`
+        ));
+      
+      totalConversations += assignments.length;
+      closedConversations += assignments.filter(a => a.status === "closed").length;
+      
+      // Calculate response times for this day
+      for (const assignment of assignments) {
+        const messages = await db
+          .select({
+            createdAt: chatMessages.createdAt,
+            senderType: chatMessages.senderType,
+          })
+          .from(chatMessages)
+          .where(and(
+            eq(chatMessages.conversationId, assignment.conversationId),
+            sql`${chatMessages.createdAt} >= ${date}`,
+            sql`${chatMessages.createdAt} < ${nextDate}`
+          ))
+          .orderBy(chatMessages.createdAt);
+        
+        // Find pairs of user message followed by office response
+        for (let j = 0; j < messages.length - 1; j++) {
+          if (messages[j].senderType === "user" && messages[j + 1].senderType === "office") {
+            const responseTime = new Date(messages[j + 1].createdAt).getTime() - new Date(messages[j].createdAt).getTime();
+            totalResponseTime += responseTime;
+            responseCount++;
+          }
+        }
+      }
+    }
+    
+    const avgResponseTimeMinutes = responseCount > 0 ? Math.round(totalResponseTime / responseCount / 1000 / 60) : 0;
+    const resolutionRate = totalConversations > 0 ? Math.round((closedConversations / totalConversations) * 100) : 0;
+    
+    trends.push({
+      date: date.toISOString().split('T')[0],
+      avgResponseTime: avgResponseTimeMinutes,
+      resolutionRate,
+      totalConversations,
+    });
+  }
+  
+  return trends;
+}
+
+// Chat Tags
+export async function updateConversationTags(conversationId: number, tags: string[]) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { chatConversations } = await import("../drizzle/schema");
+  
+  // Use raw SQL to update JSON field
+  await db.execute(
+    sql`UPDATE ${chatConversations} SET tags = ${JSON.stringify(tags)} WHERE id = ${conversationId}`
+  );
+  
+  return { conversationId, tags };
+}
+
+export async function getConversationsByTags(officeId: number, tags: string[]) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { chatConversations } = await import("../drizzle/schema");
+  
+  // Get all conversations for the office
+  const conversations = await db
+    .select()
+    .from(chatConversations)
+    .where(eq(chatConversations.officeId, officeId));
+  
+  // Filter conversations that have at least one of the requested tags
+  return conversations.filter((conv: any) => {
+    const convTags = (conv.tags as string[]) || [];
+    return tags.some(tag => convTags.includes(tag));
+  });
+}
+
 // Chat Assignments
 export async function assignConversation(data: {
   conversationId: number;

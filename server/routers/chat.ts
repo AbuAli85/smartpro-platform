@@ -179,4 +179,24 @@ export const chatRouter = router({
       await db.markMessagesAsRead(input.conversationId, readerType);
       return { success: true };
     }),
+
+  // Update conversation tags
+  updateTags: protectedProcedure
+    .input(z.object({
+      conversationId: z.number(),
+      tags: z.array(z.string()),
+    }))
+    .mutation(async ({ input }) => {
+      return await db.updateConversationTags(input.conversationId, input.tags);
+    }),
+
+  // Get conversations by tags
+  getConversationsByTags: protectedProcedure
+    .input(z.object({
+      officeId: z.number(),
+      tags: z.array(z.string()),
+    }))
+    .query(async ({ input }) => {
+      return await db.getConversationsByTags(input.officeId, input.tags);
+    }),
 });
