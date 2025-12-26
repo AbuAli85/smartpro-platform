@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Gift, Copy, Check, Users, TrendingUp, Clock, Mail, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 export default function ReferFriends() {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   
   const { data: referralCode, isLoading: codeLoading } = trpc.referral.getMyReferralCode.useQuery();
@@ -43,7 +45,7 @@ export default function ReferFriends() {
     return (
       <div className="min-h-screen flex flex-col bg-background">
         <div className="container py-8">
-          <Breadcrumb items={[{ label: "Refer Friends" }]} className="mb-6" />
+          <Breadcrumb items={[{ label: t("referral.title") }]} className="mb-6" />
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#003366]"></div>
             <span className="ml-3 text-gray-600">Loading referral information...</span>

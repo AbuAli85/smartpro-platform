@@ -22,6 +22,7 @@ import LoyaltyDashboard from "./pages/LoyaltyDashboard";
 import ReferFriends from "./pages/ReferFriends";
 import Analytics from "./pages/Analytics";
 import AdminAnalytics from "./pages/AdminAnalytics";
+import OfficeOwnerDashboard from "./pages/OfficeOwnerDashboard";
 import { useNotifications } from "./hooks/useNotifications";
 
 function Router() {
@@ -62,6 +63,9 @@ function Router() {
       {/* Analytics */}
       <Route path="/analytics" component={Analytics} />
       <Route path="/admin/analytics" component={AdminAnalytics} />
+      
+      {/* Office Owner */}
+      <Route path="/owner/dashboard" component={OfficeOwnerDashboard} />
       
       {/* 404 */}
       <Route path="/404" component={NotFound} />

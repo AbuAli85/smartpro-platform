@@ -5,8 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Gift, TrendingUp, Award, Calendar } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 export default function LoyaltyDashboard() {
+  const { t } = useTranslation();
   const { data: loyalty, isLoading: loadingLoyalty } = trpc.loyalty.getMyLoyalty.useQuery();
   const { data: transactions, isLoading: loadingTransactions } = trpc.loyalty.getMyTransactions.useQuery({ limit: 50 });
 
@@ -30,9 +32,9 @@ export default function LoyaltyDashboard() {
         <div className="container py-12">
           <div className="flex items-center gap-3 mb-2">
             <Award className="h-8 w-8 text-[#D4AF37]" />
-            <h1 className="text-3xl font-bold">Loyalty Rewards</h1>
+            <h1 className="text-3xl font-bold">{t("loyalty.title")}</h1>
           </div>
-          <p className="text-blue-100">Earn points with every booking and review</p>
+          <p className="text-blue-100">{t("loyalty.subtitle")}</p>
         </div>
       </div>
 
@@ -43,7 +45,7 @@ export default function LoyaltyDashboard() {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Gift className="h-5 w-5 text-[#D4AF37]" />
-                Available Points
+                {t("loyalty.availablePoints")}
               </CardTitle>
             </CardHeader>
             <CardContent>

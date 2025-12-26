@@ -10,8 +10,10 @@ import { Calendar } from "@/components/ui/calendar";
 import { toast } from "sonner";
 import { ArrowLeft, Calendar as CalendarIcon, Clock, CheckCircle2, Gift } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useTranslation } from "react-i18next";
 
 export default function BookOffice() {
+  const { t } = useTranslation();
   const [, params] = useRoute("/offices/:slug/book");
   const [, setLocation] = useLocation();
   const slug = params?.slug || "";
@@ -134,9 +136,9 @@ export default function BookOffice() {
             className="mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Office
+            {t("booking.backToOffice")}
           </Button>
-          <h1 className="text-3xl font-bold text-gray-900">Book Appointment</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{t("booking.title")}</h1>
           <p className="text-gray-600 mt-2">{office.officeName}</p>
         </div>
       </div>
@@ -150,9 +152,9 @@ export default function BookOffice() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CalendarIcon className="h-5 w-5" />
-                  Select Date
+                  {t("booking.selectDate")}
                 </CardTitle>
-                <CardDescription>Choose your preferred appointment date</CardDescription>
+                <CardDescription>{t("booking.selectDateDesc")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <Calendar
@@ -171,10 +173,10 @@ export default function BookOffice() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Clock className="h-5 w-5" />
-                    Select Time Slot
+                    {t("booking.selectTime")}
                   </CardTitle>
                   <CardDescription>
-                    Available slots for {selectedDate.toLocaleDateString()}
+                    {t("booking.availableSlots")} {selectedDate.toLocaleDateString()}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

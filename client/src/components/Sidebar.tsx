@@ -49,6 +49,7 @@ export function Sidebar({ className }: SidebarProps) {
     { name: t("nav.documents"), href: "/templates", icon: FileText },
     { name: t("nav.bookings"), href: "/bookings", icon: Calendar, requiresAuth: true },
     { name: t("nav.myOffices"), href: "/my-offices", icon: Briefcase, requiresAuth: true },
+    { name: "Owner Dashboard", href: "/owner/dashboard", icon: Shield, requiresAuth: true },
     { name: t("nav.loyalty"), href: "/loyalty", icon: Award, requiresAuth: true },
     { name: t("nav.refer"), href: "/refer", icon: Gift, requiresAuth: true },
     { name: t("nav.analytics"), href: "/analytics", icon: BarChart3, requiresAuth: true },

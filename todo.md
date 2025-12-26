@@ -772,7 +772,7 @@
 ## Progressive UI Translation Implementation
 - [x] Translate Home page with useTranslation hook
 - [x] Translate Sanad Offices page (filters, office cards)
-- [ ] Translate BookOffice page (booking form, service selection)
+- [x] Translate BookOffice page (booking form, service selection)
 - [x] Translate navigation menu items
 - [ ] Translate common buttons and labels
 - [ ] Test language switching on translated pages
@@ -801,3 +801,33 @@
 - [ ] Add payment history page
 - [ ] Handle payment webhooks for status updates
 - [ ] Write unit tests for payment flow
+
+## Complete Office Owner Dashboard UI
+- [x] Create OfficeOwnerDashboard page component
+- [x] Add office selection dropdown (for owners with multiple offices)
+- [x] Build booking requests tab with approve/reject actions
+- [ ] Build service management tab (add/edit/delete services)
+- [x] Build performance metrics dashboard with cards
+- [x] Build reviews tab with response interface
+- [x] Add office availability toggle
+- [x] Add route and navigation for office owner dashboard
+- [ ] Write tests for office owner UI
+
+## Complete Stripe Payment Integration
+- [ ] Add Stripe feature using webdev_add_feature
+- [ ] Configure Stripe API keys
+- [ ] Create payment procedures in backend
+- [ ] Integrate Stripe checkout in BookOffice page
+- [ ] Add payment status tracking to bookings
+- [ ] Implement invoice generation function
+- [ ] Send invoice email after successful payment
+- [ ] Add payment webhook endpoint
+- [ ] Handle payment confirmation webhooks
+- [ ] Write tests for payment flow
+
+## Complete Translation of High-Traffic Pages
+- [x] Translate BookOffice page (form, service selection, summary)
+- [x] Translate LoyaltyDashboard page (points, transactions)
+- [x] Translate ReferFriends page (code, stats, sharing)
+- [ ] Test language switching on all translated pages
+- [ ] Verify RTL layout on all translated pages
