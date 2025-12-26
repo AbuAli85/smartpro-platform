@@ -32,6 +32,12 @@ export default function StaffPerformance() {
     { officeId: officeId!, days: dateRange },
     { enabled: !!officeId }
   );
+  
+  // Get satisfaction trends
+  const { data: satisfactionTrends } = trpc.chatRatings.getSatisfactionTrends.useQuery(
+    { days: dateRange },
+    { enabled: !!officeId }
+  );
 
   // Calculate team averages
   const teamStats = metrics
@@ -254,7 +260,7 @@ export default function StaffPerformance() {
                   />
                   <Line 
                     type="monotone" 
-                    dataKey="resolutionRate" 
+                    dataKey="avgResolutionRate" 
                     stroke="#8b5cf6" 
                     strokeWidth={2}
                     dot={{ r: 3 }}
@@ -265,6 +271,55 @@ export default function StaffPerformance() {
             </CardContent>
           </Card>
         </div>
+      )}
+      
+      {/* Satisfaction Trend Chart */}
+      {satisfactionTrends && satisfactionTrends.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Customer Satisfaction Trend
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={satisfactionTrends}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="date" 
+                  tick={{ fontSize: 12 }}
+                  tickFormatter={(value) => {
+                    const date = new Date(value);
+                    return `${date.getMonth() + 1}/${date.getDate()}`;
+                  }}
+                />
+                <YAxis 
+                  label={{ value: 'Rating', angle: -90, position: 'insideLeft' }}
+                  tick={{ fontSize: 12 }}
+                  domain={[0, 5]}
+                />
+                <Tooltip 
+                  labelFormatter={(value) => new Date(value).toLocaleDateString()}
+                  formatter={(value: number) => [`${value.toFixed(2)} stars`, 'Avg Satisfaction']}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="avgRating" 
+                  stroke="#10b981" 
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 5 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+            <div className="mt-4 text-center">
+              <p className="text-sm text-muted-foreground">
+                Average satisfaction score over the past {dateRange} days
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Individual Performance Table */}

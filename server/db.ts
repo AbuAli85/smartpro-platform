@@ -2938,6 +2938,30 @@ export async function getTransferHistory(conversationId: number) {
 }
 
 // Chat Ratings
+export async function getSatisfactionTrends(days: number = 30) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { chatRatings, chatAssignments, officeStaff, users } = await import("../drizzle/schema");
+  
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+  
+  // Get daily satisfaction scores grouped by date
+  const trends = await db
+    .select({
+      date: sql<string>`DATE(${chatRatings.createdAt})`,
+      avgRating: sql<number>`AVG(${chatRatings.rating})`,
+      totalRatings: sql<number>`COUNT(${chatRatings.id})`,
+    })
+    .from(chatRatings)
+    .where(gte(chatRatings.createdAt, startDate))
+    .groupBy(sql`DATE(${chatRatings.createdAt})`)
+    .orderBy(sql`DATE(${chatRatings.createdAt})`);
+  
+  return trends;
+}
+
 export async function createChatRating(data: {
   conversationId: number;
   rating: number;

@@ -38,4 +38,11 @@ export const chatRatingsRouter = router({
     .query(async ({ input }) => {
       return await db.getAverageStaffRating(input.staffUserId);
     }),
+
+  // Get satisfaction trends over time
+  getSatisfactionTrends: protectedProcedure
+    .input(z.object({ days: z.number().default(30) }))
+    .query(async ({ input }) => {
+      return await db.getSatisfactionTrends(input.days);
+    }),
 });

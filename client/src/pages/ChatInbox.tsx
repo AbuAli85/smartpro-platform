@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageCircle, Send, Search, Archive, CheckCheck, MessageSquareText, Paperclip, Download, FileIcon, UserPlus, Image as ImageIcon } from "lucide-react";
+import { MessageCircle, Send, Search, Archive, CheckCheck, MessageSquareText, Paperclip, Download, FileIcon, UserPlus, Image as ImageIcon, Clock } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -24,6 +24,7 @@ import { FileGallery } from "@/components/FileGallery";
 import { AvailabilityToggle } from "@/components/AvailabilityToggle";
 import { RatingModal } from "@/components/RatingModal";
 import { TransferDialog } from "@/components/TransferDialog";
+import { TransferHistory } from "@/components/TransferHistory";
 
 interface Message {
   id: number;
@@ -142,6 +143,7 @@ export default function ChatInbox() {
   const [ratingConversationId, setRatingConversationId] = useState<number | null>(null);
   const [ratingStaffId, setRatingStaffId] = useState<number | undefined>();
   const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
+  const [isTransferHistoryOpen, setIsTransferHistoryOpen] = useState(false);
 
   // Get user's offices
   const { data: userOffices } = trpc.officeOwner.getMyOffices.useQuery();
@@ -161,6 +163,9 @@ export default function ChatInbox() {
     { officeId: selectedConversation?.conversation.officeId || 0 },
     { enabled: !!selectedConversation?.conversation.officeId }
   );
+  
+  // Process template variables mutation
+  const processVariablesMutation = trpc.cannedResponses.processVariables.useMutation();
 
   // Search messages mutation
   const searchMessagesMutation = trpc.chat.searchMessages.useQuery(
@@ -494,6 +499,14 @@ export default function ChatInbox() {
                       <Button 
                         variant="ghost" 
                         size="icon"
+                        onClick={() => setIsTransferHistoryOpen(true)}
+                        title="Transfer history"
+                      >
+                        <Clock className="h-5 w-5" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
                         onClick={() => setIsTransferDialogOpen(true)}
                         title="Transfer conversation"
                       >
@@ -620,8 +633,16 @@ export default function ChatInbox() {
                           {cannedResponses.map((response) => (
                             <button
                               key={response.id}
-                              onClick={() => {
-                                setMessage(response.content);
+                              onClick={async () => {
+                                if (selectedConversation) {
+                                  const result = await processVariablesMutation.mutateAsync({
+                                    template: response.content,
+                                    conversationId: selectedConversation.conversation.id,
+                                  });
+                                  setMessage(result.processed);
+                                } else {
+                                  setMessage(response.content);
+                                }
                                 setShowCannedResponses(false);
                               }}
                               className="w-full text-left px-2 py-1 text-sm rounded hover:bg-accent transition-colors"
@@ -665,12 +686,18 @@ export default function ChatInbox() {
                           setMessage(value);
                           
                           // Check for shortcut match
-                          if (value.startsWith('/') && cannedResponses) {
+                          if (value.startsWith('/') && cannedResponses && selectedConversation) {
                             const matchingResponse = cannedResponses.find(
                               r => r.shortcut && value.toLowerCase() === r.shortcut.toLowerCase()
                             );
                             if (matchingResponse) {
-                              setMessage(matchingResponse.content);
+                              // Process variables before inserting
+                              processVariablesMutation.mutateAsync({
+                                template: matchingResponse.content,
+                                conversationId: selectedConversation.conversation.id,
+                              }).then(result => {
+                                setMessage(result.processed);
+                              });
                             }
                           }
                         }}
@@ -733,6 +760,15 @@ export default function ChatInbox() {
           isOpen={isTransferDialogOpen}
           onClose={() => setIsTransferDialogOpen(false)}
           onSuccess={() => refetchConversations()}
+        />
+      )}
+      
+      {/* Transfer History */}
+      {selectedConversation && (
+        <TransferHistory
+          conversationId={selectedConversation.conversation.id}
+          isOpen={isTransferHistoryOpen}
+          onClose={() => setIsTransferHistoryOpen(false)}
         />
       )}
     </div>

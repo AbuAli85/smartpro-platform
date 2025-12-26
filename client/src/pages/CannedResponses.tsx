@@ -183,6 +183,32 @@ export default function CannedResponses() {
                   rows={5}
                   required
                 />
+                <div className="mt-2 p-3 bg-muted/50 rounded-md border">
+                  <p className="text-xs font-medium mb-2">Available Variables:</p>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <code className="bg-background px-1.5 py-0.5 rounded">{`{{customer_name}}`}</code>
+                      <span className="text-muted-foreground ml-1">Customer's name</span>
+                    </div>
+                    <div>
+                      <code className="bg-background px-1.5 py-0.5 rounded">{`{{office_name}}`}</code>
+                      <span className="text-muted-foreground ml-1">Your office name</span>
+                    </div>
+                    <div>
+                      <code className="bg-background px-1.5 py-0.5 rounded">{`{{staff_name}}`}</code>
+                      <span className="text-muted-foreground ml-1">Your name</span>
+                    </div>
+                    <div>
+                      <code className="bg-background px-1.5 py-0.5 rounded">{`{{date}}`}</code>
+                      <span className="text-muted-foreground ml-1">Current date</span>
+                    </div>
+                    <div>
+                      <code className="bg-background px-1.5 py-0.5 rounded">{`{{time}}`}</code>
+                      <span className="text-muted-foreground ml-1">Current time</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">Variables will be automatically replaced when you insert the template</p>
+                </div>
               </div>
 
               <div className="flex justify-end gap-2">
