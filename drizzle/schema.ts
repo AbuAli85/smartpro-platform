@@ -739,6 +739,33 @@ export const chatTransferHistory = mysqlTable("chat_transfer_history", {
 export type ChatTransferHistory = typeof chatTransferHistory.$inferSelect;
 export type InsertChatTransferHistory = typeof chatTransferHistory.$inferInsert;
 
+// ===== Scheduled Follow-ups =====
+export const scheduledFollowups = mysqlTable("scheduled_followups", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Conversation reference
+  conversationId: int("conversationId").notNull(),
+  officeId: int("officeId").notNull(),
+  
+  // Scheduling
+  scheduledFor: timestamp("scheduledFor").notNull(),
+  triggerType: mysqlEnum("triggerType", ["24h", "48h", "manual"]).notNull().default("24h"),
+  
+  // Message
+  messageTemplate: text("messageTemplate").notNull(),
+  
+  // Status
+  status: mysqlEnum("status", ["pending", "sent", "cancelled"]).notNull().default("pending"),
+  sentAt: timestamp("sentAt"),
+  
+  // Metadata
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ScheduledFollowup = typeof scheduledFollowups.$inferSelect;
+export type InsertScheduledFollowup = typeof scheduledFollowups.$inferInsert;
+
 // ===== Office Staff =====
 export const officeStaff = mysqlTable("office_staff", {
   id: int("id").autoincrement().primaryKey(),

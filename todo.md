@@ -1194,3 +1194,42 @@
 - [x] Add transfer history button to ChatInbox conversation header
 - [x] Show transfer history in modal dialog
 - [x] Write unit tests for transfer system (tests created, need test data)
+
+
+## Chat Analytics & Automation - Phase 3
+
+### Chat Analytics Dashboard
+- [x] Create ChatAnalytics page component (already exists)
+- [x] Add daily message volume chart with date range selector
+- [x] Build peak hours bar chart showing busiest times
+- [x] Calculate and display average wait time metrics
+- [x] Show conversation resolution rate
+- [x] Create staffing optimization insights panel
+- [x] Integrate analytics into navigation sidebar
+- [ ] Write unit tests for analytics calculations
+
+### Automated Follow-up Messages
+- [x] Create scheduled_followups table in database (migration applied)
+- [ ] Add follow-up database functions to db.ts
+- [ ] Create followUp router with scheduling procedures
+- [ ] Build follow-up scheduling logic (24h/48h triggers)
+- [ ] Create FollowUpSettings component for configuration
+- [ ] Add customizable follow-up message templates
+- [ ] Implement status-based trigger conditions
+- [ ] Add manual override to skip/reschedule follow-ups
+- [ ] Create background job to send scheduled messages
+- [ ] Add follow-up history tracking
+- [ ] Show follow-up status in conversation list
+- [ ] Write unit tests for scheduling logic
+
+### Multi-language Chat Support
+- [ ] Integrate translation API (Google Translate or similar)
+- [ ] Add language detection for incoming messages
+- [ ] Create language toggle in chat interface
+- [ ] Store both original and translated messages
+- [ ] Add translation indicator badges
+- [ ] Implement bidirectional Arabic-English translation
+- [ ] Add auto-translate preference per conversation
+- [ ] Handle translation errors gracefully
+- [ ] Show translation confidence scores
+- [ ] Write unit tests for translation functionality
