@@ -1568,3 +1568,34 @@
 - [x] Add RTL support for toast notifications
 - [x] Fix calendar component RTL layout
 - [x] Test all interactive components in Arabic mode
+
+
+## Final Bilingual Platform Enhancements (Phase 6)
+### Phase 1: Reviews Section Translation
+- [ ] Read OfficeProfile reviews tab to find all hardcoded text
+- [ ] Translate review headers and section titles
+- [ ] Translate rating labels (stars, scores, feedback)
+- [ ] Translate review form labels (submit review, rating, comment)
+- [ ] Translate review display (posted by, date, helpful, report)
+- [ ] Add all missing review translation keys to dictionary
+- [ ] Test reviews section in both languages
+
+### Phase 2: Admin Interface for Bilingual Content
+- [x] Create ContentTranslation page for admins
+- [x] Add form to edit office Arabic translations
+- [ ] Add form to edit template Arabic translations
+- [ ] Add bulk translation management interface
+- [ ] Create tRPC mutations for updating translations
+- [ ] Add validation for Arabic text fields
+- [x] Test admin interface for managing translations
+
+### Phase 3: Bilingual Email/SMS Notifications
+- [x] Update email templates to support bilingual content
+- [x] Update SMS templates to support bilingual content
+- [x] Modify notification helpers to detect user language
+- [x] Add Arabic email templates for booking confirmations
+- [x] Add Arabic SMS templates for follow-up reminders
+- [x] Add Arabic templates for status updates
+- [x] Create bilingual email notification helper
+- [x] Create bilingual SMS notification helper
+- [ ] Test notifications in both languages

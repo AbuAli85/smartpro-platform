@@ -233,7 +233,7 @@ export default function OfficeProfile() {
                           {review.userName?.charAt(0) || "U"}
                         </div>
                         <div>
-                          <p className="font-semibold">{review.userName || "Anonymous"}</p>
+                          <p className="font-semibold">{review.userName || t("office.anonymous")}</p>
                           <div className="flex items-center gap-1">
                             {[...Array(5)].map((_, i) => (
                               <Star
@@ -261,7 +261,7 @@ export default function OfficeProfile() {
             ) : (
               <Card>
                 <CardContent className="py-8 text-center">
-                  <p className="text-muted-foreground">No reviews yet. Be the first to review!</p>
+                  <p className="text-muted-foreground">{t("office.noReviews")}</p>
                 </CardContent>
               </Card>
             )}

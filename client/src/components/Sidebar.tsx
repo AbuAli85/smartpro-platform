@@ -23,6 +23,7 @@ import {
   Users,
   Activity,
   Clock,
+  Languages,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -72,6 +73,7 @@ export function Sidebar({ className }: SidebarProps) {
   if (user?.role === "admin") {
     navigation.push({ name: t("nav.adminDashboard"), href: "/admin", icon: Shield, requiresAuth: true });
     navigation.push({ name: t("nav.adminAnalytics"), href: "/admin/analytics", icon: BarChart3, requiresAuth: true });
+    navigation.push({ name: t("nav.contentTranslation"), href: "/admin/translations", icon: Languages, requiresAuth: true });
   }
 
   const filteredNavigation = navigation.filter((item) => !item.requiresAuth || user);

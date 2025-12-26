@@ -30,6 +30,7 @@ import CannedResponses from "./pages/CannedResponses";
 import StaffManagement from "./pages/StaffManagement";
 import StaffPerformance from "./pages/StaffPerformance";
 import FollowUpSettings from "./pages/FollowUpSettings";
+import ContentTranslation from "./pages/ContentTranslation";
 import { useNotifications } from "./hooks/useNotifications";
 
 function Router() {
@@ -56,6 +57,7 @@ function Router() {
       
       {/* Admin */}
       <Route path="/admin" component={AdminDashboard} />
+      <Route path="/admin/translations" component={ContentTranslation} />
       
       {/* Office Dashboard */}
       <Route path="/office-dashboard" component={OfficeDashboard} />
