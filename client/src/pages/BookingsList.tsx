@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,6 +38,7 @@ export default function BookingsList() {
       <div className="min-h-screen flex flex-col bg-background">
         
         <div className="container py-8">
+        <Breadcrumb items={[{ label: "My Bookings" }]} className="mb-6" />
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#003366]"></div>
             <span className="ml-3 text-gray-600">Loading bookings...</span>
@@ -50,6 +52,7 @@ export default function BookingsList() {
     <div className="min-h-screen flex flex-col bg-background">
       
       <div className="container py-8">
+        <Breadcrumb items={[{ label: "My Bookings" }]} className="mb-6" />
         <h1 className="text-4xl font-bold mb-8">My Bookings</h1>
         
         {!bookings || bookings.length === 0 ? (

@@ -39,6 +39,13 @@ export const appRouter = router({
         });
         return { success: true };
       }),
+    getNotificationCounts: protectedProcedure.query(async ({ ctx }) => {
+      const user = ctx.user!;
+      const pendingBookings = await db.getPendingBookingsCount(user.id);
+      return {
+        bookings: pendingBookings,
+      };
+    }),
   }),
 
   // SmartPro feature routers

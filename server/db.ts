@@ -806,3 +806,32 @@ export async function deleteOfficeAvailability(id: number) {
 
   await db.delete(officeAvailability).where(eq(officeAvailability.id, id));
 }
+
+// ============================================================================
+// NOTIFICATION COUNTS
+// ============================================================================
+
+export async function getPendingBookingsCount(userId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get pending bookings count: database not available");
+    return 0;
+  }
+
+  try {
+    const result = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(bookings)
+      .where(
+        and(
+          eq(bookings.userId, userId),
+          eq(bookings.status, "pending")
+        )
+      );
+    
+    return result[0]?.count || 0;
+  } catch (error) {
+    console.error("[Database] Error getting pending bookings count:", error);
+    return 0;
+  }
+}

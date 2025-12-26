@@ -7,6 +7,7 @@ import { trpc } from "@/lib/trpc";
 import { Building2, MapPin, Phone, Mail, Globe, Star, Calendar, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { CanonicalURL } from "@/components/CanonicalURL";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 export default function OfficeProfile() {
   const [, params] = useRoute("/offices/:slug");
@@ -55,6 +56,15 @@ export default function OfficeProfile() {
       
 
       <div className="container py-8">
+        {/* Breadcrumb */}
+        <Breadcrumb 
+          items={[
+            { label: "Sanad Offices", href: "/offices" },
+            { label: office.officeName }
+          ]} 
+          className="mb-6" 
+        />
+        
         <Button asChild variant="ghost" className="mb-4">
           <Link href="/offices">
             <a className="flex items-center gap-2">

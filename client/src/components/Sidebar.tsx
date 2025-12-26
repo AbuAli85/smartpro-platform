@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { trpc } from "@/lib/trpc";
+import { NotificationBadge } from "@/components/NotificationBadge";
 
 interface SidebarProps {
   className?: string;
@@ -27,6 +29,12 @@ export function Sidebar({ className }: SidebarProps) {
   const { user, logout } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  
+  // Fetch notification counts
+  const { data: notificationCounts } = trpc.auth.getNotificationCounts.useQuery(
+    undefined,
+    { enabled: !!user, refetchInterval: 30000 } // Refetch every 30 seconds
+  );
 
   const navigation = [
     { name: "Home", href: "/", icon: Home },
@@ -115,14 +123,19 @@ export function Sidebar({ className }: SidebarProps) {
               <Link key={item.href} href={item.href}>
                 <div
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer",
+                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer relative",
                     isActive
                       ? "bg-[#003366] text-white"
                       : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                   )}
                   onClick={() => setIsMobileOpen(false)}
                 >
-                  <Icon className="h-5 w-5 flex-shrink-0" />
+                  <div className="relative">
+                    <Icon className="h-5 w-5 flex-shrink-0" />
+                    {item.name === "My Bookings" && notificationCounts?.bookings && (
+                      <NotificationBadge count={notificationCounts.bookings} />
+                    )}
+                  </div>
                   {!isCollapsed && <span>{item.name}</span>}
                 </div>
               </Link>

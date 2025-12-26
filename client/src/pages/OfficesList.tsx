@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { trpc } from "@/lib/trpc";
 import { Building2, MapPin, Star, Search, Plus, Filter } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 export default function OfficesList() {
   const [search, setSearch] = useState("");
@@ -42,6 +43,9 @@ export default function OfficesList() {
       
 
       <div className="container py-8">
+        {/* Breadcrumb */}
+        <Breadcrumb items={[{ label: "Sanad Offices" }]} className="mb-6" />
+        
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
           <div>
