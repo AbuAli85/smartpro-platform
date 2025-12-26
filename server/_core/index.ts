@@ -13,6 +13,7 @@ import sseRouter from "../routes/sse";
 import { startReminderScheduler } from "./reminderScheduler";
 import { startFollowUpJob } from "../jobs/followUpJob";
 import { startQualityMonitoringScheduler } from "./qualityMonitoringJob";
+import { initializeWorkflowMonitoringJob } from "./workflowMonitoringJob";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -69,6 +70,9 @@ async function startServer() {
   
   // Start quality monitoring scheduler
   startQualityMonitoringScheduler();
+  
+  // Start workflow monitoring job (daily untranslated content scan)
+  initializeWorkflowMonitoringJob();
 
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);
