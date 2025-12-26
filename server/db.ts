@@ -1012,7 +1012,7 @@ export async function getBookingsNeedingReminder(
       serviceDescription: bookings.serviceDescription,
     })
     .from(bookings)
-    .innerJoin(users, eq(bookings.userId, users.openId))
+    .innerJoin(users, eq(bookings.userId, users.id))
     .innerJoin(sanadOffices, eq(bookings.officeId, sanadOffices.id))
     .where(
       and(
@@ -1657,5 +1657,169 @@ export async function getRevenueMetricsAnalytics(params: {
     totalBookings,
     completedBookings,
     averageBookingValue,
+  };
+}
+
+
+// ============================================================================
+// ADMIN ANALYTICS
+// ============================================================================
+
+/**
+ * Get office performance metrics for admin dashboard
+ */
+export async function getOfficePerformanceMetrics(params: {
+  startDate: Date;
+  endDate: Date;
+  limit?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { startDate, endDate, limit = 20 } = params;
+
+  const results = await db
+    .select({
+      officeId: sanadOffices.id,
+      officeName: sanadOffices.officeName,
+      governorate: sanadOffices.governorate,
+      totalBookings: sql<number>`COUNT(${bookings.id})`.as('totalBookings'),
+      completedBookings: sql<number>`SUM(CASE WHEN ${bookings.status} = 'completed' THEN 1 ELSE 0 END)`.as('completedBookings'),
+      totalRevenue: sql<string>`SUM(CASE WHEN ${bookings.status} = 'completed' THEN COALESCE(${bookings.price}, 0) ELSE 0 END)`.as('totalRevenue'),
+      averageRating: sanadOffices.averageRating,
+      totalReviews: sanadOffices.totalReviews,
+    })
+    .from(sanadOffices)
+    .leftJoin(bookings, eq(bookings.officeId, sanadOffices.id))
+    .where(
+      and(
+        eq(sanadOffices.status, "active"),
+        or(
+          isNull(bookings.createdAt),
+          and(
+            gte(bookings.createdAt, startDate),
+            lte(bookings.createdAt, endDate)
+          )
+        )
+      )
+    )
+    .groupBy(sanadOffices.id, sanadOffices.officeName, sanadOffices.governorate, sanadOffices.averageRating, sanadOffices.totalReviews)
+    .orderBy(desc(sql`totalBookings`))
+    .limit(limit);
+
+  return results.map(r => ({
+    ...r,
+    completionRate: r.totalBookings > 0 ? ((r.completedBookings / r.totalBookings) * 100).toFixed(1) : "0",
+  }));
+}
+
+/**
+ * Get user growth statistics
+ */
+export async function getUserGrowthStats(params: {
+  startDate: Date;
+  endDate: Date;
+  groupBy: "day" | "week" | "month";
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { startDate, endDate, groupBy } = params;
+
+  const dateFormat = {
+    day: "%Y-%m-%d",
+    week: "%Y-%u",
+    month: "%Y-%m",
+  }[groupBy];
+
+  const results = await db
+    .select({
+      period: sql<string>`DATE_FORMAT(${users.createdAt}, ${dateFormat})`.as('period'),
+      newUsers: sql<number>`COUNT(*)`.as('newUsers'),
+    })
+    .from(users)
+    .where(and(gte(users.createdAt, startDate), lte(users.createdAt, endDate)))
+    .groupBy(sql`period`)
+    .orderBy(sql`period`);
+
+  return results;
+}
+
+/**
+ * Get revenue breakdown by governorate
+ */
+export async function getRevenueByGovernorate(params: {
+  startDate: Date;
+  endDate: Date;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { startDate, endDate } = params;
+
+  const results = await db
+    .select({
+      governorate: sanadOffices.governorate,
+      totalRevenue: sql<string>`SUM(CASE WHEN ${bookings.status} = 'completed' THEN COALESCE(${bookings.price}, 0) ELSE 0 END)`.as('totalRevenue'),
+      totalBookings: sql<number>`COUNT(${bookings.id})`.as('totalBookings'),
+      completedBookings: sql<number>`SUM(CASE WHEN ${bookings.status} = 'completed' THEN 1 ELSE 0 END)`.as('completedBookings'),
+    })
+    .from(sanadOffices)
+    .leftJoin(bookings, eq(bookings.officeId, sanadOffices.id))
+    .where(
+      and(
+        eq(sanadOffices.status, "active"),
+        or(
+          isNull(bookings.createdAt),
+          and(
+            gte(bookings.createdAt, startDate),
+            lte(bookings.createdAt, endDate)
+          )
+        )
+      )
+    )
+    .groupBy(sanadOffices.governorate)
+    .orderBy(desc(sql`totalRevenue`));
+
+  return results;
+}
+
+/**
+ * Get platform health metrics
+ */
+export async function getPlatformHealthMetrics() {
+  const db = await getDb();
+  if (!db) return {
+    totalUsers: 0,
+    activeOffices: 0,
+    pendingOffices: 0,
+    totalBookings: 0,
+    completedBookings: 0,
+  };
+
+  const [userCount] = await db
+    .select({ count: sql<number>`COUNT(*)` })
+    .from(users);
+
+  const [officeStats] = await db
+    .select({
+      active: sql<number>`SUM(CASE WHEN ${sanadOffices.status} = 'active' THEN 1 ELSE 0 END)`,
+      pending: sql<number>`SUM(CASE WHEN ${sanadOffices.status} = 'pending' THEN 1 ELSE 0 END)`,
+    })
+    .from(sanadOffices);
+
+  const [bookingStats] = await db
+    .select({
+      total: sql<number>`COUNT(*)`,
+      completed: sql<number>`SUM(CASE WHEN ${bookings.status} = 'completed' THEN 1 ELSE 0 END)`,
+    })
+    .from(bookings);
+
+  return {
+    totalUsers: userCount?.count || 0,
+    activeOffices: officeStats?.active || 0,
+    pendingOffices: officeStats?.pending || 0,
+    totalBookings: bookingStats?.total || 0,
+    completedBookings: bookingStats?.completed || 0,
   };
 }

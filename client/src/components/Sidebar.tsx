@@ -22,7 +22,8 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
 import { NotificationBadge } from "@/components/NotificationBadge";
-import { NotificationDropdown } from "@/components/NotificationDropdown";
+import { NotificationDropdown } from "./NotificationDropdown";
+import { LanguageToggle } from "./LanguageToggle";
 
 interface SidebarProps {
   className?: string;
@@ -55,6 +56,7 @@ export function Sidebar({ className }: SidebarProps) {
   // Add admin link if user is admin
   if (user?.role === "admin") {
     navigation.push({ name: "Admin Dashboard", href: "/admin", icon: Shield, requiresAuth: true });
+    navigation.push({ name: "Admin Analytics", href: "/admin/analytics", icon: BarChart3, requiresAuth: true });
   }
 
   const filteredNavigation = navigation.filter((item) => !item.requiresAuth || user);
@@ -92,6 +94,7 @@ export function Sidebar({ className }: SidebarProps) {
           </div>
         </Link>
         <div className="flex items-center gap-2">
+          <LanguageToggle />
           {user && <NotificationDropdown />}
           <Button
             variant="ghost"
