@@ -603,9 +603,22 @@ export default function ChatInbox() {
                       />
                       <Input
                         value={message}
-                        onChange={(e) => setMessage(e.target.value)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setMessage(value);
+                          
+                          // Check for shortcut match
+                          if (value.startsWith('/') && cannedResponses) {
+                            const matchingResponse = cannedResponses.find(
+                              r => r.shortcut && value.toLowerCase() === r.shortcut.toLowerCase()
+                            );
+                            if (matchingResponse) {
+                              setMessage(matchingResponse.content);
+                            }
+                          }
+                        }}
                         onKeyPress={handleKeyPress}
-                        placeholder="Type a message..."
+                        placeholder="Type a message or /shortcut..."
                         className="flex-1"
                       />
                       <Button

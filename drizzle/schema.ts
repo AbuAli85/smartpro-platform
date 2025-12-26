@@ -650,7 +650,8 @@ export const cannedResponses = mysqlTable("canned_responses", {
   // Response content
   title: varchar("title", { length: 255 }).notNull(),
   content: text("content").notNull(),
-  category: mysqlEnum("category", ["pricing", "hours", "services", "general"]).default("general").notNull(),
+  shortcut: varchar("shortcut", { length: 50 }),
+  category: mysqlEnum("category", ["greeting", "faq", "closing", "pricing", "hours", "services", "general"]).default("general").notNull(),
   
   // Audit
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -683,6 +684,34 @@ export const chatAssignments = mysqlTable("chat_assignments", {
 
 export type ChatAssignment = typeof chatAssignments.$inferSelect;
 export type InsertChatAssignment = typeof chatAssignments.$inferInsert;
+
+// ===== Chat Ratings =====
+export const chatRatings = mysqlTable("chat_ratings", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Conversation reference
+  conversationId: int("conversationId").notNull(),
+  
+  // Rating info
+  rating: int("rating").notNull(), // 1-5 stars
+  feedback: text("feedback"),
+  
+  // Staff reference (who was rated)
+  staffUserId: int("staffUserId"),
+  
+  // Customer reference
+  userId: int("userId").notNull(),
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  conversationIdx: index("conversation_idx").on(table.conversationId),
+  staffIdx: index("staff_idx").on(table.staffUserId),
+  ratingIdx: index("rating_idx").on(table.rating),
+}));
+
+export type ChatRating = typeof chatRatings.$inferSelect;
+export type InsertChatRating = typeof chatRatings.$inferInsert;
 
 // ===== Office Staff =====
 export const officeStaff = mysqlTable("office_staff", {

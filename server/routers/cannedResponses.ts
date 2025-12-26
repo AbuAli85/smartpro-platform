@@ -16,7 +16,8 @@ export const cannedResponsesRouter = router({
       officeId: z.number(),
       title: z.string().min(1),
       content: z.string().min(1),
-      category: z.enum(["pricing", "hours", "services", "general"]),
+      shortcut: z.string().optional(),
+      category: z.enum(["greeting", "faq", "closing", "pricing", "hours", "services", "general"]),
     }))
     .mutation(async ({ ctx, input }) => {
       // Verify user owns the office
@@ -35,7 +36,8 @@ export const cannedResponsesRouter = router({
       id: z.number(),
       title: z.string().min(1).optional(),
       content: z.string().min(1).optional(),
-      category: z.enum(["pricing", "hours", "services", "general"]).optional(),
+      shortcut: z.string().optional(),
+      category: z.enum(["greeting", "faq", "closing", "pricing", "hours", "services", "general"]).optional(),
     }))
     .mutation(async ({ input }) => {
       const { id, ...data } = input;

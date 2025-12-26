@@ -16,7 +16,8 @@ export default function CannedResponses() {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
-    category: "general" as "pricing" | "hours" | "services" | "general",
+    shortcut: "",
+    category: "general" as "greeting" | "faq" | "closing" | "pricing" | "hours" | "services" | "general",
   });
 
   const { data: offices } = trpc.officeOwner.getMyOffices.useQuery();
@@ -60,7 +61,7 @@ export default function CannedResponses() {
   });
 
   const resetForm = () => {
-    setFormData({ title: "", content: "", category: "general" });
+    setFormData({ title: "", content: "", shortcut: "", category: "general" });
     setEditingResponse(null);
   };
 
@@ -86,6 +87,7 @@ export default function CannedResponses() {
     setFormData({
       title: response.title,
       content: response.content,
+      shortcut: response.shortcut || "",
       category: response.category,
     });
     setIsDialogOpen(true);
@@ -97,7 +99,10 @@ export default function CannedResponses() {
     }
   };
 
-  const categoryColors = {
+  const categoryColors: Record<string, string> = {
+    greeting: "bg-yellow-100 text-yellow-800",
+    faq: "bg-cyan-100 text-cyan-800",
+    closing: "bg-pink-100 text-pink-800",
     pricing: "bg-blue-100 text-blue-800",
     hours: "bg-green-100 text-green-800",
     services: "bg-purple-100 text-purple-800",
@@ -148,12 +153,25 @@ export default function CannedResponses() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="greeting">Greeting</SelectItem>
+                    <SelectItem value="faq">FAQ</SelectItem>
+                    <SelectItem value="closing">Closing</SelectItem>
                     <SelectItem value="pricing">Pricing</SelectItem>
                     <SelectItem value="hours">Hours</SelectItem>
                     <SelectItem value="services">Services</SelectItem>
                     <SelectItem value="general">General</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium">Shortcut (optional)</label>
+                <Input
+                  value={formData.shortcut || ''}
+                  onChange={(e) => setFormData({ ...formData, shortcut: e.target.value })}
+                  placeholder="e.g., /hello or /hours"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Type this shortcut in chat to quickly insert this template</p>
               </div>
 
               <div>

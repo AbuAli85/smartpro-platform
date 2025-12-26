@@ -2339,11 +2339,22 @@ export async function getChatAnalytics(params: {
 }
 
 // Canned Responses
-export async function getCannedResponsesByOffice(officeId: number) {
+export async function getCannedResponsesByOffice(officeId: number, category?: string) {
   const db = await getDb();
   if (!db) return [];
   
   const { cannedResponses } = await import("../drizzle/schema");
+  
+  if (category) {
+    return await db
+      .select()
+      .from(cannedResponses)
+      .where(and(
+        eq(cannedResponses.officeId, officeId),
+        eq(cannedResponses.category, category as any)
+      ))
+      .orderBy(desc(cannedResponses.createdAt));
+  }
   
   return await db
     .select()
@@ -2356,7 +2367,8 @@ export async function createCannedResponse(data: {
   officeId: number;
   title: string;
   content: string;
-  category: "pricing" | "hours" | "services" | "general";
+  shortcut?: string;
+  category: "greeting" | "faq" | "closing" | "pricing" | "hours" | "services" | "general";
 }) {
   const db = await getDb();
   if (!db) return null;
@@ -2374,7 +2386,8 @@ export async function createCannedResponse(data: {
 export async function updateCannedResponse(id: number, data: {
   title?: string;
   content?: string;
-  category?: "pricing" | "hours" | "services" | "general";
+  shortcut?: string;
+  category?: "greeting" | "faq" | "closing" | "pricing" | "hours" | "services" | "general";
 }) {
   const db = await getDb();
   if (!db) return null;
@@ -2783,6 +2796,64 @@ export async function getConversationsByTags(officeId: number, tags: string[]) {
     const convTags = (conv.tags as string[]) || [];
     return tags.some(tag => convTags.includes(tag));
   });
+}
+
+// Chat Ratings
+export async function createChatRating(data: {
+  conversationId: number;
+  rating: number;
+  feedback?: string;
+  staffUserId?: number;
+  userId: number;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { chatRatings } = await import("../drizzle/schema");
+  
+  const [rating] = await db
+    .insert(chatRatings)
+    .values(data)
+    .$returningId();
+  
+  return rating;
+}
+
+export async function getChatRatingByConversation(conversationId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { chatRatings } = await import("../drizzle/schema");
+  
+  const [rating] = await db
+    .select()
+    .from(chatRatings)
+    .where(eq(chatRatings.conversationId, conversationId));
+  
+  return rating;
+}
+
+export async function getStaffRatings(staffUserId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { chatRatings } = await import("../drizzle/schema");
+  
+  return await db
+    .select()
+    .from(chatRatings)
+    .where(eq(chatRatings.staffUserId, staffUserId));
+}
+
+export async function getAverageStaffRating(staffUserId: number) {
+  const db = await getDb();
+  if (!db) return 0;
+  
+  const ratings = await getStaffRatings(staffUserId);
+  if (ratings.length === 0) return 0;
+  
+  const sum = ratings.reduce((acc, r) => acc + r.rating, 0);
+  return sum / ratings.length;
 }
 
 // Chat Assignments

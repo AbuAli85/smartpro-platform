@@ -1132,3 +1132,40 @@
 - [x] Add 7/30/90 day preset filters with button toggles
 - [x] Format dates and tooltips for better readability
 - [x] Write unit tests for trend calculations (included in enhancement tests)
+
+
+## Chat System Completion Features
+
+### Chat Templates & Quick Replies
+- [x] Add shortcut field to canned_responses table
+- [x] Create template categories (greeting, faq, closing, pricing, hours, services, general)
+- [x] Enhanced existing CannedResponses component for template management
+- [x] Add template CRUD operations (create, edit, delete) - already exists
+- [x] Implement template quick insert with keyboard shortcuts (type /shortcut)
+- [x] Add template picker dropdown in message composer - already exists
+- [x] Enhanced message input to detect and auto-replace shortcuts
+- [ ] Support variable placeholders ({{customer_name}}, {{office_name}})
+- [ ] Write unit tests for template system
+
+### Customer Satisfaction Ratings
+- [x] Add chat_ratings table to database
+- [x] Create RatingModal component with star selection
+- [x] Add optional feedback text area
+- [x] Create rating backend procedures (create, get by conversation, get staff ratings)
+- [x] Add chatRatings router with CRUD operations
+- [ ] Trigger rating request on conversation closure
+- [ ] Integrate ratings into Staff Performance dashboard
+- [ ] Calculate average satisfaction scores
+- [ ] Add satisfaction trend chart
+- [ ] Write unit tests for rating system
+
+### Chat Transfer & Escalation
+- [ ] Add transfer_history table to database
+- [ ] Create TransferDialog component with staff selection
+- [ ] Add context notes field for transfer reason
+- [ ] Implement conversation reassignment logic
+- [ ] Add escalation flag for manager attention
+- [ ] Show transfer notifications to receiving staff
+- [ ] Display transfer history in conversation details
+- [ ] Add transfer analytics to performance dashboard
+- [ ] Write unit tests for transfer system
