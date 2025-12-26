@@ -10,10 +10,10 @@ import { Building2, MapPin, Star, Search, Plus, Filter } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { AdvancedFilters, type FilterState } from "@/components/AdvancedFilters";
-import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function OfficesList() {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [governorate, setGovernorate] = useState<string>();
@@ -111,7 +111,7 @@ export default function OfficesList() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
               type="text"
-              placeholder="Search offices by name or location..."
+              placeholder={t("offices.searchPlaceholder")}
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -126,10 +126,10 @@ export default function OfficesList() {
           }}>
             <SelectTrigger className="w-full md:w-[200px]">
               <Filter className="w-4 h-4 mr-2" />
-              <SelectValue placeholder="All Governorates" />
+              <SelectValue placeholder={t("offices.allRegions")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Governorates</SelectItem>
+              <SelectItem value="all">{t("offices.allRegions")}</SelectItem>
               {governorates.map((gov) => (
                 <SelectItem key={gov} value={gov}>
                   {gov}
@@ -140,12 +140,12 @@ export default function OfficesList() {
           
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-full md:w-[180px]">
-              <SelectValue placeholder="Sort by" />
+              <SelectValue placeholder={t("common.filter")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="rating">Highest Rated</SelectItem>
-              <SelectItem value="reviews">Most Reviews</SelectItem>
-              <SelectItem value="name">Name (A-Z)</SelectItem>
+              <SelectItem value="rating">{t("offices.highestRated")}</SelectItem>
+              <SelectItem value="reviews">{t("offices.mostReviews")}</SelectItem>
+              <SelectItem value="name">{t("offices.nameAZ")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -174,7 +174,7 @@ export default function OfficesList() {
           <>
             <div className="flex items-center justify-between mb-4">
               <p className="text-sm text-muted-foreground">
-                Showing {sortedOffices.length} of {data.total} offices
+                {t("offices.showing")} {sortedOffices.length} {t("offices.of")} {data.total} {t("offices.offices")}
               </p>
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

@@ -176,3 +176,62 @@
     }
   }
 }
+
+/* RTL Layout Utilities */
+[dir="rtl"] {
+  direction: rtl;
+}
+
+[dir="rtl"] .rtl\:flex-row-reverse {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .rtl\:text-right {
+  text-align: right;
+}
+
+[dir="rtl"] .rtl\:text-left {
+  text-align: left;
+}
+
+/* Icon positioning in RTL - flip horizontal arrows */
+[dir="rtl"] .lucide-arrow-right,
+[dir="rtl"] .lucide-arrow-left,
+[dir="rtl"] .lucide-chevron-right,
+[dir="rtl"] .lucide-chevron-left {
+  transform: scaleX(-1);
+}
+
+/* Table alignment in RTL */
+[dir="rtl"] table {
+  direction: rtl;
+}
+
+[dir="rtl"] th,
+[dir="rtl"] td {
+  text-align: right;
+}
+
+/* Form field icons in RTL */
+[dir="rtl"] .relative .absolute.left-3 {
+  left: auto;
+  right: 0.75rem;
+}
+
+[dir="rtl"] .pl-10 {
+  padding-left: 0.75rem;
+  padding-right: 2.5rem;
+}
+
+/* Dropdown menu alignment */
+[dir="rtl"] [role="menu"],
+[dir="rtl"] [role="listbox"] {
+  text-align: right;
+}
+
+/* Card layouts in RTL */
+[dir="rtl"] .flex.items-center.gap-2,
+[dir="rtl"] .flex.items-center.gap-3,
+[dir="rtl"] .flex.items-center.gap-4 {
+  flex-direction: row-reverse;
+}

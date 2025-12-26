@@ -1392,3 +1392,41 @@
 - [x] Test RTL layout with Arabic content
 - [x] Ensure proper text alignment in RTL mode
 - [ ] Fix icon positions in RTL layout
+
+
+## Complete Bilingual Coverage Implementation
+### Phase 1: Translation Coverage Expansion
+- [x] Expand translation dictionary with 200+ additional UI strings
+- [x] Translate OfficesList page (search, filters, cards)
+- [ ] Translate OfficeProfile page (details, services, reviews)
+- [ ] Translate Templates page (categories, search, filters)
+- [ ] Translate TemplateDetail page (form fields, generation)
+- [ ] Translate BookingsList page (status, actions, filters)
+- [ ] Translate BookOffice page (calendar, time slots, form)
+- [ ] Translate Profile page (form fields, labels)
+- [x] Translate all form validation messages
+- [x] Translate all error and success toast messages
+- [ ] Translate all button labels across pages
+- [ ] Translate modal dialogs and confirmations
+
+### Phase 2: RTL Layout Refinements
+- [x] Add RTL-aware CSS utilities for icons and spacing
+- [x] Fix table header alignment in RTL mode
+- [x] Adjust form field icon positions for RTL
+- [x] Fix dropdown menu alignment in RTL
+- [x] Adjust card layouts for RTL consistency
+- [ ] Fix navigation breadcrumb direction in RTL
+- [ ] Test and fix calendar component RTL layout
+- [ ] Adjust chat message bubble alignment for RTL
+
+### Phase 3: Dynamic Content Translation
+- [x] Add nameAr field to offices table (already exists)
+- [x] Add descriptionAr field to offices table (already exists)
+- [x] Add nameAr field to document_templates table (already exists)
+- [x] Add descriptionAr field to document_templates table (already exists)
+- [x] Add nameAr field to services (already exists in template variables)
+- [ ] Update office creation form with Arabic fields
+- [ ] Update template creation form with Arabic fields
+- [x] Modify backend queries to return content based on language
+- [x] Create translation helper for dynamic content
+- [ ] Seed Arabic translations for existing content
