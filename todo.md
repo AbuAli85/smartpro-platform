@@ -481,3 +481,9 @@
 - [x] Add customer feedback summaries
 - [x] Create download report button in office dashboard
 - [x] Test PDF generation and download
+
+
+## Fix Nested Anchor Tags
+- [x] Search for all instances of nested anchor tags
+- [x] Fix Button asChild with Link containing anchor tags
+- [x] Verify no console warnings remain

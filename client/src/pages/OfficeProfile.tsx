@@ -42,7 +42,7 @@ export default function OfficeProfile() {
         <div className="container py-16 text-center">
           <h2 className="text-2xl font-bold mb-4">Office Not Found</h2>
           <Button asChild>
-            <Link href="/offices"><a>Browse Offices</a></Link>
+            <Link href="/offices">Browse Offices</Link>
           </Button>
         </div>
       </div>
@@ -66,11 +66,9 @@ export default function OfficeProfile() {
         />
         
         <Button asChild variant="ghost" className="mb-4">
-          <Link href="/offices">
-            <a className="flex items-center gap-2">
+          <Link href="/offices" className="flex items-center gap-2">
               <ArrowLeft className="w-4 h-4" />
               Back to Offices
-            </a>
           </Link>
         </Button>
 
@@ -127,11 +125,9 @@ export default function OfficeProfile() {
 
             {isAuthenticated && (
               <Button asChild size="lg" className="bg-gradient-accent">
-                <Link href={`/offices/${slug}/book`}>
-                  <a className="flex items-center gap-2">
+                <Link href={`/offices/${slug}/book`} className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     Book Service
-                  </a>
                 </Link>
               </Button>
             )}

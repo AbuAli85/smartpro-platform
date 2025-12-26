@@ -58,11 +58,9 @@ export default function OfficesList() {
           </div>
           {isAuthenticated && (
             <Button asChild size="lg" className="bg-gradient-accent hover:opacity-90">
-              <Link href="/create-office">
-                <a className="flex items-center gap-2">
+              <Link href="/create-office" className="flex items-center gap-2">
                   <Plus className="w-4 h-4" />
                   Register Your Office
-                </a>
               </Link>
             </Button>
           )}
@@ -172,7 +170,7 @@ export default function OfficesList() {
                   <CardFooter>
                     <Button asChild variant="default" className="w-full">
                       <Link href={`/offices/${office.slug}`}>
-                        <a>View Office</a>
+                        View Office
                       </Link>
                     </Button>
                   </CardFooter>
@@ -217,7 +215,7 @@ export default function OfficesList() {
             {isAuthenticated && (
               <Button asChild>
                 <Link href="/create-office">
-                  <a>Register Your Office</a>
+                  Register Your Office
                 </Link>
               </Button>
             )}
