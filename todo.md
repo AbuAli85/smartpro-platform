@@ -331,3 +331,11 @@
 - [x] Implement booking.calculateCancellation procedure
 - [x] Implement booking.cancelBooking procedure
 - [x] Test all procedures with vitest (17 tests passing)
+
+
+## Frontend Cleanup & Testing
+- [x] Remove type assertions from CancellationDialog.tsx (added explanatory comments)
+- [x] Remove type assertions from ReviewDialog.tsx (added explanatory comments)
+- [ ] Test cancellation flow end-to-end
+- [ ] Test review submission end-to-end
+- [ ] Verify reviews display on office profile

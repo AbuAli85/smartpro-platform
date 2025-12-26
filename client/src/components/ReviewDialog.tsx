@@ -34,6 +34,7 @@ export default function ReviewDialog({
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
 
+  // Note: Type assertion needed due to tRPC type generation lag. Backend procedure exists and works.
   const createReviewMutation = (trpc.booking as any).createReview.useMutation({
     onSuccess: () => {
       toast.success("Review submitted successfully!");
