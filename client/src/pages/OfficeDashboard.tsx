@@ -118,8 +118,8 @@ export default function OfficeDashboard() {
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats?.pendingBookings || 0}</div>
-              <p className="text-xs text-muted-foreground">Awaiting confirmation</p>
+              <div className="text-2xl font-bold">{stats?.cancelledBookings || 0}</div>
+              <p className="text-xs text-muted-foreground">Cancelled bookings</p>
             </CardContent>
           </Card>
 
@@ -129,8 +129,8 @@ export default function OfficeDashboard() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats?.monthlyBookings || 0}</div>
-              <p className="text-xs text-muted-foreground">Current month</p>
+              <div className="text-2xl font-bold">{stats?.completedBookings || 0}</div>
+              <p className="text-xs text-muted-foreground">Completed bookings</p>
             </CardContent>
           </Card>
 
@@ -140,7 +140,7 @@ export default function OfficeDashboard() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats?.uniqueCustomers || 0}</div>
+              <div className="text-2xl font-bold">{stats?.totalBookings || 0}</div>
               <p className="text-xs text-muted-foreground">Unique clients</p>
             </CardContent>
           </Card>

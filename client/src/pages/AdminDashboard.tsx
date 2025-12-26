@@ -78,7 +78,7 @@ export default function AdminDashboard() {
             <CardContent>
               <div className="text-3xl font-bold">{stats?.totalUsers || 0}</div>
               <p className="text-xs text-gray-500 mt-1">
-                +{stats?.newUsersThisMonth || 0} this month
+                Registered users
               </p>
             </CardContent>
           </Card>
@@ -93,7 +93,7 @@ export default function AdminDashboard() {
             <CardContent>
               <div className="text-3xl font-bold">{stats?.totalDocuments || 0}</div>
               <p className="text-xs text-gray-500 mt-1">
-                {stats?.documentsThisMonth || 0} this month
+                Total generated documents
               </p>
             </CardContent>
           </Card>
@@ -108,7 +108,7 @@ export default function AdminDashboard() {
             <CardContent>
               <div className="text-3xl font-bold">{stats?.totalBookings || 0}</div>
               <p className="text-xs text-gray-500 mt-1">
-                {stats?.bookingsThisMonth || 0} this month
+                All time bookings
               </p>
             </CardContent>
           </Card>
@@ -209,7 +209,7 @@ export default function AdminDashboard() {
                           [
                             {
                               name: "Bookings",
-                              data: [{ "Total Bookings": stats?.totalBookings || 0, "This Month": stats?.bookingsThisMonth || 0 }],
+                              data: [{ "Total Bookings": stats?.totalBookings || 0, "Completed": 0 }],
                             },
                             {
                               name: "Documents",

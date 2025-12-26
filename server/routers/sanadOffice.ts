@@ -322,4 +322,33 @@ export const sanadOfficeRouter = router({
       await db.deleteOfficeAvailability(input.id);
       return { success: true };
     }),
+
+  // Office profile management
+  updateProfile: protectedProcedure
+    .input(
+      z.object({
+        officeId: z.number(),
+        name: z.string(),
+        description: z.string().optional(),
+        email: z.string().email(),
+        phone: z.string(),
+        address: z.string(),
+        region: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { officeId, ...updateData } = input;
+      
+      // Verify office ownership
+      const office = await db.getOfficeById(officeId);
+      if (!office || office.ownerId !== ctx.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have permission to update this office",
+        });
+      }
+
+      await db.updateOfficeProfile(officeId, updateData);
+      return { success: true };
+    }),
 });

@@ -138,6 +138,13 @@ export async function getSanadOfficeById(id: number) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+/**
+ * Get office by ID (alias for getSanadOfficeById for consistency)
+ */
+export async function getOfficeById(id: number) {
+  return await getSanadOfficeById(id);
+}
+
 export async function getSanadOfficeBySlug(slug: string) {
   const db = await getDb();
   if (!db) return undefined;
@@ -202,6 +209,38 @@ export async function updateSanadOffice(id: number, updates: Partial<SanadOffice
   if (!db) throw new Error("Database not available");
 
   await db.update(sanadOffices).set(updates).where(eq(sanadOffices.id, id));
+}
+
+/**
+ * Update office profile information
+ */
+export async function updateOfficeProfile(
+  officeId: number,
+  data: {
+    name?: string;
+    description?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    region?: string;
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Map the simplified field names to actual database column names
+  const updates: any = {};
+  if (data.name !== undefined) updates.officeName = data.name;
+  if (data.description !== undefined) updates.description = data.description;
+  if (data.email !== undefined) updates.email = data.email;
+  if (data.phone !== undefined) updates.phone = data.phone;
+  if (data.address !== undefined) updates.address = data.address;
+  if (data.region !== undefined) updates.governorate = data.region;
+
+  await db
+    .update(sanadOffices)
+    .set(updates)
+    .where(eq(sanadOffices.id, officeId));
 }
 
 export async function getSanadOfficesByOwnerId(ownerId: number) {
@@ -569,21 +608,26 @@ export async function getAvailableTimeSlots(officeId: number, date: Date) {
   const [startHour, startMinute] = startTime.split(":").map(Number);
   const [endHour, endMinute] = endTime.split(":").map(Number);
   
-  let currentTime = startHour * 60 + startMinute; // Convert to minutes
+  let currentTime = startHour * 60 + startMinute;
   const endTimeMinutes = endHour * 60 + endMinute;
   
-  while (currentTime < endTimeMinutes) {
-    const hour = Math.floor(currentTime / 60);
-    const minute = currentTime % 60;
-    const timeStr = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+  while (currentTime + slotDuration <= endTimeMinutes) {
+    const slotHour = Math.floor(currentTime / 60);
+    const slotMinute = currentTime % 60;
+    const slotTime = `${String(slotHour).padStart(2, "0")}:${String(slotMinute).padStart(2, "0")}`;
     
     // Check if this slot is already booked
-    const isBooked = existingBookings.some(booking => booking.scheduledTime === timeStr);
-    
-    slots.push({
-      time: timeStr,
-      available: !isBooked,
+    const isBooked = existingBookings.some((booking) => {
+      const bookingTime = booking.scheduledTime;
+      return bookingTime === slotTime;
     });
+    
+    if (!isBooked) {
+      slots.push({
+        time: slotTime,
+        available: true,
+      });
+    }
     
     currentTime += slotDuration;
   }
@@ -591,47 +635,44 @@ export async function getAvailableTimeSlots(officeId: number, date: Date) {
   return slots;
 }
 
-export async function updateBookingStatus(bookingId: number, status: string) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  await db
-    .update(bookings)
-    .set({ status: status as any, updatedAt: new Date() })
-    .where(eq(bookings.id, bookingId));
-}
-
 // ============================================================================
-// ADMIN FUNCTIONS
+// ADMIN HELPERS
 // ============================================================================
 
-export async function getAdminStats() {
+export async function getPlatformStatistics() {
   const db = await getDb();
-  if (!db) return null;
+  if (!db) return {
+    totalOffices: 0,
+    totalUsers: 0,
+    totalDocuments: 0,
+    totalBookings: 0,
+    pendingOffices: 0,
+    activeOffices: 0,
+  };
 
   const [
-    totalOffices,
-    activeOffices,
-    totalUsers,
-    totalDocuments,
-    totalBookings,
+    officesCount,
+    usersCount,
+    documentsCount,
+    bookingsCount,
+    pendingOfficesCount,
+    activeOfficesCount,
   ] = await Promise.all([
     db.select({ count: sql<number>`count(*)` }).from(sanadOffices),
-    db.select({ count: sql<number>`count(*)` }).from(sanadOffices).where(eq(sanadOffices.status, "active")),
     db.select({ count: sql<number>`count(*)` }).from(users),
     db.select({ count: sql<number>`count(*)` }).from(generatedDocuments),
     db.select({ count: sql<number>`count(*)` }).from(bookings),
+    db.select({ count: sql<number>`count(*)` }).from(sanadOffices).where(eq(sanadOffices.status, "pending")),
+    db.select({ count: sql<number>`count(*)` }).from(sanadOffices).where(eq(sanadOffices.status, "active")),
   ]);
 
   return {
-    totalOffices: Number(totalOffices[0]?.count || 0),
-    activeOffices: Number(activeOffices[0]?.count || 0),
-    totalUsers: Number(totalUsers[0]?.count || 0),
-    totalDocuments: Number(totalDocuments[0]?.count || 0),
-    totalBookings: Number(totalBookings[0]?.count || 0),
-    newUsersThisMonth: 0, // TODO: Calculate
-    documentsThisMonth: 0, // TODO: Calculate
-    bookingsThisMonth: 0, // TODO: Calculate
+    totalOffices: officesCount[0]?.count || 0,
+    totalUsers: usersCount[0]?.count || 0,
+    totalDocuments: documentsCount[0]?.count || 0,
+    totalBookings: bookingsCount[0]?.count || 0,
+    pendingOffices: pendingOfficesCount[0]?.count || 0,
+    activeOffices: activeOfficesCount[0]?.count || 0,
   };
 }
 
@@ -646,58 +687,71 @@ export async function getPendingOffices() {
     .orderBy(desc(sanadOffices.createdAt));
 }
 
-export async function updateOfficeStatus(officeId: number, status: string) {
+export async function getAllUsers() {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) return [];
 
-  await db
-    .update(sanadOffices)
-    .set({ status: status as any, updatedAt: new Date() })
-    .where(eq(sanadOffices.id, officeId));
+  return await db
+    .select()
+    .from(users)
+    .orderBy(desc(users.lastSignedIn));
 }
 
+export async function getRecentActivity(limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
 
-// ============================================================================
-// OFFICE DASHBOARD HELPERS
-// ============================================================================
+  return await db
+    .select()
+    .from(activityLog)
+    .orderBy(desc(activityLog.createdAt))
+    .limit(limit);
+}
 
 /**
- * Get statistics for an office dashboard
+ * Get office statistics for office dashboard
  */
 export async function getOfficeStatistics(officeId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) return {
+    totalBookings: 0,
+    completedBookings: 0,
+    cancelledBookings: 0,
+    totalRevenue: 0,
+    averageRating: 0,
+    totalReviews: 0,
+  };
 
-  const now = new Date();
-  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const office = await getSanadOfficeById(officeId);
+  const officeBookings = await getOfficeBookings(officeId);
 
-  // Get all bookings for this office
-  const allBookings = await db
-    .select()
-    .from(bookings)
-    .where(eq(bookings.officeId, officeId));
-
-  // Calculate statistics
-  const totalBookings = allBookings.length;
-  const pendingBookings = allBookings.filter(b => b.status === "pending").length;
-  const monthlyBookings = allBookings.filter(b => 
-    b.createdAt >= firstDayOfMonth
-  ).length;
-  const uniqueCustomers = new Set(allBookings.map(b => b.userId)).size;
+  const completedBookings = officeBookings.filter((b) => b.status === "completed").length;
+  const cancelledBookings = officeBookings.filter((b) => b.status === "cancelled").length;
+  const totalRevenue = officeBookings
+    .filter((b) => b.status === "completed")
+    .reduce((sum, b) => sum + parseFloat(b.price || "0"), 0);
 
   return {
-    totalBookings,
-    pendingBookings,
-    monthlyBookings,
-    uniqueCustomers,
+    totalBookings: officeBookings.length,
+    completedBookings,
+    cancelledBookings,
+    totalRevenue,
+    averageRating: parseFloat(office?.averageRating || "0"),
+    totalReviews: office?.totalReviews || 0,
   };
 }
-
 
 /**
  * Create office availability schedule
  */
-export async function createOfficeAvailability(data: Partial<typeof officeAvailability.$inferInsert>) {
+export async function createOfficeAvailability(data: {
+  officeId: number;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  slotDuration: number;
+  isActive: boolean;
+}) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 

@@ -20,7 +20,7 @@ const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
 export const adminRouter = router({
   // Get platform statistics
   getStats: adminProcedure.query(async () => {
-    const stats = await db.getAdminStats();
+    const stats = await db.getPlatformStatistics();
     return stats;
   }),
 
@@ -33,7 +33,7 @@ export const adminRouter = router({
   approveOffice: adminProcedure
     .input(z.object({ officeId: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      await db.updateOfficeStatus(input.officeId, "active");
+      await db.updateSanadOffice(input.officeId, { status: "active" });
 
       await db.logActivity({
         userId: ctx.user!.id,
@@ -73,7 +73,7 @@ export const adminRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await db.updateOfficeStatus(input.officeId, "rejected");
+      await db.updateSanadOffice(input.officeId, { verificationStatus: "rejected" });
 
       await db.logActivity({
         userId: ctx.user!.id,
