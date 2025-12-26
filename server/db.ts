@@ -2446,6 +2446,38 @@ export async function addOfficeStaff(data: {
   return staff;
 }
 
+export async function updateOfficeStaff(staffId: number, data: {
+  role?: "owner" | "manager" | "agent";
+  isActive?: boolean;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { officeStaff } = await import("../drizzle/schema");
+  
+  await db
+    .update(officeStaff)
+    .set(data)
+    .where(eq(officeStaff.id, staffId));
+  
+  return { id: staffId };
+}
+
+export async function removeOfficeStaff(staffId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { officeStaff } = await import("../drizzle/schema");
+  
+  // Soft delete by setting isActive to false
+  await db
+    .update(officeStaff)
+    .set({ isActive: false })
+    .where(eq(officeStaff.id, staffId));
+  
+  return { id: staffId };
+}
+
 // Chat Assignments
 export async function assignConversation(data: {
   conversationId: number;

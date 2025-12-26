@@ -6,7 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageCircle, Send, Search, Archive, CheckCheck, MessageSquareText, Paperclip, Download, FileIcon } from "lucide-react";
+import { MessageCircle, Send, Search, Archive, CheckCheck, MessageSquareText, Paperclip, Download, FileIcon, UserPlus } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
@@ -37,6 +44,68 @@ interface Conversation {
     id: number;
     officeName: string;
   } | null;
+}
+
+function AssignmentDropdown({ conversationId }: { conversationId: number }) {
+  const { data: userOffices } = trpc.officeOwner.getMyOffices.useQuery();
+  const officeId = userOffices?.[0]?.id;
+  
+  const { data: staff } = trpc.chatAssignment.getOfficeStaff.useQuery(
+    { officeId: officeId! },
+    { enabled: !!officeId }
+  );
+  
+  const { data: currentAssignment } = trpc.chatAssignment.getAssignment.useQuery(
+    { conversationId },
+    { enabled: !!conversationId }
+  );
+  
+  const assignMutation = trpc.chatAssignment.assignConversation.useMutation({
+    onSuccess: () => {
+      toast.success("Conversation assigned successfully");
+    },
+    onError: () => {
+      toast.error("Failed to assign conversation");
+    },
+  });
+  
+  const handleAssign = (staffUserId: number) => {
+    assignMutation.mutate({
+      conversationId,
+      assignedToUserId: staffUserId,
+    });
+  };
+  
+  return (
+    <div className="flex items-center gap-2">
+      <UserPlus className="h-4 w-4 text-muted-foreground" />
+      <Select
+        value={currentAssignment?.assignedToUserId?.toString() || "unassigned"}
+        onValueChange={(value) => {
+          if (value !== "unassigned") {
+            handleAssign(parseInt(value));
+          }
+        }}
+      >
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Assign to..." />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="unassigned">Unassigned</SelectItem>
+          {staff?.map((member: any) => (
+            <SelectItem key={member.userId} value={member.userId.toString()}>
+              {member.userName || member.userEmail || `User ${member.userId}`}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {currentAssignment && (
+        <span className="text-xs text-muted-foreground">
+          Assigned to {currentAssignment.assignedToUserName}
+        </span>
+      )}
+    </div>
+  );
 }
 
 export default function ChatInbox() {
@@ -357,15 +426,18 @@ export default function ChatInbox() {
               <>
                 <CardHeader className="border-b">
                   <div className="flex items-center justify-between">
-                    <div>
+                    <div className="flex-1">
                       <CardTitle>{selectedConversation.office?.officeName || "Unknown Office"}</CardTitle>
                       <p className="text-sm text-muted-foreground mt-1">
                         Status: {selectedConversation.conversation.status}
                       </p>
                     </div>
-                    <Button variant="ghost" size="icon">
-                      <Archive className="h-5 w-5" />
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <AssignmentDropdown conversationId={selectedConversation.conversation.id} />
+                      <Button variant="ghost" size="icon">
+                        <Archive className="h-5 w-5" />
+                      </Button>
+                    </div>
                   </div>
                   
                   {/* Message Search */}

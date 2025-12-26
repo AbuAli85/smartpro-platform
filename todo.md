@@ -1030,3 +1030,43 @@
 - [ ] Create routing configuration page for office owners
 - [ ] Add routing analytics (assignment distribution, wait times)
 - [ ] Write unit tests for routing logic
+
+
+## Staff Management UI Implementation
+- [ ] Create StaffManagement page component in Office Owner Dashboard
+- [ ] Add staff list table with name, email, role, status columns
+- [ ] Build add/edit staff modal with form validation
+- [ ] Implement remove staff functionality with confirmation
+- [ ] Add staff role assignment (admin, agent, viewer)
+- [ ] Show staff workload metrics (active chats, response time)
+- [ ] Add staff availability toggle (online/offline/busy)
+- [ ] Write unit tests for staff management
+
+## Chat Assignment Integration
+- [ ] Add assignment dropdown to ChatInbox conversation list
+- [ ] Show currently assigned staff member in conversation header
+- [ ] Add reassignment functionality with notification
+- [ ] Display unassigned conversations badge
+- [ ] Add bulk assignment for multiple conversations
+- [ ] Show staff workload in assignment dropdown
+- [ ] Write unit tests for assignment integration
+
+## Automated Chat Routing Implementation
+- [ ] Create routing algorithm based on availability and workload
+- [ ] Add expertise tags to staff profiles
+- [ ] Implement round-robin distribution for balanced workload
+- [ ] Add priority routing for VIP customers
+- [ ] Create routing rules configuration interface
+- [ ] Add manual override for automatic assignments
+- [ ] Log routing decisions for analytics
+- [ ] Write unit tests for routing logic
+
+## Chat File Gallery Implementation
+- [ ] Create FileGallery component for conversations
+- [ ] Filter files by type (images, documents, all)
+- [ ] Add thumbnail preview for images
+- [ ] Implement file search by name and date
+- [ ] Add bulk download functionality
+- [ ] Show file metadata (size, uploader, date)
+- [ ] Add delete file functionality for office owners
+- [ ] Write unit tests for file gallery

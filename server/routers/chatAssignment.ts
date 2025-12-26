@@ -64,4 +64,25 @@ export const chatAssignmentRouter = router({
     .query(async ({ ctx }) => {
       return await db.getAssignedConversations(ctx.user.id);
     }),
+
+  // Update staff member
+  updateStaff: protectedProcedure
+    .input(z.object({
+      staffId: z.number(),
+      role: z.enum(["owner", "manager", "agent"]).optional(),
+      isActive: z.boolean().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      return await db.updateOfficeStaff(input.staffId, {
+        role: input.role,
+        isActive: input.isActive,
+      });
+    }),
+
+  // Remove staff member
+  removeStaff: protectedProcedure
+    .input(z.object({ staffId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      return await db.removeOfficeStaff(input.staffId);
+    }),
 });
