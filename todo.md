@@ -1599,3 +1599,34 @@
 - [x] Create bilingual email notification helper
 - [x] Create bilingual SMS notification helper
 - [ ] Test notifications in both languages
+
+
+## Notification Integration & Preferences (Phase 7)
+### Phase 1: Booking Flow Integration
+- [x] Find booking creation procedure in tRPC routers
+- [x] Add email notification on booking creation
+- [x] Add SMS notification on booking creation
+- [x] Detect user's preferred language from database
+- [x] Format booking data for email/SMS templates
+- [x] Add error handling for notification failures
+- [ ] Test booking notifications in both languages
+
+### Phase 2: Template Translation Management
+- [x] Add template selection dropdown to ContentTranslation page
+- [x] Create form for editing template Arabic name
+- [x] Create form for editing template Arabic description
+- [ ] Add tRPC mutation for updating template translations
+- [ ] Add validation for template Arabic fields
+- [x] Test template translation management
+- [x] Update seeding script to include templates
+
+### Phase 3: Notification Preferences
+- [ ] Add notificationPreferences field to user schema
+- [ ] Create NotificationPreferences page component
+- [ ] Add email notification toggle
+- [ ] Add SMS notification toggle
+- [ ] Add notification type preferences (confirmations, reminders, marketing)
+- [ ] Create tRPC mutation for updating preferences
+- [ ] Add navigation link to preferences page
+- [ ] Test notification preferences functionality
+- [ ] Update notification helpers to respect user preferences

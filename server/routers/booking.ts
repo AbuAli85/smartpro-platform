@@ -3,7 +3,8 @@ import { TRPCError } from "@trpc/server";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import * as db from "../db";
 import { notifyOwner } from "../_core/notification";
-import { sendBookingConfirmationEmail, sendBookingReminderSMS, sendBookingStatusUpdateSMS } from "../_core/emailSms";
+import { sendBilingualEmail, getUserLanguage } from "../_core/emailNotifications";
+import { sendBilingualSMS } from "../_core/smsNotifications";
 import { calculateCancellation, cancelBooking } from "../cancellationPolicy";
 import { emitBookingNotification } from "../_core/notifications";
 
@@ -127,16 +128,21 @@ export const bookingRouter = router({
         }
       }
 
-      // Send email confirmation to user
+      // Send bilingual email confirmation to user
       if (user.email) {
-        await sendBookingConfirmationEmail({
-          userEmail: user.email,
-          userName: user.name || "User",
-          officeName: office.officeName,
-          scheduledDate: input.scheduledDate ? new Date(input.scheduledDate).toLocaleDateString() : "TBD",
-          scheduledTime: input.scheduledTime || "TBD",
-          serviceDescription: input.serviceDescription,
-        });
+        const userLanguage = getUserLanguage(user.preferredLanguage);
+        await sendBilingualEmail(
+          user.email,
+          "bookingConfirmation",
+          {
+            customerName: user.name || "User",
+            officeName: office.officeName,
+            bookingDate: input.scheduledDate ? new Date(input.scheduledDate).toLocaleDateString() : "TBD",
+            bookingTime: input.scheduledTime || "TBD",
+            bookingId: bookingId.toString(),
+          },
+          userLanguage
+        );
       }
 
       // Create notification for booking confirmation
@@ -272,19 +278,22 @@ export const bookingRouter = router({
         actionUrl: `/bookings`,
       });
 
-      // Send SMS notification for status update
+      // Send bilingual SMS notification for status update
       try {
         const bookingUser = await db.getUserById(booking.userId);
         const office = await db.getSanadOfficeById(booking.officeId);
         if (bookingUser?.phone && office) {
-          await sendBookingStatusUpdateSMS({
-            userPhone: bookingUser.phone,
-            userName: bookingUser.name || "Customer",
-            officeName: office.officeName,
-            status: input.status,
-            scheduledDate: booking.scheduledDate ? new Date(booking.scheduledDate).toLocaleDateString() : undefined,
-            scheduledTime: booking.scheduledTime || undefined,
-          });
+          const userLanguage = getUserLanguage(bookingUser.preferredLanguage);
+          await sendBilingualSMS(
+            bookingUser.phone,
+            "statusUpdate",
+            {
+              customerName: bookingUser.name || "Customer",
+              serviceName: booking.serviceDescription || "Service",
+              status: input.status,
+            },
+            userLanguage
+          );
         }
       } catch (error) {
         console.error("Failed to send status update SMS:", error);

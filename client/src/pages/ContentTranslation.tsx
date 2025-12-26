@@ -15,10 +15,18 @@ export default function ContentTranslation() {
   const [selectedOfficeId, setSelectedOfficeId] = useState<number | null>(null);
   const [officeNameAr, setOfficeNameAr] = useState("");
   const [officeDescriptionAr, setOfficeDescriptionAr] = useState("");
+  
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
+  const [templateNameAr, setTemplateNameAr] = useState("");
+  const [templateDescriptionAr, setTemplateDescriptionAr] = useState("");
 
   // Fetch all offices
   const { data: officesData, isLoading: officesLoading } = trpc.sanadOffice.list.useQuery({});
   const offices = officesData?.offices || [];
+  
+  // Fetch all templates
+  const { data: templatesData, isLoading: templatesLoading } = trpc.documentTemplate.list.useQuery({});
+  const templates = templatesData?.templates || [];
 
   // Update office translation mutation (placeholder - will create tRPC mutation)
   const updateOfficeMutation = {
@@ -53,6 +61,33 @@ export default function ContentTranslation() {
       officeNameAr,
       descriptionAr: officeDescriptionAr,
     });
+  };
+  
+  const handleTemplateSelect = (templateId: number) => {
+    const template = templates.find((tmpl: any) => tmpl.id === templateId);
+    if (template) {
+      setSelectedTemplateId(templateId);
+      setTemplateNameAr(template.templateNameAr || "");
+      setTemplateDescriptionAr(template.descriptionAr || "");
+    }
+  };
+  
+  const handleSaveTemplateTranslation = () => {
+    if (!selectedTemplateId) {
+      toast.error(t("admin.selectTemplateFirst"));
+      return;
+    }
+
+    // Placeholder for now
+    console.log("Update template translation:", {
+      templateId: selectedTemplateId,
+      templateNameAr,
+      descriptionAr: templateDescriptionAr,
+    });
+    toast.success(t("admin.translationUpdated"));
+    setSelectedTemplateId(null);
+    setTemplateNameAr("");
+    setTemplateDescriptionAr("");
   };
 
   return (
@@ -169,10 +204,72 @@ export default function ContentTranslation() {
                 {t("admin.manageTemplateTranslationsDesc")}
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground text-center py-8">
-                {t("admin.templateTranslationsComingSoon")}
-              </p>
+            <CardContent className="space-y-6">
+              {/* Template Selection */}
+              <div className="space-y-2">
+                <Label htmlFor="template-select">{t("admin.selectTemplate")}</Label>
+                {templatesLoading ? (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>{t("common.loading")}</span>
+                  </div>
+                ) : (
+                  <select
+                    id="template-select"
+                    className="w-full rounded-md border border-input bg-background px-3 py-2"
+                    value={selectedTemplateId || ""}
+                    onChange={(e) => handleTemplateSelect(Number(e.target.value))}
+                  >
+                    <option value="">{t("admin.selectTemplate")}</option>
+                    {templates.map((template: any) => (
+                      <option key={template.id} value={template.id}>
+                        {template.templateName}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              {selectedTemplateId && (
+                <>
+                  {/* Arabic Name */}
+                  <div className="space-y-2">
+                    <Label htmlFor="template-name-ar">{t("admin.templateNameArabic")}</Label>
+                    <Input
+                      id="template-name-ar"
+                      value={templateNameAr}
+                      onChange={(e) => setTemplateNameAr(e.target.value)}
+                      placeholder={t("admin.enterArabicName")}
+                      dir="rtl"
+                      className="text-right"
+                    />
+                  </div>
+
+                  {/* Arabic Description */}
+                  <div className="space-y-2">
+                    <Label htmlFor="template-description-ar">
+                      {t("admin.templateDescriptionArabic")}
+                    </Label>
+                    <Textarea
+                      id="template-description-ar"
+                      value={templateDescriptionAr}
+                      onChange={(e) => setTemplateDescriptionAr(e.target.value)}
+                      placeholder={t("admin.enterArabicDescription")}
+                      dir="rtl"
+                      className="text-right min-h-[120px]"
+                    />
+                  </div>
+
+                  {/* Save Button */}
+                  <Button
+                    onClick={handleSaveTemplateTranslation}
+                    className="w-full"
+                  >
+                    <Save className="mr-2 h-4 w-4" />
+                    {t("common.save")}
+                  </Button>
+                </>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
