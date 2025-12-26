@@ -162,6 +162,13 @@
       "when": 1766768960830,
       "tag": "0022_abnormal_centennial",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "5",
+      "when": 1766769447281,
+      "tag": "0023_condemned_nick_fury",
+      "breakpoints": true
     }
   ]
 }

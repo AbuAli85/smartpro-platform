@@ -960,3 +960,45 @@ export const translationVersions = mysqlTable("translation_versions", {
 
 export type TranslationVersion = typeof translationVersions.$inferSelect;
 export type InsertTranslationVersion = typeof translationVersions.$inferInsert;
+
+
+// ============================================================================
+// TRANSLATION REVIEWS (Collaborative Workflow)
+// ============================================================================
+
+export const translationReviews = mysqlTable("translation_reviews", {
+  id: int("id").primaryKey().autoincrement(),
+  entityType: mysqlEnum("entity_type", ["office", "template"]).notNull(),
+  entityId: int("entity_id").notNull(),
+  fieldName: varchar("field_name", { length: 50 }).notNull(), // nameAr, descriptionAr
+  translatedText: text("translated_text").notNull(),
+  status: mysqlEnum("status", ["pending", "approved", "rejected", "needs_revision"]).notNull().default("pending"),
+  submittedBy: int("submitted_by").notNull(),
+  submittedByName: varchar("submitted_by_name", { length: 255 }).notNull(),
+  reviewedBy: int("reviewed_by"),
+  reviewedByName: varchar("reviewed_by_name", { length: 255 }),
+  reviewNotes: text("review_notes"),
+  submittedAt: timestamp("submitted_at").defaultNow().notNull(),
+  reviewedAt: timestamp("reviewed_at"),
+}, (table) => ({
+  entityIdx: index("entity_idx").on(table.entityType, table.entityId),
+  statusIdx: index("status_idx").on(table.status),
+  submittedByIdx: index("submitted_by_idx").on(table.submittedBy),
+}));
+
+export type TranslationReview = typeof translationReviews.$inferSelect;
+export type InsertTranslationReview = typeof translationReviews.$inferInsert;
+
+export const translationReviewComments = mysqlTable("translation_review_comments", {
+  id: int("id").primaryKey().autoincrement(),
+  reviewId: int("review_id").notNull(),
+  userId: int("user_id").notNull(),
+  userName: varchar("user_name", { length: 255 }).notNull(),
+  comment: text("comment").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+  reviewIdIdx: index("review_id_idx").on(table.reviewId),
+}));
+
+export type TranslationReviewComment = typeof translationReviewComments.$inferSelect;
+export type InsertTranslationReviewComment = typeof translationReviewComments.$inferInsert;

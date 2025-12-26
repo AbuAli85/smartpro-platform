@@ -30,6 +30,7 @@ import { translationExportRouter } from "./routers/translationExport";
 import { translationAnalyticsRouter } from "./routers/translationAnalytics";
 import { translationMemoryRouter } from "./routers/translationMemory";
 import { autoTranslateRouter } from "./routers/autoTranslate";
+import { translationQualityRouter } from "./routers/translationQuality";
 
 export const appRouter = router({
   system: systemRouter,
@@ -118,6 +119,7 @@ export const appRouter = router({
   translationAnalytics: translationAnalyticsRouter,
   translationMemory: translationMemoryRouter,
   autoTranslate: autoTranslateRouter,
+  translationQuality: translationQualityRouter,
 });
 
 export type AppRouter = typeof appRouter;
