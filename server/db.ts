@@ -2337,3 +2337,172 @@ export async function getChatAnalytics(params: {
     busiestHours: busiestHoursResult,
   };
 }
+
+// Canned Responses
+export async function getCannedResponsesByOffice(officeId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { cannedResponses } = await import("../drizzle/schema");
+  
+  return await db
+    .select()
+    .from(cannedResponses)
+    .where(eq(cannedResponses.officeId, officeId))
+    .orderBy(desc(cannedResponses.createdAt));
+}
+
+export async function createCannedResponse(data: {
+  officeId: number;
+  title: string;
+  content: string;
+  category: "pricing" | "hours" | "services" | "general";
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { cannedResponses } = await import("../drizzle/schema");
+  
+  const [response] = await db
+    .insert(cannedResponses)
+    .values(data)
+    .$returningId();
+  
+  return response;
+}
+
+export async function updateCannedResponse(id: number, data: {
+  title?: string;
+  content?: string;
+  category?: "pricing" | "hours" | "services" | "general";
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { cannedResponses } = await import("../drizzle/schema");
+  
+  await db
+    .update(cannedResponses)
+    .set(data)
+    .where(eq(cannedResponses.id, id));
+  
+  return { id };
+}
+
+export async function deleteCannedResponse(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { cannedResponses } = await import("../drizzle/schema");
+  
+  await db
+    .delete(cannedResponses)
+    .where(eq(cannedResponses.id, id));
+  
+  return { id };
+}
+
+// Office Staff
+export async function getOfficeStaff(officeId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { officeStaff, users } = await import("../drizzle/schema");
+  
+  return await db
+    .select({
+      id: officeStaff.id,
+      userId: officeStaff.userId,
+      userName: users.name,
+      userEmail: users.email,
+      role: officeStaff.role,
+      isActive: officeStaff.isActive,
+      createdAt: officeStaff.createdAt,
+    })
+    .from(officeStaff)
+    .leftJoin(users, eq(officeStaff.userId, users.id))
+    .where(and(
+      eq(officeStaff.officeId, officeId),
+      eq(officeStaff.isActive, true)
+    ))
+    .orderBy(desc(officeStaff.createdAt));
+}
+
+export async function addOfficeStaff(data: {
+  officeId: number;
+  userId: number;
+  role: "owner" | "manager" | "agent";
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { officeStaff } = await import("../drizzle/schema");
+  
+  const [staff] = await db
+    .insert(officeStaff)
+    .values(data)
+    .$returningId();
+  
+  return staff;
+}
+
+// Chat Assignments
+export async function assignConversation(data: {
+  conversationId: number;
+  assignedToUserId: number;
+  assignedByUserId: number;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { chatAssignments } = await import("../drizzle/schema");
+  
+  const [assignment] = await db
+    .insert(chatAssignments)
+    .values(data)
+    .$returningId();
+  
+  return assignment;
+}
+
+export async function getConversationAssignment(conversationId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { chatAssignments, users } = await import("../drizzle/schema");
+  
+  const [assignment] = await db
+    .select({
+      id: chatAssignments.id,
+      conversationId: chatAssignments.conversationId,
+      assignedToUserId: chatAssignments.assignedToUserId,
+      assignedToUserName: users.name,
+      assignedByUserId: chatAssignments.assignedByUserId,
+      assignedAt: chatAssignments.assignedAt,
+    })
+    .from(chatAssignments)
+    .leftJoin(users, eq(chatAssignments.assignedToUserId, users.id))
+    .where(eq(chatAssignments.conversationId, conversationId))
+    .orderBy(desc(chatAssignments.assignedAt))
+    .limit(1);
+  
+  return assignment;
+}
+
+export async function getAssignedConversations(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { chatAssignments, chatConversations } = await import("../drizzle/schema");
+  
+  return await db
+    .select({
+      conversationId: chatAssignments.conversationId,
+      assignedAt: chatAssignments.assignedAt,
+      conversation: chatConversations,
+    })
+    .from(chatAssignments)
+    .leftJoin(chatConversations, eq(chatAssignments.conversationId, chatConversations.id))
+    .where(eq(chatAssignments.assignedToUserId, userId))
+    .orderBy(desc(chatAssignments.assignedAt));
+}

@@ -19,6 +19,7 @@ import {
   BarChart3,
   MessageCircle,
   TrendingUp,
+  MessageSquareText,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -54,6 +55,7 @@ export function Sidebar({ className }: SidebarProps) {
     { name: "Owner Dashboard", href: "/owner/dashboard", icon: Shield, requiresAuth: true },
     { name: "Chat Inbox", href: "/owner/chat", icon: MessageCircle, requiresAuth: true },
     { name: "Chat Analytics", href: "/owner/chat-analytics", icon: TrendingUp, requiresAuth: true },
+    { name: "Canned Responses", href: "/owner/canned-responses", icon: MessageSquareText, requiresAuth: true },
     { name: t("nav.loyalty"), href: "/loyalty", icon: Award, requiresAuth: true },
     { name: t("nav.refer"), href: "/refer", icon: Gift, requiresAuth: true },
     { name: t("nav.analytics"), href: "/analytics", icon: BarChart3, requiresAuth: true },

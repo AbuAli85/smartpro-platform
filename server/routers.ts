@@ -18,6 +18,8 @@ import { officeOwnerRouter } from "./routers/officeOwner";
 import { templateRouter } from "./routers/template";
 import { chatRouter } from "./routers/chat";
 import { chatAnalyticsRouter } from "./routers/chatAnalytics";
+import { cannedResponsesRouter } from "./routers/cannedResponses";
+import { chatAssignmentRouter } from "./routers/chatAssignment";
 
 export const appRouter = router({
   system: systemRouter,
@@ -72,6 +74,8 @@ export const appRouter = router({
   template: templateRouter,
   chat: chatRouter,
   chatAnalytics: chatAnalyticsRouter,
+  cannedResponses: cannedResponsesRouter,
+  chatAssignment: chatAssignmentRouter,
 });
 
 export type AppRouter = typeof appRouter;

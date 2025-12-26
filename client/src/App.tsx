@@ -26,6 +26,7 @@ import OfficeOwnerDashboard from "./pages/OfficeOwnerDashboard";
 import TemplateManager from "./pages/TemplateManager";
 import ChatInbox from "./pages/ChatInbox";
 import ChatAnalytics from "./pages/ChatAnalytics";
+import CannedResponses from "./pages/CannedResponses";
 import { useNotifications } from "./hooks/useNotifications";
 
 function Router() {
@@ -72,6 +73,7 @@ function Router() {
       <Route path="/owner/templates" component={TemplateManager} />
       <Route path="/owner/chat" component={ChatInbox} />
       <Route path="/owner/chat-analytics" component={ChatAnalytics} />
+      <Route path="/owner/canned-responses" component={CannedResponses} />
       
       {/* 404 */}
       <Route path="/404" component={NotFound} />

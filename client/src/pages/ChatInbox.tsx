@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageCircle, Send, Search, Archive, CheckCheck } from "lucide-react";
+import { MessageCircle, Send, Search, Archive, CheckCheck, MessageSquareText } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
@@ -52,6 +52,7 @@ export default function ChatInbox() {
   }, []);
   const [selectedConversationId, setSelectedConversationId] = useState<number | null>(null);
   const [message, setMessage] = useState("");
+  const [showCannedResponses, setShowCannedResponses] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [messageSearchQuery, setMessageSearchQuery] = useState("");
@@ -68,6 +69,16 @@ export default function ChatInbox() {
   const { data: conversations, refetch: refetchConversations } = trpc.chat.getConversations.useQuery(
     undefined,
     { enabled: !!user }
+  );
+  
+  // Get selected conversation
+  const selectedConversation = conversations?.find(
+    (c) => c.conversation.id === selectedConversationId
+  );
+  
+  const { data: cannedResponses } = trpc.cannedResponses.getByOffice.useQuery(
+    { officeId: selectedConversation?.conversation.officeId || 0 },
+    { enabled: !!selectedConversation?.conversation.officeId }
   );
 
   // Search messages mutation
@@ -201,10 +212,6 @@ export default function ChatInbox() {
     
     return matchesFilter && matchesSearch;
   });
-
-  const selectedConversation = conversations?.find(
-    c => c.conversation.id === selectedConversationId
-  );
 
   if (!user) {
     return (
@@ -403,7 +410,37 @@ export default function ChatInbox() {
 
                   {/* Message Input */}
                   <div className="p-4 border-t">
+                    {/* Canned Responses Dropdown */}
+                    {showCannedResponses && cannedResponses && cannedResponses.length > 0 && (
+                      <div className="mb-2 p-2 border rounded-lg bg-muted/50 max-h-48 overflow-y-auto">
+                        <p className="text-xs font-medium mb-2">Quick Replies:</p>
+                        <div className="space-y-1">
+                          {cannedResponses.map((response) => (
+                            <button
+                              key={response.id}
+                              onClick={() => {
+                                setMessage(response.content);
+                                setShowCannedResponses(false);
+                              }}
+                              className="w-full text-left px-2 py-1 text-sm rounded hover:bg-accent transition-colors"
+                            >
+                              <span className="font-medium">{response.title}</span>
+                              <p className="text-xs text-muted-foreground truncate">{response.content}</p>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
                     <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setShowCannedResponses(!showCannedResponses)}
+                        title="Quick replies"
+                      >
+                        <MessageSquareText className="h-4 w-4" />
+                      </Button>
                       <Input
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}

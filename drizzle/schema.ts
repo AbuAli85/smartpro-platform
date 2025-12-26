@@ -639,3 +639,71 @@ export const chatMessages = mysqlTable("chat_messages", {
 
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type InsertChatMessage = typeof chatMessages.$inferInsert;
+
+// ===== Canned Responses =====
+export const cannedResponses = mysqlTable("canned_responses", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Office reference
+  officeId: int("officeId").notNull(),
+  
+  // Response content
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  category: mysqlEnum("category", ["pricing", "hours", "services", "general"]).default("general").notNull(),
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  officeIdx: index("office_idx").on(table.officeId),
+  categoryIdx: index("category_idx").on(table.category),
+}));
+
+export type CannedResponse = typeof cannedResponses.$inferSelect;
+export type InsertCannedResponse = typeof cannedResponses.$inferInsert;
+
+// ===== Chat Assignments =====
+export const chatAssignments = mysqlTable("chat_assignments", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Conversation reference
+  conversationId: int("conversationId").notNull(),
+  
+  // Assignment info
+  assignedToUserId: int("assignedToUserId").notNull(),
+  assignedByUserId: int("assignedByUserId").notNull(),
+  
+  // Audit
+  assignedAt: timestamp("assignedAt").defaultNow().notNull(),
+}, (table) => ({
+  conversationIdx: index("conversation_idx").on(table.conversationId),
+  assignedToIdx: index("assigned_to_idx").on(table.assignedToUserId),
+}));
+
+export type ChatAssignment = typeof chatAssignments.$inferSelect;
+export type InsertChatAssignment = typeof chatAssignments.$inferInsert;
+
+// ===== Office Staff =====
+export const officeStaff = mysqlTable("office_staff", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // References
+  officeId: int("officeId").notNull(),
+  userId: int("userId").notNull(),
+  
+  // Role
+  role: mysqlEnum("role", ["owner", "manager", "agent"]).default("agent").notNull(),
+  
+  // Status
+  isActive: boolean("isActive").default(true).notNull(),
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  officeIdx: index("office_idx").on(table.officeId),
+  userIdx: index("user_idx").on(table.userId),
+}));
+
+export type OfficeStaff = typeof officeStaff.$inferSelect;
+export type InsertOfficeStaff = typeof officeStaff.$inferInsert;

@@ -968,3 +968,38 @@
 - [x] Add date range filter for analytics
 - [x] Add route and navigation for chat analytics
 - [ ] Test analytics calculations
+
+## Canned Responses Implementation
+- [x] Create canned_responses table (office_id, title, content, category, created_at)
+- [ ] Add getCannedResponses backend procedure
+- [ ] Add createCannedResponse backend procedure
+- [ ] Add updateCannedResponse backend procedure
+- [ ] Add deleteCannedResponse backend procedure
+- [x] Build CannedResponses management page for office owners
+- [ ] Add quick-reply dropdown to ChatInbox message input
+- [ ] Implement insert canned response into message field
+- [ ] Add categories for organizing responses (pricing, hours, services, general)
+- [x] Write unit tests for canned responses
+
+## Chat File Attachments Implementation
+- [ ] Add attachments field to chat_messages table (JSON array)
+- [ ] Create file upload handler with S3 storage
+- [ ] Add file upload button to chat input
+- [ ] Display file attachments in message bubbles
+- [ ] Add file preview for images
+- [ ] Add download functionality for documents
+- [ ] Validate file types and size limits (10MB max)
+- [ ] Show upload progress indicator
+- [ ] Write unit tests for file attachments
+
+## Chat Assignment System Implementation
+- [x] Create chat_assignments table (conversation_id, assigned_to_user_id, assigned_by_user_id, assigned_at)
+- [ ] Add staff management for offices (link users to offices as staff)
+- [ ] Create assignConversation backend procedure
+- [ ] Create getAssignedConversations backend procedure
+- [ ] Add assignment dropdown in ChatInbox
+- [ ] Show assigned staff member in conversation list
+- [ ] Add workload balancing (show conversation count per staff)
+- [ ] Add reassignment functionality
+- [ ] Send notification when conversation is assigned
+- [ ] Write unit tests for assignment system
