@@ -180,11 +180,9 @@ export const bookingRouter = router({
 
       return { success: true };
     }),
-});
 
-export const reviewRouter = router({
   // Create a review
-  create: protectedProcedure
+  createReview: protectedProcedure
     .input(
       z.object({
         officeId: z.number(),

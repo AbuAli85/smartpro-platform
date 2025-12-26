@@ -31,16 +31,14 @@ export default function CancellationDialog({
   const [showConfirm, setShowConfirm] = useState(false);
 
   // Calculate cancellation details
-  // Note: Type assertion needed due to tRPC type generation lag. Backend procedure exists and works.
   const { data: cancellationInfo, isLoading: calculating } =
-    (trpc.booking as any).calculateCancellation.useQuery(
+    trpc.booking.calculateCancellation.useQuery(
       { bookingId },
       { enabled: open && bookingId > 0 }
     );
 
   // Cancel booking mutation
-  // Note: Type assertion needed due to tRPC type generation lag. Backend procedure exists and works.
-  const cancelMutation = (trpc.booking as any).cancelBooking.useMutation({
+  const cancelMutation = trpc.booking.cancelBooking.useMutation({
     onSuccess: () => {
       toast.success("Booking cancelled successfully");
       onOpenChange(false);

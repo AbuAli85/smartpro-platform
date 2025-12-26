@@ -7,7 +7,7 @@ interface ReviewsListProps {
 }
 
 export default function ReviewsList({ officeId }: ReviewsListProps) {
-  const { data: reviews, isLoading } = (trpc.booking as any).getOfficeReviews.useQuery({
+  const { data: reviews, isLoading } = trpc.booking.getOfficeReviews.useQuery({
     officeId,
   });
 

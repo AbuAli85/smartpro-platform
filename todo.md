@@ -365,3 +365,12 @@
 - [ ] Test cancellation flow with real booking
 - [ ] Test review submission with completed booking
 - [ ] Verify all navigation links work correctly
+
+
+## tRPC Type Generation Fix
+- [x] Merge reviewRouter procedures into bookingRouter
+- [x] Remove type assertions from CancellationDialog
+- [x] Remove type assertions from ReviewDialog
+- [x] Remove type assertions from ReviewsList
+- [x] Verify TypeScript compilation with no errors
+- [x] Test cancellation and review features with proper type safety
