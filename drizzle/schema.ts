@@ -1054,3 +1054,41 @@ export const batchTranslationJobs = mysqlTable("batch_translation_jobs", {
 
 export type BatchTranslationJob = typeof batchTranslationJobs.$inferSelect;
 export type InsertBatchTranslationJob = typeof batchTranslationJobs.$inferInsert;
+
+
+// ============================================================================
+// QUALITY ALERTS
+// ============================================================================
+
+export const qualityAlerts = mysqlTable("quality_alerts", {
+  id: int("id").primaryKey().autoincrement(),
+  
+  // Alert details
+  alertType: mysqlEnum("alert_type", ["low_accuracy", "high_revision_rate", "memory_usage_drop"]).notNull(),
+  severity: mysqlEnum("severity", ["warning", "critical"]).notNull(),
+  
+  // Metrics
+  currentValue: decimal("current_value", { precision: 5, scale: 2 }).notNull(),
+  thresholdValue: decimal("threshold_value", { precision: 5, scale: 2 }).notNull(),
+  
+  // Message
+  message: text("message").notNull(),
+  
+  // Status
+  status: mysqlEnum("status", ["active", "resolved", "acknowledged"]).notNull().default("active"),
+  
+  // Timestamps
+  detectedAt: timestamp("detected_at").defaultNow().notNull(),
+  resolvedAt: timestamp("resolved_at"),
+  acknowledgedAt: timestamp("acknowledged_at"),
+  
+  // Notification
+  emailSent: boolean("email_sent").notNull().default(false),
+  emailSentAt: timestamp("email_sent_at"),
+}, (table) => ({
+  statusIdx: index("status_idx").on(table.status),
+  detectedAtIdx: index("detected_at_idx").on(table.detectedAt),
+}));
+
+export type QualityAlert = typeof qualityAlerts.$inferSelect;
+export type InsertQualityAlert = typeof qualityAlerts.$inferInsert;

@@ -1836,15 +1836,17 @@
 - [x] Add auto-approval logic for high-confidence translations
 - [x] Build review queue for low-confidence translations
 - [x] Create tRPC procedures for batch job management
-- [ ] Create SmartBatchProcessor UI component
-- [ ] Add progress tracking and job monitoring UI
+- [x] Create SmartBatchProcessor UI component with job wizard
+- [x] Add job list with status indicators
+- [x] Add progress tracking and real-time monitoring
+- [x] Review queue integrated in ReviewQueue page
+- [x] Add route and navigation for batch processing page
 - [ ] Test batch processing with real data
 
 ### Phase 3: Automated Quality Alerts
-- [ ] Build quality metrics monitoring system
-- [ ] Create alert rules engine (accuracy, revision rate, memory usage)
-- [ ] Implement email notification system for alerts
-- [ ] Add alert history tracking
-- [ ] Create AlertSettings page for threshold configuration
-- [ ] Add alert dashboard widget
+- [x] Build quality metrics monitoring system
+- [x] Create alert rules engine (accuracy < 80%, revision rate spikes)
+- [x] Implement email notification system for quality alerts
+- [x] Add alert history tracking to database
+- [x] Create scheduled job for periodic quality checks
 - [ ] Test alert system with simulated quality issues

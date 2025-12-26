@@ -12,6 +12,7 @@ import { initializeCronJobs } from "./cronJobs";
 import sseRouter from "../routes/sse";
 import { startReminderScheduler } from "./reminderScheduler";
 import { startFollowUpJob } from "../jobs/followUpJob";
+import { startQualityMonitoringScheduler } from "./qualityMonitoringJob";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -65,6 +66,9 @@ async function startServer() {
   
   // Start booking reminder scheduler
   startReminderScheduler();
+  
+  // Start quality monitoring scheduler
+  startQualityMonitoringScheduler();
 
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);

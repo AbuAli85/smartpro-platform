@@ -35,6 +35,7 @@ import TranslationRequestQueue from "./pages/TranslationRequestQueue";
 import TranslationAnalytics from "./pages/TranslationAnalytics";
 import TranslationQualityDashboard from "./pages/TranslationQualityDashboard";
 import ReviewQueue from "./pages/ReviewQueue";
+import SmartBatchProcessing from "./pages/SmartBatchProcessing";
 import NotificationPreferences from "./pages/NotificationPreferences";
 import { useNotifications } from "./hooks/useNotifications";
 
@@ -67,6 +68,7 @@ function Router() {
       <Route path="/admin/translation-analytics" component={TranslationAnalytics} />
       <Route path="/admin/translation-quality" component={TranslationQualityDashboard} />
       <Route path="/admin/review-queue" component={ReviewQueue} />
+      <Route path="/admin/batch-processing" component={SmartBatchProcessing} />
       
       {/* Office Dashboard */}
       <Route path="/office-dashboard" component={OfficeDashboard} />
