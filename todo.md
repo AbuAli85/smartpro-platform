@@ -1430,3 +1430,33 @@
 - [x] Modify backend queries to return content based on language
 - [x] Create translation helper for dynamic content
 - [ ] Seed Arabic translations for existing content
+
+
+## Final Bilingual Platform Completion
+### Phase 1: Complete Page Translation
+- [x] Translate Templates page (search, filters, categories)
+- [ ] Translate TemplateDetail page (form fields, variables, generation)
+- [ ] Translate BookingsList page (tabs, status, actions)
+- [ ] Translate BookOffice page (calendar, time slots, booking form)
+- [ ] Translate Profile page (personal info, password change)
+- [ ] Translate OfficeProfile page (details, services, reviews, booking)
+- [ ] Translate all remaining button labels and CTAs
+- [ ] Translate all modal dialogs and confirmations
+
+### Phase 2: Language-Aware Backend
+- [x] Add language detection to tRPC context from Accept-Language header
+- [x] Update sanadOffice.list procedure to return localized content
+- [ ] Update sanadOffice.getBySlug procedure to return localized content
+- [ ] Update documentTemplate.list procedure to return localized content
+- [ ] Update documentTemplate.getById procedure to return localized content
+- [x] Add language parameter to all relevant queries
+- [x] Test backend localization with different language headers
+
+### Phase 3: Admin Interface for Bilingual Content
+- [x] Add Arabic name field to CreateOffice form (already exists)
+- [x] Add Arabic description field to CreateOffice form (already exists)
+- [ ] Add Arabic name field to TemplateManager form
+- [ ] Add Arabic description field to TemplateManager form
+- [ ] Create bulk import tool for Arabic translations
+- [ ] Add validation for Arabic text fields
+- [ ] Create admin page to manage existing translations

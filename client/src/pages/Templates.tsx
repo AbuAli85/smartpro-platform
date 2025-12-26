@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Search, Filter, Download, Eye } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const CATEGORIES = [
   { value: "all", label: "All Templates" },
@@ -19,6 +20,7 @@ const CATEGORIES = [
 ];
 
 export default function Templates() {
+  const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [page, setPage] = useState(1);
@@ -36,9 +38,9 @@ export default function Templates() {
       <div className="bg-gradient-to-r from-[#003366] to-[#004488] text-white py-16">
         <div className="container">
           <div className="max-w-3xl">
-            <h1 className="text-4xl font-bold mb-4">Document Templates</h1>
+            <h1 className="text-4xl font-bold mb-4">{t("templates.title")}</h1>
             <p className="text-xl text-blue-100">
-              Access 3,000+ professional document templates. Generate contracts, certificates, and official documents instantly.
+              {t("templates.subtitle")}
             </p>
           </div>
         </div>
@@ -51,7 +53,7 @@ export default function Templates() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <Input
-                placeholder="Search templates..."
+                placeholder={t("templates.searchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-10"
@@ -59,7 +61,7 @@ export default function Templates() {
             </div>
             <Button variant="outline" className="gap-2">
               <Filter className="h-4 w-4" />
-              Filters
+              {t("common.filter")}
             </Button>
           </div>
 

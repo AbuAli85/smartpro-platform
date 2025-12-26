@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import * as db from "../db";
 import { logActivity } from "../db";
+import { localizeArray } from "../helpers/i18n";
 
 // Validation schemas
 const createSanadOfficeSchema = z.object({
@@ -147,7 +148,7 @@ export const sanadOfficeRouter = router({
         availableThisWeek: z.boolean().optional(),
       })
     )
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
       const { page, limit, governorate, search, status, category, minRating, availableToday, availableThisWeek } = input;
       const offset = (page - 1) * limit;
 
@@ -163,8 +164,15 @@ export const sanadOfficeRouter = router({
         offset,
       });
 
+      // Localize office names and descriptions based on user language
+      const localizedOffices = localizeArray(
+        result.offices,
+        ctx.language,
+        ["officeName", "description"]
+      );
+
       return {
-        offices: result.offices,
+        offices: localizedOffices,
         total: result.total,
         page,
         limit,

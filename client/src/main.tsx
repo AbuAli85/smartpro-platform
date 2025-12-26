@@ -45,9 +45,16 @@ const trpcClient = trpc.createClient({
       url: "/api/trpc",
       transformer: superjson,
       fetch(input, init) {
+        // Get current language from localStorage
+        const language = localStorage.getItem("language") || "en";
+        
         return globalThis.fetch(input, {
           ...(init ?? {}),
           credentials: "include",
+          headers: {
+            ...((init as RequestInit)?.headers || {}),
+            "Accept-Language": language,
+          },
         });
       },
     }),
