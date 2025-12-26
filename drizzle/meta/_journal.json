@@ -183,6 +183,13 @@
       "when": 1766778936004,
       "tag": "0025_conscious_thor",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "5",
+      "when": 1766779724472,
+      "tag": "0026_lyrical_vector",
+      "breakpoints": true
     }
   ]
 }

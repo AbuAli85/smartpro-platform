@@ -1873,8 +1873,36 @@
 - [ ] Test export functionality
 
 ### Phase 3: Translator Training Module
-- [ ] Create training_materials table in database
-- [ ] Create training_quizzes table in database
+- [x] Create training_materials table in database
+- [x] Create training_quizzes table in database
+- [x] Create quiz_questions table in database
+- [x] Create quiz_options table in database
+- [x] Create quiz_attempts table for tracking progress
+- [x] Build translatorTraining router with tRPC procedures
+- [x] Add getMaterials procedure
+- [x] Add getQuizzes and getQuizDetails procedures
+- [x] Add submitQuiz procedure with scoring
+- [x] Add getMyAttempts procedure
+- [x] Add admin procedures for creating materials and quizzes
+- [ ] Seed initial training content (guidelines, mistakes, quizzes)
+- [ ] Create TranslatorTraining page component
+- [ ] Add navigation link to training module
+- [ ] Test training module end-to-end
+
+### Phase 4: Translation Workflow Automation
+- [x] Create untranslated_content_alerts table
+- [ ] Build content monitoring service
+- [ ] Implement priority level calculation
+- [ ] Add email notifications for new untranslated content
+- [ ] Create admin alert dashboard
+- [ ] Test notification system
+
+### Phase 5: Real-time Translation Preview
+- [ ] Create preview component with side-by-side layout
+- [ ] Add live preview rendering
+- [ ] Integrate preview into EnhancedTranslationEditor
+- [ ] Add context switching (office/template preview)
+- [ ] Test preview accuracy
 - [ ] Build training content management backend
 - [ ] Create TranslatorTraining page component
 - [ ] Add translation guidelines section

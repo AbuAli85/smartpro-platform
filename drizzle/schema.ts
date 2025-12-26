@@ -1092,3 +1092,95 @@ export const qualityAlerts = mysqlTable("quality_alerts", {
 
 export type QualityAlert = typeof qualityAlerts.$inferSelect;
 export type InsertQualityAlert = typeof qualityAlerts.$inferInsert;
+
+
+// ============================================================================
+// TRANSLATOR TRAINING MODULE
+// ============================================================================
+
+export const trainingMaterials = mysqlTable("training_materials", {
+  id: int("id").primaryKey().autoincrement(),
+  title: varchar("title", { length: 255 }).notNull(),
+  titleAr: varchar("title_ar", { length: 255 }),
+  content: text("content").notNull(),
+  contentAr: text("content_ar"),
+  category: mysqlEnum("category", ["guidelines", "common_mistakes", "best_practices", "examples"]).notNull(),
+  orderIndex: int("order_index").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
+});
+
+export const trainingQuizzes = mysqlTable("training_quizzes", {
+  id: int("id").primaryKey().autoincrement(),
+  title: varchar("title", { length: 255 }).notNull(),
+  titleAr: varchar("title_ar", { length: 255 }),
+  description: text("description"),
+  descriptionAr: text("description_ar"),
+  passingScore: int("passing_score").default(70),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const quizQuestions = mysqlTable("quiz_questions", {
+  id: int("id").primaryKey().autoincrement(),
+  quizId: int("quiz_id").notNull().references(() => trainingQuizzes.id, { onDelete: "cascade" }),
+  question: text("question").notNull(),
+  questionAr: text("question_ar"),
+  correctAnswer: text("correct_answer").notNull(),
+  explanation: text("explanation"),
+  explanationAr: text("explanation_ar"),
+  orderIndex: int("order_index").default(0),
+});
+
+export const quizOptions = mysqlTable("quiz_options", {
+  id: int("id").primaryKey().autoincrement(),
+  questionId: int("question_id").notNull().references(() => quizQuestions.id, { onDelete: "cascade" }),
+  optionText: text("option_text").notNull(),
+  optionTextAr: text("option_text_ar"),
+  isCorrect: boolean("is_correct").default(false),
+  orderIndex: int("order_index").default(0),
+});
+
+export const quizAttempts = mysqlTable("quiz_attempts", {
+  id: int("id").primaryKey().autoincrement(),
+  quizId: int("quiz_id").notNull().references(() => trainingQuizzes.id),
+  userId: int("user_id").notNull().references(() => users.id),
+  score: int("score").notNull(),
+  totalQuestions: int("total_questions").notNull(),
+  passed: boolean("passed").default(false),
+  completedAt: timestamp("completed_at").defaultNow(),
+});
+
+export type TrainingMaterial = typeof trainingMaterials.$inferSelect;
+export type InsertTrainingMaterial = typeof trainingMaterials.$inferInsert;
+export type TrainingQuiz = typeof trainingQuizzes.$inferSelect;
+export type InsertTrainingQuiz = typeof trainingQuizzes.$inferInsert;
+export type QuizQuestion = typeof quizQuestions.$inferSelect;
+export type InsertQuizQuestion = typeof quizQuestions.$inferInsert;
+export type QuizOption = typeof quizOptions.$inferSelect;
+export type InsertQuizOption = typeof quizOptions.$inferInsert;
+export type QuizAttempt = typeof quizAttempts.$inferSelect;
+export type InsertQuizAttempt = typeof quizAttempts.$inferInsert;
+
+// ============================================================================
+// TRANSLATION WORKFLOW AUTOMATION
+// ============================================================================
+
+export const untranslatedContentAlerts = mysqlTable("untranslated_content_alerts", {
+  id: int("id").primaryKey().autoincrement(),
+  contentType: mysqlEnum("content_type", ["office", "template"]).notNull(),
+  contentId: int("content_id").notNull(),
+  priority: mysqlEnum("priority", ["low", "medium", "high", "critical"]).default("medium"),
+  status: mysqlEnum("status", ["pending", "in_progress", "resolved"]).default("pending"),
+  notificationSent: boolean("notification_sent").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  resolvedAt: timestamp("resolved_at"),
+}, (table) => ({
+  contentIdx: index("content_idx").on(table.contentType, table.contentId),
+  statusIdx: index("status_idx").on(table.status),
+  priorityIdx: index("priority_idx").on(table.priority),
+}));
+
+export type UntranslatedContentAlert = typeof untranslatedContentAlerts.$inferSelect;
+export type InsertUntranslatedContentAlert = typeof untranslatedContentAlerts.$inferInsert;
