@@ -26,6 +26,7 @@ import {
   Languages,
   Bell,
   Zap,
+  BookOpen,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -82,6 +83,7 @@ export function Sidebar({ className }: SidebarProps) {
     navigation.push({ name: "Translation Quality", href: "/admin/translation-quality", icon: Activity, requiresAuth: true });
     navigation.push({ name: "Review Queue", href: "/admin/review-queue", icon: MessageSquareText, requiresAuth: true });
     navigation.push({ name: "Batch Processing", href: "/admin/batch-processing", icon: Zap, requiresAuth: true });
+    navigation.push({ name: "Translator Training", href: "/admin/training", icon: BookOpen, requiresAuth: true });
   }
 
   const filteredNavigation = navigation.filter((item) => !item.requiresAuth || user);

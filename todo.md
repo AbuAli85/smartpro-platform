@@ -1889,9 +1889,12 @@
 - [x] Seed best practices content
 - [x] Seed translation examples
 - [x] Create 3 quizzes covering translation fundamentals
-- [ ] Create TranslatorTraining page component with tabs
-- [ ] Add progress tracking and quiz history display
-- [ ] Add navigation link to training module
+- [ ] Create TranslatorTraining page component with tabs (Guidelines, Common Mistakes, Best Practices, Quizzes)
+- [ ] Build material browser with category filtering
+- [ ] Create quiz taking interface with question navigation
+- [ ] Add quiz results display with score and explanations
+- [ ] Add progress tracking dashboard showing completed quizzes
+- [ ] Add navigation link to training module in Sidebar
 - [ ] Test training module end-to-end
 
 ### Phase 4: Translation Workflow Automation
