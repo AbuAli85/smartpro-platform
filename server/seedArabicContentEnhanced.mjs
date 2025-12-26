@@ -6,51 +6,30 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import * as dotenv from "dotenv";
-// Using native fetch (Node.js 18+)
+import { invokeLLM } from "./_core/llm.js";
 
 dotenv.config();
 
 const connection = await mysql.createConnection(process.env.DATABASE_URL);
 const db = drizzle(connection);
 
-// LLM translation helper
+// LLM translation helper using the built-in invokeLLM
 async function translateToArabic(text, context = "") {
   try {
-    const apiUrl = `${process.env.BUILT_IN_FORGE_API_URL}/llm/chat/completions`;
-    const response = await fetch(apiUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.BUILT_IN_FORGE_API_KEY}`,
-      },
-      body: JSON.stringify({
-        messages: [
-          {
-            role: "system",
-            content: "You are a professional Arabic translator specializing in business and legal terminology. Translate the given English text to Modern Standard Arabic (MSA) with proper business terminology. Only return the translation, no explanations."
-          },
-          {
-            role: "user",
-            content: `Translate this ${context} to Arabic: "${text}"`
-          }
-        ],
-        temperature: 0.3,
-      }),
+    const response = await invokeLLM({
+      messages: [
+        {
+          role: "system",
+          content: "You are a professional Arabic translator specializing in business and legal terminology. Translate the given English text to Modern Standard Arabic (MSA) with proper business terminology. Only return the translation, no explanations."
+        },
+        {
+          role: "user",
+          content: `Translate this ${context} to Arabic: "${text}"`
+        }
+      ],
     });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`API error (${response.status}):`, errorText.substring(0, 200));
-      return `${text} (عربي)`;
-    }
-
-    const data = await response.json();
-    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-      console.error("Invalid API response structure:", JSON.stringify(data).substring(0, 200));
-      return `${text} (عربي)`;
-    }
     
-    return data.choices[0].message.content.trim();
+    return response.choices[0].message.content.trim();
   } catch (error) {
     console.error("Translation error:", error.message);
     return `${text} (عربي)`;

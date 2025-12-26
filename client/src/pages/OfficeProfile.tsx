@@ -9,8 +9,10 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { CanonicalURL } from "@/components/CanonicalURL";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import ChatWidget from "@/components/ChatWidget";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function OfficeProfile() {
+  const { t } = useLanguage();
   const [, params] = useRoute("/offices/:slug");
   const slug = params?.slug || "";
   const { isAuthenticated } = useAuth();
@@ -46,9 +48,9 @@ export default function OfficeProfile() {
       <div className="min-h-screen flex flex-col bg-background">
         
         <div className="container py-16 text-center">
-          <h2 className="text-2xl font-bold mb-4">Office Not Found</h2>
+          <h2 className="text-2xl font-bold mb-4">{t("office.notFound")}</h2>
           <Button asChild>
-            <Link href="/offices">Browse Offices</Link>
+            <Link href="/offices">{t("office.browseOffices")}</Link>
           </Button>
         </div>
       </div>
@@ -65,7 +67,7 @@ export default function OfficeProfile() {
         {/* Breadcrumb */}
         <Breadcrumb 
           items={[
-            { label: "Sanad Offices", href: "/offices" },
+            { label: t("nav.sanadOffices"), href: "/offices" },
             { label: office.officeName }
           ]} 
           className="mb-6" 
@@ -74,7 +76,7 @@ export default function OfficeProfile() {
         <Button asChild variant="ghost" className="mb-4">
           <Link href="/offices" className="flex items-center gap-2">
               <ArrowLeft className="w-4 h-4" />
-              Back to Offices
+              {t("office.backToOffices")}
           </Link>
         </Button>
 
