@@ -18,6 +18,7 @@ export const users = mysqlTable("users", {
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin", "sanad_owner", "sanad_staff", "sme_owner", "gig_worker", "government_official"]).default("user").notNull(),
   avatarUrl: text("avatarUrl"),
+  referralCode: varchar("referralCode", { length: 20 }).unique(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -459,3 +460,77 @@ export const loyaltyTransactions = mysqlTable("loyalty_transactions", {
 
 export type LoyaltyTransaction = typeof loyaltyTransactions.$inferSelect;
 export type InsertLoyaltyTransaction = typeof loyaltyTransactions.$inferInsert;
+
+// ============================================================================
+// REFERRAL SYSTEM
+// ============================================================================
+
+export const referrals = mysqlTable("referrals", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Referrer (user who shares the code)
+  referrerId: int("referrerId").notNull(),
+  referralCode: varchar("referralCode", { length: 20 }).notNull().unique(),
+  
+  // Referred user (new user who signs up with code)
+  referredId: int("referredId"),
+  
+  // Status tracking
+  status: mysqlEnum("status", ["pending", "completed", "expired"]).default("pending").notNull(),
+  pointsAwarded: boolean("pointsAwarded").default(false).notNull(),
+  
+  // Completion tracking
+  firstBookingId: int("firstBookingId"), // Track when referred user completes first booking
+  completedAt: timestamp("completedAt"),
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  referrerIdx: index("referrer_idx").on(table.referrerId),
+  referredIdx: index("referred_idx").on(table.referredId),
+  codeIdx: index("code_idx").on(table.referralCode),
+  statusIdx: index("status_idx").on(table.status),
+}));
+
+export type Referral = typeof referrals.$inferSelect;
+export type InsertReferral = typeof referrals.$inferInsert;
+
+// ============================================================================
+// NOTIFICATION SYSTEM
+// ============================================================================
+
+export const notifications = mysqlTable("notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // User reference
+  userId: int("userId").notNull(),
+  
+  // Notification content
+  type: mysqlEnum("type", ["booking", "points", "system", "review", "referral"]).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  
+  // Related entities
+  bookingId: int("bookingId"),
+  reviewId: int("reviewId"),
+  referralId: int("referralId"),
+  
+  // Status
+  isRead: boolean("isRead").default(false).notNull(),
+  readAt: timestamp("readAt"),
+  
+  // Action link (optional)
+  actionUrl: varchar("actionUrl", { length: 500 }),
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  userIdx: index("user_idx").on(table.userId),
+  typeIdx: index("type_idx").on(table.type),
+  readIdx: index("read_idx").on(table.isRead),
+  dateIdx: index("date_idx").on(table.createdAt),
+}));
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;

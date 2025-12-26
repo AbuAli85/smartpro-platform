@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { toast } from "sonner";
-import { ArrowLeft, Calendar as CalendarIcon, Clock, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Calendar as CalendarIcon, Clock, CheckCircle2, Gift } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function BookOffice() {
   const [, params] = useRoute("/offices/:slug/book");
@@ -20,6 +21,7 @@ export default function BookOffice() {
   const [selectedServiceId, setSelectedServiceId] = useState<string>("");
   const [serviceDescription, setServiceDescription] = useState("");
   const [requirements, setRequirements] = useState("");
+  const [usePoints, setUsePoints] = useState(false);
 
   // Get office details
   const { data: office } = trpc.sanadOffice.getBySlug.useQuery({ slug });
@@ -32,6 +34,19 @@ export default function BookOffice() {
 
   // Get selected service details
   const selectedService = services?.find(s => s.id === parseInt(selectedServiceId));
+
+  // Get user loyalty points
+  const { data: loyalty } = trpc.loyalty.getMyLoyalty.useQuery();
+
+  // Calculate price with points discount
+  const POINTS_TO_REDEEM = 100;
+  const DISCOUNT_AMOUNT = 5; // 5 OMR discount for 100 points
+  const basePrice = selectedService?.price ? parseFloat(selectedService.price) : 0;
+  const discount = usePoints && loyalty && loyalty.availablePoints >= POINTS_TO_REDEEM ? DISCOUNT_AMOUNT : 0;
+  const finalPrice = Math.max(0, basePrice - discount);
+
+  // Check if user has enough points
+  const hasEnoughPoints = loyalty && loyalty.availablePoints >= POINTS_TO_REDEEM;
 
   // Get available time slots when date is selected
   const { data: slots, isLoading: loadingSlots } = trpc.booking.getAvailableSlots.useQuery(
@@ -77,6 +92,14 @@ export default function BookOffice() {
       return;
     }
 
+    // Check if using points and validate
+    if (usePoints && (!loyalty || loyalty.availablePoints < POINTS_TO_REDEEM)) {
+      toast.error("Insufficient Points", {
+        description: `You need ${POINTS_TO_REDEEM} points to redeem this discount`,
+      });
+      return;
+    }
+
     createBookingMutation.mutate({
       officeId: office.id,
       serviceId: parseInt(selectedServiceId),
@@ -85,6 +108,7 @@ export default function BookOffice() {
       scheduledDate: selectedDate.toISOString(),
       scheduledTime: selectedTime,
       duration: 60,
+      usePoints: !!(usePoints && hasEnoughPoints),
     });
   };
 
@@ -301,6 +325,55 @@ export default function BookOffice() {
                   <p className="text-sm font-medium text-gray-500">Duration</p>
                   <p className="text-sm">60 minutes</p>
                 </div>
+
+                {/* Points Redemption */}
+                {selectedService && loyalty && (
+                  <div className="pt-4 border-t space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          id="usePoints"
+                          checked={usePoints}
+                          onCheckedChange={(checked) => setUsePoints(checked as boolean)}
+                          disabled={!hasEnoughPoints}
+                        />
+                        <Label
+                          htmlFor="usePoints"
+                          className={`text-sm cursor-pointer ${!hasEnoughPoints ? 'text-gray-400' : ''}`}
+                        >
+                          Use 100 points for 5 OMR discount
+                        </Label>
+                      </div>
+                      <Gift className="h-4 w-4 text-[#003366]" />
+                    </div>
+                    
+                    <div className="text-xs text-gray-500">
+                      Available points: <span className="font-semibold text-[#003366]">{loyalty.availablePoints}</span>
+                      {!hasEnoughPoints && (
+                        <span className="block text-yellow-600 mt-1">
+                          Need {POINTS_TO_REDEEM - loyalty.availablePoints} more points
+                        </span>
+                      )}
+                    </div>
+
+                    {usePoints && hasEnoughPoints && (
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">Base Price:</span>
+                          <span>{basePrice.toFixed(2)} OMR</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm text-green-600">
+                          <span>Points Discount:</span>
+                          <span>-{discount.toFixed(2)} OMR</span>
+                        </div>
+                        <div className="flex items-center justify-between text-base font-bold mt-2 pt-2 border-t border-green-200">
+                          <span>Final Price:</span>
+                          <span className="text-[#003366]">{finalPrice.toFixed(2)} OMR</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="pt-4 border-t">
                   <p className="text-xs text-gray-500">

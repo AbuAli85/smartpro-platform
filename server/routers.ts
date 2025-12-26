@@ -10,6 +10,8 @@ import { bookingRouter } from "./routers/booking";
 import { sitemapRouter } from "./routers/sitemap";
 import { adminRouter } from "./routers/admin";
 import { loyaltyRouter } from "./routers/loyalty";
+import { referralRouter } from "./routers/referral";
+import { notificationRouter } from "./routers/notification";
 
 export const appRouter = router({
   system: systemRouter,
@@ -56,6 +58,8 @@ export const appRouter = router({
   sitemap: sitemapRouter,
   admin: adminRouter,
   loyalty: loyaltyRouter,
+  referral: referralRouter,
+  notification: notificationRouter,
 });
 
 export type AppRouter = typeof appRouter;

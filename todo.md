@@ -625,3 +625,39 @@
 - [x] Integrate calendar into user dashboard
 - [ ] Add calendar view to office dashboard
 - [x] Test calendar responsiveness and interactions
+
+
+## Referral System Implementation
+- [x] Add referral code field to user table
+- [x] Create referrals tracking table (referrer_id, referred_id, status, points_awarded)
+- [x] Generate unique referral codes for users
+- [x] Create getReferralCode procedure
+- [x] Create trackReferral procedure
+- [x] Create getReferralStats procedure (total referrals, successful, pending, points earned)
+- [x] Award 25 points when referred user completes first booking
+- [x] Build Refer Friends page with code display and sharing options
+- [x] Add referral stats dashboard (total referrals, successful conversions, points earned)
+- [ ] Write unit tests for referral system
+
+## Points Redemption in Booking Flow
+- [x] Add usePoints checkbox to booking form
+- [x] Calculate discount when points checkbox is checked (100 points = 5 OMR)
+- [x] Display adjusted price in booking summary
+- [x] Validate sufficient points balance before booking
+- [x] Redeem points automatically on successful booking
+- [x] Show points used in booking confirmation
+- [ ] Update booking history to show points redemption
+- [ ] Write unit tests for points redemption flow
+
+## Notification Center Implementation
+- [x] Create notifications table (user_id, type, title, message, read, created_at)
+- [x] Create notification procedures (create, getUnread, markAsRead, markAllAsRead)
+- [x] Send notification on booking confirmation
+- [x] Send notification on booking status change
+- [x] Send notification on points earned
+- [x] Send notification on points redeemed
+- [x] Build notification dropdown component with badge
+- [x] Add unread count badge to header
+- [x] Implement real-time notification updates (30s polling)
+- [ ] Add notification preferences page
+- [ ] Write unit tests for notification system

@@ -50,6 +50,20 @@
       "when": 1766739565885,
       "tag": "0006_supreme_payback",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1766741024922,
+      "tag": "0007_long_bastion",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1766741056157,
+      "tag": "0008_icy_kinsey_walden",
+      "breakpoints": true
     }
   ]
 }

@@ -34,6 +34,7 @@ export const bookingRouter = router({
         scheduledDate: z.string().optional(), // ISO date string
         scheduledTime: z.string().optional(), // e.g., "09:00"
         duration: z.number().default(60),
+        usePoints: z.boolean().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -101,6 +102,31 @@ export const bookingRouter = router({
         serviceDescription: input.serviceDescription,
       });
 
+      // Redeem points if requested
+      if (input.usePoints) {
+        try {
+          await db.redeemPoints({
+            userId: user.id,
+            points: 100,
+            reason: "Booking discount (100 points = 5 OMR)",
+            bookingId,
+          });
+
+          // Create notification for points redemption
+          await db.createNotification({
+            userId: user.id,
+            type: "points",
+            title: "Points Redeemed",
+            message: "You redeemed 100 points for 5 OMR discount on your booking",
+            bookingId,
+            actionUrl: `/bookings`,
+          });
+        } catch (error) {
+          console.error("Failed to redeem points:", error);
+          // Don't fail the booking if points redemption fails
+        }
+      }
+
       // Send email confirmation to user
       if (user.email) {
         await sendBookingConfirmationEmail({
@@ -112,6 +138,16 @@ export const bookingRouter = router({
           serviceDescription: input.serviceDescription,
         });
       }
+
+      // Create notification for booking confirmation
+      await db.createNotification({
+        userId: user.id,
+        type: "booking",
+        title: "Booking Confirmed",
+        message: `Your booking at ${office.officeName} has been ${office.autoAcceptBookings ? 'confirmed' : 'submitted for review'}`,
+        bookingId,
+        actionUrl: `/bookings`,
+      });
 
       return { id: bookingId };
     }),
@@ -199,10 +235,42 @@ export const bookingRouter = router({
             reason: `Booking completed at ${office?.officeName || "office"}`,
             bookingId: input.bookingId,
           });
+
+          // Create notification for points earned
+          await db.createNotification({
+            userId: booking.userId,
+            type: "points",
+            title: "Points Earned!",
+            message: "You earned 10 loyalty points for completing your booking",
+            bookingId: input.bookingId,
+            actionUrl: `/loyalty`,
+          });
+
+          // Check and complete referral if this is the first booking
+          const userBookings = await db.getUserBookings(booking.userId);
+          const completedBookings = userBookings.filter(b => b.status === "completed");
+          if (completedBookings.length === 1) {
+            // This is the first completed booking
+            const referralCompleted = await db.completeReferral(booking.userId, input.bookingId);
+            if (referralCompleted) {
+              // Notification for referral completion is created in completeReferral function
+              console.log("Referral completed for user", booking.userId);
+            }
+          }
         } catch (error) {
           console.error("Failed to award loyalty points for completed booking:", error);
         }
       }
+
+      // Create notification for status change
+      await db.createNotification({
+        userId: booking.userId,
+        type: "booking",
+        title: "Booking Status Updated",
+        message: `Your booking status has been updated to ${input.status}`,
+        bookingId: input.bookingId,
+        actionUrl: `/bookings`,
+      });
 
       return { success: true };
     }),
@@ -255,6 +323,16 @@ export const bookingRouter = router({
           points: 5,
           reason: `Review submitted for ${office.officeName}`,
           reviewId: reviewId,
+        });
+
+        // Create notification for points earned
+        await db.createNotification({
+          userId: user.id,
+          type: "points",
+          title: "Points Earned!",
+          message: "You earned 5 loyalty points for submitting a review",
+          reviewId: reviewId,
+          actionUrl: `/loyalty`,
         });
       } catch (error) {
         console.error("Failed to award loyalty points for review:", error);

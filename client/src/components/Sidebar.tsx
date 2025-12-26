@@ -15,11 +15,13 @@ import {
   Home,
   Shield,
   Award,
+  Gift,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
 import { NotificationBadge } from "@/components/NotificationBadge";
+import { NotificationDropdown } from "@/components/NotificationDropdown";
 
 interface SidebarProps {
   className?: string;
@@ -44,6 +46,7 @@ export function Sidebar({ className }: SidebarProps) {
     { name: "My Bookings", href: "/bookings", icon: Calendar, requiresAuth: true },
     { name: "My Offices", href: "/my-offices", icon: Briefcase, requiresAuth: true },
     { name: "Loyalty Rewards", href: "/loyalty", icon: Award, requiresAuth: true },
+    { name: "Refer Friends", href: "/refer", icon: Gift, requiresAuth: true },
     { name: "Profile", href: "/profile", icon: User, requiresAuth: true },
   ];
 
@@ -86,14 +89,17 @@ export function Sidebar({ className }: SidebarProps) {
             )}
           </div>
         </Link>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="lg:flex hidden"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        >
-          {isCollapsed ? <Menu className="h-5 w-5" /> : <X className="h-5 w-5" />}
-        </Button>
+        <div className="flex items-center gap-2">
+          {user && <NotificationDropdown />}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:flex hidden"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          >
+            {isCollapsed ? <Menu className="h-5 w-5" /> : <X className="h-5 w-5" />}
+          </Button>
+        </div>
       </div>
 
       {/* User Profile Section */}

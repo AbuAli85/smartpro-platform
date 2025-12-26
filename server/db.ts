@@ -1,4 +1,4 @@
-import { and, desc, eq, like, or, sql, gte, lte, not } from "drizzle-orm";
+import { and, desc, eq, like, or, sql, gte, lte, not, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser,
@@ -14,6 +14,8 @@ import {
   officeAvailability,
   loyaltyPoints,
   loyaltyTransactions,
+  referrals,
+  notifications,
   type SanadOffice,
   type SanadOfficeStaff,
   type SanadOfficeService,
@@ -1153,4 +1155,324 @@ export async function redeemPoints(params: {
     .where(eq(loyaltyPoints.userId, params.userId));
 
   return true;
+}
+
+
+// ============================================================================
+// REFERRAL SYSTEM
+// ============================================================================
+
+/**
+ * Generate a unique referral code
+ */
+async function generateReferralCode(): Promise<string> {
+  const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  
+  for (let i = 0; i < 8; i++) {
+    code += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const existing = await db
+    .select()
+    .from(referrals)
+    .where(eq(referrals.referralCode, code))
+    .limit(1);
+  
+  if (existing.length > 0) {
+    return generateReferralCode();
+  }
+  
+  return code;
+}
+
+/**
+ * Get or create referral code for a user
+ */
+export async function getUserReferralCode(userId: number): Promise<string> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const user = await db
+    .select({ referralCode: users.referralCode })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  
+  if (user[0]?.referralCode) {
+    return user[0].referralCode;
+  }
+  
+  const code = await generateReferralCode();
+  
+  await db
+    .update(users)
+    .set({ referralCode: code })
+    .where(eq(users.id, userId));
+  
+  await db.insert(referrals).values({
+    referrerId: userId,
+    referralCode: code,
+    status: "pending",
+  });
+  
+  return code;
+}
+
+/**
+ * Track a referral when a new user signs up with a code
+ */
+export async function trackReferral(referralCode: string, newUserId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  
+  try {
+    const referral = await db
+      .select()
+      .from(referrals)
+      .where(
+        and(
+          eq(referrals.referralCode, referralCode),
+          eq(referrals.status, "pending"),
+          isNull(referrals.referredId)
+        )
+      )
+      .limit(1);
+    
+    if (referral.length === 0) {
+      return false;
+    }
+    
+    await db
+      .update(referrals)
+      .set({
+        referredId: newUserId,
+        updatedAt: new Date(),
+      })
+      .where(eq(referrals.id, referral[0].id));
+    
+    return true;
+  } catch (error) {
+    console.error("Error tracking referral:", error);
+    return false;
+  }
+}
+
+/**
+ * Complete a referral and award points when referred user completes first booking
+ */
+export async function completeReferral(referredUserId: number, bookingId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  
+  try {
+    const referral = await db
+      .select()
+      .from(referrals)
+      .where(
+        and(
+          eq(referrals.referredId, referredUserId),
+          eq(referrals.status, "pending"),
+          eq(referrals.pointsAwarded, false)
+        )
+      )
+      .limit(1);
+    
+    if (referral.length === 0) {
+      return false;
+    }
+    
+    const ref = referral[0];
+    
+    await db
+      .update(referrals)
+      .set({
+        status: "completed",
+        pointsAwarded: true,
+        firstBookingId: bookingId,
+        completedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(referrals.id, ref.id));
+    
+    await awardPoints({
+      userId: ref.referrerId,
+      points: 25,
+      reason: "Successful referral - friend completed first booking",
+      referralId: ref.id,
+    });
+
+    // Create notification for referrer
+    await createNotification({
+      userId: ref.referrerId,
+      type: "referral",
+      title: "Referral Bonus Earned!",
+      message: "Your friend completed their first booking! You earned 25 loyalty points.",
+      referralId: ref.id,
+      actionUrl: `/refer`,
+    });
+    
+    return true;
+  } catch (error) {
+    console.error("Error completing referral:", error);
+    return false;
+  }
+}
+
+/**
+ * Get referral statistics for a user
+ */
+export async function getReferralStats(userId: number) {
+  const db = await getDb();
+  if (!db) return {
+    totalReferrals: 0,
+    successfulReferrals: 0,
+    pendingReferrals: 0,
+    pointsEarned: 0,
+    referrals: [],
+  };
+  
+  const allReferrals = await db
+    .select({
+      id: referrals.id,
+      referralCode: referrals.referralCode,
+      referredId: referrals.referredId,
+      status: referrals.status,
+      pointsAwarded: referrals.pointsAwarded,
+      completedAt: referrals.completedAt,
+      createdAt: referrals.createdAt,
+      referredUserName: users.name,
+      referredUserEmail: users.email,
+    })
+    .from(referrals)
+    .leftJoin(users, eq(referrals.referredId, users.id))
+    .where(eq(referrals.referrerId, userId))
+    .orderBy(desc(referrals.createdAt));
+  
+  return {
+    totalReferrals: allReferrals.filter(r => r.referredId !== null).length,
+    successfulReferrals: allReferrals.filter(r => r.status === "completed").length,
+    pendingReferrals: allReferrals.filter(r => r.status === "pending" && r.referredId !== null).length,
+    pointsEarned: allReferrals.filter(r => r.pointsAwarded).length * 25,
+    referrals: allReferrals,
+  };
+}
+
+// ============================================================================
+// NOTIFICATION SYSTEM
+// ============================================================================
+
+/**
+ * Create a notification for a user
+ */
+export async function createNotification(params: {
+  userId: number;
+  type: "booking" | "points" | "system" | "review" | "referral";
+  title: string;
+  message: string;
+  bookingId?: number;
+  reviewId?: number;
+  referralId?: number;
+  actionUrl?: string;
+}) {
+  const db = await getDb();
+  if (!db) return 0;
+  
+  await db.insert(notifications).values({
+    userId: params.userId,
+    type: params.type,
+    title: params.title,
+    message: params.message,
+    bookingId: params.bookingId,
+    reviewId: params.reviewId,
+    referralId: params.referralId,
+    actionUrl: params.actionUrl,
+    isRead: false,
+  });
+  
+  return 0;
+}
+
+/**
+ * Get unread notifications for a user
+ */
+export async function getUnreadNotifications(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(notifications)
+    .where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)))
+    .orderBy(desc(notifications.createdAt))
+    .limit(50);
+}
+
+/**
+ * Get all notifications for a user
+ */
+export async function getUserNotifications(userId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(notifications)
+    .where(eq(notifications.userId, userId))
+    .orderBy(desc(notifications.createdAt))
+    .limit(limit);
+}
+
+/**
+ * Mark a notification as read
+ */
+export async function markNotificationAsRead(notificationId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  
+  await db
+    .update(notifications)
+    .set({
+      isRead: true,
+      readAt: new Date(),
+    })
+    .where(eq(notifications.id, notificationId));
+  
+  return true;
+}
+
+/**
+ * Mark all notifications as read for a user
+ */
+export async function markAllNotificationsAsRead(userId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  
+  await db
+    .update(notifications)
+    .set({
+      isRead: true,
+      readAt: new Date(),
+    })
+    .where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)));
+  
+  return true;
+}
+
+/**
+ * Get unread notification count for a user
+ */
+export async function getUnreadNotificationCount(userId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+  
+  const result = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(notifications)
+    .where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)));
+  
+  return result[0]?.count || 0;
 }
