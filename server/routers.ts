@@ -32,6 +32,7 @@ import { translationMemoryRouter } from "./routers/translationMemory";
 import { autoTranslateRouter } from "./routers/autoTranslate";
 import { translationQualityRouter } from "./routers/translationQuality";
 import { collaborativeReviewRouter } from "./routers/collaborativeReview";
+import { smartBatchProcessingRouter } from "./routers/smartBatchProcessing";
 
 export const appRouter = router({
   system: systemRouter,
@@ -122,6 +123,7 @@ export const appRouter = router({
   autoTranslate: autoTranslateRouter,
   translationQuality: translationQualityRouter,
   collaborativeReview: collaborativeReviewRouter,
+  smartBatchProcessing: smartBatchProcessingRouter,
 });
 
 export type AppRouter = typeof appRouter;
