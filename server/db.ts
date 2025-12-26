@@ -22,6 +22,8 @@ import {
   type DocumentTemplate,
   type Booking,
   type Review,
+  scheduledFollowups,
+  type ScheduledFollowup,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -1662,7 +1664,66 @@ export async function getRevenueMetricsAnalytics(params: {
 
 
 // ============================================================================
-// ADMIN ANALYTICS
+// SCHEDULED FOLLOW-UPS
+// ============================================================================
+
+export async function createScheduledFollowup(data: {
+  conversationId: number;
+  officeId: number;
+  scheduledFor: Date;
+  triggerType: "24h" | "48h" | "manual";
+  messageTemplate: string;
+}) {
+  const database = await getDb();
+  if (!database) throw new Error("Database not initialized");
+  const [result] = await database.insert(scheduledFollowups).values(data);
+  return result;
+}
+
+export async function getPendingFollowups() {
+  const database = await getDb();
+  if (!database) throw new Error("Database not initialized");
+  return database
+    .select()
+    .from(scheduledFollowups)
+    .where(
+      and(
+        eq(scheduledFollowups.status, "pending"),
+        lte(scheduledFollowups.scheduledFor, new Date())
+      )
+    );
+}
+
+export async function getFollowupsByConversation(conversationId: number) {
+  const database = await getDb();
+  if (!database) throw new Error("Database not initialized");
+  return database
+    .select()
+    .from(scheduledFollowups)
+    .where(eq(scheduledFollowups.conversationId, conversationId))
+    .orderBy(desc(scheduledFollowups.createdAt));
+}
+
+export async function markFollowupAsSent(followupId: number) {
+  const database = await getDb();
+  if (!database) throw new Error("Database not initialized");
+  await database
+    .update(scheduledFollowups)
+    .set({ status: "sent", sentAt: new Date() })
+    .where(eq(scheduledFollowups.id, followupId));
+}
+
+export async function cancelFollowup(followupId: number) {
+  const database = await getDb();
+  if (!database) throw new Error("Database not initialized");
+  await database
+    .update(scheduledFollowups)
+    .set({ status: "cancelled" })
+    .where(eq(scheduledFollowups.id, followupId));
+}
+
+// ============================================================================
+// CHAT ANALYTICS
 // ============================================================================
 
 /**

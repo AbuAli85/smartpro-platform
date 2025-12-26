@@ -22,6 +22,7 @@ import {
   MessageSquareText,
   Users,
   Activity,
+  Clock,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -60,6 +61,7 @@ export function Sidebar({ className }: SidebarProps) {
     { name: "Canned Responses", href: "/owner/canned-responses", icon: MessageSquareText, requiresAuth: true },
     { name: "Staff Management", href: "/owner/staff", icon: Users, requiresAuth: true },
     { name: "Staff Performance", href: "/owner/staff-performance", icon: Activity, requiresAuth: true },
+    { name: "Follow-up Settings", href: "/owner/follow-up-settings", icon: Clock, requiresAuth: true },
     { name: t("nav.loyalty"), href: "/loyalty", icon: Award, requiresAuth: true },
     { name: t("nav.refer"), href: "/refer", icon: Gift, requiresAuth: true },
     { name: t("nav.analytics"), href: "/analytics", icon: BarChart3, requiresAuth: true },

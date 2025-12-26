@@ -1208,28 +1208,43 @@
 - [x] Integrate analytics into navigation sidebar
 - [ ] Write unit tests for analytics calculations
 
-### Automated Follow-up Messages
+### Automated Follow-up Messages - Complete Implementation
 - [x] Create scheduled_followups table in database (migration applied)
-- [ ] Add follow-up database functions to db.ts
+- [ ] Add follow-up database functions to db.ts (create, get, update, cancel)
 - [ ] Create followUp router with scheduling procedures
-- [ ] Build follow-up scheduling logic (24h/48h triggers)
-- [ ] Create FollowUpSettings component for configuration
-- [ ] Add customizable follow-up message templates
-- [ ] Implement status-based trigger conditions
-- [ ] Add manual override to skip/reschedule follow-ups
-- [ ] Create background job to send scheduled messages
-- [ ] Add follow-up history tracking
-- [ ] Show follow-up status in conversation list
-- [ ] Write unit tests for scheduling logic
+- [ ] Build automatic scheduling on conversation inactivity
+- [ ] Create FollowUpSettings page component for office owners
+- [ ] Add enable/disable toggle for auto-follow-ups
+- [ ] Add customizable message templates for 24h and 48h triggers
+- [ ] Implement background job to check and send pending follow-ups
+- [ ] Add manual trigger button in ChatInbox
+- [ ] Show follow-up scheduled indicator in conversation list
+- [ ] Add cancel follow-up functionality
+- [ ] Write unit tests for scheduling and sending logic
 
-### Multi-language Chat Support
-- [ ] Integrate translation API (Google Translate or similar)
-- [ ] Add language detection for incoming messages
-- [ ] Create language toggle in chat interface
-- [ ] Store both original and translated messages
-- [ ] Add translation indicator badges
-- [ ] Implement bidirectional Arabic-English translation
-- [ ] Add auto-translate preference per conversation
-- [ ] Handle translation errors gracefully
-- [ ] Show translation confidence scores
+### Multi-language Chat Support - Complete Implementation
+- [ ] Use built-in LLM for translation (no external API needed)
+- [ ] Add language detection helper function
+- [ ] Create translation database functions
+- [ ] Add translateMessage procedure to chat router
+- [ ] Create language toggle button in ChatInbox message composer
+- [ ] Add "Translate" button on each message
+- [ ] Show original and translated text in message bubbles
+- [ ] Implement automatic translation on send (when enabled)
+- [ ] Add translation indicator badges (AR/EN)
+- [ ] Handle translation errors with fallback to original
 - [ ] Write unit tests for translation functionality
+
+### Chat Export & Reporting - Complete Implementation
+- [ ] Add export database query functions to db.ts
+- [ ] Create export router with CSV and PDF generation
+- [ ] Build ExportDialog component with filter options
+- [ ] Add date range picker for export
+- [ ] Add staff member filter dropdown
+- [ ] Add tags filter multi-select
+- [ ] Add resolution status filter
+- [ ] Generate CSV with conversation and message data
+- [ ] Generate PDF report with formatted layout
+- [ ] Add export button to Chat Analytics page
+- [ ] Show export progress indicator
+- [ ] Write unit tests for export generation

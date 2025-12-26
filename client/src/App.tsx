@@ -29,6 +29,7 @@ import ChatAnalytics from "./pages/ChatAnalytics";
 import CannedResponses from "./pages/CannedResponses";
 import StaffManagement from "./pages/StaffManagement";
 import StaffPerformance from "./pages/StaffPerformance";
+import FollowUpSettings from "./pages/FollowUpSettings";
 import { useNotifications } from "./hooks/useNotifications";
 
 function Router() {
@@ -78,6 +79,7 @@ function Router() {
       <Route path="/owner/canned-responses" component={CannedResponses} />
       <Route path="/owner/staff" component={StaffManagement} />
       <Route path="/owner/staff-performance" component={StaffPerformance} />
+      <Route path="/owner/follow-up-settings" component={FollowUpSettings} />
       
       {/* 404 */}
       <Route path="/404" component={NotFound} />
