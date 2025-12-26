@@ -835,3 +835,137 @@ export async function getPendingBookingsCount(userId: number): Promise<number> {
     return 0;
   }
 }
+
+// ============================================================================
+// OFFICE ANALYTICS
+// ============================================================================
+
+export async function getOfficeAnalytics(officeId: number, startDate: Date, endDate: Date) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get office analytics: database not available");
+    return null;
+  }
+
+  try {
+    // Get total bookings
+    const totalBookingsResult = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(bookings)
+      .where(
+        and(
+          eq(bookings.officeId, officeId),
+          gte(bookings.scheduledDate, startDate),
+          lte(bookings.scheduledDate, endDate)
+        )
+      );
+    
+    // Get revenue (sum of prices for completed bookings)
+    const revenueResult = await db
+      .select({ total: sql<number>`COALESCE(SUM(CAST(${bookings.price} AS DECIMAL(10,2))), 0)` })
+      .from(bookings)
+      .where(
+        and(
+          eq(bookings.officeId, officeId),
+          eq(bookings.status, "completed"),
+          gte(bookings.scheduledDate, startDate),
+          lte(bookings.scheduledDate, endDate)
+        )
+      );
+    
+    // Get average rating
+    const ratingsResult = await db
+      .select({ 
+        avgRating: sql<number>`COALESCE(AVG(${reviews.rating}), 0)`,
+        count: sql<number>`count(*)`
+      })
+      .from(reviews)
+      .where(
+        and(
+          eq(reviews.officeId, officeId),
+          gte(reviews.createdAt, startDate),
+          lte(reviews.createdAt, endDate)
+        )
+      );
+    
+    // Get bookings by status
+    const statusBreakdown = await db
+      .select({ 
+        status: bookings.status,
+        count: sql<number>`count(*)`
+      })
+      .from(bookings)
+      .where(
+        and(
+          eq(bookings.officeId, officeId),
+          gte(bookings.scheduledDate, startDate),
+          lte(bookings.scheduledDate, endDate)
+        )
+      )
+      .groupBy(bookings.status);
+    
+    // Get daily bookings for trend chart
+    const dailyBookings = await db
+      .select({
+        date: sql<string>`DATE(${bookings.scheduledDate})`,
+        count: sql<number>`count(*)`
+      })
+      .from(bookings)
+      .where(
+        and(
+          eq(bookings.officeId, officeId),
+          gte(bookings.scheduledDate, startDate),
+          lte(bookings.scheduledDate, endDate)
+        )
+      )
+      .groupBy(sql`DATE(${bookings.scheduledDate})`)
+      .orderBy(sql`DATE(${bookings.scheduledDate})`);
+    
+    return {
+      totalBookings: totalBookingsResult[0]?.count || 0,
+      revenue: revenueResult[0]?.total || 0,
+      averageRating: ratingsResult[0]?.avgRating || 0,
+      totalReviews: ratingsResult[0]?.count || 0,
+      statusBreakdown: statusBreakdown.map(s => ({
+        status: s.status,
+        count: s.count
+      })),
+      dailyBookings: dailyBookings.map(d => ({
+        date: d.date,
+        count: d.count
+      }))
+    };
+  } catch (error) {
+    console.error("[Database] Error getting office analytics:", error);
+    return null;
+  }
+}
+
+export async function getPopularServices(officeId: number, limit: number = 5) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get popular services: database not available");
+    return [];
+  }
+
+  try {
+    const result = await db
+      .select({
+        serviceDescription: bookings.serviceDescription,
+        count: sql<number>`count(*)`
+      })
+      .from(bookings)
+      .where(eq(bookings.officeId, officeId))
+      .groupBy(bookings.serviceDescription)
+      .orderBy(sql`count(*) DESC`)
+      .limit(limit);
+    
+    return result.map(r => ({
+      service: r.serviceDescription,
+      count: r.count
+    }));
+  } catch (error) {
+    console.error("[Database] Error getting popular services:", error);
+    return [];
+  }
+}

@@ -9,11 +9,13 @@ import { trpc } from "@/lib/trpc";
 import { Building2, MapPin, Star, Search, Plus, Filter } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { AdvancedFilters, type FilterState } from "@/components/AdvancedFilters";
 
 export default function OfficesList() {
   const [search, setSearch] = useState("");
   const [governorate, setGovernorate] = useState<string>();
   const [page, setPage] = useState(1);
+  const [advancedFilters, setAdvancedFilters] = useState<FilterState>({});
   const { isAuthenticated } = useAuth();
 
   const { data, isLoading } = trpc.sanadOffice.list.useQuery({
@@ -66,8 +68,8 @@ export default function OfficesList() {
           )}
         </div>
 
-        {/* Filters */}
-        <div className="mb-8 flex flex-col gap-4 md:flex-row">
+        {/* Basic Filters */}
+        <div className="mb-4 flex flex-col gap-4 md:flex-row">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
@@ -99,6 +101,13 @@ export default function OfficesList() {
             </SelectContent>
           </Select>
         </div>
+
+        {/* Advanced Filters */}
+        <AdvancedFilters 
+          filters={advancedFilters} 
+          onFiltersChange={setAdvancedFilters} 
+          className="mb-8"
+        />
 
         {/* Offices Grid */}
         {isLoading ? (

@@ -7,9 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Users, TrendingUp, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import AvailabilityEditor from "@/components/AvailabilityEditor";
+import { OfficeAnalytics } from "@/components/OfficeAnalytics";
 
 export default function OfficeDashboard() {
-  const [selectedTab, setSelectedTab] = useState("bookings");
+  const [selectedTab, setSelectedTab] = useState("analytics");
 
   // Get office owned by current user
   const { data: myOffice, isLoading: loadingOffice } = trpc.sanadOffice.getMyOffice.useQuery();
@@ -149,10 +150,16 @@ export default function OfficeDashboard() {
         {/* Main Content Tabs */}
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
           <TabsList>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="bookings">Bookings</TabsTrigger>
             <TabsTrigger value="availability">Availability</TabsTrigger>
             <TabsTrigger value="profile">Office Profile</TabsTrigger>
           </TabsList>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics">
+            <OfficeAnalytics officeId={myOffice.id} />
+          </TabsContent>
 
           {/* Bookings Tab */}
           <TabsContent value="bookings" className="space-y-4">

@@ -419,3 +419,37 @@
 - [x] Integrate badges into sidebar menu items
 - [x] Add real-time notification updates
 - [x] Test notification badge display
+
+
+## Office Dashboard Analytics
+- [x] Create backend procedures for analytics data (bookings, revenue, ratings)
+- [x] Add database helpers for metrics calculation
+- [x] Create OfficeAnalytics component with Chart.js integration
+- [x] Display total bookings this month
+- [x] Show revenue trends chart
+- [x] Display customer satisfaction ratings
+- [x] Show popular services list
+- [x] Add date range selector for analytics
+- [x] Integrate analytics into OfficeDashboard page
+
+## Advanced Search Filters
+- [x] Add service category filter to office search
+- [x] Implement price range filter
+- [x] Add availability filter (instant booking, same-day)
+- [x] Add customer rating filter
+- [x] Update backend search procedure to support new filters
+- [x] Create FilterPanel component
+- [x] Add filter chips to show active filters
+- [x] Implement filter reset functionality
+- [x] Test all filter combinations
+
+## Booking Calendar View
+- [x] Create BookingCalendar component
+- [x] Integrate calendar library (react-big-calendar or similar)
+- [x] Implement monthly view with color-coded bookings
+- [x] Add weekly view option
+- [x] Color-code by status (pending, confirmed, completed, cancelled)
+- [x] Add quick actions (reschedule, cancel) from calendar
+- [x] Show booking details on click
+- [x] Add navigation between months
+- [x] Test calendar functionality

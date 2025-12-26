@@ -323,6 +323,45 @@ export const sanadOfficeRouter = router({
       return { success: true };
     }),
 
+  // Office analytics
+  getAnalytics: protectedProcedure
+    .input(
+      z.object({
+        officeId: z.number(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const user = ctx.user!;
+      
+      // Verify office ownership
+      const staff = await db.getUserOfficeRole(user.id, input.officeId);
+      if (!staff || !["owner", "manager"].includes(staff.role)) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have permission to view analytics",
+        });
+      }
+
+      // Default to current month if no dates provided
+      const now = new Date();
+      const startDate = input.startDate 
+        ? new Date(input.startDate) 
+        : new Date(now.getFullYear(), now.getMonth(), 1);
+      const endDate = input.endDate 
+        ? new Date(input.endDate) 
+        : new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+      const analytics = await db.getOfficeAnalytics(input.officeId, startDate, endDate);
+      const popularServices = await db.getPopularServices(input.officeId, 5);
+
+      return {
+        ...analytics,
+        popularServices,
+      };
+    }),
+
   // Office profile management
   updateProfile: protectedProcedure
     .input(
