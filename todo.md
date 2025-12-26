@@ -500,14 +500,14 @@
 - [x] Test reminder delivery
 
 ## Service Catalog Management
-- [ ] Create services database table
-- [ ] Add service CRUD procedures
-- [ ] Build service management UI for offices
-- [ ] Add service categories (business registration, attestation, NOC, etc.)
-- [ ] Implement service pricing and duration
-- [ ] Add service descriptions and requirements
-- [ ] Integrate services into office profile
-- [ ] Update booking flow to select specific services
+- [x] Create services database table
+- [x] Add service CRUD procedures
+- [x] Build service management UI for offices
+- [x] Add service categories (business registration, attestation, NOC, etc.)
+- [x] Implement service pricing and duration
+- [x] Add service descriptions and requirements
+- [x] Integrate services into office profile
+- [x] Update booking flow to select specific services
 
 ## Customer Loyalty Program
 - [ ] Create loyalty points database table
@@ -518,3 +518,30 @@
 - [ ] Add discount codes generation
 - [ ] Create referral tracking system
 - [ ] Display points balance in user profile
+
+## Service Catalog Management
+- [x] Add service categories to database schema
+- [x] Create service CRUD backend procedures
+- [x] Build ServiceCatalog component for office dashboard
+- [x] Add service creation form with pricing tiers
+- [x] Implement service editing and deletion
+- [x] Display services on office profile page
+- [x] Add service selection to booking flow
+
+## Customer Loyalty Program
+- [ ] Create loyalty_points table in schema
+- [ ] Add points tracking backend procedures
+- [ ] Create points earning rules (bookings, reviews, referrals)
+- [ ] Build rewards redemption system
+- [ ] Create LoyaltyDashboard component
+- [ ] Display points balance in user profile
+- [ ] Add discount application to booking flow
+
+## Booking Calendar View
+- [ ] Install react-big-calendar or similar library
+- [ ] Create BookingCalendar component
+- [ ] Implement month/week view switching
+- [ ] Add color-coded status indicators
+- [ ] Implement drag-and-drop rescheduling
+- [ ] Add quick action buttons (cancel, reschedule)
+- [ ] Integrate calendar into My Bookings page

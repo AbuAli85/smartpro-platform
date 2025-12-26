@@ -390,4 +390,53 @@ export const sanadOfficeRouter = router({
       await db.updateOfficeProfile(officeId, updateData);
       return { success: true };
     }),
+
+  // Service Management
+  createService: protectedProcedure
+    .input(z.object({
+      officeId: z.number(),
+      serviceName: z.string().min(3),
+      serviceNameAr: z.string().optional(),
+      category: z.string(),
+      description: z.string().optional(),
+      descriptionAr: z.string().optional(),
+      price: z.string().optional(),
+      priceType: z.enum(["fixed", "hourly", "custom"]).default("fixed"),
+      estimatedDeliveryDays: z.number().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const office = await db.getSanadOfficeById(input.officeId);
+      if (!office || office.ownerId !== ctx.user!.id) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Not authorized" });
+      }
+
+      await db.createSanadOfficeService(input as any);
+      return { success: true };
+    }),
+
+  updateService: protectedProcedure
+    .input(z.object({
+      serviceId: z.number(),
+      serviceName: z.string().min(3).optional(),
+      serviceNameAr: z.string().optional(),
+      category: z.string().optional(),
+      description: z.string().optional(),
+      descriptionAr: z.string().optional(),
+      price: z.string().optional(),
+      priceType: z.enum(["fixed", "hourly", "custom"]).optional(),
+      estimatedDeliveryDays: z.number().optional(),
+      isActive: z.boolean().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const { serviceId, ...updates } = input;
+      await db.updateSanadOfficeService(serviceId, updates as any);
+      return { success: true };
+    }),
+
+  deleteService: protectedProcedure
+    .input(z.object({ serviceId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      await db.updateSanadOfficeService(input.serviceId, { isActive: false });
+      return { success: true };
+    }),
 });

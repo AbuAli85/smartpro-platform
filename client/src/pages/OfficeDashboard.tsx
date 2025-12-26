@@ -8,6 +8,7 @@ import { Calendar, Clock, Users, TrendingUp, CheckCircle2, XCircle, AlertCircle 
 import { toast } from "sonner";
 import AvailabilityEditor from "@/components/AvailabilityEditor";
 import { OfficeAnalytics } from "@/components/OfficeAnalytics";
+import { ServiceCatalog } from "@/components/ServiceCatalog";
 
 export default function OfficeDashboard() {
   const [selectedTab, setSelectedTab] = useState("analytics");
@@ -152,6 +153,7 @@ export default function OfficeDashboard() {
           <TabsList>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="bookings">Bookings</TabsTrigger>
+            <TabsTrigger value="services">Services</TabsTrigger>
             <TabsTrigger value="availability">Availability</TabsTrigger>
             <TabsTrigger value="profile">Office Profile</TabsTrigger>
           </TabsList>
@@ -245,6 +247,11 @@ export default function OfficeDashboard() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Services Tab */}
+          <TabsContent value="services">
+            <ServiceCatalog officeId={myOffice.id} />
           </TabsContent>
 
           {/* Availability Tab */}

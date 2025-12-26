@@ -1021,3 +1021,8 @@ export async function markReminderSent(bookingId: number, reminderType: "24h" | 
     .set(updateField)
     .where(eq(bookings.id, bookingId));
 }
+
+// ============================================================================
+// SANAD OFFICE SERVICES
+// ============================================================================
+
