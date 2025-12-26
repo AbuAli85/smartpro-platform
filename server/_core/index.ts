@@ -10,6 +10,7 @@ import { serveStatic, setupVite } from "./vite";
 import { initializeSocket } from "./socket";
 import { initializeCronJobs } from "./cronJobs";
 import sseRouter from "../routes/sse";
+import { startReminderScheduler } from "./reminderScheduler";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -60,6 +61,9 @@ async function startServer() {
 
   // Initialize cron jobs for scheduled tasks
   initializeCronJobs();
+  
+  // Start booking reminder scheduler
+  startReminderScheduler();
 
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);

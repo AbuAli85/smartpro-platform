@@ -36,6 +36,13 @@
       "when": 1766700995599,
       "tag": "0004_perfect_metal_master",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1766738913821,
+      "tag": "0005_quiet_magdalene",
+      "breakpoints": true
     }
   ]
 }

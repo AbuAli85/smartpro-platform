@@ -969,3 +969,55 @@ export async function getPopularServices(officeId: number, limit: number = 5) {
     return [];
   }
 }
+
+// ============================================================================
+// Booking Reminders
+// ============================================================================
+
+export async function getBookingsNeedingReminder(
+  targetTime: Date,
+  windowEnd: Date,
+  reminderType: "24h" | "1h"
+) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const reminderField = reminderType === "24h" ? "reminder24hSent" : "reminder1hSent";
+  
+  return await db
+    .select({
+      id: bookings.id,
+      customerName: users.name,
+      customerEmail: users.email,
+      customerPhone: users.phone,
+      officeName: sanadOffices.officeName,
+      scheduledDate: bookings.scheduledDate,
+      scheduledTime: bookings.scheduledTime,
+      serviceDescription: bookings.serviceDescription,
+    })
+    .from(bookings)
+    .innerJoin(users, eq(bookings.userId, users.openId))
+    .innerJoin(sanadOffices, eq(bookings.officeId, sanadOffices.id))
+    .where(
+      and(
+        eq(bookings.status, "confirmed"),
+        gte(bookings.scheduledDate, targetTime),
+        lte(bookings.scheduledDate, windowEnd),
+        eq(bookings[reminderField], false)
+      )
+    );
+}
+
+export async function markReminderSent(bookingId: number, reminderType: "24h" | "1h") {
+  const db = await getDb();
+  if (!db) return;
+  
+  const updateField = reminderType === "24h" 
+    ? { reminder24hSent: true }
+    : { reminder1hSent: true };
+    
+  await db
+    .update(bookings)
+    .set(updateField)
+    .where(eq(bookings.id, bookingId));
+}

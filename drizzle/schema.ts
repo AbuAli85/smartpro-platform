@@ -300,6 +300,10 @@ export const bookings = mysqlTable("bookings", {
   // Communication
   notes: text("notes"),
   
+  // Reminders
+  reminder24hSent: boolean("reminder24hSent").default(false).notNull(),
+  reminder1hSent: boolean("reminder1hSent").default(false).notNull(),
+  
   // Audit
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

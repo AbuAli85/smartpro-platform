@@ -487,3 +487,34 @@
 - [x] Search for all instances of nested anchor tags
 - [x] Fix Button asChild with Link containing anchor tags
 - [x] Verify no console warnings remain
+
+
+## Booking Reminders System
+- [x] Create reminder scheduler service
+- [x] Add reminder preferences to user settings
+- [x] Implement 24-hour reminder job
+- [x] Implement 1-hour reminder job
+- [x] Add SMS reminder via Twilio
+- [x] Add email reminder via Resend
+- [x] Create reminder logs table
+- [x] Test reminder delivery
+
+## Service Catalog Management
+- [ ] Create services database table
+- [ ] Add service CRUD procedures
+- [ ] Build service management UI for offices
+- [ ] Add service categories (business registration, attestation, NOC, etc.)
+- [ ] Implement service pricing and duration
+- [ ] Add service descriptions and requirements
+- [ ] Integrate services into office profile
+- [ ] Update booking flow to select specific services
+
+## Customer Loyalty Program
+- [ ] Create loyalty points database table
+- [ ] Add points earning rules (bookings, reviews, referrals)
+- [ ] Create points transaction history
+- [ ] Build loyalty dashboard for customers
+- [ ] Implement points redemption system
+- [ ] Add discount codes generation
+- [ ] Create referral tracking system
+- [ ] Display points balance in user profile
