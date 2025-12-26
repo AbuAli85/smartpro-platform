@@ -79,6 +79,7 @@ export function Sidebar({ className }: SidebarProps) {
     navigation.push({ name: "Translation Requests", href: "/admin/translation-requests", icon: MessageSquareText, requiresAuth: true });
     navigation.push({ name: "Translation Analytics", href: "/admin/translation-analytics", icon: TrendingUp, requiresAuth: true });
     navigation.push({ name: "Translation Quality", href: "/admin/translation-quality", icon: Activity, requiresAuth: true });
+    navigation.push({ name: "Review Queue", href: "/admin/review-queue", icon: MessageSquareText, requiresAuth: true });
   }
 
   const filteredNavigation = navigation.filter((item) => !item.requiresAuth || user);

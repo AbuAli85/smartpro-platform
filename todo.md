@@ -1790,22 +1790,31 @@
 - [x] Test dashboard with real data
 
 ### Phase 2: Collaborative Review Workflow
-- [ ] Create translation_reviews table in database schema
-- [ ] Add review status to translations (draft, pending_review, approved, rejected)
-- [ ] Build tRPC procedures for submitting translations for review
-- [ ] Build tRPC procedures for adding comments and feedback
-- [ ] Build tRPC procedures for approving/rejecting translations
-- [ ] Create TranslationReviewQueue component for reviewers
-- [ ] Add comment system to translation editor
-- [ ] Implement email notifications for review requests
-- [ ] Test collaborative workflow end-to-end
+- [x] Create translation_reviews table in database schema
+- [x] Create translation_review_comments table in database schema
+- [x] Build tRPC procedures for submitting translations for review
+- [x] Build tRPC procedures for adding comments and feedback
+- [x] Build tRPC procedures for approving/rejecting translations
+- [x] Create CollaborativeReviewWorkflow component
+- [x] Add review submission to EnhancedTranslationEditor
+- [x] Create ReviewQueue page for peer reviewers
+- [x] Implement email notifications for review requests
+- [x] Test collaborative workflow end-to-end
 
 ### Phase 3: Smart Batch Processing
 - [ ] Create batch_translation_jobs table in database schema
 - [ ] Build detection algorithm for untranslated content
-- [ ] Create smart batch processor with AI translation
-- [ ] Implement confidence-based review queue
-- [ ] Build SmartBatchProcessor UI component
-- [ ] Add progress tracking for batch jobs
-- [ ] Add review queue for low-confidence translations
+- [ ] Create smart batch processor with AI translation and memory suggestions
+- [ ] Implement confidence-based auto-approval and review queue
+- [ ] Build SmartBatchProcessor UI component with progress tracking
+- [ ] Add batch job status monitoring
+- [ ] Create review queue interface for low-confidence translations
 - [ ] Test batch processing with large datasets
+
+### Phase 4: Translation Quality Alerts
+- [ ] Build quality threshold monitoring system
+- [ ] Create alert rules for accuracy drops and revision spikes
+- [ ] Implement email notification system for quality alerts
+- [ ] Add alert history and tracking
+- [ ] Create AlertSettings page for configuring thresholds
+- [ ] Test alert system with simulated quality issues

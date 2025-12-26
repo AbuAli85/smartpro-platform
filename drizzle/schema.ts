@@ -1002,3 +1002,55 @@ export const translationReviewComments = mysqlTable("translation_review_comments
 
 export type TranslationReviewComment = typeof translationReviewComments.$inferSelect;
 export type InsertTranslationReviewComment = typeof translationReviewComments.$inferInsert;
+
+
+// ============================================================================
+// SMART BATCH TRANSLATION
+// ============================================================================
+
+export const batchTranslationJobs = mysqlTable("batch_translation_jobs", {
+  id: int("id").primaryKey().autoincrement(),
+  
+  // Job details
+  jobName: varchar("job_name", { length: 255 }).notNull(),
+  entityType: mysqlEnum("entity_type", ["office", "template", "both"]).notNull(),
+  
+  // Scope
+  targetEntityIds: json("target_entity_ids").$type<number[]>(), // null = all entities
+  
+  // Progress tracking
+  status: mysqlEnum("status", ["pending", "processing", "completed", "failed"]).notNull().default("pending"),
+  totalItems: int("total_items").notNull().default(0),
+  processedItems: int("processed_items").notNull().default(0),
+  autoApprovedCount: int("auto_approved_count").notNull().default(0),
+  queuedForReviewCount: int("queued_for_review_count").notNull().default(0),
+  failedCount: int("failed_count").notNull().default(0),
+  
+  // Settings
+  confidenceThreshold: int("confidence_threshold").notNull().default(80), // Auto-approve if >= threshold
+  useMemorySuggestions: boolean("use_memory_suggestions").notNull().default(true),
+  
+  // Results
+  results: json("results").$type<Array<{
+    entityType: string;
+    entityId: number;
+    fieldName: string;
+    status: "success" | "queued" | "failed";
+    confidence?: number;
+    error?: string;
+  }>>(),
+  
+  // Audit
+  createdBy: int("created_by").notNull(),
+  createdByName: varchar("created_by_name", { length: 255 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  startedAt: timestamp("started_at"),
+  completedAt: timestamp("completed_at"),
+}, (table) => ({
+  statusIdx: index("status_idx").on(table.status),
+  createdByIdx: index("created_by_idx").on(table.createdBy),
+  createdAtIdx: index("created_at_idx").on(table.createdAt),
+}));
+
+export type BatchTranslationJob = typeof batchTranslationJobs.$inferSelect;
+export type InsertBatchTranslationJob = typeof batchTranslationJobs.$inferInsert;
