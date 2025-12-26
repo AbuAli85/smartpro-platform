@@ -110,7 +110,7 @@ export const sanadOfficeRouter = router({
   // Get a single Sanad office by slug
   getBySlug: publicProcedure
     .input(z.object({ slug: z.string() }))
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
       const office = await db.getSanadOfficeBySlug(input.slug);
 
       if (!office || office.status !== "active") {
@@ -126,8 +126,11 @@ export const sanadOfficeRouter = router({
       // Get reviews
       const reviews = await db.getOfficeReviews(office.id);
 
+      // Localize office content
+      const localizedOffice = localizeArray([office], ctx.language, ["officeName", "description"])[0];
+
       return {
-        ...office,
+        ...localizedOffice,
         services,
         reviews,
       };

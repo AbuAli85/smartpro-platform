@@ -4,6 +4,7 @@ import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import * as db from "../db";
 import { storagePut } from "../storage";
 import { generatePDF } from "../pdfGenerator";
+import { localizeArray } from "../helpers/i18n";
 
 export const documentTemplateRouter = router({
   // List all document templates
@@ -17,7 +18,7 @@ export const documentTemplateRouter = router({
         search: z.string().optional(),
       })
     )
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
       const { page, limit, category, language, search } = input;
       const offset = (page - 1) * limit;
 
@@ -29,8 +30,15 @@ export const documentTemplateRouter = router({
         offset,
       });
 
+      // Localize template names and descriptions
+      const localizedTemplates = localizeArray(
+        result.templates,
+        ctx.language,
+        ["templateName", "description"]
+      );
+
       return {
-        templates: result.templates,
+        templates: localizedTemplates,
         total: result.total,
         page,
         limit,
@@ -40,7 +48,7 @@ export const documentTemplateRouter = router({
   // Get a single template by ID
   getById: publicProcedure
     .input(z.object({ id: z.number() }))
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
       const template = await db.getDocumentTemplateById(input.id);
 
       if (!template) {
@@ -50,7 +58,10 @@ export const documentTemplateRouter = router({
         });
       }
 
-      return template;
+      // Localize template content
+      const localizedTemplate = localizeArray([template], ctx.language, ["templateName", "description"])[0];
+
+      return localizedTemplate;
     }),
 
   // Generate a document from a template

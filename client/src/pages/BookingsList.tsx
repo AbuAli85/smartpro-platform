@@ -9,8 +9,10 @@ import { Calendar, Clock, MapPin, XCircle, Star, CalendarDays, List } from "luci
 import { BookingCalendar } from "@/components/BookingCalendar";
 import CancellationDialog from "@/components/CancellationDialog";
 import ReviewDialog from "@/components/ReviewDialog";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function BookingsList() {
+  const { t } = useLanguage();
   const [cancelBookingId, setCancelBookingId] = useState<number | null>(null);
   const [reviewBooking, setReviewBooking] = useState<any | null>(null);
   
@@ -39,10 +41,10 @@ export default function BookingsList() {
     return (
       <div className="min-h-screen flex flex-col bg-background">
         <div className="container py-8">
-          <Breadcrumb items={[{ label: "My Bookings" }]} className="mb-6" />
+          <Breadcrumb items={[{ label: t("bookings.title") }]} className="mb-6" />
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#003366]"></div>
-            <span className="ml-3 text-gray-600">Loading bookings...</span>
+            <span className="ml-3 text-gray-600">{t("common.loading")}</span>
           </div>
         </div>
       </div>
@@ -53,17 +55,17 @@ export default function BookingsList() {
     <div className="min-h-screen flex flex-col bg-background">
       <div className="container py-8">
         <Breadcrumb items={[{ label: "My Bookings" }]} className="mb-6" />
-        <h1 className="text-4xl font-bold mb-8">My Bookings</h1>
+        <h1 className="text-4xl font-bold mb-8">{t("bookings.title")}</h1>
         
         <Tabs defaultValue="list" className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="list" className="flex items-center gap-2">
               <List className="h-4 w-4" />
-              List View
+              {t("bookings.listView")}
             </TabsTrigger>
             <TabsTrigger value="calendar" className="flex items-center gap-2">
               <CalendarDays className="h-4 w-4" />
-              Calendar View
+              {t("bookings.calendarView")}
             </TabsTrigger>
           </TabsList>
 
@@ -71,12 +73,12 @@ export default function BookingsList() {
             {!bookings || bookings.length === 0 ? (
               <Card>
                 <CardHeader>
-                  <CardTitle>Booking History</CardTitle>
-                  <CardDescription>View and manage your service bookings</CardDescription>
+                  <CardTitle>{t("bookings.history")}</CardTitle>
+                  <CardDescription>{t("bookings.historyDesc")}</CardDescription>
                 </CardHeader>
                 <CardContent className="py-12 text-center">
                   <Calendar className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">No bookings yet</p>
+                  <p className="text-muted-foreground">{t("bookings.noBookings")}</p>
                 </CardContent>
               </Card>
             ) : (

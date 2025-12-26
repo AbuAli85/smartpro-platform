@@ -1460,3 +1460,28 @@
 - [ ] Create bulk import tool for Arabic translations
 - [ ] Add validation for Arabic text fields
 - [ ] Create admin page to manage existing translations
+
+
+## Final Bilingual Platform Completion (Phase 2)
+### Phase 1: Complete Remaining Page Translations
+- [ ] Translate MyBookings page (tabs, status filters, booking cards)
+- [ ] Translate Profile page (form labels, sections, buttons)
+- [ ] Translate OfficeProfile page (tabs, services, reviews, booking CTA)
+- [ ] Add missing translation keys to dictionary
+- [ ] Test all translated pages in both languages
+
+### Phase 2: Extend Backend Localization
+- [ ] Update sanadOffice.getBySlug to return localized content
+- [ ] Update sanadOffice.getById to return localized content
+- [ ] Update documentTemplate.list to return localized content
+- [ ] Update documentTemplate.getById to return localized content
+- [ ] Update booking.list to return localized office names
+- [ ] Update booking.getById to return localized content
+- [ ] Test all API endpoints with Arabic language header
+
+### Phase 3: Seed Arabic Content
+- [x] Create seed script for office Arabic translations
+- [x] Create seed script for template Arabic translations
+- [x] Add sample Arabic content for demo offices
+- [x] Add sample Arabic content for popular templates
+- [x] Run seeding script and verify data
