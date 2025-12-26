@@ -16,6 +16,7 @@ import { analyticsRouter } from "./routers/analytics";
 import { adminAnalyticsRouter } from "./routers/adminAnalytics";
 import { officeOwnerRouter } from "./routers/officeOwner";
 import { templateRouter } from "./routers/template";
+import { chatRouter } from "./routers/chat";
 
 export const appRouter = router({
   system: systemRouter,
@@ -68,6 +69,7 @@ export const appRouter = router({
   adminAnalytics: adminAnalyticsRouter,
   officeOwner: officeOwnerRouter,
   template: templateRouter,
+  chat: chatRouter,
 });
 
 export type AppRouter = typeof appRouter;

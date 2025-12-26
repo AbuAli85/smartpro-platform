@@ -847,8 +847,8 @@
 ## Real-time Chat Support Implementation
 - [x] Add chat_conversations table (id, userId, officeId, status, createdAt, updatedAt)
 - [x] Add chat_messages table (id, conversationId, senderId, senderType, message, createdAt)
-- [ ] Install socket.io and socket.io-client packages
-- [ ] Create Socket.io server integration in Express
+- [x] Install socket.io and socket.io-client packages
+- [x] Create Socket.io server integration in server/_core (already exists)
 - [ ] Implement chat event handlers (join, message, typing, disconnect)
 - [ ] Build ChatWidget component with message list and input
 - [ ] Add unread message indicators
@@ -867,14 +867,14 @@
 - [x] Add template list with search and filters
 
 ## Real-time Chat Widget Implementation
-- [ ] Install socket.io and socket.io-client packages
-- [ ] Create Socket.io server integration
+- [x] Install socket.io and socket.io-client packages
+- [x] Create Socket.io server integration in server/_core (already exists)
 - [ ] Build chat backend event handlers (connect, disconnect, sendMessage, typing)
-- [ ] Create ChatWidget component
+- [x] Create ChatWidget component with message list
 - [ ] Build message list with auto-scroll
-- [ ] Add message input with send button
-- [ ] Implement typing indicators
-- [ ] Add unread message badges
+- [x] Add message input with send button
+- [x] Implement typing indicators
+- [x] Add unread message badges
 - [ ] Create conversation list for office owners
 - [ ] Test real-time message delivery
 
@@ -888,3 +888,37 @@
 - [ ] Add "Clear all filters" button
 - [x] Show active filter count badge
 - [ ] Optimize search performance with indexes
+
+## Real-time Chat Widget Implementation
+- [x] Install socket.io and socket.io-client packages
+- [x] Create Socket.io server integration in server/_core (already exists)
+- [x] Build chat event handlers (connection, message, typing, disconnect)
+- [x] Create ChatWidget component with message list
+- [x] Add message input with send button
+- [x] Implement typing indicators
+- [x] Add unread message badges
+- [ ] Create conversation list for office owners
+- [ ] Test real-time message delivery
+- [ ] Add chat to booking flow
+
+## Stripe Payment Gateway Integration
+- [ ] Request Stripe API keys from user
+- [ ] Create Stripe payment router
+- [ ] Build payment intent creation endpoint
+- [ ] Integrate Stripe checkout in booking flow
+- [ ] Add payment status tracking
+- [ ] Generate invoices on successful payment
+- [ ] Send invoice via email
+- [ ] Create webhook handler for payment confirmations
+- [ ] Add payment history to user dashboard
+- [ ] Test payment flow end-to-end
+
+## Mobile-Responsive Navigation
+- [x] Add hamburger menu icon for mobile (already implemented)
+- [x] Create mobile sidebar with slide-in animation (already implemented)
+- [x] Add overlay backdrop for mobile menu (already implemented)
+- [x] Optimize sidebar width for tablets
+- [ ] Ensure all pages are responsive
+- [ ] Test navigation on mobile devices
+- [ ] Add touch gestures for mobile
+- [ ] Optimize header spacing for small screens
