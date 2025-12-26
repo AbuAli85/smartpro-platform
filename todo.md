@@ -384,3 +384,7 @@
 - [x] Add success/error notifications
 - [x] Test profile editing functionality
 - [x] Update navigation to link to profile page
+
+
+## Bug Fixes
+- [x] Fix nested anchor tag warning in Navigation component

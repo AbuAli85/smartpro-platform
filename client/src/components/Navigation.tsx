@@ -31,38 +31,28 @@ export function Navigation() {
     <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         {/* Logo */}
-        <Link href="/">
-          <a className="flex items-center space-x-2 mr-8">
-            <div className="w-8 h-8 rounded-lg bg-gradient-elegant flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-bold text-xl hidden sm:inline-block">SmartPro</span>
-          </a>
+        <Link href="/" className="flex items-center space-x-2 mr-8">
+          <div className="w-8 h-8 rounded-lg bg-gradient-elegant flex items-center justify-center">
+            <Building2 className="w-5 h-5 text-white" />
+          </div>
+          <span className="font-bold text-xl hidden sm:inline-block">SmartPro</span>
         </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex flex-1 items-center space-x-6">
-          <Link href="/offices">
-            <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Sanad Offices
-            </a>
+          <Link href="/offices" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            Sanad Offices
           </Link>
-          <Link href="/templates">
-            <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Document Templates
-            </a>
+          <Link href="/templates" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            Document Templates
           </Link>
           {isAuthenticated && (
             <>
-              <Link href="/bookings">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  My Bookings
-                </a>
+              <Link href="/bookings" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                My Bookings
               </Link>
-              <Link href="/my-offices">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  My Offices
-                </a>
+              <Link href="/my-offices" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                My Offices
               </Link>
             </>
           )}
@@ -90,35 +80,27 @@ export function Navigation() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/profile">
-                    <a className="flex items-center w-full">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                    </a>
+                  <Link href="/profile" className="flex items-center w-full">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/my-offices">
-                    <a className="flex items-center w-full">
-                      <Building2 className="mr-2 h-4 w-4" />
-                      <span>My Offices</span>
-                    </a>
+                  <Link href="/my-offices" className="flex items-center w-full">
+                    <Building2 className="mr-2 h-4 w-4" />
+                    <span>My Offices</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/bookings">
-                    <a className="flex items-center w-full">
-                      <Calendar className="mr-2 h-4 w-4" />
-                      <span>My Bookings</span>
-                    </a>
+                  <Link href="/bookings" className="flex items-center w-full">
+                    <Calendar className="mr-2 h-4 w-4" />
+                    <span>My Bookings</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/documents">
-                    <a className="flex items-center w-full">
-                      <FileText className="mr-2 h-4 w-4" />
-                      <span>My Documents</span>
-                    </a>
+                  <Link href="/documents" className="flex items-center w-full">
+                    <FileText className="mr-2 h-4 w-4" />
+                    <span>My Documents</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -143,25 +125,25 @@ export function Navigation() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuItem asChild>
-                <Link href="/offices">
-                  <a className="flex items-center w-full">Sanad Offices</a>
+                <Link href="/offices" className="flex items-center w-full">
+                  Sanad Offices
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/templates">
-                  <a className="flex items-center w-full">Document Templates</a>
+                <Link href="/templates" className="flex items-center w-full">
+                  Document Templates
                 </Link>
               </DropdownMenuItem>
               {isAuthenticated && (
                 <>
                   <DropdownMenuItem asChild>
-                    <Link href="/bookings">
-                      <a className="flex items-center w-full">My Bookings</a>
+                    <Link href="/bookings" className="flex items-center w-full">
+                      My Bookings
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/my-offices">
-                      <a className="flex items-center w-full">My Offices</a>
+                    <Link href="/my-offices" className="flex items-center w-full">
+                      My Offices
                     </Link>
                   </DropdownMenuItem>
                 </>

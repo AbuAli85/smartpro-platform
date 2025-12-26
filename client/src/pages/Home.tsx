@@ -28,14 +28,10 @@ export default function Home() {
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <Button asChild size="lg" variant="secondary">
-                <Link href="/offices">
-                  <a>Browse Sanad Offices</a>
-                </Link>
+                <Link href="/offices">Browse Sanad Offices</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="bg-white/10 text-white border-white/20 hover:bg-white/20">
-                <Link href="/templates">
-                  <a>Explore Templates</a>
-                </Link>
+                <Link href="/templates">Explore Templates</Link>
               </Button>
             </div>
           </div>
@@ -68,9 +64,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Button asChild variant="link" className="p-0">
-                  <Link href="/offices">
-                    <a>Explore offices →</a>
-                  </Link>
+                  <Link href="/offices">Explore offices →</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -88,9 +82,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Button asChild variant="link" className="p-0">
-                  <Link href="/templates">
-                    <a>Browse templates →</a>
-                  </Link>
+                  <Link href="/templates">Browse templates →</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -108,9 +100,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Button asChild variant="link" className="p-0">
-                  <Link href="/offices">
-                    <a>Book a service →</a>
-                  </Link>
+                  <Link href="/offices">Book a service →</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -169,9 +159,7 @@ export default function Home() {
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <Button asChild size="lg">
-                <Link href="/offices">
-                  <a>Get Started</a>
-                </Link>
+                <Link href="/offices">Get Started</Link>
               </Button>
               <Button asChild size="lg" variant="outline">
                 <a href="#features">Learn More</a>
