@@ -150,8 +150,14 @@ export default function ChatInbox() {
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [translatingMessageId, setTranslatingMessageId] = useState<number | null>(null);
   const [autoTranslate, setAutoTranslate] = useState(false);
+  const [showOriginal, setShowOriginal] = useState<Record<number, boolean>>({});
   
-  const translateMutation = trpc.chat.translateMessage.useMutation();
+  const translateMutation = trpc.chat.translateMessage.useMutation({
+    onError: (error) => {
+      toast.error("Translation failed. Please try again.");
+      setTranslatingMessageId(null);
+    },
+  });
 
   // Get user's offices
   const { data: userOffices } = trpc.officeOwner.getMyOffices.useQuery();
@@ -620,15 +626,37 @@ export default function ChatInbox() {
                               ) : (
                                 <div>
                                   <p className="text-sm whitespace-pre-wrap break-words">{msg.message}</p>
-                                  {msg.translatedText && (
-                                    <div className="mt-2 pt-2 border-t border-border/50">
-                                      <div className="flex items-center gap-1 mb-1">
+                                {msg.translatedText && !showOriginal[msg.id] && (
+                                  <div className="mt-2 border-t pt-2 border-border/50 bg-muted/30 -mx-3 px-3 py-2 rounded">
+                                    <div className="flex items-center justify-between mb-1">
+                                      <div className="flex items-center gap-1">
                                         <Languages className="h-3 w-3 opacity-70" />
                                         <span className="text-xs opacity-70">Translation:</span>
                                       </div>
-                                      <p className="text-sm whitespace-pre-wrap break-words opacity-90">{msg.translatedText}</p>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-5 px-2 text-xs"
+                                        onClick={() => setShowOriginal(prev => ({ ...prev, [msg.id]: true }))}
+                                      >
+                                        Show original
+                                      </Button>
                                     </div>
-                                  )}
+                                    <p className="text-sm whitespace-pre-wrap break-words opacity-90">{msg.translatedText}</p>
+                                  </div>
+                                )}
+                                {msg.translatedText && showOriginal[msg.id] && (
+                                  <div className="mt-2 flex justify-end">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-5 px-2 text-xs"
+                                      onClick={() => setShowOriginal(prev => ({ ...prev, [msg.id]: false }))}
+                                    >
+                                      Show translation
+                                    </Button>
+                                  </div>
+                                )}
                                 </div>
                               )}
                               <div className="flex items-center gap-1 mt-1">
@@ -646,6 +674,7 @@ export default function ChatInbox() {
                                     variant="ghost"
                                     size="sm"
                                     className="h-5 px-1 ml-auto"
+                                    disabled={translatingMessageId === msg.id}
                                     onClick={async () => {
                                       setTranslatingMessageId(msg.id);
                                       try {
@@ -660,14 +689,17 @@ export default function ChatInbox() {
                                             : m
                                         ));
                                       } catch (error) {
-                                        toast.error("Translation failed");
+                                        // Error already handled by mutation onError
                                       } finally {
                                         setTranslatingMessageId(null);
                                       }
                                     }}
-                                    disabled={translatingMessageId === msg.id}
                                   >
-                                    <Languages className="h-3 w-3" />
+                                    {translatingMessageId === msg.id ? (
+                                      <div className="h-3 w-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                      <Languages className="h-3 w-3" />
+                                    )}
                                   </Button>
                                 )}
                               </div>

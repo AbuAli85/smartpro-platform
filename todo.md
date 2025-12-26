@@ -1356,3 +1356,23 @@
 - [x] Resolution time calculation (for closed conversations)
 - [x] Customizable filters for compliance reporting
 - [x] Both CSV and Excel format support
+
+
+## Translation Feature Fixes & Improvements
+- [x] Add loading indicators for message translation in ChatInbox
+- [x] Add error handling and user feedback for translation failures
+- [ ] Persist auto-translate setting per conversation in database
+- [x] Add "Show original" button to toggle between original and translated text
+- [x] Improve visual styling to distinguish translated text from original
+- [ ] Add translatedContent field to chat_messages table
+- [ ] Implement translation caching to avoid re-translating same messages
+- [ ] Add language preference field to users table
+- [ ] Translate office names and descriptions in Sanad Offices listing
+- [ ] Translate document template names and descriptions
+- [ ] Translate booking confirmation emails
+- [ ] Translate SMS notifications
+- [ ] Integrate LanguageToggle component into main navigation
+- [ ] Implement i18n for static UI text (buttons, labels, headers)
+- [ ] Add RTL layout support for Arabic language
+- [ ] Translate form validation messages
+- [ ] Translate error and success toast messages
