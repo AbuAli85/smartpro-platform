@@ -2579,7 +2579,7 @@ export async function getStaffPerformanceMetrics(officeId: number, staffUserId?:
   const db = await getDb();
   if (!db) return [];
   
-  const { officeStaff, chatAssignments, chatMessages, chatConversations, users } = await import("../drizzle/schema");
+  const { officeStaff, chatAssignments, chatMessages, chatConversations, users, chatRatings } = await import("../drizzle/schema");
   
   // Get staff members to analyze
   const staffQuery = db
@@ -2650,6 +2650,16 @@ export async function getStaffPerformanceMetrics(officeId: number, staffUserId?:
         ? Math.round((closedConversations / totalConversations) * 100) 
         : 0;
       
+      // Calculate average satisfaction score
+      const ratings = await db
+        .select()
+        .from(chatRatings)
+        .where(eq(chatRatings.staffUserId, s.userId));
+      
+      const avgSatisfaction = ratings.length > 0
+        ? (ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length).toFixed(1)
+        : null;
+      
       return {
         staffId: s.staffId,
         userId: s.userId,
@@ -2660,6 +2670,8 @@ export async function getStaffPerformanceMetrics(officeId: number, staffUserId?:
         closedConversations,
         avgResponseTimeMinutes,
         resolutionRate,
+        avgSatisfaction: avgSatisfaction ? parseFloat(avgSatisfaction) : null,
+        totalRatings: ratings.length,
       };
     })
   );
@@ -2671,7 +2683,7 @@ export async function getStaffPerformanceTrends(officeId: number, days: number =
   const db = await getDb();
   if (!db) return [];
   
-  const { officeStaff, chatAssignments, chatMessages, chatConversations, users } = await import("../drizzle/schema");
+  const { officeStaff, chatAssignments, chatMessages, chatConversations, users, chatRatings } = await import("../drizzle/schema");
   
   // Calculate start date
   const startDate = new Date();
@@ -2796,6 +2808,21 @@ export async function getConversationsByTags(officeId: number, tags: string[]) {
     const convTags = (conv.tags as string[]) || [];
     return tags.some(tag => convTags.includes(tag));
   });
+}
+
+// Close conversation
+export async function closeConversation(conversationId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { chatConversations } = await import("../drizzle/schema");
+  
+  await db
+    .update(chatConversations)
+    .set({ status: "closed" })
+    .where(eq(chatConversations.id, conversationId));
+  
+  return { id: conversationId };
 }
 
 // Chat Ratings

@@ -287,6 +287,7 @@ export default function StaffPerformance() {
                   <TableHead className="text-center">Closed</TableHead>
                   <TableHead className="text-center">Avg Response Time</TableHead>
                   <TableHead className="text-center">Resolution Rate</TableHead>
+                  <TableHead className="text-center">Satisfaction</TableHead>
                   <TableHead className="text-center">Performance</TableHead>
                 </TableRow>
               </TableHeader>
@@ -329,6 +330,19 @@ export default function StaffPerformance() {
                             {resolutionBadge.label}
                           </Badge>
                         </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {metric.avgSatisfaction ? (
+                          <div className="flex flex-col items-center gap-1">
+                            <div className="flex items-center gap-1">
+                              <span className="text-2xl">⭐</span>
+                              <span className="font-medium">{metric.avgSatisfaction.toFixed(1)}</span>
+                            </div>
+                            <span className="text-xs text-muted-foreground">({metric.totalRatings} ratings)</span>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">No ratings</span>
+                        )}
                       </TableCell>
                       <TableCell className="text-center">
                         {metric.avgResponseTimeMinutes <= 10 && metric.resolutionRate >= 70 ? (

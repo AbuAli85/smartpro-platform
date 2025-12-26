@@ -1144,8 +1144,14 @@
 - [x] Implement template quick insert with keyboard shortcuts (type /shortcut)
 - [x] Add template picker dropdown in message composer - already exists
 - [x] Enhanced message input to detect and auto-replace shortcuts
-- [ ] Support variable placeholders ({{customer_name}}, {{office_name}})
-- [ ] Write unit tests for template system
+- [ ] Add variable placeholder detection in template content
+- [ ] Implement dynamic replacement for {{customer_name}}
+- [ ] Implement dynamic replacement for {{office_name}}
+- [ ] Implement dynamic replacement for {{staff_name}}
+- [ ] Add variable preview in template management UI
+- [ ] Process variables when inserting template via shortcut
+- [ ] Process variables when inserting template via dropdown
+- [ ] Write unit tests for variable replacement
 
 ### Customer Satisfaction Ratings
 - [x] Add chat_ratings table to database
@@ -1153,19 +1159,22 @@
 - [x] Add optional feedback text area
 - [x] Create rating backend procedures (create, get by conversation, get staff ratings)
 - [x] Add chatRatings router with CRUD operations
-- [ ] Trigger rating request on conversation closure
-- [ ] Integrate ratings into Staff Performance dashboard
-- [ ] Calculate average satisfaction scores
-- [ ] Add satisfaction trend chart
+- [x] Add status field to chat_conversations table (already exists: active, closed, archived)
+- [x] Add close conversation button to ChatInbox (replaced Archive button)
+- [x] Trigger RatingModal automatically when conversation is closed
+- [x] Integrate average satisfaction scores into Staff Performance dashboard
+- [x] Add satisfaction score display in performance table with star rating
+- [ ] Add satisfaction trend chart with time-series data
 - [ ] Write unit tests for rating system
 
 ### Chat Transfer & Escalation
 - [ ] Add transfer_history table to database
-- [ ] Create TransferDialog component with staff selection
-- [ ] Add context notes field for transfer reason
-- [ ] Implement conversation reassignment logic
-- [ ] Add escalation flag for manager attention
-- [ ] Show transfer notifications to receiving staff
+- [ ] Create TransferDialog component with staff selection dropdown
+- [ ] Add context notes textarea for transfer reason
+- [ ] Implement conversation reassignment logic in backend
+- [ ] Add escalation flag checkbox for manager attention
+- [ ] Create transfer history tracking with timestamps
+- [ ] Show transfer notifications to both sender and receiver
+- [ ] Add transfer button in ChatInbox conversation header
 - [ ] Display transfer history in conversation details
-- [ ] Add transfer analytics to performance dashboard
 - [ ] Write unit tests for transfer system

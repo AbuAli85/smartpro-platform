@@ -713,6 +713,32 @@ export const chatRatings = mysqlTable("chat_ratings", {
 export type ChatRating = typeof chatRatings.$inferSelect;
 export type InsertChatRating = typeof chatRatings.$inferInsert;
 
+// ===== Chat Transfer History =====
+export const chatTransferHistory = mysqlTable("chat_transfer_history", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Conversation reference
+  conversationId: int("conversationId").notNull(),
+  
+  // Transfer details
+  fromUserId: int("fromUserId").notNull(),
+  toUserId: int("toUserId").notNull(),
+  
+  // Context and reason
+  contextNotes: text("contextNotes"),
+  isEscalation: boolean("isEscalation").default(false).notNull(),
+  
+  // Audit
+  transferredAt: timestamp("transferredAt").defaultNow().notNull(),
+}, (table) => ({
+  conversationIdx: index("conversation_idx").on(table.conversationId),
+  fromUserIdx: index("from_user_idx").on(table.fromUserId),
+  toUserIdx: index("to_user_idx").on(table.toUserId),
+}));
+
+export type ChatTransferHistory = typeof chatTransferHistory.$inferSelect;
+export type InsertChatTransferHistory = typeof chatTransferHistory.$inferInsert;
+
 // ===== Office Staff =====
 export const officeStaff = mysqlTable("office_staff", {
   id: int("id").autoincrement().primaryKey(),

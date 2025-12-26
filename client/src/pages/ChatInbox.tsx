@@ -22,6 +22,7 @@ import { requestNotificationPermission, sendChatNotification, canSendNotificatio
 import { useLocation } from "wouter";
 import { FileGallery } from "@/components/FileGallery";
 import { AvailabilityToggle } from "@/components/AvailabilityToggle";
+import { RatingModal } from "@/components/RatingModal";
 
 interface Message {
   id: number;
@@ -136,6 +137,9 @@ export default function ChatInbox() {
   const [, setLocation] = useLocation();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [isFileGalleryOpen, setIsFileGalleryOpen] = useState(false);
+  const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
+  const [ratingConversationId, setRatingConversationId] = useState<number | null>(null);
+  const [ratingStaffId, setRatingStaffId] = useState<number | undefined>();
 
   // Get user's conversations (for office owners)
   const { data: conversations, refetch: refetchConversations } = trpc.chat.getConversations.useQuery(
@@ -181,6 +185,40 @@ export default function ChatInbox() {
 
   // Mark as read mutation
   const markAsReadMutation = trpc.chat.markAsRead.useMutation();
+  
+  const utils = trpc.useUtils();
+  
+  const closeConversationMutation = trpc.chat.closeConversation.useMutation({
+    onSuccess: async (_, variables) => {
+      toast.success("Conversation closed");
+      await refetchConversations();
+      
+      // Fetch assignment to find staff ID
+      try {
+        const assignment = await utils.chatAssignment.getAssignment.fetch(
+          { conversationId: variables.conversationId }
+        );
+        
+        // Trigger rating modal
+        setRatingConversationId(variables.conversationId);
+        setRatingStaffId(assignment?.assignedToUserId);
+        setIsRatingModalOpen(true);
+      } catch (error) {
+        // If no assignment found, still show rating modal
+        setRatingConversationId(variables.conversationId);
+        setIsRatingModalOpen(true);
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to close conversation");
+    },
+  });
+  
+  const handleCloseConversation = (conversationId: number) => {
+    if (confirm("Are you sure you want to close this conversation? This will trigger a rating request.")) {
+      closeConversationMutation.mutate({ conversationId });
+    }
+  };
 
   useEffect(() => {
     if (chatMessages) {
@@ -448,8 +486,14 @@ export default function ChatInbox() {
                       >
                         <ImageIcon className="h-5 w-5" />
                       </Button>
-                      <Button variant="ghost" size="icon">
-                        <Archive className="h-5 w-5" />
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => handleCloseConversation(selectedConversation.conversation.id)}
+                        title="Close conversation"
+                        disabled={selectedConversation.conversation.status === "closed"}
+                      >
+                        <CheckCheck className="h-5 w-5" />
                       </Button>
                     </div>
                   </div>
@@ -651,6 +695,20 @@ export default function ChatInbox() {
           conversationId={selectedConversationId}
           isOpen={isFileGalleryOpen}
           onClose={() => setIsFileGalleryOpen(false)}
+        />
+      )}
+      
+      {/* Rating Modal */}
+      {ratingConversationId && (
+        <RatingModal
+          conversationId={ratingConversationId}
+          staffUserId={ratingStaffId}
+          isOpen={isRatingModalOpen}
+          onClose={() => {
+            setIsRatingModalOpen(false);
+            setRatingConversationId(null);
+            setRatingStaffId(undefined);
+          }}
         />
       )}
     </div>

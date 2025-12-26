@@ -180,6 +180,13 @@ export const chatRouter = router({
       return { success: true };
     }),
 
+  // Close conversation
+  closeConversation: protectedProcedure
+    .input(z.object({ conversationId: z.number() }))
+    .mutation(async ({ input }) => {
+      return await db.closeConversation(input.conversationId);
+    }),
+
   // Update conversation tags
   updateTags: protectedProcedure
     .input(z.object({
