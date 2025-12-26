@@ -855,3 +855,36 @@
 - [ ] Integrate chat into booking flow and office pages
 - [ ] Add chat history persistence
 - [ ] Write unit tests for chat functionality
+
+## Template Management UI Implementation
+- [x] Create TemplateManager page component
+- [x] Build template upload form with category selection
+- [x] Add file upload with drag-and-drop support
+- [ ] Create template preview modal
+- [x] Build download analytics table
+- [x] Add template edit/delete functionality
+- [x] Integrate with template tRPC router
+- [x] Add template list with search and filters
+
+## Real-time Chat Widget Implementation
+- [ ] Install socket.io and socket.io-client packages
+- [ ] Create Socket.io server integration
+- [ ] Build chat backend event handlers (connect, disconnect, sendMessage, typing)
+- [ ] Create ChatWidget component
+- [ ] Build message list with auto-scroll
+- [ ] Add message input with send button
+- [ ] Implement typing indicators
+- [ ] Add unread message badges
+- [ ] Create conversation list for office owners
+- [ ] Test real-time message delivery
+
+## Advanced Search & Filtering Enhancement
+- [x] Add full-text search input to Sanad Offices page
+- [x] Implement search across office names and descriptions
+- [ ] Add multi-select service filter
+- [ ] Add certification filter
+- [x] Add sort dropdown (rating, reviews, name)
+- [x] Implement debounced search (500ms)
+- [ ] Add "Clear all filters" button
+- [x] Show active filter count badge
+- [ ] Optimize search performance with indexes

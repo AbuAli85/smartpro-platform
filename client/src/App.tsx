@@ -23,6 +23,7 @@ import ReferFriends from "./pages/ReferFriends";
 import Analytics from "./pages/Analytics";
 import AdminAnalytics from "./pages/AdminAnalytics";
 import OfficeOwnerDashboard from "./pages/OfficeOwnerDashboard";
+import TemplateManager from "./pages/TemplateManager";
 import { useNotifications } from "./hooks/useNotifications";
 
 function Router() {
@@ -66,6 +67,7 @@ function Router() {
       
       {/* Office Owner */}
       <Route path="/owner/dashboard" component={OfficeOwnerDashboard} />
+      <Route path="/owner/templates" component={TemplateManager} />
       
       {/* 404 */}
       <Route path="/404" component={NotFound} />

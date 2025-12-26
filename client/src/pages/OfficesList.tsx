@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,9 +15,20 @@ import { useTranslation } from "react-i18next";
 export default function OfficesList() {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [governorate, setGovernorate] = useState<string>();
+  const [sortBy, setSortBy] = useState<string>("rating");
   const [page, setPage] = useState(1);
   const [advancedFilters, setAdvancedFilters] = useState<FilterState>({});
+  
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const handleFiltersChange = (newFilters: FilterState) => {
     setAdvancedFilters(newFilters);
@@ -28,7 +39,7 @@ export default function OfficesList() {
   const { data, isLoading } = trpc.sanadOffice.list.useQuery({
     page,
     limit: 12,
-    search: search || undefined,
+    search: debouncedSearch || undefined,
     governorate,
     status: "active",
     category: advancedFilters.category,
@@ -36,6 +47,23 @@ export default function OfficesList() {
     availableToday: advancedFilters.availableToday,
     availableThisWeek: advancedFilters.availableThisWeek,
   });
+  
+  // Sort offices client-side
+  const sortedOffices = useMemo(() => {
+    if (!data?.offices) return [];
+    const offices = [...data.offices];
+    
+    switch (sortBy) {
+      case "rating":
+        return offices.sort((a, b) => parseFloat(b.averageRating || "0") - parseFloat(a.averageRating || "0"));
+      case "name":
+        return offices.sort((a, b) => a.officeName.localeCompare(b.officeName));
+      case "reviews":
+        return offices.sort((a, b) => (b.totalReviews || 0) - (a.totalReviews || 0));
+      default:
+        return offices;
+    }
+  }, [data?.offices, sortBy]);
 
   const governorates = [
     "Muscat",
@@ -109,6 +137,17 @@ export default function OfficesList() {
               ))}
             </SelectContent>
           </Select>
+          
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-full md:w-[180px]">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="rating">Highest Rated</SelectItem>
+              <SelectItem value="reviews">Most Reviews</SelectItem>
+              <SelectItem value="name">Name (A-Z)</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Advanced Filters */}
@@ -133,8 +172,13 @@ export default function OfficesList() {
           </div>
         ) : data && data.offices.length > 0 ? (
           <>
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-muted-foreground">
+                Showing {sortedOffices.length} of {data.total} offices
+              </p>
+            </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {data.offices.map((office) => (
+              {sortedOffices.map((office) => (
                 <Card key={office.id} className="hover:shadow-elegant-lg transition-all duration-300 border-2 hover:border-primary/50">
                   <CardHeader>
                     {office.coverImageUrl ? (

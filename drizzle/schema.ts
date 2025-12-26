@@ -209,6 +209,15 @@ export const documentTemplates = mysqlTable("document_templates", {
   isOfficial: boolean("isOfficial").default(false).notNull(), // Government-approved template
   isPremium: boolean("isPremium").default(false).notNull(),
   
+  // Pricing
+  price: decimal("price", { precision: 10, scale: 3 }),
+  
+  // File storage
+  fileUrl: text("fileUrl"),
+  fileKey: varchar("fileKey", { length: 500 }),
+  fileSize: int("fileSize"),
+  mimeType: varchar("mimeType", { length: 100 }),
+  
   // Usage stats
   usageCount: int("usageCount").default(0).notNull(),
   
