@@ -534,3 +534,99 @@ export const notifications = mysqlTable("notifications", {
 
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = typeof notifications.$inferInsert;
+
+// ============================================================================
+// TEMPLATE DOWNLOADS TRACKING
+// ============================================================================
+
+export const templateDownloads = mysqlTable("template_downloads", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // References
+  templateId: int("templateId").notNull(),
+  userId: int("userId").notNull(),
+  
+  // Download metadata
+  downloadedAt: timestamp("downloadedAt").defaultNow().notNull(),
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+}, (table) => ({
+  templateIdx: index("template_idx").on(table.templateId),
+  userIdx: index("user_idx").on(table.userId),
+  dateIdx: index("date_idx").on(table.downloadedAt),
+}));
+
+export type TemplateDownload = typeof templateDownloads.$inferSelect;
+export type InsertTemplateDownload = typeof templateDownloads.$inferInsert;
+
+// ============================================================================
+// REAL-TIME CHAT SYSTEM
+// ============================================================================
+
+export const chatConversations = mysqlTable("chat_conversations", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Participants
+  userId: int("userId").notNull(),
+  officeId: int("officeId").notNull(),
+  
+  // Related booking (optional)
+  bookingId: int("bookingId"),
+  
+  // Status
+  status: mysqlEnum("status", ["active", "closed", "archived"]).default("active").notNull(),
+  
+  // Last message info for sorting
+  lastMessageAt: timestamp("lastMessageAt").defaultNow().notNull(),
+  lastMessagePreview: varchar("lastMessagePreview", { length: 255 }),
+  
+  // Unread counts
+  unreadByUser: int("unreadByUser").default(0).notNull(),
+  unreadByOffice: int("unreadByOffice").default(0).notNull(),
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  userIdx: index("user_idx").on(table.userId),
+  officeIdx: index("office_idx").on(table.officeId),
+  bookingIdx: index("booking_idx").on(table.bookingId),
+  statusIdx: index("status_idx").on(table.status),
+  lastMessageIdx: index("last_message_idx").on(table.lastMessageAt),
+}));
+
+export type ChatConversation = typeof chatConversations.$inferSelect;
+export type InsertChatConversation = typeof chatConversations.$inferInsert;
+
+export const chatMessages = mysqlTable("chat_messages", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Conversation reference
+  conversationId: int("conversationId").notNull(),
+  
+  // Sender info
+  senderId: int("senderId").notNull(),
+  senderType: mysqlEnum("senderType", ["user", "office"]).notNull(),
+  
+  // Message content
+  message: text("message").notNull(),
+  
+  // Message type
+  messageType: mysqlEnum("messageType", ["text", "file", "system"]).default("text").notNull(),
+  fileUrl: text("fileUrl"),
+  fileName: varchar("fileName", { length: 255 }),
+  
+  // Read status
+  isRead: boolean("isRead").default(false).notNull(),
+  readAt: timestamp("readAt"),
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  conversationIdx: index("conversation_idx").on(table.conversationId),
+  senderIdx: index("sender_idx").on(table.senderId),
+  dateIdx: index("date_idx").on(table.createdAt),
+}));
+
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertChatMessage = typeof chatMessages.$inferInsert;

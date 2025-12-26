@@ -1945,3 +1945,248 @@ export async function getReviewById(reviewId: number) {
     
   return review || null;
 }
+
+
+// ============================================================================
+// DOCUMENT TEMPLATE MANAGEMENT (Extended)
+// ============================================================================
+
+export async function createDocumentTemplateByOwner(data: {
+  templateName: string;
+  templateNameAr?: string;
+  category: string;
+  description?: string;
+  templateContent: string;
+  variables?: any;
+  language?: string;
+  isOfficial?: boolean;
+  isPremium?: boolean;
+  price?: string;
+  fileUrl?: string;
+  fileKey?: string;
+  fileSize?: number;
+  mimeType?: string;
+  createdBy: number;
+  officeId?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result] = await db.insert(documentTemplates).values(data as any);
+  return result.insertId;
+}
+
+export async function updateDocumentTemplateByOwner(id: number, data: Partial<{
+  templateName: string;
+  templateNameAr: string;
+  category: string;
+  description: string;
+  templateContent: string;
+  variables: any;
+  price: string;
+  fileUrl: string;
+  fileKey: string;
+}>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(documentTemplates).set(data).where(eq(documentTemplates.id, id));
+}
+
+export async function deleteDocumentTemplateByOwner(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(documentTemplates).where(eq(documentTemplates.id, id));
+}
+
+export async function getDocumentTemplatesByOfficeId(officeId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(documentTemplates)
+    .where(eq(documentTemplates.createdBy, officeId))
+    .orderBy(desc(documentTemplates.createdAt));
+}
+
+export async function trackTemplateDownload(templateId: number, userId: number, metadata?: {
+  ipAddress?: string;
+  userAgent?: string;
+}) {
+  const db = await getDb();
+  if (!db) return;
+  
+  const { templateDownloads } = await import("../drizzle/schema");
+  
+  // Record download
+  await db.insert(templateDownloads).values({
+    templateId,
+    userId,
+    ipAddress: metadata?.ipAddress,
+    userAgent: metadata?.userAgent,
+  } as any);
+  
+  // Increment usage count
+  await db.update(documentTemplates)
+    .set({ usageCount: sql`${documentTemplates.usageCount} + 1` })
+    .where(eq(documentTemplates.id, templateId));
+}
+
+export async function getTemplateDownloadStats(templateId: number) {
+  const db = await getDb();
+  if (!db) return { totalDownloads: 0, uniqueUsers: 0 };
+  
+  const { templateDownloads } = await import("../drizzle/schema");
+  
+  const downloads = await db.select({
+    totalDownloads: sql<number>`COUNT(*)`,
+    uniqueUsers: sql<number>`COUNT(DISTINCT ${templateDownloads.userId})`,
+  })
+  .from(templateDownloads)
+  .where(eq(templateDownloads.templateId, templateId));
+  
+  return downloads[0] || { totalDownloads: 0, uniqueUsers: 0 };
+}
+
+// ============================================================================
+// CHAT SYSTEM
+// ============================================================================
+
+export async function createChatConversation(data: {
+  userId: number;
+  officeId: number;
+  bookingId?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { chatConversations } = await import("../drizzle/schema");
+  
+  // Check if conversation already exists
+  const existing = await db.select().from(chatConversations)
+    .where(and(
+      eq(chatConversations.userId, data.userId),
+      eq(chatConversations.officeId, data.officeId),
+      eq(chatConversations.status, "active")
+    ))
+    .limit(1);
+    
+  if (existing.length > 0) {
+    return existing[0].id;
+  }
+  
+  const [result] = await db.insert(chatConversations).values(data as any);
+  return result.insertId;
+}
+
+export async function getChatConversationById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { chatConversations } = await import("../drizzle/schema");
+  
+  const [conversation] = await db.select().from(chatConversations)
+    .where(eq(chatConversations.id, id))
+    .limit(1);
+    
+  return conversation || null;
+}
+
+export async function getUserChatConversations(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { chatConversations } = await import("../drizzle/schema");
+  
+  return await db.select({
+    conversation: chatConversations,
+    office: sanadOffices,
+  })
+  .from(chatConversations)
+  .leftJoin(sanadOffices, eq(chatConversations.officeId, sanadOffices.id))
+  .where(eq(chatConversations.userId, userId))
+  .orderBy(desc(chatConversations.lastMessageAt));
+}
+
+export async function getOfficeChatConversations(officeId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { chatConversations } = await import("../drizzle/schema");
+  
+  return await db.select({
+    conversation: chatConversations,
+    user: users,
+  })
+  .from(chatConversations)
+  .leftJoin(users, eq(chatConversations.userId, users.id))
+  .where(eq(chatConversations.officeId, officeId))
+  .orderBy(desc(chatConversations.lastMessageAt));
+}
+
+export async function createChatMessage(data: {
+  conversationId: number;
+  senderId: number;
+  senderType: "user" | "office";
+  message: string;
+  messageType?: "text" | "file" | "system";
+  fileUrl?: string;
+  fileName?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { chatMessages, chatConversations } = await import("../drizzle/schema");
+  
+  const [result] = await db.insert(chatMessages).values(data as any);
+  
+  // Update conversation last message
+  if (data.senderType === "office") {
+    await db.update(chatConversations)
+      .set({
+        lastMessageAt: new Date(),
+        lastMessagePreview: data.message.substring(0, 255),
+        unreadByUser: sql`${chatConversations.unreadByUser} + 1`,
+      })
+      .where(eq(chatConversations.id, data.conversationId));
+  } else {
+    await db.update(chatConversations)
+      .set({
+        lastMessageAt: new Date(),
+        lastMessagePreview: data.message.substring(0, 255),
+        unreadByOffice: sql`${chatConversations.unreadByOffice} + 1`,
+      })
+      .where(eq(chatConversations.id, data.conversationId));
+  }
+    
+  return result.insertId;
+}
+
+export async function getChatMessages(conversationId: number, limit = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { chatMessages } = await import("../drizzle/schema");
+  
+  return await db.select().from(chatMessages)
+    .where(eq(chatMessages.conversationId, conversationId))
+    .orderBy(desc(chatMessages.createdAt))
+    .limit(limit);
+}
+
+export async function markMessagesAsRead(conversationId: number, readerType: "user" | "office") {
+  const db = await getDb();
+  if (!db) return;
+  
+  const { chatConversations } = await import("../drizzle/schema");
+  
+  if (readerType === "user") {
+    await db.update(chatConversations)
+      .set({ unreadByUser: 0 })
+      .where(eq(chatConversations.id, conversationId));
+  } else {
+    await db.update(chatConversations)
+      .set({ unreadByOffice: 0 })
+      .where(eq(chatConversations.id, conversationId));
+  }
+}

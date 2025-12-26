@@ -831,3 +831,27 @@
 - [x] Translate ReferFriends page (code, stats, sharing)
 - [ ] Test language switching on all translated pages
 - [ ] Verify RTL layout on all translated pages
+
+## Document Template Management Implementation
+- [x] Add document_templates table (already exists in schema)
+- [x] Add template_downloads table (id, templateId, userId, downloadedAt)
+- [x] Create template CRUD procedures (create, update, delete, getByOffice, getById)
+- [x] Create getTemplateDownloads procedure for analytics
+- [x] Implement S3 upload for template files
+- [ ] Build TemplateManagement page for office owners
+- [ ] Add template upload form with file validation
+- [ ] Add template preview functionality
+- [ ] Add download tracking and analytics
+- [ ] Write unit tests for template management
+
+## Real-time Chat Support Implementation
+- [x] Add chat_conversations table (id, userId, officeId, status, createdAt, updatedAt)
+- [x] Add chat_messages table (id, conversationId, senderId, senderType, message, createdAt)
+- [ ] Install socket.io and socket.io-client packages
+- [ ] Create Socket.io server integration in Express
+- [ ] Implement chat event handlers (join, message, typing, disconnect)
+- [ ] Build ChatWidget component with message list and input
+- [ ] Add unread message indicators
+- [ ] Integrate chat into booking flow and office pages
+- [ ] Add chat history persistence
+- [ ] Write unit tests for chat functionality

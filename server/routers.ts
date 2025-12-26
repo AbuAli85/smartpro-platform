@@ -15,6 +15,7 @@ import { notificationRouter } from "./routers/notification";
 import { analyticsRouter } from "./routers/analytics";
 import { adminAnalyticsRouter } from "./routers/adminAnalytics";
 import { officeOwnerRouter } from "./routers/officeOwner";
+import { templateRouter } from "./routers/template";
 
 export const appRouter = router({
   system: systemRouter,
@@ -66,6 +67,7 @@ export const appRouter = router({
   analytics: analyticsRouter,
   adminAnalytics: adminAnalyticsRouter,
   officeOwner: officeOwnerRouter,
+  template: templateRouter,
 });
 
 export type AppRouter = typeof appRouter;
