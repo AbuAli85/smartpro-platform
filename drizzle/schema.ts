@@ -805,3 +805,92 @@ export const officeStaff = mysqlTable("office_staff", {
 
 export type OfficeStaff = typeof officeStaff.$inferSelect;
 export type InsertOfficeStaff = typeof officeStaff.$inferInsert;
+
+// ============================================================================
+// TRANSLATION MANAGEMENT
+// ============================================================================
+
+export const translationRequests = mysqlTable("translation_requests", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Request details
+  entityType: mysqlEnum("entityType", ["office", "template"]).notNull(),
+  entityId: int("entityId").notNull(),
+  
+  // Requester info
+  requesterId: int("requesterId").notNull(),
+  requesterName: varchar("requesterName", { length: 255 }).notNull(),
+  requesterEmail: varchar("requesterEmail", { length: 320 }),
+  
+  // Translation content
+  currentNameEn: varchar("currentNameEn", { length: 255 }).notNull(),
+  currentDescriptionEn: text("currentDescriptionEn"),
+  proposedNameAr: varchar("proposedNameAr", { length: 255 }),
+  proposedDescriptionAr: text("proposedDescriptionAr"),
+  
+  // Request notes
+  notes: text("notes"),
+  
+  // Status and workflow
+  status: mysqlEnum("status", ["pending", "approved", "rejected", "completed"]).default("pending").notNull(),
+  priority: mysqlEnum("priority", ["low", "medium", "high"]).default("medium").notNull(),
+  
+  // Admin actions
+  reviewedBy: int("reviewedBy"),
+  reviewedAt: timestamp("reviewedAt"),
+  reviewNotes: text("reviewNotes"),
+  
+  // Completion tracking
+  completedBy: int("completedBy"),
+  completedAt: timestamp("completedAt"),
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  entityIdx: index("entity_idx").on(table.entityType, table.entityId),
+  requesterIdx: index("requester_idx").on(table.requesterId),
+  statusIdx: index("status_idx").on(table.status),
+  priorityIdx: index("priority_idx").on(table.priority),
+  createdAtIdx: index("created_at_idx").on(table.createdAt),
+}));
+
+export type TranslationRequest = typeof translationRequests.$inferSelect;
+export type InsertTranslationRequest = typeof translationRequests.$inferInsert;
+
+export const translationActivityLog = mysqlTable("translation_activity_log", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // What was translated
+  entityType: mysqlEnum("entityType", ["office", "template"]).notNull(),
+  entityId: int("entityId").notNull(),
+  entityName: varchar("entityName", { length: 255 }).notNull(),
+  
+  // Who translated
+  translatorId: int("translatorId").notNull(),
+  translatorName: varchar("translatorName", { length: 255 }).notNull(),
+  
+  // What changed
+  actionType: mysqlEnum("actionType", ["created", "updated", "bulk_import"]).notNull(),
+  fieldChanged: varchar("fieldChanged", { length: 50 }), // "nameAr", "descriptionAr", "both"
+  
+  // Previous and new values (for audit)
+  previousValue: text("previousValue"),
+  newValue: text("newValue"),
+  
+  // Metadata
+  source: mysqlEnum("source", ["manual", "bulk_import", "request_approval"]).default("manual").notNull(),
+  requestId: int("requestId"), // Link to translation request if applicable
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  entityIdx: index("entity_idx").on(table.entityType, table.entityId),
+  translatorIdx: index("translator_idx").on(table.translatorId),
+  actionIdx: index("action_idx").on(table.actionType),
+  sourceIdx: index("source_idx").on(table.source),
+  dateIdx: index("date_idx").on(table.createdAt),
+}));
+
+export type TranslationActivityLog = typeof translationActivityLog.$inferSelect;
+export type InsertTranslationActivityLog = typeof translationActivityLog.$inferInsert;

@@ -76,6 +76,8 @@ export function Sidebar({ className }: SidebarProps) {
     navigation.push({ name: t("nav.adminDashboard"), href: "/admin", icon: Shield, requiresAuth: true });
     navigation.push({ name: t("nav.adminAnalytics"), href: "/admin/analytics", icon: BarChart3, requiresAuth: true });
     navigation.push({ name: t("nav.contentTranslation"), href: "/admin/translations", icon: Languages, requiresAuth: true });
+    navigation.push({ name: "Translation Requests", href: "/admin/translation-requests", icon: MessageSquareText, requiresAuth: true });
+    navigation.push({ name: "Translation Analytics", href: "/admin/translation-analytics", icon: TrendingUp, requiresAuth: true });
   }
 
   const filteredNavigation = navigation.filter((item) => !item.requiresAuth || user);

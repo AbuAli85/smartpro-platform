@@ -31,6 +31,8 @@ import StaffManagement from "./pages/StaffManagement";
 import StaffPerformance from "./pages/StaffPerformance";
 import FollowUpSettings from "./pages/FollowUpSettings";
 import ContentTranslation from "./pages/ContentTranslation";
+import TranslationRequestQueue from "./pages/TranslationRequestQueue";
+import TranslationAnalytics from "./pages/TranslationAnalytics";
 import NotificationPreferences from "./pages/NotificationPreferences";
 import { useNotifications } from "./hooks/useNotifications";
 
@@ -59,6 +61,8 @@ function Router() {
       {/* Admin */}
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/translations" component={ContentTranslation} />
+      <Route path="/admin/translation-requests" component={TranslationRequestQueue} />
+      <Route path="/admin/translation-analytics" component={TranslationAnalytics} />
       
       {/* Office Dashboard */}
       <Route path="/office-dashboard" component={OfficeDashboard} />

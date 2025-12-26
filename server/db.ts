@@ -24,6 +24,8 @@ import {
   type Review,
   scheduledFollowups,
   type ScheduledFollowup,
+  translationRequests,
+  translationActivityLog,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -3346,4 +3348,282 @@ export async function updateTemplateTranslation(
     .update(documentTemplates)
     .set(translations)
     .where(eq(documentTemplates.id, templateId));
+}
+
+// ============================================================================
+// TRANSLATION REQUESTS & WORKFLOW
+// ============================================================================
+
+export async function createTranslationRequest(data: {
+  entityType: "office" | "template";
+  entityId: number;
+  requesterId: number;
+  requesterName: string;
+  requesterEmail?: string;
+  currentNameEn: string;
+  currentDescriptionEn?: string;
+  proposedNameAr?: string;
+  proposedDescriptionAr?: string;
+  notes?: string;
+  priority?: "low" | "medium" | "high";
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const [result] = await db.insert(translationRequests).values(data as any);
+  return result.insertId;
+}
+
+export async function getTranslationRequestById(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db
+    .select()
+    .from(translationRequests)
+    .where(eq(translationRequests.id, id))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+export async function listTranslationRequests(filters: {
+  status?: "pending" | "approved" | "rejected" | "completed";
+  entityType?: "office" | "template";
+  requesterId?: number;
+  limit?: number;
+  offset?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  let query = db.select().from(translationRequests);
+
+  const conditions = [];
+  if (filters.status) {
+    conditions.push(eq(translationRequests.status, filters.status));
+  }
+  if (filters.entityType) {
+    conditions.push(eq(translationRequests.entityType, filters.entityType));
+  }
+  if (filters.requesterId) {
+    conditions.push(eq(translationRequests.requesterId, filters.requesterId));
+  }
+
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
+  }
+
+  const requests = await query
+    .orderBy(desc(translationRequests.createdAt))
+    .limit(filters.limit || 50)
+    .offset(filters.offset || 0);
+
+  return requests;
+}
+
+export async function updateTranslationRequestStatus(
+  id: number,
+  status: "pending" | "approved" | "rejected" | "completed",
+  reviewedBy: number,
+  reviewNotes?: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(translationRequests)
+    .set({
+      status,
+      reviewedBy,
+      reviewedAt: new Date(),
+      reviewNotes,
+    })
+    .where(eq(translationRequests.id, id));
+}
+
+export async function completeTranslationRequest(
+  id: number,
+  completedBy: number
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(translationRequests)
+    .set({
+      status: "completed",
+      completedBy,
+      completedAt: new Date(),
+    })
+    .where(eq(translationRequests.id, id));
+}
+
+export async function getPendingTranslationRequestsCount(): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(translationRequests)
+    .where(eq(translationRequests.status, "pending"));
+
+  return result[0]?.count || 0;
+}
+
+// ============================================================================
+// TRANSLATION ACTIVITY LOG
+// ============================================================================
+
+export async function logTranslationActivity(data: {
+  entityType: "office" | "template";
+  entityId: number;
+  entityName: string;
+  translatorId: number;
+  translatorName: string;
+  actionType: "created" | "updated" | "bulk_import";
+  fieldChanged?: string;
+  previousValue?: string;
+  newValue?: string;
+  source?: "manual" | "bulk_import" | "request_approval";
+  requestId?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(translationActivityLog).values(data as any);
+}
+
+export async function getTranslationActivityLog(filters: {
+  entityType?: "office" | "template";
+  entityId?: number;
+  translatorId?: number;
+  startDate?: Date;
+  endDate?: Date;
+  limit?: number;
+  offset?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  let query = db.select().from(translationActivityLog);
+
+  const conditions = [];
+  if (filters.entityType) {
+    conditions.push(eq(translationActivityLog.entityType, filters.entityType));
+  }
+  if (filters.entityId) {
+    conditions.push(eq(translationActivityLog.entityId, filters.entityId));
+  }
+  if (filters.translatorId) {
+    conditions.push(eq(translationActivityLog.translatorId, filters.translatorId));
+  }
+  if (filters.startDate) {
+    conditions.push(gte(translationActivityLog.createdAt, filters.startDate));
+  }
+  if (filters.endDate) {
+    conditions.push(lte(translationActivityLog.createdAt, filters.endDate));
+  }
+
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
+  }
+
+  const activities = await query
+    .orderBy(desc(translationActivityLog.createdAt))
+    .limit(filters.limit || 100)
+    .offset(filters.offset || 0);
+
+  return activities;
+}
+
+export async function getTranslatorLeaderboard(params: {
+  startDate?: Date;
+  endDate?: Date;
+  limit?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const conditions = [];
+  if (params.startDate) {
+    conditions.push(gte(translationActivityLog.createdAt, params.startDate));
+  }
+  if (params.endDate) {
+    conditions.push(lte(translationActivityLog.createdAt, params.endDate));
+  }
+
+  let query = db
+    .select({
+      translatorId: translationActivityLog.translatorId,
+      translatorName: translationActivityLog.translatorName,
+      totalTranslations: sql<number>`count(*)`,
+      officeTranslations: sql<number>`sum(case when ${translationActivityLog.entityType} = 'office' then 1 else 0 end)`,
+      templateTranslations: sql<number>`sum(case when ${translationActivityLog.entityType} = 'template' then 1 else 0 end)`,
+      lastActivity: sql<Date>`max(${translationActivityLog.createdAt})`,
+    })
+    .from(translationActivityLog);
+
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
+  }
+
+  const leaderboard = await query
+    .groupBy(translationActivityLog.translatorId, translationActivityLog.translatorName)
+    .orderBy(sql`count(*) desc`)
+    .limit(params.limit || 10);
+
+  return leaderboard;
+}
+
+export async function getTranslationCompletionTrends(params: {
+  startDate: Date;
+  endDate: Date;
+  groupBy?: "day" | "week" | "month";
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const groupByFormat = params.groupBy === "month" ? "%Y-%m" : 
+                        params.groupBy === "week" ? "%Y-%U" : "%Y-%m-%d";
+
+  // Use raw SQL to avoid GROUP BY issues with Drizzle
+  const query = `
+    SELECT 
+      DATE_FORMAT(createdAt, '${groupByFormat}') as period,
+      COUNT(*) as totalTranslations,
+      SUM(CASE WHEN entityType = 'office' THEN 1 ELSE 0 END) as officeTranslations,
+      SUM(CASE WHEN entityType = 'template' THEN 1 ELSE 0 END) as templateTranslations,
+      COUNT(DISTINCT translatorId) as uniqueTranslators
+    FROM translation_activity_log
+    WHERE createdAt >= ? AND createdAt <= ?
+    GROUP BY DATE_FORMAT(createdAt, '${groupByFormat}')
+    ORDER BY period
+  `;
+
+  const [rows] = await (db as any).execute(query, [
+    params.startDate,
+    params.endDate,
+  ]);
+
+  return rows as Array<{
+    period: string;
+    totalTranslations: number;
+    officeTranslations: number;
+    templateTranslations: number;
+    uniqueTranslators: number;
+  }>;
+}
+
+export async function getRecentTranslationActivity(limit: number = 20) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const activities = await db
+    .select()
+    .from(translationActivityLog)
+    .orderBy(desc(translationActivityLog.createdAt))
+    .limit(limit);
+
+  return activities;
 }

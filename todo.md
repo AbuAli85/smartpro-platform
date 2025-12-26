@@ -1714,3 +1714,39 @@
 - [x] Add quality overview statistics to template tab
 - [x] Add completion status badge to selected items
 - [x] Test quality indicators display
+
+
+## Translation Workflow Automation
+### Phase 1: Translation Request System Backend
+- [x] Create translation_requests table in database schema
+- [x] Add translation request status enum (pending, approved, rejected, completed)
+- [x] Create database helpers for translation requests
+- [x] Build tRPC procedures for creating translation requests
+- [x] Build tRPC procedures for admin approval/rejection
+- [x] Add email notification for new translation requests
+
+### Phase 2: Translation Request UI
+- [x] Create TranslationRequestForm component for office owners
+- [ ] Add translation request button to office dashboard
+- [x] Create admin translation request queue page
+- [x] Build approval/rejection workflow UI
+- [x] Add email notifications for status changes
+- [ ] Test end-to-end translation request workflow
+
+### Phase 3: Export Functionality
+- [x] Create export procedure for all office translations
+- [x] Create export procedure for all template translations
+- [x] Create combined export with summary sheet
+- [x] Add export button to ContentTranslation page
+- [x] Test export functionality
+- [x] Test export with large datasets
+
+### Phase 4: Translation Analytics Dashboard
+- [x] Create translation_activity_log table for tracking changes
+- [x] Add logging to all translation update operations
+- [x] Build analytics aggregation queries
+- [x] Create TranslationAnalytics page component
+- [x] Add completion trends chart (recharts)
+- [x] Build translator leaderboard component
+- [x] Add recently translated items list
+- [x] Test analytics with historical data

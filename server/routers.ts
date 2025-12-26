@@ -25,6 +25,9 @@ import { chatTransferRouter } from "./routers/chatTransfer";
 import { followUpRouter } from "./routers/followUp";
 import { exportRouter } from "./routers/export";
 import { bulkTranslationRouter } from "./routers/bulkTranslation";
+import { translationRequestRouter } from "./routers/translationRequest";
+import { translationExportRouter } from "./routers/translationExport";
+import { translationAnalyticsRouter } from "./routers/translationAnalytics";
 
 export const appRouter = router({
   system: systemRouter,
@@ -108,6 +111,9 @@ export const appRouter = router({
   followUp: followUpRouter,
   export: exportRouter,
   bulkTranslation: bulkTranslationRouter,
+  translationRequest: translationRequestRouter,
+  translationExport: translationExportRouter,
+  translationAnalytics: translationAnalyticsRouter,
 });
 
 export type AppRouter = typeof appRouter;

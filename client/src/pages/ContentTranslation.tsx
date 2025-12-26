@@ -8,9 +8,56 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Loader2, Save, Languages } from "lucide-react";
+import { Loader2, Save, Languages, Download } from "lucide-react";
 import BulkImport from "@/components/BulkImport";
 import TranslationQualityBadge from "@/components/TranslationQualityBadge";
+
+function ExportAllButton() {
+  const { t } = useLanguage();
+  const exportAll = trpc.translationExport.exportAllTranslations.useQuery(undefined, {
+    enabled: false,
+  });
+
+  const handleExport = async () => {
+    try {
+      const result = await exportAll.refetch();
+      if (result.data) {
+        // Convert base64 to blob and download
+        const byteCharacters = atob(result.data.data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = result.data.filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        toast.success(t("admin.exportSuccess") || "Export completed successfully");
+      }
+    } catch (error) {
+      toast.error(t("admin.exportError") || "Failed to export translations");
+    }
+  };
+
+  return (
+    <Button
+      onClick={handleExport}
+      variant="outline"
+      disabled={exportAll.isFetching}
+    >
+      <Download className="h-4 w-4 mr-2" />
+      {exportAll.isFetching ? t("common.loading") : t("admin.exportAll") || "Export All"}
+    </Button>
+  );
+}
 
 export default function ContentTranslation() {
   const { t } = useLanguage();
@@ -102,14 +149,17 @@ export default function ContentTranslation() {
 
   return (
     <div className="container py-8">
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Languages className="h-8 w-8 text-primary" />
-          <h1 className="text-4xl font-bold">{t("admin.contentTranslation")}</h1>
+      <div className="mb-8 flex justify-between items-start">
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <Languages className="h-8 w-8 text-primary" />
+            <h1 className="text-4xl font-bold">{t("admin.contentTranslation")}</h1>
+          </div>
+          <p className="text-muted-foreground text-lg">
+            {t("admin.contentTranslationDesc")}
+          </p>
         </div>
-        <p className="text-muted-foreground text-lg">
-          {t("admin.contentTranslationDesc")}
-        </p>
+        <ExportAllButton />
       </div>
 
       <Tabs defaultValue="offices" className="space-y-6">
