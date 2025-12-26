@@ -1248,3 +1248,41 @@
 - [ ] Add export button to Chat Analytics page
 - [ ] Show export progress indicator
 - [ ] Write unit tests for export generation
+
+
+## Final Chat Automation & Reporting Features
+
+### Background Job Implementation
+- [ ] Install node-cron package for scheduled tasks
+- [ ] Create background job file in server directory
+- [ ] Implement getPendingFollowups query logic
+- [ ] Create sendFollowupMessage function using chat system
+- [ ] Mark follow-ups as sent after successful delivery
+- [ ] Add error handling and logging
+- [ ] Schedule job to run every 5 minutes
+- [ ] Test background job execution
+- [ ] Write unit tests for job logic
+
+### Multi-language Chat Translation
+- [ ] Create translateMessage helper using invokeLLM
+- [ ] Add translation procedures to chat router
+- [ ] Create language toggle button in ChatInbox
+- [ ] Add "Translate" button on each message
+- [ ] Show original and translated text in message bubbles
+- [ ] Add translation indicator badges (AR/EN)
+- [ ] Handle translation errors with fallback
+- [ ] Store translation preferences per conversation
+- [ ] Write unit tests for translation
+
+### Chat Export & Reporting
+- [ ] Install jsPDF library for PDF generation
+- [ ] Create export query functions in db.ts
+- [ ] Build exportConversations procedure in chat router
+- [ ] Create ExportDialog component with filters
+- [ ] Add date range picker for export
+- [ ] Add staff member filter dropdown
+- [ ] Add tags filter multi-select
+- [ ] Generate CSV with conversation data
+- [ ] Generate PDF report with formatted layout
+- [ ] Add export button to Chat Analytics page
+- [ ] Write unit tests for export generation

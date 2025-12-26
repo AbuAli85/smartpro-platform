@@ -11,6 +11,7 @@ import { initializeSocket } from "./socket";
 import { initializeCronJobs } from "./cronJobs";
 import sseRouter from "../routes/sse";
 import { startReminderScheduler } from "./reminderScheduler";
+import { startFollowUpJob } from "../jobs/followUpJob";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -74,6 +75,9 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
+    
+    // Start background jobs
+    startFollowUpJob();
   });
 }
 

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { translateMessage } from "../_core/translation";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import * as db from "../db";
 
@@ -178,6 +179,17 @@ export const chatRouter = router({
       const readerType = conversation?.userId === ctx.user.id ? "user" : "office";
       await db.markMessagesAsRead(input.conversationId, readerType);
       return { success: true };
+    }),
+
+  // Translate message
+  translateMessage: protectedProcedure
+    .input(z.object({
+      text: z.string(),
+      targetLanguage: z.enum(["ar", "en"]),
+    }))
+    .mutation(async ({ input }) => {
+      const result = await translateMessage(input.text, input.targetLanguage);
+      return result;
     }),
 
   // Close conversation
