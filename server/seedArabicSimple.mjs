@@ -10,8 +10,9 @@ dotenv.config();
 
 const connection = await mysql.createConnection(process.env.DATABASE_URL);
 
-// Simple fallback translations for common business terms
+// Enhanced professional Arabic translations for business terms
 const simpleTranslations = {
+  // Office names
   "Test Office for Filters": "مكتب اختبار الفلاتر",
   "Muscat Business Center": "مركز مسقط للأعمال",
   "Salalah Trade Office": "مكتب صلالة التجاري",
@@ -22,11 +23,20 @@ const simpleTranslations = {
   "Barka Trade Center": "مركز بركاء التجاري",
   "Rustaq Business Hub": "مركز الرستاق للأعمال",
   "Buraimi Commercial Office": "المكتب التجاري البريمي",
+  
+  // Business descriptions
   "Professional business services": "خدمات الأعمال المهنية",
   "Comprehensive business support": "دعم شامل للأعمال",
   "Expert business consultation": "استشارات الأعمال المتخصصة",
   "Full-service business center": "مركز خدمات الأعمال المتكامل",
   "Business registration and licensing": "تسجيل الأعمال والترخيص",
+  "Certified business services provider": "مزود خدمات الأعمال المعتمد",
+  "Trusted business partner": "شريك الأعمال الموثوق",
+  "One-stop business solutions": "حلول الأعمال المتكاملة",
+  "Government-approved services": "خدمات معتمدة حكوميًا",
+  "Fast and reliable service": "خدمة سريعة وموثوقة",
+  
+  // Document templates
   "Commercial Registration": "السجل التجاري",
   "Business License": "رخصة تجارية",
   "Tax Registration": "التسجيل الضريبي",
@@ -35,6 +45,37 @@ const simpleTranslations = {
   "Power of Attorney": "توكيل رسمي",
   "Company Formation": "تأسيس شركة",
   "Legal Documents": "مستندات قانونية",
+  "Articles of Association": "عقد التأسيس",
+  "Memorandum of Understanding": "مذكرة تفاهم",
+  "Board Resolution": "قرار مجلس الإدارة",
+  "Shareholder Agreement": "اتفاقية المساهمين",
+  "Non-Disclosure Agreement": "اتفاقية عدم الإفصاح",
+  "Service Agreement": "اتفاقية خدمة",
+  "Lease Agreement": "عقد إيجار",
+  "Sales Contract": "عقد بيع",
+  "Purchase Order": "أمر شراء",
+  "Invoice": "فاتورة",
+  "Receipt": "إيصال",
+  
+  // Service categories
+  "Company Registration": "تسجيل الشركات",
+  "Licensing Services": "خدمات التراخيص",
+  "Legal Consultation": "الاستشارات القانونية",
+  "Document Attestation": "تصديق المستندات",
+  "Visa Services": "خدمات التأشيرات",
+  "PRO Services": "خدمات العلاقات العامة",
+  "Accounting Services": "خدمات المحاسبة",
+  "Audit Services": "خدمات التدقيق",
+  "Tax Services": "الخدمات الضريبية",
+  "HR Services": "خدمات الموارد البشرية",
+  "Business Consulting": "استشارات الأعمال",
+  "Market Research": "بحوث السوق",
+  "Business Planning": "تخطيط الأعمال",
+  "Financial Advisory": "الاستشارات المالية",
+  "Corporate Services": "الخدمات المؤسسية",
+  "Trade License": "الرخصة التجارية",
+  "Industrial License": "الرخصة الصناعية",
+  "Professional License": "الرخصة المهنية",
 };
 
 function getSimpleTranslation(text) {

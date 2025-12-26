@@ -99,7 +99,7 @@ export default function OfficeProfile() {
               <div className="flex items-center gap-3 mb-2">
                 <h1 className="text-4xl font-bold">{office.officeName}</h1>
                 {office.verificationStatus === "verified" && (
-                  <Badge className="bg-green-100 text-green-800">✓ Verified</Badge>
+                  <Badge className="bg-green-100 text-green-800">✓ {t("office.verified")}</Badge>
                 )}
               </div>
               <p className="text-muted-foreground text-lg mb-4">{office.description}</p>
@@ -124,7 +124,7 @@ export default function OfficeProfile() {
                   <div className="flex items-center gap-2">
                     <Globe className="w-4 h-4 text-muted-foreground" />
                     <a href={office.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                      Website
+                      {t("office.website")}
                     </a>
                   </div>
                 )}
@@ -135,7 +135,7 @@ export default function OfficeProfile() {
               <Button asChild size="lg" className="bg-gradient-accent">
                 <Link href={`/offices/${slug}/book`} className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
-                    Book Service
+                    {t("office.bookService")}
                 </Link>
               </Button>
             )}
@@ -145,28 +145,28 @@ export default function OfficeProfile() {
         {/* Tabs */}
         <Tabs defaultValue="about" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="about">About</TabsTrigger>
-            <TabsTrigger value="services">Services</TabsTrigger>
-            <TabsTrigger value="reviews">Reviews ({reviews?.length || 0})</TabsTrigger>
+            <TabsTrigger value="about">{t("office.about")}</TabsTrigger>
+            <TabsTrigger value="services">{t("office.services")}</TabsTrigger>
+            <TabsTrigger value="reviews">{t("office.reviews")} ({reviews?.length || 0})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="about" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>About This Office</CardTitle>
+                <CardTitle>{t("office.aboutThisOffice")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h4 className="font-semibold mb-2">Location</h4>
+                  <h4 className="font-semibold mb-2">{t("office.location")}</h4>
                   <p className="text-muted-foreground">{office.wilayat}, {office.governorate}</p>
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-2">Contact Information</h4>
-                  {office.phone && <p className="text-muted-foreground">Phone: {office.phone}</p>}
-                  {office.email && <p className="text-muted-foreground">Email: {office.email}</p>}
+                  <h4 className="font-semibold mb-2">{t("office.contactInformation")}</h4>
+                  {office.phone && <p className="text-muted-foreground">{t("office.phone")}: {office.phone}</p>}
+                  {office.email && <p className="text-muted-foreground">{t("office.email")}: {office.email}</p>}
                   {office.website && (
                     <p className="text-muted-foreground">
-                      Website: <a href={office.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{office.website}</a>
+                      {t("office.website")}: <a href={office.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{office.website}</a>
                     </p>
                   )}
                 </div>
@@ -177,12 +177,12 @@ export default function OfficeProfile() {
           <TabsContent value="services">
             <Card>
               <CardHeader>
-                <CardTitle>Available Services</CardTitle>
-                <CardDescription>Professional business services offered by this office</CardDescription>
+                <CardTitle>{t("office.availableServices")}</CardTitle>
+                <CardDescription>{t("office.servicesDescription")}</CardDescription>
               </CardHeader>
               <CardContent>
                 {!services || services.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">No services listed yet</p>
+                  <p className="text-muted-foreground text-center py-8">{t("office.noServices")}</p>
                 ) : (
                   <div className="grid gap-4 md:grid-cols-2">
                     {services.map((service) => (
