@@ -3,13 +3,59 @@ import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, TrendingUp, Award, BookOpen, Target, Users, FileText } from "lucide-react";
+import { Loader2, TrendingUp, Award, BookOpen, Target, Users, FileText, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
 export default function TranslationQualityDashboard() {
   const { t } = useLanguage();
+  
+  const handleExport = async () => {
+    try {
+      toast.info("Generating report...", { description: "Please wait" });
+      
+      const result = await fetch("/api/trpc/analyticsExport.exportQualityReport", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      
+      const data = await result.json();
+      
+      if (data.result?.data?.success) {
+        // Convert base64 to blob and download
+        const base64Data = data.result.data.data;
+        const binaryString = atob(base64Data);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = data.result.data.filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        toast.success("Export successful", { 
+          description: "Quality report downloaded" 
+        });
+      } else {
+        throw new Error("Export failed");
+      }
+    } catch (error) {
+      toast.error("Export failed", { 
+        description: "Failed to generate report"
+      });
+    }
+  };
 
   // Fetch all dashboard data
   const { data: qualityMetrics, isLoading: metricsLoading } = trpc.translationQuality.getQualityMetrics.useQuery();
@@ -40,13 +86,21 @@ export default function TranslationQualityDashboard() {
     <div className="container py-8">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Target className="h-8 w-8 text-primary" />
-          <h1 className="text-4xl font-bold">Translation Quality Dashboard</h1>
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <Target className="h-8 w-8 text-primary" />
+              <h1 className="text-4xl font-bold">Translation Quality Dashboard</h1>
+            </div>
+            <p className="text-muted-foreground text-lg">
+              Monitor translation accuracy, performance metrics, and quality trends
+            </p>
+          </div>
+          <Button onClick={handleExport} variant="outline" size="lg">
+            <Download className="mr-2 h-5 w-5" />
+            Export Report
+          </Button>
         </div>
-        <p className="text-muted-foreground text-lg">
-          Monitor translation accuracy, performance metrics, and quality trends
-        </p>
       </div>
 
       {/* Overview Cards */}

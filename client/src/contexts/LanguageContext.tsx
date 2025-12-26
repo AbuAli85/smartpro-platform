@@ -221,6 +221,27 @@ const translations: Record<Language, Record<string, string>> = {
     "bookings.selectTime": "Select Time",
     "bookings.confirmBooking": "Confirm Booking",
     
+    // Booking flow
+    "booking.title": "Book a Service",
+    "booking.backToOffice": "Back to Office",
+    "booking.selectDate": "Select Date",
+    "booking.selectDateDesc": "Choose your preferred appointment date",
+    "booking.selectTime": "Select Time",
+    "booking.availableSlots": "Available time slots for",
+    
+    // Loyalty
+    "loyalty.title": "Loyalty Rewards",
+    "loyalty.subtitle": "Earn points and get exclusive rewards",
+    "loyalty.availablePoints": "Available Points",
+    
+    // Referral
+    "referral.title": "Refer Friends",
+    
+    // Admin
+    "admin.exportSuccess": "Export completed successfully",
+    "admin.exportError": "Failed to export",
+    "admin.exportAll": "Export All Translations",
+    
     // Notifications
     "notifications.title": "Notification Preferences",
     "notifications.subtitle": "Manage how you receive notifications",
@@ -475,6 +496,27 @@ const translations: Record<Language, Record<string, string>> = {
     "bookings.selectDate": "اختر التاريخ",
     "bookings.selectTime": "اختر الوقت",
     "bookings.confirmBooking": "تأكيد الحجز",
+    
+    // Booking flow
+    "booking.title": "احجز خدمة",
+    "booking.backToOffice": "العودة إلى المكتب",
+    "booking.selectDate": "اختر التاريخ",
+    "booking.selectDateDesc": "اختر تاريخ الموعد المفضل لديك",
+    "booking.selectTime": "اختر الوقت",
+    "booking.availableSlots": "الأوقات المتاحة لـ",
+    
+    // Loyalty
+    "loyalty.title": "مكافآت الولاء",
+    "loyalty.subtitle": "اكسب النقاط واحصل على مكافآت حصرية",
+    "loyalty.availablePoints": "النقاط المتاحة",
+    
+    // Referral
+    "referral.title": "إحالة الأصدقاء",
+    
+    // Admin
+    "admin.exportSuccess": "تم التصدير بنجاح",
+    "admin.exportError": "فشل التصدير",
+    "admin.exportAll": "تصدير جميع الترجمات",
         // Notifications
     "notifications.title": "تفضيلات الإشعارات",
     "notifications.subtitle": "إدارة كيفية تلقي الإشعارات",
