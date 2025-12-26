@@ -697,9 +697,14 @@ export const officeStaff = mysqlTable("office_staff", {
   
   // Status
   isActive: boolean("isActive").default(true).notNull(),
+  availabilityStatus: mysqlEnum("availabilityStatus", ["online", "offline", "busy"]).default("offline").notNull(),
+  
+  // Expertise tags for routing
+  expertiseTags: json("expertiseTags").$type<string[]>(),
   
   // Audit
   createdAt: timestamp("createdAt").defaultNow().notNull(),
+  lastActiveAt: timestamp("lastActiveAt"),
 }, (table) => ({
   officeIdx: index("office_idx").on(table.officeId),
   userIdx: index("user_idx").on(table.userId),

@@ -7,6 +7,7 @@ export const chatRouter = router({
   getOrCreateConversation: protectedProcedure
     .input(z.object({
       officeId: z.number(),
+      autoAssign: z.boolean().default(true),
     }))
     .query(async ({ ctx, input }) => {
       // Check if conversation already exists
@@ -18,10 +19,53 @@ export const chatRouter = router({
       }
 
       // Create new conversation
-      return await db.createChatConversation({
+      const conversationId = await db.createChatConversation({
         userId: ctx.user.id,
         officeId: input.officeId,
       });
+
+      // Auto-assign to available staff if enabled
+      if (input.autoAssign && typeof conversationId === 'number') {
+        try {
+          const availableStaff = await db.getAvailableStaff(input.officeId);
+          
+          if (availableStaff.length > 0) {
+            const workload = await db.getStaffWorkload(input.officeId);
+            
+            const staffWithWorkload = availableStaff.map(staff => {
+              const load = workload.find(w => w.userId === staff.userId);
+              return {
+                ...staff,
+                activeConversations: load?.activeConversations || 0,
+              };
+            });
+
+            staffWithWorkload.sort((a, b) => a.activeConversations - b.activeConversations);
+            const selectedStaff = staffWithWorkload[0];
+            
+            await db.assignConversation({
+              conversationId,
+              assignedToUserId: selectedStaff.userId,
+              assignedByUserId: ctx.user.id,
+            });
+
+            await db.createNotification({
+              userId: selectedStaff.userId,
+              type: "system",
+              title: "New Chat Auto-Assigned",
+              message: `You have been automatically assigned to a new conversation`,
+            });
+          }
+        } catch (error) {
+          console.error('Auto-assignment failed:', error);
+          // Continue even if auto-assignment fails
+        }
+      }
+
+      // Fetch and return the created conversation
+      const newConversations = await db.getUserChatConversations(ctx.user.id);
+      const newConversation = newConversations.find(c => c.conversation.id === conversationId);
+      return newConversation;
     }),
 
   // Get messages for a conversation

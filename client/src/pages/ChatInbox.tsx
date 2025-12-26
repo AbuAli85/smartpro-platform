@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageCircle, Send, Search, Archive, CheckCheck, MessageSquareText, Paperclip, Download, FileIcon, UserPlus } from "lucide-react";
+import { MessageCircle, Send, Search, Archive, CheckCheck, MessageSquareText, Paperclip, Download, FileIcon, UserPlus, Image as ImageIcon } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { requestNotificationPermission, sendChatNotification, canSendNotifications } from "@/lib/notifications";
 import { useLocation } from "wouter";
+import { FileGallery } from "@/components/FileGallery";
 
 interface Message {
   id: number;
@@ -133,6 +134,7 @@ export default function ChatInbox() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [, setLocation] = useLocation();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [isFileGalleryOpen, setIsFileGalleryOpen] = useState(false);
 
   // Get user's conversations (for office owners)
   const { data: conversations, refetch: refetchConversations } = trpc.chat.getConversations.useQuery(
@@ -434,6 +436,14 @@ export default function ChatInbox() {
                     </div>
                     <div className="flex items-center gap-2">
                       <AssignmentDropdown conversationId={selectedConversation.conversation.id} />
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => setIsFileGalleryOpen(true)}
+                        title="View file gallery"
+                      >
+                        <ImageIcon className="h-5 w-5" />
+                      </Button>
                       <Button variant="ghost" size="icon">
                         <Archive className="h-5 w-5" />
                       </Button>
@@ -617,6 +627,15 @@ export default function ChatInbox() {
           </Card>
         </div>
       </div>
+
+      {/* File Gallery Modal */}
+      {selectedConversationId && (
+        <FileGallery
+          conversationId={selectedConversationId}
+          isOpen={isFileGalleryOpen}
+          onClose={() => setIsFileGalleryOpen(false)}
+        />
+      )}
     </div>
   );
 }

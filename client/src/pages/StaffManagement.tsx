@@ -27,7 +27,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { UserPlus, Edit, Trash2, Users } from "lucide-react";
+import { UserPlus, Edit, Trash2, Users, Circle } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
@@ -174,6 +175,7 @@ export default function StaffManagement() {
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Role</TableHead>
+                  <TableHead>Availability</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -187,6 +189,18 @@ export default function StaffManagement() {
                       <Badge variant={getRoleBadgeVariant(member.role)}>
                         {member.role}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Circle 
+                          className={`h-2 w-2 fill-current ${
+                            member.availabilityStatus === 'online' ? 'text-green-500' :
+                            member.availabilityStatus === 'busy' ? 'text-yellow-500' :
+                            'text-gray-400'
+                          }`}
+                        />
+                        <span className="text-sm capitalize">{member.availabilityStatus || 'offline'}</span>
+                      </div>
                     </TableCell>
                     <TableCell>
                       <Badge variant={member.isActive ? "default" : "secondary"}>

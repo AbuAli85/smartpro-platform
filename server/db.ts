@@ -2478,6 +2478,182 @@ export async function removeOfficeStaff(staffId: number) {
   return { id: staffId };
 }
 
+export async function updateStaffAvailability(staffId: number, status: "online" | "offline" | "busy") {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { officeStaff } = await import("../drizzle/schema");
+  
+  await db
+    .update(officeStaff)
+    .set({ 
+      availabilityStatus: status,
+      lastActiveAt: new Date(),
+    })
+    .where(eq(officeStaff.id, staffId));
+  
+  return { id: staffId, status };
+}
+
+export async function getAvailableStaff(officeId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { officeStaff, users } = await import("../drizzle/schema");
+  
+  return await db
+    .select({
+      id: officeStaff.id,
+      userId: officeStaff.userId,
+      userName: users.name,
+      userEmail: users.email,
+      role: officeStaff.role,
+      availabilityStatus: officeStaff.availabilityStatus,
+      expertiseTags: officeStaff.expertiseTags,
+    })
+    .from(officeStaff)
+    .leftJoin(users, eq(officeStaff.userId, users.id))
+    .where(and(
+      eq(officeStaff.officeId, officeId),
+      eq(officeStaff.isActive, true),
+      eq(officeStaff.availabilityStatus, "online")
+    ))
+    .orderBy(desc(officeStaff.lastActiveAt));
+}
+
+export async function getStaffWorkload(officeId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { officeStaff, chatAssignments, chatConversations } = await import("../drizzle/schema");
+  
+  // Get all active staff
+  const staff = await db
+    .select({
+      staffId: officeStaff.id,
+      userId: officeStaff.userId,
+    })
+    .from(officeStaff)
+    .where(and(
+      eq(officeStaff.officeId, officeId),
+      eq(officeStaff.isActive, true)
+    ));
+  
+  // Count active conversations per staff member
+  const workload = await Promise.all(
+    staff.map(async (s) => {
+      const assignments = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(chatAssignments)
+        .leftJoin(chatConversations, eq(chatAssignments.conversationId, chatConversations.id))
+        .where(and(
+          eq(chatAssignments.assignedToUserId, s.userId),
+          eq(chatConversations.status, "active")
+        ));
+      
+      return {
+        staffId: s.staffId,
+        userId: s.userId,
+        activeConversations: assignments[0]?.count || 0,
+      };
+    })
+  );
+  
+  return workload;
+}
+
+export async function getStaffPerformanceMetrics(officeId: number, staffUserId?: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { officeStaff, chatAssignments, chatMessages, chatConversations, users } = await import("../drizzle/schema");
+  
+  // Get staff members to analyze
+  const staffQuery = db
+    .select({
+      staffId: officeStaff.id,
+      userId: officeStaff.userId,
+      userName: users.name,
+      userEmail: users.email,
+      role: officeStaff.role,
+    })
+    .from(officeStaff)
+    .leftJoin(users, eq(officeStaff.userId, users.id))
+    .where(and(
+      eq(officeStaff.officeId, officeId),
+      eq(officeStaff.isActive, true),
+      staffUserId ? eq(officeStaff.userId, staffUserId) : sql`1=1`
+    ));
+  
+  const staff = await staffQuery;
+  
+  // Calculate metrics for each staff member
+  const metrics = await Promise.all(
+    staff.map(async (s) => {
+      // Get all assigned conversations
+      const assignments = await db
+        .select({
+          conversationId: chatAssignments.conversationId,
+          assignedAt: chatAssignments.assignedAt,
+          status: chatConversations.status,
+        })
+        .from(chatAssignments)
+        .leftJoin(chatConversations, eq(chatAssignments.conversationId, chatConversations.id))
+        .where(eq(chatAssignments.assignedToUserId, s.userId));
+      
+      const totalConversations = assignments.length;
+      const activeConversations = assignments.filter(a => a.status === "active").length;
+      const closedConversations = assignments.filter(a => a.status === "closed").length;
+      
+      // Calculate average response time
+      let totalResponseTime = 0;
+      let responseCount = 0;
+      
+      for (const assignment of assignments) {
+        const messages = await db
+          .select({
+            createdAt: chatMessages.createdAt,
+            senderType: chatMessages.senderType,
+          })
+          .from(chatMessages)
+          .where(eq(chatMessages.conversationId, assignment.conversationId))
+          .orderBy(chatMessages.createdAt);
+        
+        // Find pairs of user message followed by office response
+        for (let i = 0; i < messages.length - 1; i++) {
+          if (messages[i].senderType === "user" && messages[i + 1].senderType === "office") {
+            const responseTime = new Date(messages[i + 1].createdAt).getTime() - new Date(messages[i].createdAt).getTime();
+            totalResponseTime += responseTime;
+            responseCount++;
+          }
+        }
+      }
+      
+      const avgResponseTimeMs = responseCount > 0 ? totalResponseTime / responseCount : 0;
+      const avgResponseTimeMinutes = Math.round(avgResponseTimeMs / 1000 / 60);
+      
+      // Calculate resolution rate (closed / total)
+      const resolutionRate = totalConversations > 0 
+        ? Math.round((closedConversations / totalConversations) * 100) 
+        : 0;
+      
+      return {
+        staffId: s.staffId,
+        userId: s.userId,
+        userName: s.userName || s.userEmail || "Unknown",
+        role: s.role,
+        totalConversations,
+        activeConversations,
+        closedConversations,
+        avgResponseTimeMinutes,
+        resolutionRate,
+      };
+    })
+  );
+  
+  return metrics;
+}
+
 // Chat Assignments
 export async function assignConversation(data: {
   conversationId: number;

@@ -1070,3 +1070,36 @@
 - [ ] Show file metadata (size, uploader, date)
 - [ ] Add delete file functionality for office owners
 - [ ] Write unit tests for file gallery
+
+
+## Automated Chat Routing - Phase 1
+- [x] Add availabilityStatus and expertiseTags fields to office_staff table
+- [x] Create getAvailableStaff database helper function
+- [x] Create getStaffWorkload database helper function
+- [x] Implement least-loaded routing algorithm
+- [x] Create autoAssignConversation procedure in chatAssignment router
+- [x] Add routing trigger on new conversation creation (auto-assign in getOrCreateConversation)
+- [x] Add availability status display in Staff Management
+- [x] Write unit tests for routing algorithms (12 tests passing)
+
+## Chat File Gallery - Phase 2
+- [x] Create FileGallery component with grid and list layout
+- [x] Add file type filtering (images, documents, all)
+- [x] Add file search functionality
+- [x] Create bulk download feature
+- [x] Show file metadata (uploader, date, message context)
+- [x] Add file preview with detailed view
+- [x] Integrate gallery into ChatInbox with button in conversation header
+- [x] Support both grid and list view modes
+
+## Staff Performance Dashboard - Phase 3
+- [x] Create getStaffPerformanceMetrics database helper
+- [x] Calculate average response time per staff member
+- [x] Calculate conversations handled count
+- [x] Calculate resolution rate
+- [x] Create StaffPerformance component with overview cards
+- [x] Add performance comparison table
+- [x] Add performance badges (Excellent/Good/Needs Improvement)
+- [x] Add automated insights and recommendations
+- [x] Integrate into Office Owner Dashboard with navigation link
+- [x] Write unit tests for performance metrics (included in routing tests)
