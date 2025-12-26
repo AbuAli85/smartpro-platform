@@ -24,6 +24,7 @@ import Analytics from "./pages/Analytics";
 import AdminAnalytics from "./pages/AdminAnalytics";
 import OfficeOwnerDashboard from "./pages/OfficeOwnerDashboard";
 import TemplateManager from "./pages/TemplateManager";
+import ChatInbox from "./pages/ChatInbox";
 import { useNotifications } from "./hooks/useNotifications";
 
 function Router() {
@@ -68,6 +69,7 @@ function Router() {
       {/* Office Owner */}
       <Route path="/owner/dashboard" component={OfficeOwnerDashboard} />
       <Route path="/owner/templates" component={TemplateManager} />
+      <Route path="/owner/chat" component={ChatInbox} />
       
       {/* 404 */}
       <Route path="/404" component={NotFound} />

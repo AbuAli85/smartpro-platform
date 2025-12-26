@@ -8,6 +8,7 @@ import { Building2, MapPin, Phone, Mail, Globe, Star, Calendar, ArrowLeft, Dolla
 import { useAuth } from "@/_core/hooks/useAuth";
 import { CanonicalURL } from "@/components/CanonicalURL";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import ChatWidget from "@/components/ChatWidget";
 
 export default function OfficeProfile() {
   const [, params] = useRoute("/offices/:slug");
@@ -266,6 +267,9 @@ export default function OfficeProfile() {
         </Tabs>
       </div>
       </div>
+      
+      {/* Chat Widget */}
+      {office && <ChatWidget officeId={office.id} officeName={office.officeName} />}
     </>
   );
 }

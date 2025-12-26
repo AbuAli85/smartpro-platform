@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Calendar as CalendarIcon, Clock, CheckCircle2, Gift } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTranslation } from "react-i18next";
+import ChatWidget from "@/components/ChatWidget";
 
 export default function BookOffice() {
   const { t } = useTranslation();
@@ -387,6 +388,9 @@ export default function BookOffice() {
           </div>
         </div>
       </div>
+      
+      {/* Chat Widget */}
+      {office && <ChatWidget officeId={office.id} officeName={office.officeName} />}
     </div>
   );
 }

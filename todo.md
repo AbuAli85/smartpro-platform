@@ -922,3 +922,21 @@
 - [ ] Test navigation on mobile devices
 - [ ] Add touch gestures for mobile
 - [ ] Optimize header spacing for small screens
+
+## ChatWidget Integration in Booking Flow
+- [x] Add ChatWidget to BookOffice page
+- [x] Add ChatWidget to OfficeDetails page (OfficeProfile)
+- [x] Pass office information to ChatWidget
+- [ ] Test chat functionality during booking
+- [ ] Ensure chat persists across page navigation
+
+## Office Chat Inbox Implementation
+- [x] Create ChatInbox page component
+- [x] Display list of conversations with preview
+- [x] Show unread message counts per conversation
+- [x] Build conversation detail view
+- [x] Add message sending functionality
+- [x] Implement real-time message updates
+- [x] Add conversation filtering (active/archived)
+- [x] Add route and navigation for chat inbox
+- [ ] Test inbox functionality for office owners

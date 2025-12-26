@@ -1,0 +1,353 @@
+import { useState, useEffect, useRef } from "react";
+import { io, Socket } from "socket.io-client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MessageCircle, Send, Search, Archive, CheckCheck } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { toast } from "sonner";
+import { formatDistanceToNow } from "date-fns";
+
+interface Message {
+  id: number;
+  senderId: number;
+  senderType: "user" | "office";
+  message: string;
+  createdAt: Date;
+  isRead: boolean;
+}
+
+interface Conversation {
+  conversation: {
+    id: number;
+    userId: number;
+    officeId: number;
+    status: "active" | "closed" | "archived";
+    lastMessageAt: Date;
+    lastMessagePreview: string | null;
+    unreadByOffice: number;
+  };
+  office: {
+    id: number;
+    officeName: string;
+  } | null;
+}
+
+export default function ChatInbox() {
+  const { user } = useAuth();
+  const [selectedConversationId, setSelectedConversationId] = useState<number | null>(null);
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState<"active" | "archived">("active");
+  
+  const socketRef = useRef<Socket | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Get user's conversations (for office owners)
+  const { data: conversations, refetch: refetchConversations } = trpc.chat.getConversations.useQuery(
+    undefined,
+    { enabled: !!user }
+  );
+
+  // Get messages for selected conversation
+  const { data: chatMessages, refetch: refetchMessages } = trpc.chat.getMessages.useQuery(
+    { conversationId: selectedConversationId! },
+    { enabled: !!selectedConversationId }
+  );
+
+  // Mark as read mutation
+  const markAsReadMutation = trpc.chat.markAsRead.useMutation();
+
+  useEffect(() => {
+    if (chatMessages) {
+      setMessages(chatMessages);
+      scrollToBottom();
+    }
+  }, [chatMessages]);
+
+  // Initialize Socket.io
+  useEffect(() => {
+    if (!user || !selectedConversationId) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const socket = io(window.location.origin, {
+      auth: { token },
+    });
+
+    socketRef.current = socket;
+
+    socket.on("connect", () => {
+      console.log("[ChatInbox] Connected to socket");
+      socket.emit("join_chat", { bookingId: selectedConversationId, userId: user.id });
+    });
+
+    socket.on("new_message", (data: any) => {
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        senderId: data.userId,
+        senderType: data.userId === user.id ? "office" : "user",
+        message: data.message,
+        createdAt: new Date(data.timestamp),
+        isRead: false,
+      }]);
+      scrollToBottom();
+      refetchConversations();
+    });
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.emit("leave_chat", { bookingId: selectedConversationId, userId: user.id });
+        socketRef.current.disconnect();
+      }
+    };
+  }, [user, selectedConversationId, refetchConversations]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleSendMessage = () => {
+    if (!message.trim() || !socketRef.current || !user || !selectedConversationId) return;
+
+    socketRef.current.emit("send_message", {
+      bookingId: selectedConversationId,
+      userId: user.id,
+      userName: user.name,
+      message: message.trim(),
+    });
+
+    setMessage("");
+  };
+
+  const handleSelectConversation = async (conversationId: number) => {
+    setSelectedConversationId(conversationId);
+    
+    // Mark messages as read
+    try {
+      await markAsReadMutation.mutateAsync({ conversationId });
+      refetchConversations();
+    } catch (error) {
+      console.error("Failed to mark as read:", error);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const filteredConversations = conversations?.filter(conv => {
+    const matchesFilter = filter === "active" 
+      ? conv.conversation.status === "active" 
+      : conv.conversation.status === "archived";
+    
+    const matchesSearch = !searchQuery || 
+      conv.office?.officeName.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    return matchesFilter && matchesSearch;
+  });
+
+  const selectedConversation = conversations?.find(
+    c => c.conversation.id === selectedConversationId
+  );
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="w-96">
+          <CardContent className="pt-6 text-center">
+            <MessageCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+            <p className="text-muted-foreground">Please login to access chat inbox</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container py-8">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold">Chat Inbox</h1>
+          <p className="text-muted-foreground">Manage conversations with customers</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Conversations List */}
+          <Card className="lg:col-span-1">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageCircle className="h-5 w-5" />
+                Conversations
+              </CardTitle>
+              
+              {/* Search */}
+              <div className="relative mt-4">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search conversations..."
+                  className="pl-9"
+                />
+              </div>
+
+              {/* Filter Tabs */}
+              <Tabs value={filter} onValueChange={(v) => setFilter(v as "active" | "archived")} className="mt-4">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="active">Active</TabsTrigger>
+                  <TabsTrigger value="archived">Archived</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </CardHeader>
+
+            <CardContent className="p-0">
+              <ScrollArea className="h-[600px]">
+                {filteredConversations && filteredConversations.length > 0 ? (
+                  <div className="divide-y">
+                    {filteredConversations.map((conv) => (
+                      <div
+                        key={conv.conversation.id}
+                        onClick={() => handleSelectConversation(conv.conversation.id)}
+                        className={`p-4 cursor-pointer transition-colors hover:bg-accent ${
+                          selectedConversationId === conv.conversation.id ? "bg-accent" : ""
+                        }`}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium truncate">{conv.office?.officeName || "Unknown Office"}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {conv.conversation.lastMessageAt && 
+                                formatDistanceToNow(new Date(conv.conversation.lastMessageAt), { addSuffix: true })}
+                            </p>
+                          </div>
+                          {conv.conversation.unreadByOffice > 0 && (
+                            <Badge variant="destructive" className="ml-2">
+                              {conv.conversation.unreadByOffice}
+                            </Badge>
+                          )}
+                        </div>
+                        {conv.conversation.lastMessagePreview && (
+                          <p className="text-sm text-muted-foreground truncate">
+                            {conv.conversation.lastMessagePreview}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-8 text-center">
+                    <MessageCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                    <p className="text-muted-foreground">No conversations found</p>
+                  </div>
+                )}
+              </ScrollArea>
+            </CardContent>
+          </Card>
+
+          {/* Messages Area */}
+          <Card className="lg:col-span-2">
+            {selectedConversation ? (
+              <>
+                <CardHeader className="border-b">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>{selectedConversation.office?.officeName || "Unknown Office"}</CardTitle>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Status: {selectedConversation.conversation.status}
+                      </p>
+                    </div>
+                    <Button variant="ghost" size="icon">
+                      <Archive className="h-5 w-5" />
+                    </Button>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="p-0">
+                  <ScrollArea className="h-[480px] p-4">
+                    {messages.length > 0 ? (
+                      <div className="space-y-4">
+                        {messages.map((msg) => (
+                          <div
+                            key={msg.id}
+                            className={`flex ${msg.senderType === "office" ? "justify-end" : "justify-start"}`}
+                          >
+                            <div
+                              className={`max-w-[75%] rounded-lg px-4 py-2 ${
+                                msg.senderType === "office"
+                                  ? "bg-primary text-primary-foreground"
+                                  : "bg-muted"
+                              }`}
+                            >
+                              <p className="text-sm whitespace-pre-wrap break-words">{msg.message}</p>
+                              <div className="flex items-center gap-1 mt-1">
+                                <p className="text-xs opacity-70">
+                                  {new Date(msg.createdAt).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}
+                                </p>
+                                {msg.senderType === "office" && msg.isRead && (
+                                  <CheckCheck className="h-3 w-3 opacity-70" />
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        <div ref={messagesEndRef} />
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-center">
+                          <MessageCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                          <p className="text-muted-foreground">No messages yet</p>
+                        </div>
+                      </div>
+                    )}
+                  </ScrollArea>
+
+                  {/* Message Input */}
+                  <div className="p-4 border-t">
+                    <div className="flex gap-2">
+                      <Input
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder="Type a message..."
+                        className="flex-1"
+                      />
+                      <Button
+                        onClick={handleSendMessage}
+                        disabled={!message.trim()}
+                        size="icon"
+                      >
+                        <Send className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </>
+            ) : (
+              <CardContent className="flex items-center justify-center h-[600px]">
+                <div className="text-center">
+                  <MessageCircle className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+                  <p className="text-lg font-medium mb-2">Select a conversation</p>
+                  <p className="text-muted-foreground">Choose a conversation from the list to start chatting</p>
+                </div>
+              </CardContent>
+            )}
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
