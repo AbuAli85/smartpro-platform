@@ -14,8 +14,9 @@ import {
   ArcElement,
 } from "chart.js";
 import { Line, Bar, Doughnut } from "react-chartjs-2";
-import { Calendar, DollarSign, Star, TrendingUp, Users } from "lucide-react";
+import { Calendar, DollarSign, Star, TrendingUp, Users, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { generateOfficeReport } from "@/utils/generateOfficeReport";
 
 // Register Chart.js components
 ChartJS.register(
@@ -150,10 +151,53 @@ export function OfficeAnalytics({ officeId }: OfficeAnalyticsProps) {
     ],
   };
 
+  const handleDownloadReport = () => {
+    if (!analytics) return;
+
+    const periodLabels = {
+      week: "Last 7 Days",
+      month: "This Month",
+      year: "This Year",
+    };
+
+    generateOfficeReport({
+      officeName: "Office Name", // You can pass this as a prop
+      period: periodLabels[dateRange],
+      metrics: {
+        totalBookings: analytics.totalBookings || 0,
+        confirmedBookings: analytics.statusBreakdown?.find(s => s.status === 'confirmed')?.count || 0,
+        completedBookings: analytics.statusBreakdown?.find(s => s.status === 'completed')?.count || 0,
+        cancelledBookings: analytics.statusBreakdown?.find(s => s.status === 'cancelled')?.count || 0,
+        totalRevenue: analytics.revenue || 0,
+        averageRating: analytics.averageRating || 0,
+        totalReviews: analytics.totalReviews || 0,
+      },
+      bookingTrends: (analytics.dailyBookings || []).map((d) => ({
+        month: new Date(d.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+        count: d.count,
+      })),
+      popularServices: (analytics.popularServices || []).map((s) => ({
+        service: s.service || "Unknown",
+        count: s.count,
+      })),
+      customerFeedback: [], // You can fetch recent reviews if needed
+    });
+  };
+
   return (
     <div className="space-y-6">
-      {/* Date Range Selector */}
-      <div className="flex justify-end gap-2">
+      {/* Date Range Selector and Download Button */}
+      <div className="flex justify-between items-center">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleDownloadReport}
+          className="gap-2"
+        >
+          <Download className="h-4 w-4" />
+          Download Report
+        </Button>
+        <div className="flex gap-2">
         <Button
           variant={dateRange === "week" ? "default" : "outline"}
           size="sm"
@@ -171,10 +215,10 @@ export function OfficeAnalytics({ officeId }: OfficeAnalyticsProps) {
         <Button
           variant={dateRange === "year" ? "default" : "outline"}
           size="sm"
-          onClick={() => setDateRange("year")}
-        >
+          onClick={() => setDateRange("year")}        >
           This Year
         </Button>
+        </div>
       </div>
 
       {/* Key Metrics */}

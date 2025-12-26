@@ -5,6 +5,7 @@ import * as db from "../db";
 import { notifyOwner } from "../_core/notification";
 import { sendBookingConfirmationEmail, sendBookingReminderSMS } from "../_core/emailSms";
 import { calculateCancellation, cancelBooking } from "../cancellationPolicy";
+import { emitBookingNotification } from "../_core/notifications";
 
 export const bookingRouter = router({
   // Get available time slots for a specific date
@@ -88,6 +89,16 @@ export const bookingRouter = router({
       await notifyOwner({
         title: "New Booking Created",
         content: `${user.name} created a booking at ${office.officeName} for ${input.scheduledDate ? new Date(input.scheduledDate).toLocaleDateString() : 'unscheduled date'}`,
+      });
+
+      // Emit real-time notification to office owner
+      emitBookingNotification("booking_created", office.ownerId, {
+        bookingId,
+        customerName: user.name,
+        officeName: office.officeName,
+        scheduledDate: input.scheduledDate,
+        scheduledTime: input.scheduledTime,
+        serviceDescription: input.serviceDescription,
       });
 
       // Send email confirmation to user

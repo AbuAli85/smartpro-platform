@@ -453,3 +453,31 @@
 - [x] Show booking details on click
 - [x] Add navigation between months
 - [x] Test calendar functionality
+
+
+## Real-Time Notifications System
+- [x] Set up Server-Sent Events (SSE) endpoint for real-time updates
+- [x] Create notification event emitter on backend
+- [x] Implement SSE client connection in frontend
+- [x] Add notification toast system for live updates
+- [x] Emit events for new bookings, status changes, inquiries
+- [x] Add reconnection logic for dropped connections
+- [x] Test real-time notification delivery
+
+## Multi-Language Support (Arabic/English)
+- [x] Install i18n library (react-i18next)
+- [ ] Create translation files for Arabic and English
+- [ ] Add language switcher to navigation
+- [ ] Implement RTL layout support for Arabic
+- [ ] Update all UI components with translation keys
+- [ ] Add language persistence in localStorage
+- [ ] Test language switching and RTL layout
+
+## Office Performance PDF Reports
+- [x] Install PDF generation library (jsPDF or pdfmake)
+- [x] Create report template with branding
+- [x] Add monthly/quarterly performance metrics
+- [x] Include booking statistics and revenue charts
+- [x] Add customer feedback summaries
+- [x] Create download report button in office dashboard
+- [x] Test PDF generation and download

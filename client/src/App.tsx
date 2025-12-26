@@ -18,6 +18,7 @@ import MyDocuments from "./pages/MyDocuments";
 import AdminDashboard from "./pages/AdminDashboard";
 import OfficeDashboard from "./pages/OfficeDashboard";
 import Profile from "./pages/Profile";
+import { useNotifications } from "./hooks/useNotifications";
 
 function Router() {
   return (
@@ -58,6 +59,9 @@ function Router() {
 }
 
 function App() {
+  // Initialize real-time notifications
+  useNotifications();
+
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">
