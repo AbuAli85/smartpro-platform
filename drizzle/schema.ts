@@ -894,3 +894,69 @@ export const translationActivityLog = mysqlTable("translation_activity_log", {
 
 export type TranslationActivityLog = typeof translationActivityLog.$inferSelect;
 export type InsertTranslationActivityLog = typeof translationActivityLog.$inferInsert;
+
+// ============================================================================
+// TRANSLATION MEMORY
+// ============================================================================
+
+export const translationMemory = mysqlTable("translation_memory", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Source and translation
+  sourceText: text("sourceText").notNull(),
+  translatedText: text("translatedText").notNull(),
+  sourceLanguage: varchar("sourceLanguage", { length: 10 }).notNull().default("en"),
+  targetLanguage: varchar("targetLanguage", { length: 10 }).notNull().default("ar"),
+  
+  // Context for better matching
+  context: varchar("context", { length: 100 }), // office_name, office_description, template_name, etc.
+  
+  // Usage tracking
+  usageCount: int("usageCount").notNull().default(0),
+  lastUsedAt: timestamp("lastUsedAt"),
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  createdBy: int("createdBy").notNull(),
+}, (table) => ({
+  contextIdx: index("context_idx").on(table.context),
+  usageIdx: index("usage_idx").on(table.usageCount),
+}));
+
+export type TranslationMemory = typeof translationMemory.$inferSelect;
+export type InsertTranslationMemory = typeof translationMemory.$inferInsert;
+
+// ============================================================================
+// TRANSLATION VERSION HISTORY
+// ============================================================================
+
+export const translationVersions = mysqlTable("translation_versions", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // What was changed
+  entityType: mysqlEnum("entityType", ["office", "template"]).notNull(),
+  entityId: int("entityId").notNull(),
+  fieldName: varchar("fieldName", { length: 50 }).notNull(), // nameAr, descriptionAr
+  
+  // Version data
+  oldValue: text("oldValue"),
+  newValue: text("newValue"),
+  
+  // Who changed it
+  changedBy: int("changedBy").notNull(),
+  changedByName: varchar("changedByName", { length: 255 }).notNull(),
+  changeReason: text("changeReason"),
+  
+  // Metadata
+  source: mysqlEnum("source", ["manual", "bulk_import", "request_approval", "auto_translate"]).default("manual").notNull(),
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  entityIdx: index("entity_idx").on(table.entityType, table.entityId),
+  changedByIdx: index("changed_by_idx").on(table.changedBy),
+  dateIdx: index("date_idx").on(table.createdAt),
+}));
+
+export type TranslationVersion = typeof translationVersions.$inferSelect;
+export type InsertTranslationVersion = typeof translationVersions.$inferInsert;

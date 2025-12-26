@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Loader2, Save, Languages, Download } from "lucide-react";
 import BulkImport from "@/components/BulkImport";
 import TranslationQualityBadge from "@/components/TranslationQualityBadge";
+import EnhancedTranslationEditor from "@/components/EnhancedTranslationEditor";
 
 function ExportAllButton() {
   const { t } = useLanguage();
@@ -220,65 +221,29 @@ export default function ContentTranslation() {
                 )}
               </div>
 
-              {selectedOfficeId && (
-                <>
-                  {/* Translation Quality Badge */}
-                  <div className="flex items-center justify-between">
-                    <Label>{t("admin.completionStatus")}</Label>
-                    <TranslationQualityBadge
-                      nameAr={officeNameAr}
-                      descriptionAr={officeDescriptionAr}
-                    />
-                  </div>
-
-                  {/* Arabic Name */}
-                  <div className="space-y-2">
-                    <Label htmlFor="office-name-ar">{t("admin.officeNameArabic")}</Label>
-                    <Input
-                      id="office-name-ar"
-                      value={officeNameAr}
-                      onChange={(e) => setOfficeNameAr(e.target.value)}
-                      placeholder={t("admin.enterArabicName")}
-                      dir="rtl"
-                      className="text-right"
-                    />
-                  </div>
-
-                  {/* Arabic Description */}
-                  <div className="space-y-2">
-                    <Label htmlFor="office-description-ar">
-                      {t("admin.officeDescriptionArabic")}
-                    </Label>
-                    <Textarea
-                      id="office-description-ar"
-                      value={officeDescriptionAr}
-                      onChange={(e) => setOfficeDescriptionAr(e.target.value)}
-                      placeholder={t("admin.enterArabicDescription")}
-                      dir="rtl"
-                      className="text-right min-h-[120px]"
-                    />
-                  </div>
-
-                  {/* Save Button */}
-                  <Button
-                    onClick={handleSaveOfficeTranslation}
-                    disabled={updateOfficeMutation.isPending}
-                    className="w-full"
-                  >
-                    {updateOfficeMutation.isPending ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {t("common.saving")}
-                      </>
-                    ) : (
-                      <>
-                        <Save className="mr-2 h-4 w-4" />
-                        {t("common.save")}
-                      </>
-                    )}
-                  </Button>
-                </>
-              )}
+              {selectedOfficeId && (() => {
+                const office = offices.find((o: any) => o.id === selectedOfficeId);
+                return office ? (
+                  <EnhancedTranslationEditor
+                    entityType="office"
+                    entityId={selectedOfficeId}
+                    entityName={office.officeName}
+                    entityDescription={office.description || undefined}
+                    initialNameAr={officeNameAr}
+                    initialDescriptionAr={officeDescriptionAr}
+                    onSave={(data) => {
+                      setOfficeNameAr(data.nameAr);
+                      setOfficeDescriptionAr(data.descriptionAr);
+                      updateOfficeMutation.mutate({
+                        officeId: selectedOfficeId,
+                        officeNameAr: data.nameAr,
+                        descriptionAr: data.descriptionAr,
+                      });
+                    }}
+                    isSaving={updateOfficeMutation.isPending}
+                  />
+                ) : null;
+              })()}
             </CardContent>
           </Card>
         </TabsContent>
@@ -335,55 +300,29 @@ export default function ContentTranslation() {
                 )}
               </div>
 
-              {selectedTemplateId && (
-                <>
-                  {/* Translation Quality Badge */}
-                  <div className="flex items-center justify-between">
-                    <Label>{t("admin.completionStatus")}</Label>
-                    <TranslationQualityBadge
-                      nameAr={templateNameAr}
-                      descriptionAr={templateDescriptionAr}
-                    />
-                  </div>
-
-                  {/* Arabic Name */}
-                  <div className="space-y-2">
-                    <Label htmlFor="template-name-ar">{t("admin.templateNameArabic")}</Label>
-                    <Input
-                      id="template-name-ar"
-                      value={templateNameAr}
-                      onChange={(e) => setTemplateNameAr(e.target.value)}
-                      placeholder={t("admin.enterArabicName")}
-                      dir="rtl"
-                      className="text-right"
-                    />
-                  </div>
-
-                  {/* Arabic Description */}
-                  <div className="space-y-2">
-                    <Label htmlFor="template-description-ar">
-                      {t("admin.templateDescriptionArabic")}
-                    </Label>
-                    <Textarea
-                      id="template-description-ar"
-                      value={templateDescriptionAr}
-                      onChange={(e) => setTemplateDescriptionAr(e.target.value)}
-                      placeholder={t("admin.enterArabicDescription")}
-                      dir="rtl"
-                      className="text-right min-h-[120px]"
-                    />
-                  </div>
-
-                  {/* Save Button */}
-                  <Button
-                    onClick={handleSaveTemplateTranslation}
-                    className="w-full"
-                  >
-                    <Save className="mr-2 h-4 w-4" />
-                    {t("common.save")}
-                  </Button>
-                </>
-              )}
+              {selectedTemplateId && (() => {
+                const template = templates.find((tmpl: any) => tmpl.id === selectedTemplateId);
+                return template ? (
+                  <EnhancedTranslationEditor
+                    entityType="template"
+                    entityId={selectedTemplateId}
+                    entityName={template.templateName}
+                    entityDescription={template.description || undefined}
+                    initialNameAr={templateNameAr}
+                    initialDescriptionAr={templateDescriptionAr}
+                    onSave={(data) => {
+                      setTemplateNameAr(data.nameAr);
+                      setTemplateDescriptionAr(data.descriptionAr);
+                      updateTemplateMutation.mutate({
+                        templateId: selectedTemplateId,
+                        templateNameAr: data.nameAr,
+                        descriptionAr: data.descriptionAr,
+                      });
+                    }}
+                    isSaving={updateTemplateMutation.isPending}
+                  />
+                ) : null;
+              })()}
             </CardContent>
           </Card>
         </TabsContent>

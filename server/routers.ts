@@ -28,6 +28,8 @@ import { bulkTranslationRouter } from "./routers/bulkTranslation";
 import { translationRequestRouter } from "./routers/translationRequest";
 import { translationExportRouter } from "./routers/translationExport";
 import { translationAnalyticsRouter } from "./routers/translationAnalytics";
+import { translationMemoryRouter } from "./routers/translationMemory";
+import { autoTranslateRouter } from "./routers/autoTranslate";
 
 export const appRouter = router({
   system: systemRouter,
@@ -114,6 +116,8 @@ export const appRouter = router({
   translationRequest: translationRequestRouter,
   translationExport: translationExportRouter,
   translationAnalytics: translationAnalyticsRouter,
+  translationMemory: translationMemoryRouter,
+  autoTranslate: autoTranslateRouter,
 });
 
 export type AppRouter = typeof appRouter;

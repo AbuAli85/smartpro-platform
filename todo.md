@@ -1750,3 +1750,29 @@
 - [x] Build translator leaderboard component
 - [x] Add recently translated items list
 - [x] Test analytics with historical data
+
+
+## Intelligent Translation Features
+### Phase 1: Translation Memory System
+- [x] Create translation_memory table in database schema
+- [x] Build similarity matching algorithm for phrase suggestions
+- [x] Create tRPC procedures for querying translation memory
+- [x] Add translation memory suggestions to ContentTranslation UI
+- [x] Implement suggestion acceptance workflow
+- [x] Test translation memory with existing translations
+
+### Phase 2: Automated Translation Pre-fill
+- [x] Research and select machine translation API (using built-in LLM)
+- [x] Create translation API integration helper
+- [x] Add auto-translate button to ContentTranslation form
+- [x] Implement pre-fill workflow with review step
+- [x] Add confidence indicators for machine translations
+- [x] Test automated translation with sample content
+
+### Phase 3: Translation Version History
+- [x] Create translation_versions table in database schema
+- [x] Modify update procedures to save version history
+- [x] Build version comparison UI component
+- [x] Add rollback functionality to restore previous versions
+- [x] Create version history viewer in ContentTranslation page
+- [x] Test version history and rollback features

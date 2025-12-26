@@ -26,6 +26,8 @@ import {
   type ScheduledFollowup,
   translationRequests,
   translationActivityLog,
+  translationMemory,
+  translationVersions,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -3326,10 +3328,79 @@ export async function updateUserNotificationPreferences(
 
 export async function updateOfficeTranslation(
   officeId: number,
-  translations: { officeNameAr?: string; descriptionAr?: string }
+  translations: { officeNameAr?: string; descriptionAr?: string },
+  metadata?: {
+    changedBy?: number;
+    changedByName?: string;
+    source?: "manual" | "bulk_import" | "request_approval" | "auto_translate";
+  }
 ) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+
+  // Get current values for version history
+  const [office] = await db
+    .select()
+    .from(sanadOffices)
+    .where(eq(sanadOffices.id, officeId))
+    .limit(1);
+
+  if (!office) throw new Error("Office not found");
+
+  // Save version history and add to translation memory if metadata provided
+  if (metadata?.changedBy && metadata?.changedByName) {
+    if (translations.officeNameAr !== undefined && translations.officeNameAr !== office.officeNameAr) {
+      await saveTranslationVersion({
+        entityType: "office",
+        entityId: officeId,
+        fieldName: "nameAr",
+        oldValue: office.officeNameAr,
+        newValue: translations.officeNameAr,
+        changedBy: metadata.changedBy,
+        changedByName: metadata.changedByName,
+        source: metadata.source,
+      });
+
+      // Add to translation memory
+      if (office.officeName && translations.officeNameAr) {
+        await addToTranslationMemory({
+          sourceText: office.officeName,
+          translatedText: translations.officeNameAr,
+          context: "office_name",
+          createdBy: metadata.changedBy,
+        });
+      }
+    }
+
+    if (translations.descriptionAr !== undefined && translations.descriptionAr !== office.descriptionAr) {
+      await saveTranslationVersion({
+        entityType: "office",
+        entityId: officeId,
+        fieldName: "descriptionAr",
+        oldValue: office.descriptionAr,
+        newValue: translations.descriptionAr,
+        changedBy: metadata.changedBy,
+        changedByName: metadata.changedByName,
+        source: metadata.source,
+      });
+
+      // Add to translation memory (split into sentences)
+      if (office.description && translations.descriptionAr) {
+        const sourceSentences = office.description.split(/[.!?]+/).filter(s => s.trim().length > 10);
+        const translatedSentences = translations.descriptionAr.split(/[.!?؟]+/).filter(s => s.trim().length > 10);
+        
+        const pairCount = Math.min(sourceSentences.length, translatedSentences.length, 5);
+        for (let i = 0; i < pairCount; i++) {
+          await addToTranslationMemory({
+            sourceText: sourceSentences[i].trim(),
+            translatedText: translatedSentences[i].trim(),
+            context: "office_description",
+            createdBy: metadata.changedBy,
+          });
+        }
+      }
+    }
+  }
 
   await db
     .update(sanadOffices)
@@ -3339,10 +3410,79 @@ export async function updateOfficeTranslation(
 
 export async function updateTemplateTranslation(
   templateId: number,
-  translations: { templateNameAr?: string; descriptionAr?: string }
+  translations: { templateNameAr?: string; descriptionAr?: string },
+  metadata?: {
+    changedBy?: number;
+    changedByName?: string;
+    source?: "manual" | "bulk_import" | "request_approval" | "auto_translate";
+  }
 ) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+
+  // Get current values for version history
+  const [template] = await db
+    .select()
+    .from(documentTemplates)
+    .where(eq(documentTemplates.id, templateId))
+    .limit(1);
+
+  if (!template) throw new Error("Template not found");
+
+  // Save version history and add to translation memory if metadata provided
+  if (metadata?.changedBy && metadata?.changedByName) {
+    if (translations.templateNameAr !== undefined && translations.templateNameAr !== template.templateNameAr) {
+      await saveTranslationVersion({
+        entityType: "template",
+        entityId: templateId,
+        fieldName: "nameAr",
+        oldValue: template.templateNameAr,
+        newValue: translations.templateNameAr,
+        changedBy: metadata.changedBy,
+        changedByName: metadata.changedByName,
+        source: metadata.source,
+      });
+
+      // Add to translation memory
+      if (template.templateName && translations.templateNameAr) {
+        await addToTranslationMemory({
+          sourceText: template.templateName,
+          translatedText: translations.templateNameAr,
+          context: "template_name",
+          createdBy: metadata.changedBy,
+        });
+      }
+    }
+
+    if (translations.descriptionAr !== undefined && translations.descriptionAr !== template.descriptionAr) {
+      await saveTranslationVersion({
+        entityType: "template",
+        entityId: templateId,
+        fieldName: "descriptionAr",
+        oldValue: template.descriptionAr,
+        newValue: translations.descriptionAr,
+        changedBy: metadata.changedBy,
+        changedByName: metadata.changedByName,
+        source: metadata.source,
+      });
+
+      // Add to translation memory (split into sentences)
+      if (template.description && translations.descriptionAr) {
+        const sourceSentences = template.description.split(/[.!?]+/).filter(s => s.trim().length > 10);
+        const translatedSentences = translations.descriptionAr.split(/[.!?؟]+/).filter(s => s.trim().length > 10);
+        
+        const pairCount = Math.min(sourceSentences.length, translatedSentences.length, 5);
+        for (let i = 0; i < pairCount; i++) {
+          await addToTranslationMemory({
+            sourceText: sourceSentences[i].trim(),
+            translatedText: translatedSentences[i].trim(),
+            context: "template_description",
+            createdBy: metadata.changedBy,
+          });
+        }
+      }
+    }
+  }
 
   await db
     .update(documentTemplates)
@@ -3626,4 +3766,252 @@ export async function getRecentTranslationActivity(limit: number = 20) {
     .limit(limit);
 
   return activities;
+}
+
+
+// ============================================================================
+// TRANSLATION MEMORY FUNCTIONS
+// ============================================================================
+
+/**
+ * Add a translation to memory
+ */
+export async function addToTranslationMemory(params: {
+  sourceText: string;
+  translatedText: string;
+  context?: string;
+  createdBy: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Check if this exact translation already exists
+  const existing = await db
+    .select()
+    .from(translationMemory)
+    .where(
+      and(
+        eq(translationMemory.sourceText, params.sourceText),
+        eq(translationMemory.translatedText, params.translatedText)
+      )
+    )
+    .limit(1);
+
+  if (existing.length > 0) {
+    // Update usage count
+    await db
+      .update(translationMemory)
+      .set({
+        usageCount: existing[0].usageCount + 1,
+        lastUsedAt: new Date(),
+      })
+      .where(eq(translationMemory.id, existing[0].id));
+    
+    return existing[0].id;
+  }
+
+  // Insert new translation memory entry
+  const [result] = await db.insert(translationMemory).values({
+    sourceText: params.sourceText,
+    translatedText: params.translatedText,
+    context: params.context,
+    usageCount: 1,
+    lastUsedAt: new Date(),
+    createdBy: params.createdBy,
+  });
+
+  return result.insertId;
+}
+
+/**
+ * Find similar translations using basic text similarity
+ */
+export async function findSimilarTranslations(params: {
+  sourceText: string;
+  context?: string;
+  limit?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const limit = params.limit || 5;
+  
+  // Simple similarity: find translations with matching words
+  // For production, consider using full-text search or Levenshtein distance
+  const words = params.sourceText.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+  
+  if (words.length === 0) {
+    return [];
+  }
+
+  // Build LIKE conditions for each significant word
+  const likeConditions = words.map(word => 
+    sql`LOWER(${translationMemory.sourceText}) LIKE ${`%${word}%`}`
+  );
+
+  let query = db
+    .select()
+    .from(translationMemory)
+    .orderBy(desc(translationMemory.usageCount), desc(translationMemory.lastUsedAt))
+    .limit(limit);
+
+  // Add context filter if provided
+  if (params.context) {
+    query = query.where(
+      and(
+        eq(translationMemory.context, params.context),
+        or(...likeConditions)
+      )
+    ) as any;
+  } else {
+    query = query.where(or(...likeConditions)) as any;
+  }
+
+  const results = await query;
+
+  // Calculate simple similarity score (number of matching words)
+  return results.map(result => {
+    const resultWords = result.sourceText.toLowerCase().split(/\s+/);
+    const matchingWords = words.filter(w => resultWords.some(rw => rw.includes(w)));
+    const similarityScore = matchingWords.length / words.length;
+
+    return {
+      ...result,
+      similarityScore,
+    };
+  }).sort((a, b) => b.similarityScore - a.similarityScore);
+}
+
+/**
+ * Get translation memory statistics
+ */
+export async function getTranslationMemoryStats() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const [stats] = await db
+    .select({
+      totalEntries: sql<number>`COUNT(*)`,
+      totalUsage: sql<number>`SUM(${translationMemory.usageCount})`,
+      avgUsage: sql<number>`AVG(${translationMemory.usageCount})`,
+    })
+    .from(translationMemory);
+
+  return stats || { totalEntries: 0, totalUsage: 0, avgUsage: 0 };
+}
+
+// ============================================================================
+// TRANSLATION VERSION HISTORY FUNCTIONS
+// ============================================================================
+
+/**
+ * Save a translation version before updating
+ */
+export async function saveTranslationVersion(params: {
+  entityType: "office" | "template";
+  entityId: number;
+  fieldName: string;
+  oldValue: string | null;
+  newValue: string;
+  changedBy: number;
+  changedByName: string;
+  changeReason?: string;
+  source?: "manual" | "bulk_import" | "request_approval" | "auto_translate";
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(translationVersions).values({
+    entityType: params.entityType,
+    entityId: params.entityId,
+    fieldName: params.fieldName,
+    oldValue: params.oldValue,
+    newValue: params.newValue,
+    changedBy: params.changedBy,
+    changedByName: params.changedByName,
+    changeReason: params.changeReason,
+    source: params.source || "manual",
+  });
+}
+
+/**
+ * Get version history for an entity
+ */
+export async function getTranslationVersionHistory(params: {
+  entityType: "office" | "template";
+  entityId: number;
+  fieldName?: string;
+  limit?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const conditions = [
+    eq(translationVersions.entityType, params.entityType),
+    eq(translationVersions.entityId, params.entityId),
+  ];
+
+  if (params.fieldName) {
+    conditions.push(eq(translationVersions.fieldName, params.fieldName));
+  }
+
+  let query = db
+    .select()
+    .from(translationVersions)
+    .where(and(...conditions))
+    .orderBy(desc(translationVersions.createdAt));
+
+  if (params.limit) {
+    query = query.limit(params.limit) as any;
+  }
+
+  return await query;
+}
+
+/**
+ * Rollback to a specific version
+ */
+export async function rollbackToVersion(versionId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Get the version
+  const [version] = await db
+    .select()
+    .from(translationVersions)
+    .where(eq(translationVersions.id, versionId))
+    .limit(1);
+
+  if (!version) {
+    throw new Error("Version not found");
+  }
+
+  // Apply the rollback based on entity type
+  if (version.entityType === "office") {
+    const updateData: any = {};
+    if (version.fieldName === "nameAr") {
+      updateData.officeNameAr = version.oldValue;
+    } else if (version.fieldName === "descriptionAr") {
+      updateData.descriptionAr = version.oldValue;
+    }
+
+    await db
+      .update(sanadOffices)
+      .set(updateData)
+      .where(eq(sanadOffices.id, version.entityId));
+  } else if (version.entityType === "template") {
+    const updateData: any = {};
+    if (version.fieldName === "nameAr") {
+      updateData.templateNameAr = version.oldValue;
+    } else if (version.fieldName === "descriptionAr") {
+      updateData.descriptionAr = version.oldValue;
+    }
+
+    await db
+      .update(documentTemplates)
+      .set(updateData)
+      .where(eq(documentTemplates.id, version.entityId));
+  }
+
+  return version;
 }
