@@ -9,6 +9,7 @@ import { documentTemplateRouter } from "./routers/documentTemplate";
 import { bookingRouter } from "./routers/booking";
 import { sitemapRouter } from "./routers/sitemap";
 import { adminRouter } from "./routers/admin";
+import { loyaltyRouter } from "./routers/loyalty";
 
 export const appRouter = router({
   system: systemRouter,
@@ -54,6 +55,7 @@ export const appRouter = router({
   booking: bookingRouter,
   sitemap: sitemapRouter,
   admin: adminRouter,
+  loyalty: loyaltyRouter,
 });
 
 export type AppRouter = typeof appRouter;

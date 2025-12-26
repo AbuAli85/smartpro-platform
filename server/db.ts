@@ -12,6 +12,8 @@ import {
   reviews,
   activityLog,
   officeAvailability,
+  loyaltyPoints,
+  loyaltyTransactions,
   type SanadOffice,
   type SanadOfficeStaff,
   type SanadOfficeService,
@@ -1026,3 +1028,129 @@ export async function markReminderSent(bookingId: number, reminderType: "24h" | 
 // SANAD OFFICE SERVICES
 // ============================================================================
 
+
+// ============================================================================
+// LOYALTY PROGRAM
+// ============================================================================
+
+export async function getUserLoyalty(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db
+    .select()
+    .from(loyaltyPoints)
+    .where(eq(loyaltyPoints.userId, userId))
+    .limit(1);
+
+  if (result.length === 0) {
+    // Create loyalty account if it doesn't exist
+    await db.insert(loyaltyPoints).values({
+      userId,
+      totalPoints: 0,
+      availablePoints: 0,
+      redeemedPoints: 0,
+    });
+
+    return {
+      id: 0,
+      userId,
+      totalPoints: 0,
+      availablePoints: 0,
+      redeemedPoints: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+  }
+
+  return result[0];
+}
+
+export async function getLoyaltyTransactions(userId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(loyaltyTransactions)
+    .where(eq(loyaltyTransactions.userId, userId))
+    .orderBy(desc(loyaltyTransactions.createdAt))
+    .limit(limit);
+}
+
+export async function awardPoints(params: {
+  userId: number;
+  points: number;
+  reason: string;
+  bookingId?: number;
+  reviewId?: number;
+  referralId?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Get or create loyalty account
+  const loyalty = await getUserLoyalty(params.userId);
+  if (!loyalty) throw new Error("Failed to get loyalty account");
+
+  // Add transaction
+  await db.insert(loyaltyTransactions).values({
+    userId: params.userId,
+    type: "earn",
+    points: params.points,
+    reason: params.reason,
+    bookingId: params.bookingId,
+    reviewId: params.reviewId,
+    referralId: params.referralId,
+  });
+
+  // Update loyalty points
+  await db
+    .update(loyaltyPoints)
+    .set({
+      totalPoints: loyalty.totalPoints + params.points,
+      availablePoints: loyalty.availablePoints + params.points,
+    })
+    .where(eq(loyaltyPoints.userId, params.userId));
+
+  return true;
+}
+
+export async function redeemPoints(params: {
+  userId: number;
+  points: number;
+  reason: string;
+  bookingId?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Get loyalty account
+  const loyalty = await getUserLoyalty(params.userId);
+  if (!loyalty) throw new Error("Loyalty account not found");
+
+  // Check if user has enough points
+  if (loyalty.availablePoints < params.points) {
+    throw new Error("Insufficient points");
+  }
+
+  // Add transaction
+  await db.insert(loyaltyTransactions).values({
+    userId: params.userId,
+    type: "redeem",
+    points: params.points,
+    reason: params.reason,
+    bookingId: params.bookingId,
+  });
+
+  // Update loyalty points
+  await db
+    .update(loyaltyPoints)
+    .set({
+      availablePoints: loyalty.availablePoints - params.points,
+      redeemedPoints: loyalty.redeemedPoints + params.points,
+    })
+    .where(eq(loyaltyPoints.userId, params.userId));
+
+  return true;
+}

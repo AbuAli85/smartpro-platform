@@ -604,3 +604,24 @@
 - [x] Update booking mutation to include serviceId
 - [x] Add service information to booking summary sidebar
 - [x] Validate service selection before booking submission
+
+
+## Loyalty Program Dashboard Implementation
+- [x] Create loyalty program backend procedures (getUserLoyalty, getLoyaltyTransactions, awardPoints, redeemPoints)
+- [x] Build LoyaltyDashboard component with points balance display
+- [x] Add transaction history table with date, type, points, description
+- [x] Integrate automatic points awarding on booking completion (10 points)
+- [x] Integrate automatic points awarding on review submission (5 points)
+- [x] Add points redemption flow for booking discounts (100 points = 5 OMR)
+- [x] Add loyalty dashboard route and navigation
+- [x] Write unit tests for loyalty program features
+
+## Booking Calendar View Implementation
+- [x] Install @fullcalendar/react and required plugins
+- [x] Create BookingCalendar component with FullCalendar integration
+- [x] Implement color-coded booking events (green=confirmed, yellow=pending, red=cancelled, blue=completed)
+- [x] Add event click handler for booking details
+- [ ] Add quick actions for rescheduling/cancellation
+- [x] Integrate calendar into user dashboard
+- [ ] Add calendar view to office dashboard
+- [x] Test calendar responsiveness and interactions

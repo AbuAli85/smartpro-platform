@@ -18,6 +18,7 @@ import MyDocuments from "./pages/MyDocuments";
 import AdminDashboard from "./pages/AdminDashboard";
 import OfficeDashboard from "./pages/OfficeDashboard";
 import Profile from "./pages/Profile";
+import LoyaltyDashboard from "./pages/LoyaltyDashboard";
 import { useNotifications } from "./hooks/useNotifications";
 
 function Router() {
@@ -50,6 +51,9 @@ function Router() {
       
       {/* Profile */}
       <Route path="/profile" component={Profile} />
+      
+      {/* Loyalty */}
+      <Route path="/loyalty" component={LoyaltyDashboard} />
       
       {/* 404 */}
       <Route path="/404" component={NotFound} />

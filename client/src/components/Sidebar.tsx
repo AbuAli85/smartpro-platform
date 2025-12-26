@@ -14,6 +14,7 @@ import {
   X,
   Home,
   Shield,
+  Award,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -42,6 +43,7 @@ export function Sidebar({ className }: SidebarProps) {
     { name: "Document Templates", href: "/templates", icon: FileText },
     { name: "My Bookings", href: "/bookings", icon: Calendar, requiresAuth: true },
     { name: "My Offices", href: "/my-offices", icon: Briefcase, requiresAuth: true },
+    { name: "Loyalty Rewards", href: "/loyalty", icon: Award, requiresAuth: true },
     { name: "Profile", href: "/profile", icon: User, requiresAuth: true },
   ];
 

@@ -189,6 +189,21 @@ export const bookingRouter = router({
         description: `Updated booking status to ${input.status}`,
       });
 
+      // Award loyalty points when booking is completed (10 points)
+      if (input.status === "completed") {
+        try {
+          const office = await db.getSanadOfficeById(booking.officeId);
+          await db.awardPoints({
+            userId: booking.userId,
+            points: 10,
+            reason: `Booking completed at ${office?.officeName || "office"}`,
+            bookingId: input.bookingId,
+          });
+        } catch (error) {
+          console.error("Failed to award loyalty points for completed booking:", error);
+        }
+      }
+
       return { success: true };
     }),
 
@@ -232,6 +247,18 @@ export const bookingRouter = router({
         entityId: reviewId,
         description: `Reviewed ${office.officeName}`,
       });
+
+      // Award loyalty points for review (5 points)
+      try {
+        await db.awardPoints({
+          userId: user.id,
+          points: 5,
+          reason: `Review submitted for ${office.officeName}`,
+          reviewId: reviewId,
+        });
+      } catch (error) {
+        console.error("Failed to award loyalty points for review:", error);
+      }
 
       return { id: reviewId };
     }),
