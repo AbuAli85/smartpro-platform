@@ -4,8 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Building2, FileText, Calendar, Shield, Zap, Users } from "lucide-react";
 import { StructuredData, getSmartProOrganizationSchema } from "@/components/StructuredData";
 import { CanonicalURL } from "@/components/CanonicalURL";
+import { useTranslation } from "react-i18next";
 
 export default function Home() {
+  const { t } = useTranslation();
+
   return (
     <>
       <CanonicalURL path="/" />
@@ -18,18 +21,17 @@ export default function Home() {
         <div className="container relative">
           <div className="mx-auto max-w-3xl text-center">
             <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-              National Digital Infrastructure for Business Services
+              {t("home.title")}
             </h1>
             <p className="mt-6 text-lg leading-8 text-blue-100">
-              Connect with certified Sanad offices across Oman. Access 3,000+ document templates.
-              Complete your business services faster, cheaper, and smarter.
+              {t("home.subtitle")}
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <Button asChild size="lg" variant="secondary">
-                <Link href="/offices">Browse Sanad Offices</Link>
+                <Link href="/offices">{t("home.browseOffices")}</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="bg-white/10 text-white border-white/20 hover:bg-white/20">
-                <Link href="/templates">Explore Templates</Link>
+                <Link href="/templates">{t("home.viewTemplates")}</Link>
               </Button>
             </div>
           </div>
@@ -55,9 +57,9 @@ export default function Home() {
                 <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                   <Building2 className="w-6 h-6 text-primary" />
                 </div>
-                <CardTitle>Certified Sanad Offices</CardTitle>
+                <CardTitle>{t("home.features.offices")}</CardTitle>
                 <CardDescription>
-                  Browse and connect with verified Sanad offices across all governorates in Oman
+                  {t("home.features.officesDesc")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -73,9 +75,9 @@ export default function Home() {
                 <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center mb-4">
                   <FileText className="w-6 h-6 text-accent" />
                 </div>
-                <CardTitle>3,000+ Document Templates</CardTitle>
+                <CardTitle>{t("home.features.templates")}</CardTitle>
                 <CardDescription>
-                  Access a comprehensive library of business documents, contracts, and official forms
+                  {t("home.features.templatesDesc")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -91,9 +93,9 @@ export default function Home() {
                 <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                   <Calendar className="w-6 h-6 text-primary" />
                 </div>
-                <CardTitle>Online Booking</CardTitle>
+                <CardTitle>{t("home.features.booking")}</CardTitle>
                 <CardDescription>
-                  Schedule appointments and request services from Sanad offices with instant confirmation
+                  {t("home.features.bookingDesc")}
                 </CardDescription>
               </CardHeader>
               <CardContent>

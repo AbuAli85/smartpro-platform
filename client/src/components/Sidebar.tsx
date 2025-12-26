@@ -24,12 +24,14 @@ import { trpc } from "@/lib/trpc";
 import { NotificationBadge } from "@/components/NotificationBadge";
 import { NotificationDropdown } from "./NotificationDropdown";
 import { LanguageToggle } from "./LanguageToggle";
+import { useTranslation } from "react-i18next";
 
 interface SidebarProps {
   className?: string;
 }
 
 export function Sidebar({ className }: SidebarProps) {
+  const { t } = useTranslation();
   const [location] = useLocation();
   const { user, logout } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -42,21 +44,21 @@ export function Sidebar({ className }: SidebarProps) {
   );
 
   const navigation = [
-    { name: "Home", href: "/", icon: Home },
-    { name: "Sanad Offices", href: "/offices", icon: Building2 },
-    { name: "Document Templates", href: "/templates", icon: FileText },
-    { name: "My Bookings", href: "/bookings", icon: Calendar, requiresAuth: true },
-    { name: "My Offices", href: "/my-offices", icon: Briefcase, requiresAuth: true },
-    { name: "Loyalty Rewards", href: "/loyalty", icon: Award, requiresAuth: true },
-    { name: "Refer Friends", href: "/refer", icon: Gift, requiresAuth: true },
-    { name: "Analytics", href: "/analytics", icon: BarChart3, requiresAuth: true },
-    { name: "Profile", href: "/profile", icon: User, requiresAuth: true },
+    { name: t("nav.home"), href: "/", icon: Home },
+    { name: t("nav.offices"), href: "/offices", icon: Building2 },
+    { name: t("nav.documents"), href: "/templates", icon: FileText },
+    { name: t("nav.bookings"), href: "/bookings", icon: Calendar, requiresAuth: true },
+    { name: t("nav.myOffices"), href: "/my-offices", icon: Briefcase, requiresAuth: true },
+    { name: t("nav.loyalty"), href: "/loyalty", icon: Award, requiresAuth: true },
+    { name: t("nav.refer"), href: "/refer", icon: Gift, requiresAuth: true },
+    { name: t("nav.analytics"), href: "/analytics", icon: BarChart3, requiresAuth: true },
+    { name: t("nav.profile"), href: "/profile", icon: User, requiresAuth: true },
   ];
 
   // Add admin link if user is admin
   if (user?.role === "admin") {
-    navigation.push({ name: "Admin Dashboard", href: "/admin", icon: Shield, requiresAuth: true });
-    navigation.push({ name: "Admin Analytics", href: "/admin/analytics", icon: BarChart3, requiresAuth: true });
+    navigation.push({ name: t("nav.adminDashboard"), href: "/admin", icon: Shield, requiresAuth: true });
+    navigation.push({ name: t("nav.adminAnalytics"), href: "/admin/analytics", icon: BarChart3, requiresAuth: true });
   }
 
   const filteredNavigation = navigation.filter((item) => !item.requiresAuth || user);
@@ -169,7 +171,7 @@ export function Sidebar({ className }: SidebarProps) {
             onClick={handleLogout}
           >
             <LogOut className="h-5 w-5" />
-            {!isCollapsed && <span className="ml-3">Logout</span>}
+            {!isCollapsed && <span className="ml-3">{t("nav.logout")}</span>}
           </Button>
         </div>
       )}

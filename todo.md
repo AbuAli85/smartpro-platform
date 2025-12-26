@@ -724,7 +724,7 @@
 - [x] Create translation files (en.json, ar.json)
 - [x] Add language toggle component in header
 - [ ] Translate all UI components (buttons, labels, headings)
-- [ ] Translate navigation menu items
+- [x] Translate navigation menu items
 - [ ] Translate form labels and validation messages
 - [ ] Translate email templates (booking confirmation, status updates)
 - [ ] Translate SMS message templates
@@ -761,10 +761,43 @@
 - [x] Create translation files (en.json, ar.json)
 - [x] Add language toggle component in header
 - [ ] Translate all UI components (buttons, labels, headings)
-- [ ] Translate navigation menu items
+- [x] Translate navigation menu items
 - [ ] Translate form labels and validation messages
 - [ ] Translate email templates (booking confirmation, status updates)
 - [ ] Translate SMS message templates
 - [x] Add RTL (right-to-left) support for Arabic
 - [ ] Store user language preference in database
 - [ ] Write unit tests for i18n functionality
+
+## Progressive UI Translation Implementation
+- [x] Translate Home page with useTranslation hook
+- [x] Translate Sanad Offices page (filters, office cards)
+- [ ] Translate BookOffice page (booking form, service selection)
+- [x] Translate navigation menu items
+- [ ] Translate common buttons and labels
+- [ ] Test language switching on translated pages
+- [ ] Verify RTL layout for Arabic
+
+## Office Owner Dashboard Implementation
+- [x] Create office owner backend procedures (getOwnerOffices, getOfficeBookings, updateOfficeAvailability)
+- [x] Add office owner role check middleware
+- [x] Create office owner dashboard router
+- [ ] Build OfficeOwnerDashboard page component
+- [ ] Add booking requests management UI
+- [ ] Add service management (create, edit, delete services)
+- [ ] Add availability calendar management
+- [ ] Add review response functionality
+- [ ] Add office performance metrics
+- [ ] Write unit tests for office owner features
+
+## Payment Gateway Integration Implementation
+- [ ] Add Stripe feature to project (webdev_add_feature)
+- [ ] Configure Stripe API keys
+- [ ] Create payment intent backend procedure
+- [ ] Integrate Stripe checkout in booking flow
+- [ ] Add payment status tracking to bookings
+- [ ] Create invoice generation function
+- [ ] Send invoice via email after successful payment
+- [ ] Add payment history page
+- [ ] Handle payment webhooks for status updates
+- [ ] Write unit tests for payment flow

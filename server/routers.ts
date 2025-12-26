@@ -14,6 +14,7 @@ import { referralRouter } from "./routers/referral";
 import { notificationRouter } from "./routers/notification";
 import { analyticsRouter } from "./routers/analytics";
 import { adminAnalyticsRouter } from "./routers/adminAnalytics";
+import { officeOwnerRouter } from "./routers/officeOwner";
 
 export const appRouter = router({
   system: systemRouter,
@@ -64,6 +65,7 @@ export const appRouter = router({
   notification: notificationRouter,
   analytics: analyticsRouter,
   adminAnalytics: adminAnalyticsRouter,
+  officeOwner: officeOwnerRouter,
 });
 
 export type AppRouter = typeof appRouter;

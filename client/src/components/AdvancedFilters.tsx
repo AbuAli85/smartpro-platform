@@ -8,6 +8,7 @@ import { Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { X, Filter, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 export interface FilterState {
   category?: string;
@@ -36,6 +37,7 @@ const serviceCategories = [
 ];
 
 export function AdvancedFilters({ filters, onFiltersChange, className }: AdvancedFiltersProps) {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleCategoryChange = (category: string) => {
@@ -82,7 +84,7 @@ export function AdvancedFilters({ filters, onFiltersChange, className }: Advance
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4" />
-            <CardTitle className="text-base">Advanced Filters</CardTitle>
+            <CardTitle className="text-base">{t("offices.filters")}</CardTitle>
             {activeFilterCount > 0 && (
               <Badge variant="secondary" className="ml-2">
                 {activeFilterCount}
@@ -97,7 +99,7 @@ export function AdvancedFilters({ filters, onFiltersChange, className }: Advance
                 onClick={clearFilters}
                 className="h-8 text-xs"
               >
-                Clear All
+                {t("offices.clearFilters")}
               </Button>
             )}
             <Button
@@ -120,16 +122,16 @@ export function AdvancedFilters({ filters, onFiltersChange, className }: Advance
         <CardContent className="space-y-6 pt-0">
           {/* Service Category */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Service Category</label>
+            <label className="text-sm font-medium">{t("offices.category")}</label>
             <Select
               value={filters.category || "all"}
               onValueChange={handleCategoryChange}
             >
               <SelectTrigger>
-                <SelectValue placeholder="All Categories" />
+                <SelectValue placeholder={t("offices.allCategories")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="all">{t("offices.allCategories")}</SelectItem>
                 {serviceCategories.map((category) => (
                   <SelectItem key={category} value={category}>
                     {category}
@@ -141,16 +143,16 @@ export function AdvancedFilters({ filters, onFiltersChange, className }: Advance
 
           {/* Minimum Rating */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Minimum Rating</label>
+            <label className="text-sm font-medium">{t("offices.rating")}</label>
             <Select
               value={filters.minRating?.toString() || "all"}
               onValueChange={handleRatingChange}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Any Rating" />
+                <SelectValue placeholder={t("offices.anyRating")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Any Rating</SelectItem>
+                <SelectItem value="all">{t("offices.anyRating")}</SelectItem>
                 <SelectItem value="4">
                   <div className="flex items-center gap-1">
                     <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />

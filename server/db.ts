@@ -1823,3 +1823,125 @@ export async function getPlatformHealthMetrics() {
     completedBookings: bookingStats?.completed || 0,
   };
 }
+
+
+// ============================================================================
+// Office Owner Functions
+// ============================================================================
+
+export async function getOfficesByOwner(ownerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select()
+    .from(sanadOffices)
+    .where(eq(sanadOffices.ownerId, ownerId));
+}
+
+export async function getOfficeBookingsForOwner(officeId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db
+    .select({
+      id: bookings.id,
+      userId: bookings.userId,
+      customerName: users.name,
+      customerEmail: users.email,
+      customerPhone: users.phone,
+      scheduledDate: bookings.scheduledDate,
+      scheduledTime: bookings.scheduledTime,
+      status: bookings.status,
+      serviceDescription: bookings.serviceDescription,
+      price: bookings.price,
+      createdAt: bookings.createdAt,
+    })
+    .from(bookings)
+    .innerJoin(users, eq(bookings.userId, users.id))
+    .where(eq(bookings.officeId, officeId))
+    .orderBy(desc(bookings.createdAt));
+}
+
+export async function toggleOfficeStatus(
+  officeId: number,
+  isAvailable: boolean
+) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  await db
+    .update(sanadOffices)
+    .set({ 
+      status: isAvailable ? "active" : "inactive",
+      updatedAt: new Date()
+    })
+    .where(eq(sanadOffices.id, officeId));
+    
+  return { success: true };
+}
+
+export async function getOwnerOfficeMetrics(officeId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const [metrics] = await db
+    .select({
+      totalBookings: sql<number>`count(${bookings.id})`,
+      completedBookings: sql<number>`sum(case when ${bookings.status} = 'completed' then 1 else 0 end)`,
+      pendingBookings: sql<number>`sum(case when ${bookings.status} = 'pending' then 1 else 0 end)`,
+      cancelledBookings: sql<number>`sum(case when ${bookings.status} = 'cancelled' then 1 else 0 end)`,
+      totalRevenue: sql<number>`sum(case when ${bookings.status} = 'completed' then ${bookings.price} else 0 end)`,
+    })
+    .from(bookings)
+    .where(eq(bookings.officeId, officeId));
+    
+  const [reviewMetrics] = await db
+    .select({
+      totalReviews: sql<number>`count(${reviews.id})`,
+      averageRating: sql<number>`avg(${reviews.rating})`,
+    })
+    .from(reviews)
+    .where(eq(reviews.officeId, officeId));
+    
+  return {
+    ...metrics,
+    ...reviewMetrics,
+    completionRate: metrics.totalBookings > 0 
+      ? ((metrics.completedBookings / metrics.totalBookings) * 100).toFixed(1)
+      : "0",
+  };
+}
+
+export async function addOwnerResponseToReview(
+  reviewId: number,
+  response: string
+) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  await db
+    .update(reviews)
+    .set({ 
+      responseText: response,
+      respondedAt: new Date(),
+      updatedAt: new Date()
+    })
+    .where(eq(reviews.id, reviewId));
+    
+  return { success: true };
+}
+
+
+export async function getReviewById(reviewId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const [review] = await db
+    .select()
+    .from(reviews)
+    .where(eq(reviews.id, reviewId))
+    .limit(1);
+    
+  return review || null;
+}

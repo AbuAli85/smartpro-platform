@@ -10,8 +10,10 @@ import { Building2, MapPin, Star, Search, Plus, Filter } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { AdvancedFilters, type FilterState } from "@/components/AdvancedFilters";
+import { useTranslation } from "react-i18next";
 
 export default function OfficesList() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [governorate, setGovernorate] = useState<string>();
   const [page, setPage] = useState(1);
@@ -55,14 +57,14 @@ export default function OfficesList() {
 
       <div className="container py-8">
         {/* Breadcrumb */}
-        <Breadcrumb items={[{ label: "Sanad Offices" }]} className="mb-6" />
+        <Breadcrumb items={[{ label: t("offices.title") }]} className="mb-6" />
         
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold tracking-tight">Sanad Offices</h1>
+            <h1 className="text-4xl font-bold tracking-tight">{t("offices.title")}</h1>
             <p className="text-muted-foreground mt-2">
-              Browse certified Sanad offices across Oman
+              {t("offices.subtitle")}
             </p>
           </div>
           {isAuthenticated && (
