@@ -2338,6 +2338,60 @@ export async function getChatAnalytics(params: {
   };
 }
 
+// Template Variable Processing
+export async function processTemplateVariables(
+  template: string,
+  context: {
+    customerName?: string;
+    officeName?: string;
+    staffName?: string;
+    userId?: number;
+    officeId?: number;
+  }
+): Promise<string> {
+  let processed = template;
+  
+  // Replace customer name
+  if (context.customerName) {
+    processed = processed.replace(/\{\{customer_name\}\}/gi, context.customerName);
+  } else if (context.userId) {
+    const db = await getDb();
+    if (db) {
+      const { users } = await import("../drizzle/schema");
+      const user = await db.select().from(users).where(eq(users.id, context.userId)).limit(1);
+      if (user[0]?.name) {
+        processed = processed.replace(/\{\{customer_name\}\}/gi, user[0].name);
+      }
+    }
+  }
+  
+  // Replace office name
+  if (context.officeName) {
+    processed = processed.replace(/\{\{office_name\}\}/gi, context.officeName);
+  } else if (context.officeId) {
+    const db = await getDb();
+    if (db) {
+      const { sanadOffices } = await import("../drizzle/schema");
+      const office = await db.select().from(sanadOffices).where(eq(sanadOffices.id, context.officeId)).limit(1);
+      if (office[0]?.officeName) {
+        processed = processed.replace(/\{\{office_name\}\}/gi, office[0].officeName);
+      }
+    }
+  }
+  
+  // Replace staff name
+  if (context.staffName) {
+    processed = processed.replace(/\{\{staff_name\}\}/gi, context.staffName);
+  }
+  
+  // Replace date and time
+  const now = new Date();
+  processed = processed.replace(/\{\{date\}\}/gi, now.toLocaleDateString());
+  processed = processed.replace(/\{\{time\}\}/gi, now.toLocaleTimeString());
+  
+  return processed;
+}
+
 // Canned Responses
 export async function getCannedResponsesByOffice(officeId: number, category?: string) {
   const db = await getDb();
@@ -2823,6 +2877,64 @@ export async function closeConversation(conversationId: number) {
     .where(eq(chatConversations.id, conversationId));
   
   return { id: conversationId };
+}
+
+// Chat Transfer
+export async function createChatTransfer(data: {
+  conversationId: number;
+  fromUserId: number;
+  toUserId: number;
+  contextNotes?: string;
+  isEscalation: boolean;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { chatTransferHistory, chatAssignments } = await import("../drizzle/schema");
+  
+  // Create transfer record
+  await db.insert(chatTransferHistory).values({
+    conversationId: data.conversationId,
+    fromUserId: data.fromUserId,
+    toUserId: data.toUserId,
+    contextNotes: data.contextNotes,
+    isEscalation: data.isEscalation,
+  });
+  
+  // Update assignment
+  await db
+    .update(chatAssignments)
+    .set({ assignedToUserId: data.toUserId })
+    .where(eq(chatAssignments.conversationId, data.conversationId));
+  
+  return { success: true };
+}
+
+export async function getTransferHistory(conversationId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { chatTransferHistory, users } = await import("../drizzle/schema");
+  
+  const transfers = await db
+    .select({
+      id: chatTransferHistory.id,
+      conversationId: chatTransferHistory.conversationId,
+      fromUserId: chatTransferHistory.fromUserId,
+      toUserId: chatTransferHistory.toUserId,
+      contextNotes: chatTransferHistory.contextNotes,
+      isEscalation: chatTransferHistory.isEscalation,
+      transferredAt: chatTransferHistory.transferredAt,
+      fromUserName: sql<string>`from_user.name`,
+      toUserName: sql<string>`to_user.name`,
+    })
+    .from(chatTransferHistory)
+    .leftJoin(sql`${users} as from_user`, eq(chatTransferHistory.fromUserId, sql`from_user.id`))
+    .leftJoin(sql`${users} as to_user`, eq(chatTransferHistory.toUserId, sql`to_user.id`))
+    .where(eq(chatTransferHistory.conversationId, conversationId))
+    .orderBy(desc(chatTransferHistory.transferredAt));
+  
+  return transfers;
 }
 
 // Chat Ratings

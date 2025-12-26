@@ -1144,13 +1144,16 @@
 - [x] Implement template quick insert with keyboard shortcuts (type /shortcut)
 - [x] Add template picker dropdown in message composer - already exists
 - [x] Enhanced message input to detect and auto-replace shortcuts
-- [ ] Add variable placeholder detection in template content
-- [ ] Implement dynamic replacement for {{customer_name}}
-- [ ] Implement dynamic replacement for {{office_name}}
-- [ ] Implement dynamic replacement for {{staff_name}}
-- [ ] Add variable preview in template management UI
+- [x] Create processTemplateVariables helper function in db.ts
+- [x] Implement dynamic replacement for {{customer_name}}
+- [x] Implement dynamic replacement for {{office_name}}
+- [x] Implement dynamic replacement for {{staff_name}}
+- [x] Implement dynamic replacement for {{date}} and {{time}}
+- [x] Add processVariables procedure to cannedResponses router
+- [ ] Update ChatInbox to process variables when inserting templates
 - [ ] Process variables when inserting template via shortcut
 - [ ] Process variables when inserting template via dropdown
+- [ ] Add variable help text in CannedResponses management UI
 - [ ] Write unit tests for variable replacement
 
 ### Customer Satisfaction Ratings
@@ -1164,17 +1167,24 @@
 - [x] Trigger RatingModal automatically when conversation is closed
 - [x] Integrate average satisfaction scores into Staff Performance dashboard
 - [x] Add satisfaction score display in performance table with star rating
-- [ ] Add satisfaction trend chart with time-series data
+- [ ] Create getSatisfactionTrends function in db.ts
+- [ ] Aggregate satisfaction scores by date with daily averages
+- [ ] Add satisfaction trend chart to StaffPerformance dashboard
+- [ ] Implement line chart with recharts showing score over time
+- [ ] Add date range selector (7/30/90 days) for trend chart
+- [ ] Show trend indicators (up/down arrows with percentage change)
+- [ ] Display average satisfaction score for selected period
 - [ ] Write unit tests for rating system
 
 ### Chat Transfer & Escalation
-- [ ] Add transfer_history table to database
-- [ ] Create TransferDialog component with staff selection dropdown
-- [ ] Add context notes textarea for transfer reason
-- [ ] Implement conversation reassignment logic in backend
-- [ ] Add escalation flag checkbox for manager attention
-- [ ] Create transfer history tracking with timestamps
-- [ ] Show transfer notifications to both sender and receiver
-- [ ] Add transfer button in ChatInbox conversation header
+- [x] Add transfer_history table to database (migration applied)
+- [x] Add transfer functions to db.ts (createChatTransfer, getTransferHistory)
+- [x] Create chatTransfer router with transfer procedures
+- [x] Create TransferDialog component with staff selection dropdown
+- [x] Add context notes textarea for transfer reason
+- [x] Add escalation flag checkbox for manager attention
+- [x] Implement conversation reassignment logic in backend
+- [x] Send transfer notifications to both sender and receiver
+- [x] Add transfer button in ChatInbox conversation header
 - [ ] Display transfer history in conversation details
 - [ ] Write unit tests for transfer system

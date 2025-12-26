@@ -50,4 +50,34 @@ export const cannedResponsesRouter = router({
     .mutation(async ({ input }) => {
       return await db.deleteCannedResponse(input.id);
     }),
+
+  // Process template variables
+  processVariables: protectedProcedure
+    .input(z.object({
+      template: z.string(),
+      conversationId: z.number(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // Get conversation details
+      const conversation = await db.getChatConversationById(input.conversationId);
+      if (!conversation) {
+        return { processed: input.template };
+      }
+
+      // Get user and office details
+      const user = await db.getUserById(conversation.userId);
+      const offices = await db.getOfficesByOwner(ctx.user.id);
+      const office = offices.find(o => o.id === conversation.officeId);
+
+      // Process variables
+      const processed = await db.processTemplateVariables(input.template, {
+        customerName: user?.name || undefined,
+        officeName: office?.officeName || undefined,
+        staffName: ctx.user.name || undefined,
+        userId: conversation.userId,
+        officeId: conversation.officeId,
+      });
+
+      return { processed };
+    }),
 });

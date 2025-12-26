@@ -23,6 +23,7 @@ import { useLocation } from "wouter";
 import { FileGallery } from "@/components/FileGallery";
 import { AvailabilityToggle } from "@/components/AvailabilityToggle";
 import { RatingModal } from "@/components/RatingModal";
+import { TransferDialog } from "@/components/TransferDialog";
 
 interface Message {
   id: number;
@@ -140,7 +141,11 @@ export default function ChatInbox() {
   const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
   const [ratingConversationId, setRatingConversationId] = useState<number | null>(null);
   const [ratingStaffId, setRatingStaffId] = useState<number | undefined>();
+  const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
 
+  // Get user's offices
+  const { data: userOffices } = trpc.officeOwner.getMyOffices.useQuery();
+  
   // Get user's conversations (for office owners)
   const { data: conversations, refetch: refetchConversations } = trpc.chat.getConversations.useQuery(
     undefined,
@@ -489,6 +494,14 @@ export default function ChatInbox() {
                       <Button 
                         variant="ghost" 
                         size="icon"
+                        onClick={() => setIsTransferDialogOpen(true)}
+                        title="Transfer conversation"
+                      >
+                        <UserPlus className="h-5 w-5" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
                         onClick={() => handleCloseConversation(selectedConversation.conversation.id)}
                         title="Close conversation"
                         disabled={selectedConversation.conversation.status === "closed"}
@@ -709,6 +722,17 @@ export default function ChatInbox() {
             setRatingConversationId(null);
             setRatingStaffId(undefined);
           }}
+        />
+      )}
+      
+      {/* Transfer Dialog */}
+      {selectedConversation && userOffices?.[0] && (
+        <TransferDialog
+          conversationId={selectedConversation.conversation.id}
+          officeId={userOffices[0].id}
+          isOpen={isTransferDialogOpen}
+          onClose={() => setIsTransferDialogOpen(false)}
+          onSuccess={() => refetchConversations()}
         />
       )}
     </div>
