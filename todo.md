@@ -569,3 +569,38 @@
 - [ ] Display booking details on calendar
 - [ ] Add quick action buttons
 - [ ] Integrate calendar into My Bookings page
+
+## Complete Loyalty Program Implementation
+- [ ] Add loyalty backend procedures (getPoints, awardPoints, redeemPoints)
+- [ ] Create LoyaltyDashboard component with points balance
+- [ ] Display transaction history in dashboard
+- [ ] Add automatic points on booking completion
+- [ ] Add automatic points on review submission  
+- [ ] Integrate points discount in booking checkout
+- [ ] Add loyalty section to user profile
+
+## Service Selection in Booking Form
+- [ ] Fetch services for selected office
+- [ ] Add service dropdown to booking form
+- [ ] Pre-fill pricing from selected service
+- [ ] Display estimated delivery time
+- [ ] Update booking creation to include service ID
+
+## Booking Calendar View
+- [ ] Install FullCalendar library
+- [ ] Create BookingCalendar component
+- [ ] Implement month/week view toggle
+- [ ] Add color-coded status indicators
+- [ ] Display booking details on event click
+- [ ] Add quick action buttons (reschedule, cancel)
+- [ ] Integrate into My Bookings page
+
+
+## Service Selection in Booking Form (COMPLETED)
+- [x] Add service selection dropdown to BookOffice page
+- [x] Fetch available services from selected office
+- [x] Display service details (name, price, delivery time)
+- [x] Pre-fill service description when service is selected
+- [x] Update booking mutation to include serviceId
+- [x] Add service information to booking summary sidebar
+- [x] Validate service selection before booking submission

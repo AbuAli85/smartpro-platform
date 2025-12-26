@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { toast } from "sonner";
 import { ArrowLeft, Calendar as CalendarIcon, Clock, CheckCircle2 } from "lucide-react";
@@ -16,11 +17,21 @@ export default function BookOffice() {
 
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string>("");
+  const [selectedServiceId, setSelectedServiceId] = useState<string>("");
   const [serviceDescription, setServiceDescription] = useState("");
   const [requirements, setRequirements] = useState("");
 
   // Get office details
   const { data: office } = trpc.sanadOffice.getBySlug.useQuery({ slug });
+
+  // Get available services for this office
+  const { data: services } = trpc.sanadOffice.getServices.useQuery(
+    { officeId: office?.id || 0 },
+    { enabled: !!office }
+  );
+
+  // Get selected service details
+  const selectedService = services?.find(s => s.id === parseInt(selectedServiceId));
 
   // Get available time slots when date is selected
   const { data: slots, isLoading: loadingSlots } = trpc.booking.getAvailableSlots.useQuery(
@@ -48,6 +59,10 @@ export default function BookOffice() {
   });
 
   const handleSubmit = () => {
+    if (!selectedServiceId) {
+      toast.error("Please select a service");
+      return;
+    }
     if (!office || !selectedDate || !selectedTime) {
       toast.error("Missing Information", {
         description: "Please select a date and time slot",
@@ -64,6 +79,7 @@ export default function BookOffice() {
 
     createBookingMutation.mutate({
       officeId: office.id,
+      serviceId: parseInt(selectedServiceId),
       serviceDescription,
       requirements,
       scheduledDate: selectedDate.toISOString(),
@@ -175,6 +191,29 @@ export default function BookOffice() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
+                  <Label htmlFor="service">
+                    Select Service <span className="text-red-500">*</span>
+                  </Label>
+                  <Select value={selectedServiceId} onValueChange={setSelectedServiceId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a service" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {services?.map((service) => (
+                        <SelectItem key={service.id} value={service.id.toString()}>
+                          {service.serviceName} - {service.price} OMR ({service.estimatedDeliveryDays} days)
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {selectedService && (
+                    <p className="text-sm text-gray-600 mt-2">
+                      {selectedService.description}
+                    </p>
+                  )}
+                </div>
+
+                <div>
                   <Label htmlFor="serviceDescription">
                     Service Description <span className="text-red-500">*</span>
                   </Label>
@@ -247,6 +286,14 @@ export default function BookOffice() {
                   <div>
                     <p className="text-sm font-medium text-gray-500">Time</p>
                     <p className="text-sm font-semibold">{selectedTime}</p>
+                  </div>
+                )}
+
+                {selectedService && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Service</p>
+                    <p className="text-sm font-semibold">{selectedService.serviceName}</p>
+                    <p className="text-sm text-gray-600">{selectedService.price} OMR</p>
                   </div>
                 )}
 
