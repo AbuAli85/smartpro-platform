@@ -1884,8 +1884,13 @@
 - [x] Add submitQuiz procedure with scoring
 - [x] Add getMyAttempts procedure
 - [x] Add admin procedures for creating materials and quizzes
-- [ ] Seed initial training content (guidelines, mistakes, quizzes)
-- [ ] Create TranslatorTraining page component
+- [x] Seed Arabic translation guidelines
+- [x] Seed common mistakes library
+- [x] Seed best practices content
+- [x] Seed translation examples
+- [x] Create 3 quizzes covering translation fundamentals
+- [ ] Create TranslatorTraining page component with tabs
+- [ ] Add progress tracking and quiz history display
 - [ ] Add navigation link to training module
 - [ ] Test training module end-to-end
 
