@@ -13,7 +13,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { Building2, CheckCircle2 } from "lucide-react";
-import { Navigation } from "@/components/Navigation";
 
 // Validation schema
 const officeSchema = z.object({
@@ -139,7 +138,7 @@ export default function CreateOffice() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/20">
-      <Navigation />
+      
       
       <div className="container max-w-4xl py-12">
         {/* Header */}

@@ -1,11 +1,10 @@
-import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText } from "lucide-react";
 
 export default function MyDocuments() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Navigation />
+      
       <div className="container py-8">
         <h1 className="text-4xl font-bold mb-8">My Documents</h1>
         <Card>

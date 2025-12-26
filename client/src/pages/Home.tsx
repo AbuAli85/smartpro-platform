@@ -1,7 +1,6 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Navigation } from "@/components/Navigation";
 import { Building2, FileText, Calendar, Shield, Zap, Users } from "lucide-react";
 import { StructuredData, getSmartProOrganizationSchema } from "@/components/StructuredData";
 import { CanonicalURL } from "@/components/CanonicalURL";
@@ -12,7 +11,6 @@ export default function Home() {
       <CanonicalURL path="/" />
       <StructuredData type="organization" data={getSmartProOrganizationSchema()} />
       <div className="min-h-screen flex flex-col">
-      <Navigation />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-elegant py-20 lg:py-32">

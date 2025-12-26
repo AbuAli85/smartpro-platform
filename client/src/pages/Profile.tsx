@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
-import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,7 +67,7 @@ export default function Profile() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navigation />
+        
         <div className="container py-12">
           <div className="flex items-center justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#003366]"></div>
@@ -81,7 +80,7 @@ export default function Profile() {
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navigation />
+        
         <div className="container py-12">
           <Card>
             <CardContent className="pt-6">
@@ -95,7 +94,7 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
+      
       
       <div className="container py-12">
         <div className="max-w-3xl mx-auto">

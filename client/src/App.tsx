@@ -4,6 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { Sidebar } from "./components/Sidebar";
 import Home from "./pages/Home";
 import OfficesList from "./pages/OfficesList";
 import OfficeProfile from "./pages/OfficeProfile";
@@ -62,7 +63,14 @@ function App() {
       <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <Toaster />
-          <Router />
+          <div className="flex h-screen overflow-hidden">
+            <Sidebar />
+            <main className="flex-1 overflow-y-auto bg-background">
+              <div className="transition-opacity duration-200">
+                <Router />
+              </div>
+            </main>
+          </div>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

@@ -1,5 +1,4 @@
 import { useRoute, Link } from "wouter";
-import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +22,7 @@ export default function OfficeProfile() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <Navigation />
+        
         <div className="container py-8">
           <div className="animate-pulse space-y-4">
             <div className="h-64 bg-muted rounded-lg" />
@@ -38,7 +37,7 @@ export default function OfficeProfile() {
   if (!office) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <Navigation />
+        
         <div className="container py-16 text-center">
           <h2 className="text-2xl font-bold mb-4">Office Not Found</h2>
           <Button asChild>
@@ -53,7 +52,7 @@ export default function OfficeProfile() {
     <>
       <CanonicalURL path={`/offices/${slug}`} />
       <div className="min-h-screen flex flex-col bg-background">
-      <Navigation />
+      
 
       <div className="container py-8">
         <Button asChild variant="ghost" className="mb-4">

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -40,7 +39,7 @@ export default function OfficesList() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Navigation />
+      
 
       <div className="container py-8">
         {/* Header */}
