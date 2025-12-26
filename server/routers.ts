@@ -1,7 +1,9 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { z } from "zod";
+import * as db from "./db";
 import { sanadOfficeRouter } from "./routers/sanadOffice";
 import { documentTemplateRouter } from "./routers/documentTemplate";
 import { bookingRouter } from "./routers/booking";
@@ -20,6 +22,23 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    updateProfile: protectedProcedure
+      .input(
+        z.object({
+          name: z.string().min(1, "Name is required"),
+          email: z.string().email().optional(),
+          phone: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const user = ctx.user!;
+        await db.updateUserProfile(user.id, {
+          name: input.name,
+          email: input.email || null,
+          phone: input.phone || null,
+        });
+        return { success: true };
+      }),
   }),
 
   // SmartPro feature routers

@@ -40,6 +40,31 @@ export async function getDb() {
 // USER MANAGEMENT
 // ============================================================================
 
+export async function updateUserProfile(
+  userId: number,
+  updates: { name?: string; email?: string | null; phone?: string | null }
+): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update user profile: database not available");
+    return;
+  }
+
+  try {
+    await db
+      .update(users)
+      .set({
+        name: updates.name,
+        email: updates.email,
+        phone: updates.phone,
+      })
+      .where(eq(users.id, userId));
+  } catch (error) {
+    console.error("[Database] Failed to update user profile:", error);
+    throw error;
+  }
+}
+
 export async function upsertUser(user: InsertUser): Promise<void> {
   if (!user.openId) {
     throw new Error("User openId is required for upsert");
