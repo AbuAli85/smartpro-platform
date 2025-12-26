@@ -3264,3 +3264,23 @@ export async function getConversationsForExport(filters: {
 
   return results;
 }
+
+
+// Update user language preference
+export async function updateUserLanguagePreference(userId: number, language: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update language preference: database not available");
+    return;
+  }
+
+  try {
+    await db
+      .update(users)
+      .set({ preferredLanguage: language })
+      .where(eq(users.id, userId));
+  } catch (error) {
+    console.error("[Database] Failed to update language preference:", error);
+    throw error;
+  }
+}

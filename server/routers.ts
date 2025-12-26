@@ -37,6 +37,13 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    updateLanguagePreference: protectedProcedure
+      .input(z.object({ language: z.enum(["en", "ar"]) }))
+      .mutation(async ({ ctx, input }) => {
+        const user = ctx.user!;
+        await db.updateUserLanguagePreference(user.id, input.language);
+        return { success: true, language: input.language };
+      }),
     updateProfile: protectedProcedure
       .input(
         z.object({

@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { User, Mail, Phone, Calendar, Shield } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Profile() {
+  const { t } = useLanguage();
   const { user, loading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -31,12 +33,12 @@ export default function Profile() {
   const utils = trpc.useUtils();
   const updateProfileMutation = trpc.auth.updateProfile.useMutation({
     onSuccess: () => {
-      toast.success("Profile updated successfully");
+      toast.success(t("profile.updateSuccess"));
       setIsEditing(false);
       utils.auth.me.invalidate();
     },
     onError: (error) => {
-      toast.error("Failed to update profile", { description: error.message });
+      toast.error(t("profile.updateError"), { description: error.message });
     },
   });
 
@@ -44,7 +46,7 @@ export default function Profile() {
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      toast.error("Name is required");
+      toast.error(t("profile.nameRequired"));
       return;
     }
 

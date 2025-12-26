@@ -1,4 +1,6 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 type Language = "en" | "ar";
 
@@ -156,11 +158,12 @@ const translations: Record<Language, Record<string, string>> = {
     "profile.language": "Preferred Language",
     "profile.updateProfile": "Update Profile",
     "profile.changePassword": "Change Password",
+    "profile.updateSuccess": "Profile updated successfully",
+    "profile.updateError": "Failed to update profile",
+    "profile.nameRequired": "Name is required",
     "profile.currentPassword": "Current Password",
     "profile.newPassword": "New Password",
     "profile.confirmPassword": "Confirm Password",
-    "profile.updateSuccess": "Profile updated successfully",
-    "profile.updateError": "Failed to update profile",
     
     // Validation
     "validation.required": "This field is required",
@@ -321,11 +324,12 @@ const translations: Record<Language, Record<string, string>> = {
     "profile.language": "اللغة المفضلة",
     "profile.updateProfile": "تحديث الملف الشخصي",
     "profile.changePassword": "تغيير كلمة المرور",
+    "profile.updateSuccess": "تم تحديث الملف الشخصي بنجاح",
+    "profile.updateError": "فشل تحديث الملف الشخصي",
+    "profile.nameRequired": "الاسم مطلوب",
     "profile.currentPassword": "كلمة المرور الحالية",
     "profile.newPassword": "كلمة المرور الجديدة",
     "profile.confirmPassword": "تأكيد كلمة المرور",
-    "profile.updateSuccess": "تم تحديث الملف الشخصي بنجاح",
-    "profile.updateError": "فشل تحديث الملف الشخصي",
     
     // Validation
     "validation.required": "هذا الحقل مطلوب",
@@ -346,11 +350,22 @@ const translations: Record<Language, Record<string, string>> = {
 };
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   const [language, setLanguageState] = useState<Language>(() => {
     // Load from localStorage or default to English
     const saved = localStorage.getItem("smartpro-language");
     return (saved === "ar" || saved === "en") ? saved : "en";
   });
+
+  const updateLanguageMutation = trpc.auth.updateLanguagePreference.useMutation();
+
+  // Sync with user's preferred language from database
+  useEffect(() => {
+    if (user?.preferredLanguage && (user.preferredLanguage === "ar" || user.preferredLanguage === "en")) {
+      setLanguageState(user.preferredLanguage);
+      localStorage.setItem("smartpro-language", user.preferredLanguage);
+    }
+  }, [user]);
 
   useEffect(() => {
     // Save to localStorage whenever language changes
@@ -363,6 +378,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
+    // Update database if user is logged in
+    if (user) {
+      updateLanguageMutation.mutate({ language: lang });
+    }
   };
 
   const t = (key: string): string => {
