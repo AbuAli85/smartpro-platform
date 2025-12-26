@@ -16,6 +16,7 @@ import {
   Shield,
   Award,
   Gift,
+  BarChart3,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -47,6 +48,7 @@ export function Sidebar({ className }: SidebarProps) {
     { name: "My Offices", href: "/my-offices", icon: Briefcase, requiresAuth: true },
     { name: "Loyalty Rewards", href: "/loyalty", icon: Award, requiresAuth: true },
     { name: "Refer Friends", href: "/refer", icon: Gift, requiresAuth: true },
+    { name: "Analytics", href: "/analytics", icon: BarChart3, requiresAuth: true },
     { name: "Profile", href: "/profile", icon: User, requiresAuth: true },
   ];
 

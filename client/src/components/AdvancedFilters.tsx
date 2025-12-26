@@ -2,17 +2,18 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { X, Filter, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface FilterState {
-  serviceCategory?: string;
-  minPrice?: number;
-  maxPrice?: number;
+  category?: string;
   minRating?: number;
-  availability?: "instant" | "same_day" | "any";
+  availableToday?: boolean;
+  availableThisWeek?: boolean;
 }
 
 interface AdvancedFiltersProps {
@@ -22,60 +23,52 @@ interface AdvancedFiltersProps {
 }
 
 const serviceCategories = [
-  "Business Registration",
-  "Commercial License",
-  "Document Attestation",
-  "NOC Certificates",
-  "Trade License",
-  "Tax Registration",
-  "Import/Export Documentation",
-  "Legal Consultation",
-  "Translation Services",
-  "Other Services",
+  "Company Formation",
+  "Licensing",
+  "Accounting & Bookkeeping",
+  "Tax Services",
+  "Legal Services",
+  "HR & Payroll",
+  "Business Consulting",
+  "Document Services",
+  "Translation",
+  "Other",
 ];
 
 export function AdvancedFilters({ filters, onFiltersChange, className }: AdvancedFiltersProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [priceRange, setPriceRange] = useState<[number, number]>([
-    filters.minPrice || 0,
-    filters.maxPrice || 500,
-  ]);
 
   const handleCategoryChange = (category: string) => {
     onFiltersChange({
       ...filters,
-      serviceCategory: category === "all" ? undefined : category,
-    });
-  };
-
-  const handlePriceChange = (values: number[]) => {
-    setPriceRange([values[0], values[1]]);
-  };
-
-  const handlePriceCommit = () => {
-    onFiltersChange({
-      ...filters,
-      minPrice: priceRange[0] > 0 ? priceRange[0] : undefined,
-      maxPrice: priceRange[1] < 500 ? priceRange[1] : undefined,
+      category: category === "all" ? undefined : category,
     });
   };
 
   const handleRatingChange = (rating: string) => {
     onFiltersChange({
       ...filters,
-      minRating: rating === "all" ? undefined : parseInt(rating),
+      minRating: rating === "all" ? undefined : parseFloat(rating),
     });
   };
 
-  const handleAvailabilityChange = (availability: string) => {
-    onFiltersChange({
-      ...filters,
-      availability: availability === "any" ? undefined : (availability as "instant" | "same_day"),
-    });
+  const handleAvailabilityChange = (type: "today" | "week", checked: boolean) => {
+    if (type === "today") {
+      onFiltersChange({
+        ...filters,
+        availableToday: checked,
+        availableThisWeek: checked ? false : filters.availableThisWeek,
+      });
+    } else {
+      onFiltersChange({
+        ...filters,
+        availableThisWeek: checked,
+        availableToday: checked ? false : filters.availableToday,
+      });
+    }
   };
 
   const clearFilters = () => {
-    setPriceRange([0, 500]);
     onFiltersChange({});
   };
 
@@ -129,7 +122,7 @@ export function AdvancedFilters({ filters, onFiltersChange, className }: Advance
           <div className="space-y-2">
             <label className="text-sm font-medium">Service Category</label>
             <Select
-              value={filters.serviceCategory || "all"}
+              value={filters.category || "all"}
               onValueChange={handleCategoryChange}
             >
               <SelectTrigger>
@@ -146,25 +139,6 @@ export function AdvancedFilters({ filters, onFiltersChange, className }: Advance
             </Select>
           </div>
 
-          {/* Price Range */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium">Price Range (OMR)</label>
-              <span className="text-sm text-muted-foreground">
-                {priceRange[0]} - {priceRange[1] >= 500 ? "500+" : priceRange[1]}
-              </span>
-            </div>
-            <Slider
-              min={0}
-              max={500}
-              step={10}
-              value={priceRange}
-              onValueChange={handlePriceChange}
-              onValueCommit={handlePriceCommit}
-              className="w-full"
-            />
-          </div>
-
           {/* Minimum Rating */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Minimum Rating</label>
@@ -177,29 +151,63 @@ export function AdvancedFilters({ filters, onFiltersChange, className }: Advance
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Any Rating</SelectItem>
-                <SelectItem value="4">4+ Stars</SelectItem>
-                <SelectItem value="3">3+ Stars</SelectItem>
-                <SelectItem value="2">2+ Stars</SelectItem>
+                <SelectItem value="4">
+                  <div className="flex items-center gap-1">
+                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                    4+ Stars
+                  </div>
+                </SelectItem>
+                <SelectItem value="4.5">
+                  <div className="flex items-center gap-1">
+                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                    4.5+ Stars
+                  </div>
+                </SelectItem>
+                <SelectItem value="3">
+                  <div className="flex items-center gap-1">
+                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                    3+ Stars
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Availability */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <label className="text-sm font-medium">Availability</label>
-            <Select
-              value={filters.availability || "any"}
-              onValueChange={handleAvailabilityChange}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Any Availability" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="any">Any Availability</SelectItem>
-                <SelectItem value="instant">Instant Booking</SelectItem>
-                <SelectItem value="same_day">Same-Day Service</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="availableToday"
+                  checked={filters.availableToday || false}
+                  onCheckedChange={(checked) =>
+                    handleAvailabilityChange("today", checked as boolean)
+                  }
+                />
+                <Label
+                  htmlFor="availableToday"
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  Available Today
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="availableThisWeek"
+                  checked={filters.availableThisWeek || false}
+                  onCheckedChange={(checked) =>
+                    handleAvailabilityChange("week", checked as boolean)
+                  }
+                />
+                <Label
+                  htmlFor="availableThisWeek"
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  Available This Week
+                </Label>
+              </div>
+            </div>
           </div>
         </CardContent>
       )}
@@ -208,9 +216,9 @@ export function AdvancedFilters({ filters, onFiltersChange, className }: Advance
       {!isExpanded && activeFilterCount > 0 && (
         <CardContent className="pt-0 pb-4">
           <div className="flex flex-wrap gap-2">
-            {filters.serviceCategory && (
+            {filters.category && (
               <Badge variant="secondary" className="flex items-center gap-1">
-                {filters.serviceCategory}
+                {filters.category}
                 <button
                   onClick={() => handleCategoryChange("all")}
                   className="ml-1 hover:bg-secondary-foreground/20 rounded-full p-0.5"
@@ -219,22 +227,9 @@ export function AdvancedFilters({ filters, onFiltersChange, className }: Advance
                 </button>
               </Badge>
             )}
-            {(filters.minPrice || filters.maxPrice) && (
-              <Badge variant="secondary" className="flex items-center gap-1">
-                {filters.minPrice || 0} - {filters.maxPrice || "500+"} OMR
-                <button
-                  onClick={() => {
-                    setPriceRange([0, 500]);
-                    onFiltersChange({ ...filters, minPrice: undefined, maxPrice: undefined });
-                  }}
-                  className="ml-1 hover:bg-secondary-foreground/20 rounded-full p-0.5"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </Badge>
-            )}
             {filters.minRating && (
               <Badge variant="secondary" className="flex items-center gap-1">
+                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                 {filters.minRating}+ Stars
                 <button
                   onClick={() => handleRatingChange("all")}
@@ -244,11 +239,22 @@ export function AdvancedFilters({ filters, onFiltersChange, className }: Advance
                 </button>
               </Badge>
             )}
-            {filters.availability && (
+            {filters.availableToday && (
               <Badge variant="secondary" className="flex items-center gap-1">
-                {filters.availability === "instant" ? "Instant Booking" : "Same-Day Service"}
+                Available Today
                 <button
-                  onClick={() => handleAvailabilityChange("any")}
+                  onClick={() => handleAvailabilityChange("today", false)}
+                  className="ml-1 hover:bg-secondary-foreground/20 rounded-full p-0.5"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </Badge>
+            )}
+            {filters.availableThisWeek && (
+              <Badge variant="secondary" className="flex items-center gap-1">
+                Available This Week
+                <button
+                  onClick={() => handleAvailabilityChange("week", false)}
                   className="ml-1 hover:bg-secondary-foreground/20 rounded-full p-0.5"
                 >
                   <X className="w-3 h-3" />

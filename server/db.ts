@@ -186,6 +186,10 @@ export async function listSanadOffices(filters: {
   governorate?: string;
   status?: string;
   search?: string;
+  category?: string;
+  minRating?: number;
+  availableToday?: boolean;
+  availableThisWeek?: boolean;
   limit?: number;
   offset?: number;
 }) {
@@ -211,6 +215,14 @@ export async function listSanadOffices(filters: {
       )
     );
   }
+
+  if (filters.minRating !== undefined) {
+    conditions.push(gte(sanadOffices.averageRating, filters.minRating.toString()));
+  }
+
+  // Note: Category filter requires joining with services table
+  // Availability filters require checking booking slots
+  // These will be implemented in the query below
 
   if (conditions.length > 0) {
     query = query.where(and(...conditions)) as any;
@@ -1475,4 +1487,175 @@ export async function getUnreadNotificationCount(userId: number): Promise<number
     .where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)));
   
   return result[0]?.count || 0;
+}
+
+
+// ============================================================================
+// ANALYTICS
+// ============================================================================
+
+export async function getBookingTrends(params: {
+  startDate: Date;
+  endDate: Date;
+  groupBy: "day" | "week" | "month";
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { startDate, endDate, groupBy } = params;
+
+  // MySQL date format based on grouping
+  const dateFormat = {
+    day: "%Y-%m-%d",
+    week: "%Y-%u", // Year-Week
+    month: "%Y-%m",
+  }[groupBy];
+
+  const results = await db
+    .select({
+      period: sql<string>`DATE_FORMAT(${bookings.createdAt}, ${dateFormat})`.as('period'),
+      totalBookings: sql<number>`COUNT(*)`.as('totalBookings'),
+      confirmedBookings: sql<number>`SUM(CASE WHEN ${bookings.status} = 'confirmed' THEN 1 ELSE 0 END)`.as('confirmedBookings'),
+      completedBookings: sql<number>`SUM(CASE WHEN ${bookings.status} = 'completed' THEN 1 ELSE 0 END)`.as('completedBookings'),
+      cancelledBookings: sql<number>`SUM(CASE WHEN ${bookings.status} = 'cancelled' THEN 1 ELSE 0 END)`.as('cancelledBookings'),
+    })
+    .from(bookings)
+    .where(and(gte(bookings.createdAt, startDate), lte(bookings.createdAt, endDate)))
+    .groupBy(sql`period`)
+    .orderBy(sql`period`);
+
+  return results;
+}
+
+export async function getPopularServicesAnalytics(params: {
+  startDate: Date;
+  endDate: Date;
+  limit?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { startDate, endDate, limit = 10 } = params;
+
+  const results = await db
+    .select({
+      serviceId: sanadOfficeServices.id,
+      serviceName: sanadOfficeServices.serviceName,
+      category: sanadOfficeServices.category,
+      bookingCount: sql<number>`COUNT(${bookings.id})`,
+      totalRevenue: sql<number>`SUM(CAST(${sanadOfficeServices.price} AS DECIMAL(10,2)))`,
+    })
+    .from(bookings)
+    .innerJoin(sanadOfficeServices, eq(bookings.serviceId, sanadOfficeServices.id))
+    .where(
+      and(
+        gte(bookings.createdAt, startDate),
+        lte(bookings.createdAt, endDate),
+        // Filter out cancelled bookings
+        not(eq(bookings.status, "cancelled"))
+      )
+    )
+    .groupBy(sanadOfficeServices.id, sanadOfficeServices.serviceName, sanadOfficeServices.category)
+    .orderBy(desc(sql`COUNT(${bookings.id})`))
+    .limit(limit);
+
+  return results;
+}
+
+export async function getPeakBookingTimesAnalytics(params: {
+  startDate: Date;
+  endDate: Date;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { startDate, endDate } = params;
+
+  // Get booking count by hour of day
+  const results = await db
+    .select({
+      hour: sql<number>`HOUR(${bookings.scheduledTime})`.as('hour'),
+      bookingCount: sql<number>`COUNT(*)`.as('bookingCount'),
+    })
+    .from(bookings)
+    .where(
+      and(
+        gte(bookings.createdAt, startDate),
+        lte(bookings.createdAt, endDate),
+        not(isNull(bookings.scheduledTime))
+      )
+    )
+    .groupBy(sql`hour`)
+    .orderBy(sql`hour`);
+
+  return results;
+}
+
+export async function getRevenueMetricsAnalytics(params: {
+  startDate: Date;
+  endDate: Date;
+  previousPeriodStartDate: Date;
+  previousPeriodEndDate: Date;
+}) {
+  const db = await getDb();
+  if (!db) return {
+    currentRevenue: 0,
+    previousRevenue: 0,
+    growthPercentage: 0,
+    totalBookings: 0,
+    completedBookings: 0,
+    averageBookingValue: 0,
+  };
+
+  const { startDate, endDate, previousPeriodStartDate, previousPeriodEndDate } = params;
+
+  // Current period metrics
+  const currentPeriod = await db
+    .select({
+      totalRevenue: sql<number>`COALESCE(SUM(CAST(${sanadOfficeServices.price} AS DECIMAL(10,2))), 0)`,
+      totalBookings: sql<number>`COUNT(*)`,
+      completedBookings: sql<number>`SUM(CASE WHEN ${bookings.status} = 'completed' THEN 1 ELSE 0 END)`,
+    })
+    .from(bookings)
+    .leftJoin(sanadOfficeServices, eq(bookings.serviceId, sanadOfficeServices.id))
+    .where(
+      and(
+        gte(bookings.createdAt, startDate),
+        lte(bookings.createdAt, endDate)
+      )
+    );
+
+  // Previous period metrics
+  const previousPeriod = await db
+    .select({
+      totalRevenue: sql<number>`COALESCE(SUM(CAST(${sanadOfficeServices.price} AS DECIMAL(10,2))), 0)`,
+    })
+    .from(bookings)
+    .leftJoin(sanadOfficeServices, eq(bookings.serviceId, sanadOfficeServices.id))
+    .where(
+      and(
+        gte(bookings.createdAt, previousPeriodStartDate),
+        lte(bookings.createdAt, previousPeriodEndDate)
+      )
+    );
+
+  const currentRevenue = currentPeriod[0]?.totalRevenue || 0;
+  const previousRevenue = previousPeriod[0]?.totalRevenue || 0;
+  const totalBookings = currentPeriod[0]?.totalBookings || 0;
+  const completedBookings = currentPeriod[0]?.completedBookings || 0;
+
+  const growthPercentage = previousRevenue > 0
+    ? ((currentRevenue - previousRevenue) / previousRevenue) * 100
+    : 0;
+
+  const averageBookingValue = totalBookings > 0 ? currentRevenue / totalBookings : 0;
+
+  return {
+    currentRevenue,
+    previousRevenue,
+    growthPercentage,
+    totalBookings,
+    completedBookings,
+    averageBookingValue,
+  };
 }

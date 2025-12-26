@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import * as db from "../db";
 import { notifyOwner } from "../_core/notification";
-import { sendBookingConfirmationEmail, sendBookingReminderSMS } from "../_core/emailSms";
+import { sendBookingConfirmationEmail, sendBookingReminderSMS, sendBookingStatusUpdateSMS } from "../_core/emailSms";
 import { calculateCancellation, cancelBooking } from "../cancellationPolicy";
 import { emitBookingNotification } from "../_core/notifications";
 
@@ -271,6 +271,24 @@ export const bookingRouter = router({
         bookingId: input.bookingId,
         actionUrl: `/bookings`,
       });
+
+      // Send SMS notification for status update
+      try {
+        const bookingUser = await db.getUserById(booking.userId);
+        const office = await db.getSanadOfficeById(booking.officeId);
+        if (bookingUser?.phone && office) {
+          await sendBookingStatusUpdateSMS({
+            userPhone: bookingUser.phone,
+            userName: bookingUser.name || "Customer",
+            officeName: office.officeName,
+            status: input.status,
+            scheduledDate: booking.scheduledDate ? new Date(booking.scheduledDate).toLocaleDateString() : undefined,
+            scheduledTime: booking.scheduledTime || undefined,
+          });
+        }
+      } catch (error) {
+        console.error("Failed to send status update SMS:", error);
+      }
 
       return { success: true };
     }),

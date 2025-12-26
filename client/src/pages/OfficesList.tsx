@@ -16,6 +16,11 @@ export default function OfficesList() {
   const [governorate, setGovernorate] = useState<string>();
   const [page, setPage] = useState(1);
   const [advancedFilters, setAdvancedFilters] = useState<FilterState>({});
+
+  const handleFiltersChange = (newFilters: FilterState) => {
+    setAdvancedFilters(newFilters);
+    setPage(1); // Reset to first page when filters change
+  };
   const { isAuthenticated } = useAuth();
 
   const { data, isLoading } = trpc.sanadOffice.list.useQuery({
@@ -24,6 +29,10 @@ export default function OfficesList() {
     search: search || undefined,
     governorate,
     status: "active",
+    category: advancedFilters.category,
+    minRating: advancedFilters.minRating,
+    availableToday: advancedFilters.availableToday,
+    availableThisWeek: advancedFilters.availableThisWeek,
   });
 
   const governorates = [
@@ -103,7 +112,7 @@ export default function OfficesList() {
         {/* Advanced Filters */}
         <AdvancedFilters 
           filters={advancedFilters} 
-          onFiltersChange={setAdvancedFilters} 
+          onFiltersChange={handleFiltersChange} 
           className="mb-8"
         />
 

@@ -221,3 +221,36 @@ MOCIP - SmartPro Team
     html,
   });
 }
+
+/**
+ * Send booking status update SMS
+ */
+export async function sendBookingStatusUpdateSMS(params: {
+  userPhone: string;
+  userName: string;
+  officeName: string;
+  status: string;
+  scheduledDate?: string;
+  scheduledTime?: string;
+}): Promise<boolean> {
+  let message = "";
+  
+  switch (params.status) {
+    case "confirmed":
+      message = `${params.userName}, your booking at ${params.officeName} has been confirmed for ${params.scheduledDate} at ${params.scheduledTime}. SmartPro`;
+      break;
+    case "cancelled":
+      message = `${params.userName}, your booking at ${params.officeName} has been cancelled. Contact us if you have questions. SmartPro`;
+      break;
+    case "completed":
+      message = `${params.userName}, your appointment at ${params.officeName} is complete. Thank you for using SmartPro!`;
+      break;
+    default:
+      message = `${params.userName}, your booking status at ${params.officeName} has been updated to ${params.status}. SmartPro`;
+  }
+
+  return await sendSMS({
+    to: params.userPhone,
+    message,
+  });
+}
