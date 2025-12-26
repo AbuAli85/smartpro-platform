@@ -85,6 +85,44 @@ export const chatRouter = router({
       });
     }),
 
+  // Upload file attachment
+  uploadFile: protectedProcedure
+    .input(z.object({
+      conversationId: z.number(),
+      fileData: z.string(), // base64 encoded file
+      fileName: z.string(),
+      mimeType: z.string(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      // Validate file size (10MB max)
+      const fileBuffer = Buffer.from(input.fileData, 'base64');
+      if (fileBuffer.length > 10 * 1024 * 1024) {
+        throw new Error('File size exceeds 10MB limit');
+      }
+      
+      // Determine sender type
+      const conversation = await db.getChatConversationById(input.conversationId);
+      const senderType = conversation?.userId === ctx.user.id ? 'user' : 'office';
+      
+      // Upload to S3
+      const { fileUrl, fileName } = await db.uploadChatAttachment(
+        fileBuffer,
+        input.fileName,
+        input.mimeType
+      );
+      
+      // Send file message
+      const message = await db.sendFileMessage({
+        conversationId: input.conversationId,
+        senderId: ctx.user.id,
+        senderType,
+        fileUrl,
+        fileName,
+      });
+      
+      return { success: true, messageId: message.id, fileUrl };
+    }),
+
   // Mark messages as read
   markAsRead: protectedProcedure
     .input(z.object({

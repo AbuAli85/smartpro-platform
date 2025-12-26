@@ -2506,3 +2506,62 @@ export async function getAssignedConversations(userId: number) {
     .where(eq(chatAssignments.assignedToUserId, userId))
     .orderBy(desc(chatAssignments.assignedAt));
 }
+
+
+// ============================================================================
+// CHAT FILE ATTACHMENTS
+// ============================================================================
+
+export async function uploadChatAttachment(file: Buffer, fileName: string, mimeType: string) {
+  const { storagePut } = await import("./storage");
+  
+  // Generate unique file key
+  const fileExtension = fileName.split('.').pop();
+  const uniqueKey = `chat-attachments/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExtension}`;
+  
+  // Upload to S3
+  const { url } = await storagePut(uniqueKey, file, mimeType);
+  
+  return {
+    fileUrl: url,
+    fileKey: uniqueKey,
+    fileName,
+  };
+}
+
+export async function sendFileMessage(data: {
+  conversationId: number;
+  senderId: number;
+  senderType: "user" | "office";
+  fileUrl: string;
+  fileName: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { chatMessages, chatConversations } = await import("../drizzle/schema");
+  
+  const [message] = await db
+    .insert(chatMessages)
+    .values({
+      conversationId: data.conversationId,
+      senderId: data.senderId,
+      senderType: data.senderType,
+      message: `Sent a file: ${data.fileName}`,
+      messageType: "file",
+      fileUrl: data.fileUrl,
+      fileName: data.fileName,
+    })
+    .$returningId();
+  
+  // Update conversation's last message
+  await db
+    .update(chatConversations)
+    .set({
+      lastMessageAt: new Date(),
+      lastMessagePreview: `📎 ${data.fileName}`,
+    })
+    .where(eq(chatConversations.id, data.conversationId));
+  
+  return message;
+}

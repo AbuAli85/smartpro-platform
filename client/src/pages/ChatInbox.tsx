@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageCircle, Send, Search, Archive, CheckCheck, MessageSquareText } from "lucide-react";
+import { MessageCircle, Send, Search, Archive, CheckCheck, MessageSquareText, Paperclip, Download, FileIcon } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
@@ -195,6 +195,50 @@ export default function ChatInbox() {
     }
   };
 
+  const uploadFileMutation = trpc.chat.uploadFile.useMutation();
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedConversationId) return;
+
+    // Validate file size (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File size exceeds 10MB limit");
+      return;
+    }
+
+    try {
+      // Convert file to base64
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64 = reader.result?.toString().split(',')[1];
+        if (!base64) return;
+
+        toast.loading("Uploading file...");
+        
+        await uploadFileMutation.mutateAsync({
+          conversationId: selectedConversationId,
+          fileData: base64,
+          fileName: file.name,
+          mimeType: file.type,
+        });
+
+        toast.dismiss();
+        toast.success("File uploaded successfully");
+        refetchMessages();
+        refetchConversations();
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Failed to upload file");
+      console.error(error);
+    }
+
+    // Reset input
+    e.target.value = "";
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -381,7 +425,22 @@ export default function ChatInbox() {
                                   : "bg-muted"
                               }`}
                             >
-                              <p className="text-sm whitespace-pre-wrap break-words">{msg.message}</p>
+                              {(msg as any).messageType === "file" ? (
+                                <div className="flex items-center gap-2">
+                                  <FileIcon className="h-4 w-4" />
+                                  <a
+                                    href={(msg as any).fileUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-sm underline hover:no-underline"
+                                  >
+                                    {(msg as any).fileName || "Download file"}
+                                  </a>
+                                  <Download className="h-3 w-3" />
+                                </div>
+                              ) : (
+                                <p className="text-sm whitespace-pre-wrap break-words">{msg.message}</p>
+                              )}
                               <div className="flex items-center gap-1 mt-1">
                                 <p className="text-xs opacity-70">
                                   {new Date(msg.createdAt).toLocaleTimeString([], {
@@ -441,6 +500,21 @@ export default function ChatInbox() {
                       >
                         <MessageSquareText className="h-4 w-4" />
                       </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => document.getElementById('file-upload')?.click()}
+                        title="Attach file"
+                      >
+                        <Paperclip className="h-4 w-4" />
+                      </Button>
+                      <input
+                        id="file-upload"
+                        type="file"
+                        className="hidden"
+                        onChange={handleFileUpload}
+                        accept="image/*,.pdf,.doc,.docx,.txt"
+                      />
                       <Input
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}

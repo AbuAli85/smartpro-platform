@@ -988,7 +988,7 @@
 - [ ] Display file attachments in message bubbles
 - [ ] Add file preview for images
 - [ ] Add download functionality for documents
-- [ ] Validate file types and size limits (10MB max)
+- [x] Validate file types and size limits (10MB max)
 - [ ] Show upload progress indicator
 - [ ] Write unit tests for file attachments
 
@@ -1003,3 +1003,30 @@
 - [ ] Add reassignment functionality
 - [ ] Send notification when conversation is assigned
 - [ ] Write unit tests for assignment system
+
+
+## Chat File Attachments Implementation
+- [x] Add attachmentUrl and attachmentType fields to chat_messages table (already exists)
+- [x] Create uploadChatAttachment function with S3 integration
+- [x] Add file upload button to ChatInbox and ChatWidget
+- [x] Display file attachments in message list with preview/download
+- [x] Validate file types and size limits (10MB max)
+- [ ] Write unit tests for file attachment functionality
+
+## Chat Assignment UI Implementation
+- [ ] Create StaffManagement page component for office owners
+- [ ] Add staff list with add/remove functionality
+- [ ] Build assignment dropdown in ChatInbox for office owners
+- [ ] Add workload indicator showing assigned conversation count
+- [ ] Implement reassignment functionality
+- [ ] Add staff performance metrics (response time, conversations handled)
+- [ ] Write unit tests for assignment UI
+
+## Automated Chat Routing Implementation
+- [ ] Create staff availability tracking (online/offline/busy status)
+- [ ] Implement expertise tags system for staff members
+- [ ] Build routing algorithm (round-robin, least-loaded, expertise-based)
+- [ ] Add auto-assignment on new conversation creation
+- [ ] Create routing configuration page for office owners
+- [ ] Add routing analytics (assignment distribution, wait times)
+- [ ] Write unit tests for routing logic
