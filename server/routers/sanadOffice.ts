@@ -458,4 +458,22 @@ export const sanadOfficeRouter = router({
       await db.updateSanadOfficeService(input.serviceId, { isActive: false });
       return { success: true };
     }),
+
+  // Translation Management (Admin only)
+  updateTranslation: protectedProcedure
+    .input(z.object({
+      officeId: z.number(),
+      officeNameAr: z.string().optional(),
+      descriptionAr: z.string().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // Check if user is admin
+      if (ctx.user!.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+
+      const { officeId, ...translations } = input;
+      await db.updateOfficeTranslation(officeId, translations);
+      return { success: true };
+    }),
 });

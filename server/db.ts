@@ -3316,3 +3316,34 @@ export async function updateUserNotificationPreferences(
     throw error;
   }
 }
+
+
+// ============================================================================
+// TRANSLATION MANAGEMENT
+// ============================================================================
+
+export async function updateOfficeTranslation(
+  officeId: number,
+  translations: { officeNameAr?: string; descriptionAr?: string }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(sanadOffices)
+    .set(translations)
+    .where(eq(sanadOffices.id, officeId));
+}
+
+export async function updateTemplateTranslation(
+  templateId: number,
+  translations: { templateNameAr?: string; descriptionAr?: string }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(documentTemplates)
+    .set(translations)
+    .where(eq(documentTemplates.id, templateId));
+}

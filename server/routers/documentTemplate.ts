@@ -135,4 +135,22 @@ export const documentTemplateRouter = router({
     const user = ctx.user!;
     return await db.getUserGeneratedDocuments(user.id);
   }),
+
+  // Translation Management (Admin only)
+  updateTranslation: protectedProcedure
+    .input(z.object({
+      templateId: z.number(),
+      templateNameAr: z.string().optional(),
+      descriptionAr: z.string().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // Check if user is admin
+      if (ctx.user!.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
+      }
+
+      const { templateId, ...translations } = input;
+      await db.updateTemplateTranslation(templateId, translations);
+      return { success: true };
+    }),
 });

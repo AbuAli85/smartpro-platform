@@ -24,6 +24,7 @@ import {
   Activity,
   Clock,
   Languages,
+  Bell,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -67,6 +68,7 @@ export function Sidebar({ className }: SidebarProps) {
     { name: t("nav.referFriends"), href: "/refer", icon: Gift, requiresAuth: true },
     { name: t("nav.analytics"), href: "/analytics", icon: BarChart3, requiresAuth: true },
     { name: t("nav.userProfile"), href: "/profile", icon: User, requiresAuth: true },
+    { name: t("nav.notificationPreferences"), href: "/notifications", icon: Bell, requiresAuth: true },
   ];
 
   // Add admin link if user is admin

@@ -28,18 +28,31 @@ export default function ContentTranslation() {
   const { data: templatesData, isLoading: templatesLoading } = trpc.documentTemplate.list.useQuery({});
   const templates = templatesData?.templates || [];
 
-  // Update office translation mutation (placeholder - will create tRPC mutation)
-  const updateOfficeMutation = {
-    mutate: (data: any) => {
-      // Placeholder for now
-      console.log("Update office translation:", data);
+  // Update office translation mutation
+  const updateOfficeMutation = trpc.sanadOffice.updateTranslation.useMutation({
+    onSuccess: () => {
       toast.success(t("admin.translationUpdated"));
       setSelectedOfficeId(null);
       setOfficeNameAr("");
       setOfficeDescriptionAr("");
     },
-    isPending: false,
-  };
+    onError: (error) => {
+      toast.error(error.message || t("admin.translationError"));
+    },
+  });
+
+  // Update template translation mutation
+  const updateTemplateMutation = trpc.documentTemplate.updateTranslation.useMutation({
+    onSuccess: () => {
+      toast.success(t("admin.translationUpdated"));
+      setSelectedTemplateId(null);
+      setTemplateNameAr("");
+      setTemplateDescriptionAr("");
+    },
+    onError: (error) => {
+      toast.error(error.message || t("admin.translationError"));
+    },
+  });
 
   const handleOfficeSelect = (officeId: number) => {
     const office = offices.find((o: any) => o.id === officeId);
@@ -78,16 +91,11 @@ export default function ContentTranslation() {
       return;
     }
 
-    // Placeholder for now
-    console.log("Update template translation:", {
+    updateTemplateMutation.mutate({
       templateId: selectedTemplateId,
       templateNameAr,
       descriptionAr: templateDescriptionAr,
     });
-    toast.success(t("admin.translationUpdated"));
-    setSelectedTemplateId(null);
-    setTemplateNameAr("");
-    setTemplateDescriptionAr("");
   };
 
   return (

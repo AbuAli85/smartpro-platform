@@ -34,6 +34,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.analytics": "Analytics",
     "nav.userProfile": "User Profile",
     "nav.contentTranslation": "Content Translation",
+    "nav.notificationPreferences": "Notification Preferences",
     
     // Home page
     "home.title": "Everything You Need for Business Services",
@@ -78,6 +79,7 @@ const translations: Record<Language, Record<string, string>> = {
     "admin.enterArabicName": "Enter Arabic name",
     "admin.enterArabicDescription": "Enter Arabic description",
     "admin.translationUpdated": "Translation updated successfully",
+    "admin.translationError": "Failed to update translation",
     "admin.translationUpdateFailed": "Failed to update translation",
     "admin.selectOfficeFirst": "Please select an office first",
     "admin.manageTemplateTranslations": "Manage Template Translations",
@@ -259,6 +261,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.analytics": "التحليلات",
     "nav.userProfile": "الملف الشخصي",
     "nav.contentTranslation": "ترجمة المحتوى",
+    "nav.notificationPreferences": "تفضيلات الإشعارات",
     
     // Home page
     "home.title": "كل ما تحتاجه لخدمات الأعمال",
@@ -303,6 +306,7 @@ const translations: Record<Language, Record<string, string>> = {
     "admin.enterArabicName": "أدخل الاسم بالعربي",
     "admin.enterArabicDescription": "أدخل الوصف بالعربي",
     "admin.translationUpdated": "تم تحديث الترجمة بنجاح",
+    "admin.translationError": "فشل تحديث الترجمة",
     "admin.translationUpdateFailed": "فشل تحديث الترجمة",
     "admin.selectOfficeFirst": "الرجاء اختيار مكتب أولاً",
     "admin.manageTemplateTranslations": "إدارة ترجمات القوالب",
