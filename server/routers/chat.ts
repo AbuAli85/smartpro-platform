@@ -67,6 +67,24 @@ export const chatRouter = router({
       return { count };
     }),
 
+  // Search messages
+  searchMessages: protectedProcedure
+    .input(z.object({
+      query: z.string(),
+      conversationId: z.number().optional(),
+      startDate: z.date().optional(),
+      endDate: z.date().optional(),
+    }))
+    .query(async ({ ctx, input }) => {
+      return await db.searchChatMessages({
+        userId: ctx.user.id,
+        query: input.query,
+        conversationId: input.conversationId,
+        startDate: input.startDate,
+        endDate: input.endDate,
+      });
+    }),
+
   // Mark messages as read
   markAsRead: protectedProcedure
     .input(z.object({

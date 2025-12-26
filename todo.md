@@ -940,3 +940,31 @@
 - [x] Add conversation filtering (active/archived)
 - [x] Add route and navigation for chat inbox
 - [ ] Test inbox functionality for office owners
+
+## Browser Push Notifications for Chat
+- [x] Request notification permission from users
+- [ ] Store notification preferences in user settings
+- [x] Send browser notifications when new messages arrive
+- [x] Add notification click handler to open chat inbox
+- [ ] Show notification badge with unread count
+- [ ] Test notifications across different browsers
+
+## Chat Message Search
+- [x] Add search input to ChatInbox component
+- [x] Create searchMessages backend procedure
+- [x] Implement full-text search across message content
+- [ ] Add search filters (date range, sender)
+- [ ] Highlight search results in conversation
+- [ ] Add search history/recent searches
+- [ ] Test search performance with large message volumes
+
+## Chat Analytics Dashboard
+- [x] Create chat analytics backend procedures
+- [x] Calculate average response time per conversation
+- [x] Track total conversations and resolution rate
+- [x] Identify busiest hours/days for chat activity
+- [x] Build ChatAnalytics page component
+- [x] Display metrics with charts (Chart.js)
+- [x] Add date range filter for analytics
+- [x] Add route and navigation for chat analytics
+- [ ] Test analytics calculations

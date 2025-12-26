@@ -2190,3 +2190,150 @@ export async function markMessagesAsRead(conversationId: number, readerType: "us
       .where(eq(chatConversations.id, conversationId));
   }
 }
+
+// Chat message search
+export async function searchChatMessages(params: {
+  userId: number;
+  query: string;
+  conversationId?: number;
+  startDate?: Date;
+  endDate?: Date;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { chatMessages, chatConversations } = await import("../drizzle/schema");
+  const { userId, query, conversationId, startDate, endDate } = params;
+
+  let conditions: any[] = [
+    like(chatMessages.message, `%${query}%`),
+  ];
+
+  if (conversationId) {
+    conditions.push(eq(chatMessages.conversationId, conversationId));
+  }
+
+  if (startDate) {
+    conditions.push(gte(chatMessages.createdAt, startDate));
+  }
+
+  if (endDate) {
+    conditions.push(lte(chatMessages.createdAt, endDate));
+  }
+
+  // Get conversations where user is the participant
+  const userConversations = await db
+    .select({ id: chatConversations.id })
+    .from(chatConversations)
+    .where(eq(chatConversations.userId, userId));
+
+  const conversationIds = userConversations.map(c => c.id);
+
+  if (conversationIds.length > 0) {
+    // Only search in user's conversations
+    const conversationCondition = or(
+      ...conversationIds.map(id => eq(chatMessages.conversationId, id))
+    );
+    if (conversationCondition) {
+      conditions.push(conversationCondition);
+    }
+  } else {
+    // No conversations, return empty
+    return [];
+  }
+
+  const results = await db
+    .select()
+    .from(chatMessages)
+    .where(and(...conditions))
+    .orderBy(desc(chatMessages.createdAt))
+    .limit(100);
+
+  return results;
+}
+
+// Chat analytics
+export async function getChatAnalytics(params: {
+  officeId?: number;
+  userId?: number;
+  startDate?: Date;
+  endDate?: Date;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { chatConversations, chatMessages } = await import("../drizzle/schema");
+  const { officeId, userId, startDate, endDate } = params;
+
+  let conditions: any[] = [];
+
+  if (officeId) {
+    conditions.push(eq(chatConversations.officeId, officeId));
+  }
+
+  if (userId) {
+    conditions.push(eq(chatConversations.userId, userId));
+  }
+
+  if (startDate) {
+    conditions.push(gte(chatConversations.createdAt, startDate));
+  }
+
+  if (endDate) {
+    conditions.push(lte(chatConversations.createdAt, endDate));
+  }
+
+  // Get total conversations
+  const conversationsResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(chatConversations)
+    .where(conditions.length > 0 ? and(...conditions) : undefined);
+
+  const totalConversations = conversationsResult[0]?.count || 0;
+
+  // Get closed conversations (status = 'closed')
+  const closedResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(chatConversations)
+    .where(
+      conditions.length > 0
+        ? and(...conditions, eq(chatConversations.status, "closed"))
+        : eq(chatConversations.status, "closed")
+    );
+
+  const closedConversations = closedResult[0]?.count || 0;
+
+  // Get average response time (time between user message and next office message)
+  // This is a simplified calculation - in production you'd want more sophisticated logic
+  const avgResponseResult = await db
+    .select({
+      avgMinutes: sql<number>`AVG(TIMESTAMPDIFF(MINUTE, ${chatMessages.createdAt}, 
+        (SELECT MIN(m2.created_at) FROM chat_messages m2 
+         WHERE m2.conversation_id = ${chatMessages.conversationId} 
+         AND m2.sender_type = 'office' 
+         AND m2.created_at > ${chatMessages.createdAt})))`,
+    })
+    .from(chatMessages)
+    .where(eq(chatMessages.senderType, "user"));
+
+  const avgResponseTimeMinutes = avgResponseResult[0]?.avgMinutes || 0;
+
+  // Get busiest hours (messages per hour)
+  const busiestHoursResult = await db
+    .select({
+      hour: sql<number>`HOUR(${chatMessages.createdAt})`,
+      count: sql<number>`count(*)`,
+    })
+    .from(chatMessages)
+    .groupBy(sql`HOUR(${chatMessages.createdAt})`)
+    .orderBy(desc(sql`count(*)`))
+    .limit(24);
+
+  return {
+    totalConversations,
+    closedConversations,
+    resolutionRate: totalConversations > 0 ? (closedConversations / totalConversations) * 100 : 0,
+    avgResponseTimeMinutes: Math.round(avgResponseTimeMinutes),
+    busiestHours: busiestHoursResult,
+  };
+}

@@ -11,6 +11,8 @@ import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
+import { requestNotificationPermission, sendChatNotification, canSendNotifications } from "@/lib/notifications";
+import { useLocation } from "wouter";
 
 interface Message {
   id: number;
@@ -39,20 +41,54 @@ interface Conversation {
 
 export default function ChatInbox() {
   const { user } = useAuth();
+
+  // Request notification permission on mount
+  useEffect(() => {
+    const initNotifications = async () => {
+      const permission = await requestNotificationPermission();
+      setNotificationsEnabled(permission === "granted");
+    };
+    initNotifications();
+  }, []);
   const [selectedConversationId, setSelectedConversationId] = useState<number | null>(null);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [messageSearchQuery, setMessageSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Message[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const [filter, setFilter] = useState<"active" | "archived">("active");
   
   const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [, setLocation] = useLocation();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   // Get user's conversations (for office owners)
   const { data: conversations, refetch: refetchConversations } = trpc.chat.getConversations.useQuery(
     undefined,
     { enabled: !!user }
   );
+
+  // Search messages mutation
+  const searchMessagesMutation = trpc.chat.searchMessages.useQuery(
+    {
+      query: messageSearchQuery,
+      conversationId: selectedConversationId || undefined,
+    },
+    {
+      enabled: messageSearchQuery.length > 0 && !!selectedConversationId,
+    }
+  );
+
+  useEffect(() => {
+    if (searchMessagesMutation.data && messageSearchQuery) {
+      setSearchResults(searchMessagesMutation.data as any);
+      setShowSearchResults(true);
+    } else {
+      setShowSearchResults(false);
+    }
+  }, [searchMessagesMutation.data, messageSearchQuery]);
 
   // Get messages for selected conversation
   const { data: chatMessages, refetch: refetchMessages } = trpc.chat.getMessages.useQuery(
@@ -89,6 +125,16 @@ export default function ChatInbox() {
     });
 
     socket.on("new_message", (data: any) => {
+      // Send browser notification if enabled and message is from another user
+      if (notificationsEnabled && data.userId !== user.id) {
+        sendChatNotification(
+          data.userName || "User",
+          data.message,
+          selectedConversationId,
+          () => setLocation("/owner/chat")
+        );
+      }
+      
       setMessages(prev => [...prev, {
         id: Date.now(),
         senderId: data.userId,
@@ -270,11 +316,51 @@ export default function ChatInbox() {
                       <Archive className="h-5 w-5" />
                     </Button>
                   </div>
+                  
+                  {/* Message Search */}
+                  <div className="relative mt-4">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      value={messageSearchQuery}
+                      onChange={(e) => setMessageSearchQuery(e.target.value)}
+                      placeholder="Search messages in this conversation..."
+                      className="pl-9"
+                    />
+                    {messageSearchQuery && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-7"
+                        onClick={() => setMessageSearchQuery("")}
+                      >
+                        Clear
+                      </Button>
+                    )}
+                  </div>
                 </CardHeader>
 
                 <CardContent className="p-0">
                   <ScrollArea className="h-[480px] p-4">
-                    {messages.length > 0 ? (
+                    {showSearchResults && searchResults.length > 0 ? (
+                      <div className="space-y-2 mb-4">
+                        <p className="text-sm text-muted-foreground">Found {searchResults.length} results</p>
+                        {searchResults.map((msg) => (
+                          <div
+                            key={msg.id}
+                            className="p-3 bg-accent/50 rounded-lg cursor-pointer hover:bg-accent"
+                            onClick={() => {
+                              setMessageSearchQuery("");
+                              // Scroll to message in main list
+                            }}
+                          >
+                            <p className="text-sm">{msg.message}</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {new Date(msg.createdAt).toLocaleString()}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : messages.length > 0 ? (
                       <div className="space-y-4">
                         {messages.map((msg) => (
                           <div
