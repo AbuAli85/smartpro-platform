@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
-import { Building2, MapPin, Phone, Mail, Globe, Star, Calendar, ArrowLeft } from "lucide-react";
+import { Building2, MapPin, Phone, Mail, Globe, Star, Calendar, ArrowLeft, DollarSign, Clock } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { CanonicalURL } from "@/components/CanonicalURL";
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -16,6 +16,11 @@ export default function OfficeProfile() {
 
   const { data: office, isLoading } = trpc.sanadOffice.getBySlug.useQuery({ slug });
   const { data: reviews } = (trpc.booking as any).getOfficeReviews.useQuery(
+    { officeId: office?.id || 0 },
+    { enabled: !!office?.id }
+  );
+
+  const { data: services } = trpc.sanadOffice.getServices.useQuery(
     { officeId: office?.id || 0 },
     { enabled: !!office?.id }
   );
@@ -173,7 +178,43 @@ export default function OfficeProfile() {
                 <CardDescription>Professional business services offered by this office</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Services information will be displayed here</p>
+                {!services || services.length === 0 ? (
+                  <p className="text-muted-foreground text-center py-8">No services listed yet</p>
+                ) : (
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {services.map((service) => (
+                      <Card key={service.id}>
+                        <CardHeader>
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <CardTitle className="text-lg">{service.serviceName}</CardTitle>
+                              <CardDescription>{service.category}</CardDescription>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          {service.description && (
+                            <p className="text-sm text-muted-foreground mb-4">{service.description}</p>
+                          )}
+                          <div className="flex gap-4 text-sm">
+                            <div className="flex items-center gap-1">
+                              <DollarSign className="h-4 w-4 text-muted-foreground" />
+                              <span className="font-semibold">
+                                {service.price ? `${service.price} ${service.currency}` : "Custom Quote"}
+                              </span>
+                            </div>
+                            {service.estimatedDeliveryDays && (
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-4 w-4 text-muted-foreground" />
+                                <span>{service.estimatedDeliveryDays} days</span>
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

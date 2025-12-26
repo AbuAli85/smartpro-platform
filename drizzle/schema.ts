@@ -408,3 +408,54 @@ export const officeAvailability = mysqlTable("office_availability", {
 
 export type OfficeAvailability = typeof officeAvailability.$inferSelect;
 export type InsertOfficeAvailability = typeof officeAvailability.$inferInsert;
+
+// ============================================================================
+// LOYALTY PROGRAM
+// ============================================================================
+
+export const loyaltyPoints = mysqlTable("loyalty_points", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // User reference
+  userId: int("userId").notNull(),
+  
+  // Points tracking
+  totalPoints: int("totalPoints").default(0).notNull(),
+  availablePoints: int("availablePoints").default(0).notNull(),
+  redeemedPoints: int("redeemedPoints").default(0).notNull(),
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  userIdx: index("user_idx").on(table.userId),
+}));
+
+export type LoyaltyPoints = typeof loyaltyPoints.$inferSelect;
+export type InsertLoyaltyPoints = typeof loyaltyPoints.$inferInsert;
+
+export const loyaltyTransactions = mysqlTable("loyalty_transactions", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // User reference
+  userId: int("userId").notNull(),
+  
+  // Transaction details
+  type: mysqlEnum("type", ["earn", "redeem"]).notNull(),
+  points: int("points").notNull(),
+  reason: varchar("reason", { length: 255 }).notNull(),
+  
+  // Related entities
+  bookingId: int("bookingId"),
+  reviewId: int("reviewId"),
+  referralId: int("referralId"),
+  
+  // Audit
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  userIdx: index("user_idx").on(table.userId),
+  typeIdx: index("type_idx").on(table.type),
+}));
+
+export type LoyaltyTransaction = typeof loyaltyTransactions.$inferSelect;
+export type InsertLoyaltyTransaction = typeof loyaltyTransactions.$inferInsert;

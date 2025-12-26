@@ -529,7 +529,7 @@
 - [x] Add service selection to booking flow
 
 ## Customer Loyalty Program
-- [ ] Create loyalty_points table in schema
+- [x] Create loyalty_points table in schema
 - [ ] Add points tracking backend procedures
 - [ ] Create points earning rules (bookings, reviews, referrals)
 - [ ] Build rewards redemption system
@@ -544,4 +544,28 @@
 - [ ] Add color-coded status indicators
 - [ ] Implement drag-and-drop rescheduling
 - [ ] Add quick action buttons (cancel, reschedule)
+- [ ] Integrate calendar into My Bookings page
+
+## Display Services on Office Profile
+- [x] Add services section to OfficeProfile page
+- [x] Display service cards with pricing and delivery time
+- [ ] Add service selection to booking form
+- [ ] Update booking flow to include selected service
+
+## Customer Loyalty Program Implementation
+- [x] Create loyalty_points table in database schema
+- [ ] Add points tracking backend procedures
+- [ ] Implement points earning on booking completion
+- [ ] Implement points earning on review submission
+- [ ] Create referral tracking system
+- [ ] Build LoyaltyDashboard component
+- [ ] Display points balance in user profile
+- [ ] Add discount redemption to booking flow
+
+## Booking Calendar View Implementation
+- [ ] Create BookingCalendar component
+- [ ] Implement month/week view switching
+- [ ] Add color-coded status indicators
+- [ ] Display booking details on calendar
+- [ ] Add quick action buttons
 - [ ] Integrate calendar into My Bookings page
