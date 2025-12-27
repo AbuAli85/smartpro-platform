@@ -40,7 +40,7 @@ export default function Home() {
                 <RegionSelector value={region} onChange={setRegion} className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2" />
               </div>
               <Badge className="mb-6 bg-white/20 text-white border-white/30 hover:bg-white/30">
-                🚀 The Future of Business Services
+                🚀 {t("home.hero.badge")}
               </Badge>
               
               <h1 className="text-5xl font-bold tracking-tight text-white sm:text-7xl mb-6">
@@ -66,7 +66,7 @@ export default function Home() {
                       variant="outline" 
                       className="bg-transparent text-white border-white/30 hover:bg-white/10 w-full sm:w-auto"
                     >
-                      <Link href="/register-office">Register Your Office</Link>
+                      <Link href="/register-office">{t("home.hero.registerOffice")}</Link>
                     </Button>
                   </>
                 ) : (
@@ -258,12 +258,12 @@ export default function Home() {
         <section className="py-20 lg:py-32">
           <div className="container">
             <div className="mx-auto max-w-2xl text-center mb-16">
-              <Badge className="mb-4">Simple Process</Badge>
+              <Badge className="mb-4">{t("home.how.badge")}</Badge>
               <h2 className="text-4xl font-bold tracking-tight">
-                How It Works
+                {t("home.how.title")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Get your business services done in 3 easy steps
+                {t("home.how.subtitle")}
               </p>
             </div>
 
@@ -273,9 +273,9 @@ export default function Home() {
                   <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
                     <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">1</span>
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">Browse & Compare</h3>
+                  <h3 className="text-xl font-semibold mb-2">{t("home.how.step1.title")}</h3>
                   <p className="text-muted-foreground">
-                    Search for services, compare prices, and read reviews from verified customers
+                    {t("home.how.step1.desc")}
                   </p>
                 </div>
                 <div className="hidden md:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-blue-200 to-transparent dark:from-blue-800" />
@@ -286,9 +286,9 @@ export default function Home() {
                   <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
                     <span className="text-2xl font-bold text-green-600 dark:text-green-400">2</span>
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">Book & Pay</h3>
+                  <h3 className="text-xl font-semibold mb-2">{t("home.how.step2.title")}</h3>
                   <p className="text-muted-foreground">
-                    Select your preferred office, choose a time slot, and make secure payment online
+                    {t("home.how.step2.desc")}
                   </p>
                 </div>
                 <div className="hidden md:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-green-200 to-transparent dark:from-green-800" />
@@ -299,9 +299,9 @@ export default function Home() {
                   <div className="w-16 h-16 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-4">
                     <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">3</span>
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">Track & Receive</h3>
+                  <h3 className="text-xl font-semibold mb-2">{t("home.how.step3.title")}</h3>
                   <p className="text-muted-foreground">
-                    Monitor progress in real-time and receive your completed documents digitally
+                    {t("home.how.step3.desc")}
                   </p>
                 </div>
               </div>
@@ -314,35 +314,34 @@ export default function Home() {
           <div className="container">
             <div className="mx-auto max-w-3xl text-center">
               <h2 className="text-4xl font-bold tracking-tight text-white mb-6">
-                Are You a Sanad Office?
+                {t("home.cta.title")}
               </h2>
               <p className="text-xl text-blue-100 mb-8">
-                Join SmartPro platform and connect with thousands of SMEs looking for your services. 
-                Grow your business with our digital marketplace.
+                {t("home.cta.subtitle")}
               </p>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
                 <div className="flex items-center gap-2 text-white">
                   <CheckCircle2 className="h-5 w-5 text-green-400" />
-                  <span>Free Registration</span>
+                  <span>{t("home.cta.benefit1")}</span>
                 </div>
                 <div className="flex items-center gap-2 text-white">
                   <CheckCircle2 className="h-5 w-5 text-green-400" />
-                  <span>More Clients</span>
+                  <span>{t("home.cta.benefit2")}</span>
                 </div>
                 <div className="flex items-center gap-2 text-white">
                   <CheckCircle2 className="h-5 w-5 text-green-400" />
-                  <span>Digital Tools</span>
+                  <span>{t("home.cta.benefit3")}</span>
                 </div>
                 <div className="flex items-center gap-2 text-white">
                   <CheckCircle2 className="h-5 w-5 text-green-400" />
-                  <span>24/7 Support</span>
+                  <span>{t("home.cta.benefit4")}</span>
                 </div>
               </div>
 
               <Button asChild size="lg" className="bg-white text-[#003366] hover:bg-blue-50">
                 <Link href="/register-office">
-                  Register Your Office Now
+                  {t("home.cta.button")}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
@@ -357,42 +356,42 @@ export default function Home() {
               <div>
                 <h3 className="font-bold text-lg mb-4">SmartPro</h3>
                 <p className="text-sm text-slate-400">
-                  The unified platform for business services in Oman
+                  {t("home.footer.tagline")}
                 </p>
               </div>
               
               <div>
-                <h4 className="font-semibold mb-4">For Customers</h4>
+                <h4 className="font-semibold mb-4">{t("home.footer.forCustomers")}</h4>
                 <ul className="space-y-2 text-sm text-slate-400">
-                  <li><Link href="/offices" className="hover:text-white transition-colors">Browse Offices</Link></li>
-                  <li><Link href="/templates" className="hover:text-white transition-colors">Document Templates</Link></li>
-                  <li><Link href="/marketplace" className="hover:text-white transition-colors">Service Marketplace</Link></li>
-                  <li><Link href="/loyalty" className="hover:text-white transition-colors">Loyalty Program</Link></li>
+                  <li><Link href="/offices" className="hover:text-white transition-colors">{t("home.footer.browseOffices")}</Link></li>
+                  <li><Link href="/templates" className="hover:text-white transition-colors">{t("home.footer.documentTemplates")}</Link></li>
+                  <li><Link href="/marketplace" className="hover:text-white transition-colors">{t("home.footer.serviceMarketplace")}</Link></li>
+                  <li><Link href="/loyalty" className="hover:text-white transition-colors">{t("home.footer.loyaltyProgram")}</Link></li>
                 </ul>
               </div>
               
               <div>
-                <h4 className="font-semibold mb-4">For Offices</h4>
+                <h4 className="font-semibold mb-4">{t("home.footer.forOffices")}</h4>
                 <ul className="space-y-2 text-sm text-slate-400">
-                  <li><Link href="/register-office" className="hover:text-white transition-colors">Register Office</Link></li>
-                  <li><Link href="/my-offices" className="hover:text-white transition-colors">Manage Office</Link></li>
-                  <li><Link href="/owner/dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
-                  <li><Link href="/owner/chat" className="hover:text-white transition-colors">Chat Inbox</Link></li>
+                  <li><Link href="/register-office" className="hover:text-white transition-colors">{t("home.footer.registerOffice")}</Link></li>
+                  <li><Link href="/my-offices" className="hover:text-white transition-colors">{t("home.footer.manageOffice")}</Link></li>
+                  <li><Link href="/owner/dashboard" className="hover:text-white transition-colors">{t("home.footer.dashboard")}</Link></li>
+                  <li><Link href="/owner/chat" className="hover:text-white transition-colors">{t("home.footer.chatInbox")}</Link></li>
                 </ul>
               </div>
               
               <div>
-                <h4 className="font-semibold mb-4">Support</h4>
+                <h4 className="font-semibold mb-4">{t("home.footer.support")}</h4>
                 <ul className="space-y-2 text-sm text-slate-400">
-                  <li><Link href="/profile" className="hover:text-white transition-colors">My Account</Link></li>
-                  <li><Link href="/notifications" className="hover:text-white transition-colors">Notifications</Link></li>
-                  <li><a href="mailto:support@smartpro.om" className="hover:text-white transition-colors">Contact Us</a></li>
+                  <li><Link href="/profile" className="hover:text-white transition-colors">{t("home.footer.myAccount")}</Link></li>
+                  <li><Link href="/notifications" className="hover:text-white transition-colors">{t("home.footer.notifications")}</Link></li>
+                  <li><a href="mailto:support@smartpro.om" className="hover:text-white transition-colors">{t("home.footer.contactUs")}</a></li>
                 </ul>
               </div>
             </div>
             
             <div className="border-t border-slate-800 mt-8 pt-8 text-center text-sm text-slate-400">
-              <p>© 2025 SmartPro. All rights reserved.</p>
+              <p>{t("home.footer.copyright")}</p>
             </div>
           </div>
         </footer>
