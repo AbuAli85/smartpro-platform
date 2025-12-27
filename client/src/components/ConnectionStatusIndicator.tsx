@@ -1,9 +1,11 @@
 import { useSocket } from "@/contexts/SocketContext";
 import { Wifi, WifiOff } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export function ConnectionStatusIndicator() {
   const { isConnected } = useSocket();
+  const { t } = useLanguage();
 
   return (
     <div
@@ -18,12 +20,12 @@ export function ConnectionStatusIndicator() {
       {isConnected ? (
         <>
           <Wifi className="h-3 w-3" />
-          <span>Connected</span>
+          <span>{t("common.connected")}</span>
         </>
       ) : (
         <>
           <WifiOff className="h-3 w-3" />
-          <span>Offline</span>
+          <span>{t("common.offline")}</span>
         </>
       )}
     </div>

@@ -53,6 +53,13 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.translatorTraining": "Translator Training",
     
     // Home page
+    "home.hero.title": "Everything You Need for Business Services",
+    "home.hero.subtitle": "A unified platform connecting SMEs with professional Sanad offices. Get your business licenses, permits, and registrations done faster.",
+    "home.hero.myBookings": "My Bookings",
+    "home.hero.browseServices": "Browse Services",
+    "home.stats.avgRating": "Average Rating",
+    "home.stats.servicesCompleted": "Services Completed",
+    "home.stats.verifiedOffices": "Verified Offices",
     "home.title": "Everything You Need for Business Services",
     "home.subtitle": "A unified platform connecting SMEs with professional Sanad offices",
     "home.templates": "Document Templates",
@@ -187,6 +194,8 @@ const translations: Record<Language, Record<string, string>> = {
     "common.apply": "Apply",
     "common.reset": "Reset",
     "common.clear": "Clear",
+    "common.connected": "Connected",
+    "common.offline": "Offline",
     
     // Offices
     "offices.title": "Sanad Offices",
@@ -361,6 +370,13 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.translatorTraining": "تدريب المترجمين",
     
     // Home page
+    "home.hero.title": "كل ما تحتاجه لخدمات الأعمال",
+    "home.hero.subtitle": "منصة موحدة تربط الشركات الصغيرة والمتوسطة بمكاتب سند المهنية. احصل على تراخيص عملك وتصاريحك وتسجيلاتك بشكل أسرع.",
+    "home.hero.myBookings": "حجوزاتي",
+    "home.hero.browseServices": "تصفح الخدمات",
+    "home.stats.avgRating": "متوسط التقييم",
+    "home.stats.servicesCompleted": "الخدمات المكتملة",
+    "home.stats.verifiedOffices": "المكاتب الموثقة",
     "home.title": "كل ما تحتاجه لخدمات الأعمال",
     "home.subtitle": "منصة موحدة تربط الشركات الصغيرة والمتوسطة بمكاتب سند المهنية",
     "home.templates": "قوالب المستندات",
@@ -446,6 +462,8 @@ const translations: Record<Language, Record<string, string>> = {
     "admin.completionStatus": "حالة الإكمال",
     "admin.suggestions": "اقتراحات",
     "common.saving": "جاري الحفظ...",
+    "common.connected": "متصل",
+    "common.offline": "غير متصل",
     "home.government": "متكامل حكوميًا",
     "home.governmentDesc": "تكامل مباشر مع وزارة التجارة والصناعة ووزارة العمل وشرطة عمان للتحقق السلس والامتثال",
     "home.booking": "حجز خدمة",

@@ -1,6 +1,24 @@
 # SmartPro Platform - Feature Tracking
 
-## 🚀 Current Sprint - Office Management Enhancements
+## 🚀 Current Sprint - Translation Completion
+
+### Homepage Hero Translation
+- [x] Add homepage hero translation keys (title, subtitle, CTAs)
+- [x] Add stats labels translation keys (average rating, services completed, verified offices)
+- [x] Add feature section translation keys (existing translations sufficient)
+- [x] Add footer translation keys (existing translations sufficient)
+- [x] Update Home.tsx component with useLanguage hook
+- [x] Test language switching on homepage
+- [x] Verify RTL layout for all new translations
+
+### Connection Status Translation
+- [x] Add connection status translation keys (connected, offline)
+- [x] Update ConnectionStatusIndicator with translations
+- [x] Test connection status in both languages
+
+---
+
+## 🚀 Previous Sprint - Office Management Enhancements
 
 ### Multi-Document Upload Enhancement
 - [x] Enhance DocumentUpload component to support multiple file uploads

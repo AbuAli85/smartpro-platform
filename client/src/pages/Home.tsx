@@ -34,12 +34,11 @@ export default function Home() {
               </Badge>
               
               <h1 className="text-5xl font-bold tracking-tight text-white sm:text-7xl mb-6">
-                Everything You Need for <span className="text-blue-200">Business Services</span>
+                {t("home.hero.title")}
               </h1>
               
               <p className="mt-6 text-xl leading-8 text-blue-100 max-w-2xl mx-auto">
-                A unified platform connecting SMEs with professional Sanad offices. 
-                Get your business licenses, permits, and registrations done faster.
+                {t("home.hero.subtitle")}
               </p>
               
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -47,7 +46,7 @@ export default function Home() {
                   <>
                     <Button asChild size="lg" className="bg-white text-[#003366] hover:bg-blue-50 w-full sm:w-auto">
                       <Link href="/offices">
-                        Browse Offices
+                        {t("home.browseOffices")}
                         <ArrowRight className="ml-2 h-5 w-5" />
                       </Link>
                     </Button>
@@ -64,7 +63,7 @@ export default function Home() {
                   <>
                     <Button asChild size="lg" className="bg-white text-[#003366] hover:bg-blue-50 w-full sm:w-auto">
                       <Link href="/bookings">
-                        My Bookings
+                        {t("home.hero.myBookings")}
                         <ArrowRight className="ml-2 h-5 w-5" />
                       </Link>
                     </Button>
@@ -74,7 +73,7 @@ export default function Home() {
                       variant="outline" 
                       className="bg-transparent text-white border-white/30 hover:bg-white/10 w-full sm:w-auto"
                     >
-                      <Link href="/offices">Browse Services</Link>
+                      <Link href="/offices">{t("home.hero.browseServices")}</Link>
                     </Button>
                   </>
                 )}
@@ -84,15 +83,15 @@ export default function Home() {
               <div className="mt-16 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
                 <div className="text-center">
                   <div className="text-4xl font-bold text-white">500+</div>
-                  <div className="text-sm text-blue-200 mt-1">Verified Offices</div>
+                  <div className="text-sm text-blue-200 mt-1">{t("home.stats.verifiedOffices")}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-4xl font-bold text-white">10K+</div>
-                  <div className="text-sm text-blue-200 mt-1">Services Completed</div>
+                  <div className="text-sm text-blue-200 mt-1">{t("home.stats.servicesCompleted")}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-4xl font-bold text-white">4.9★</div>
-                  <div className="text-sm text-blue-200 mt-1">Average Rating</div>
+                  <div className="text-sm text-blue-200 mt-1">{t("home.stats.avgRating")}</div>
                 </div>
               </div>
             </div>
