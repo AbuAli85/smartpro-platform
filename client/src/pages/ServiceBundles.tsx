@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ export default function ServiceBundles() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedBundle, setSelectedBundle] = useState<any>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; bundleId: number | null }>({ open: false, bundleId: null });
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -214,9 +216,13 @@ export default function ServiceBundles() {
 
   const handleDelete = (bundleId: number) => {
     if (!officeId) return;
-    if (confirm("Are you sure you want to delete this bundle?")) {
-      deleteMutation.mutate({ bundleId, officeId });
-    }
+    setDeleteConfirm({ open: true, bundleId });
+  };
+
+  const confirmDelete = () => {
+    if (!officeId || !deleteConfirm.bundleId) return;
+    deleteMutation.mutate({ bundleId: deleteConfirm.bundleId, officeId });
+    setDeleteConfirm({ open: false, bundleId: null });
   };
 
   const handleToggleActive = (bundle: any) => {
@@ -604,6 +610,18 @@ export default function ServiceBundles() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteConfirm.open}
+        onOpenChange={(open) => setDeleteConfirm({ open, bundleId: null })}
+        onConfirm={confirmDelete}
+        title="Delete Service Bundle?"
+        description="This will permanently delete this bundle. Customers will no longer be able to purchase it. This action cannot be undone."
+        confirmText="Delete Bundle"
+        variant="danger"
+        loading={deleteMutation.isPending}
+      />
     </div>
   );
 }

@@ -348,3 +348,33 @@
 - [ ] Fix data display inconsistencies
 - [ ] Fix responsive layout issues
 - [ ] Fix accessibility issues
+
+
+## 🛡️ Safety, Mobile & Security Improvements
+
+### Confirmation Dialogs
+- [x] Create reusable ConfirmDialog component
+- [ ] Add confirmation for office deletion
+- [x] Add confirmation for booking cancellation (CancellationDialog exists)
+- [x] Add confirmation for verification rejection (RejectDialog exists)
+- [ ] Add confirmation for staff removal
+- [x] Add confirmation for service bundle deletion
+- [ ] Add confirmation for account deletion
+
+### Mobile Navigation
+- [x] Implement hamburger menu for mobile (already exists in Sidebar)
+- [x] Create bottom navigation bar for mobile
+- [ ] Add swipe gestures for sidebar
+- [x] Optimize touch targets for mobile (64px min-width)
+- [ ] Test on various screen sizes
+- [ ] Improve mobile form layouts
+
+### Rate Limiting
+- [x] Install express-rate-limit package
+- [x] Add rate limiting to login endpoint
+- [x] Add rate limiting to registration endpoint
+- [x] Add rate limiting to password reset
+- [x] Add rate limiting to all tRPC endpoints
+- [x] Configure different limits for different endpoints
+- [x] Add rate limit headers to responses
+- [ ] Log rate limit violations
