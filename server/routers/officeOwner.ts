@@ -428,7 +428,7 @@ export const officeOwnerRouter = router({
   updateOfficeAvailability: protectedProcedure
     .input(z.object({
       officeId: z.number(),
-      workingHours: z.record(z.object({
+      workingHours: z.record(z.string(), z.object({
         enabled: z.boolean(),
         start: z.string(),
         end: z.string(),

@@ -429,7 +429,7 @@ export default function OnboardingWizard() {
                   Previous
                 </Button>
                 <Button 
-                  onClick={handleStep3Submit}
+                  onClick={handleStep2Submit}
                   disabled={updateAvailabilityMutation.isPending}
                 >
                   {updateAvailabilityMutation.isPending ? "Saving..." : "Next"}
@@ -439,8 +439,8 @@ export default function OnboardingWizard() {
             </div>
           )}
 
-          {/* Step 4: Launch */}
-          {currentStep === 4 && (
+          {/* Step 3: Launch */}
+          {currentStep === 3 && (
             <div className="space-y-6">
               <div className="text-center py-8">
                 <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">

@@ -2846,3 +2846,36 @@ The booking form already includes:
 - [x] Update vite.config.ts with proper HMR settings (clientPort: 443, protocol: wss)
 - [x] Restart dev server to apply changes
 - [ ] Test hot reload functionality after fix
+
+
+## IMPLEMENTATION: Document Upload for Office Verification (Dec 27, 2025)
+- [x] Add document fields to sanadOffices schema (licenseDocumentUrl, certificateUrls, permitUrls)
+- [x] Create DocumentUpload reusable component
+- [x] Create storage tRPC router with uploadFile procedure
+- [x] Implement S3 file upload with storagePut
+- [x] Support multiple file types (PDF, images)
+- [x] Add file size validation (configurable max size)
+- [x] Show upload progress indicator
+- [ ] Integrate DocumentUpload into OfficeRegistration form
+- [ ] Store document URLs in database during registration
+- [ ] Add document preview in admin verification interface
+
+## IMPLEMENTATION: Office Analytics Dashboard (Dec 27, 2025)
+- [ ] Create OfficeAnalytics page component
+- [ ] Add booking trends chart (daily/weekly/monthly)
+- [ ] Show revenue statistics with totals
+- [ ] Display popular services ranking
+- [ ] Add customer ratings overview
+- [ ] Show performance comparison with similar offices
+- [ ] Add date range filter
+- [ ] Create analytics tRPC procedures
+
+## IMPLEMENTATION: Service Catalog Management (Dec 27, 2025)
+- [ ] Create ServiceCatalog page for office owners
+- [ ] Add CreateServiceDialog component
+- [ ] Implement service CRUD operations
+- [ ] Add pricing tiers configuration
+- [ ] Add delivery time settings
+- [ ] Add custom requirements fields
+- [ ] Fix sanadOfficeServices schema structure
+- [ ] Add service activation/deactivation toggle

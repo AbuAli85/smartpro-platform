@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "5d63ddf0-569e-4b2e-8373-c21515067aa0",
-  "prevId": "ee3995a9-667b-4388-a93b-5bf63117fe7a",
+  "id": "646e71f0-971d-4fd5-92fc-4d61a40f1479",
+  "prevId": "5d63ddf0-569e-4b2e-8373-c21515067aa0",
   "tables": {
     "activity_log": {
       "name": "activity_log",
@@ -3330,6 +3330,27 @@
         },
         "images": {
           "name": "images",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "licenseDocumentUrl": {
+          "name": "licenseDocumentUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "certificateUrls": {
+          "name": "certificateUrls",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "permitUrls": {
+          "name": "permitUrls",
           "type": "json",
           "primaryKey": false,
           "notNull": false,

@@ -37,6 +37,7 @@ import { analyticsExportRouter } from "./routers/analyticsExport";
 import { translatorTrainingRouter } from "./routers/translatorTraining";
 import { serviceMarketplaceRouter } from "./routers/serviceMarketplace";
 import { serviceBundleRouter } from "./routers/serviceBundle";
+import { storageRouter } from "./routers/storage";
 
 export const appRouter = router({
   system: systemRouter,
@@ -132,6 +133,7 @@ export const appRouter = router({
   translatorTraining: translatorTrainingRouter,
   serviceMarketplace: serviceMarketplaceRouter,
   serviceBundle: serviceBundleRouter,
+  storage: storageRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -99,6 +99,11 @@ export const sanadOffices = mysqlTable("sanad_offices", {
   coverImageUrl: text("coverImageUrl"),
   images: json("images").$type<string[]>(),
   
+  // Verification Documents
+  licenseDocumentUrl: text("licenseDocumentUrl"),
+  certificateUrls: json("certificateUrls").$type<string[]>(),
+  permitUrls: json("permitUrls").$type<string[]>(),
+  
   // Analytics
   totalOrders: int("totalOrders").default(0).notNull(),
   completedOrders: int("completedOrders").default(0).notNull(),

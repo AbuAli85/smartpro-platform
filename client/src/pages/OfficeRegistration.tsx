@@ -38,8 +38,11 @@ export default function OfficeRegistration() {
     email: "",
     website: "",
     
-    // Step 3: Services
+    // Step 3: Services & Documents
     selectedServices: [] as string[],
+    licenseDocumentUrl: "",
+    certificateUrls: [] as string[],
+    permitUrls: [] as string[],
     termsAccepted: false,
   });
 
