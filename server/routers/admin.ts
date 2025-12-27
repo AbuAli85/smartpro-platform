@@ -222,4 +222,43 @@ export const adminRouter = router({
 
       return { success: true };
     }),
+
+  // Get regional statistics
+  getRegionalStatistics: adminProcedure.query(async () => {  
+    // Get office distribution by region
+    const officesByRegion = await db.getOfficeCountByGovernorate();
+    const totalOffices = officesByRegion.reduce((sum, item) => sum + item.count, 0);
+
+    // Get booking statistics by region
+    const bookingsByRegion = await db.getBookingCountByGovernorate();
+    const totalBookings = bookingsByRegion.reduce((sum, item) => sum + item.count, 0);
+    const totalRevenue = bookingsByRegion.reduce((sum, item) => sum + (item.revenue || 0), 0);
+
+    // Find top region by bookings
+    const topRegion = bookingsByRegion.length > 0 
+      ? bookingsByRegion.reduce((max, item) => item.count > max.count ? item : max).governorate
+      : "Muscat";
+
+    // Get service demand by region
+    const servicesByRegion = await db.getServiceDemandByGovernorate();
+
+    // Identify underserved areas (regions with fewer than 5 offices)
+    const underservedAreas = officesByRegion
+      .filter(item => item.count < 5)
+      .map(item => ({
+        governorate: item.governorate,
+        officeCount: item.count,
+      }));
+
+    return {
+      totalOffices,
+      totalBookings,
+      totalRevenue,
+      topRegion,
+      officesByRegion,
+      bookingsByRegion,
+      servicesByRegion,
+      underservedAreas,
+    };
+  }),
 });

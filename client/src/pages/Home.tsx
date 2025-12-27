@@ -13,6 +13,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useRegionalContent } from "@/hooks/useRegionalContent";
 import { RegionSelector } from "@/components/RegionSelector";
+import { FeaturedRegionalServices } from "@/components/FeaturedRegionalServices";
 
 export default function Home() {
   const { t } = useLanguage();
@@ -241,6 +242,9 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Featured Regional Services */}
+        <FeaturedRegionalServices />
 
         {/* How It Works Section */}
         <section className="py-20 lg:py-32">

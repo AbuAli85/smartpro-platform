@@ -36,6 +36,7 @@ import FollowUpSettings from "./pages/FollowUpSettings";
 import ContentTranslation from "./pages/ContentTranslation";
 import TranslationRequestQueue from "./pages/TranslationRequestQueue";
 import TranslationAnalytics from "./pages/TranslationAnalytics";
+import RegionalStatistics from "./pages/RegionalStatistics";
 import TranslationQualityDashboard from "./pages/TranslationQualityDashboard";
 import ReviewQueue from "./pages/ReviewQueue";
 import SmartBatchProcessing from "./pages/SmartBatchProcessing";
@@ -98,6 +99,7 @@ function Router() {
       <Route path="/admin/analytics" component={AdminAnalytics} />
       <Route path="/admin/translation-requests" component={TranslationRequestQueue} />
       <Route path="/admin/translation-analytics" component={TranslationAnalytics} />
+      <Route path="/admin/regional-statistics" component={RegionalStatistics} />
       <Route path="/admin/translation-quality" component={TranslationQualityDashboard} />
       <Route path="/admin/review-queue" component={ReviewQueue} />
       <Route path="/admin/batch-processing" component={SmartBatchProcessing} />

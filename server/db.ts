@@ -5270,3 +5270,63 @@ export async function removePushSubscription(userId: number, endpoint: string) {
   console.log('Removing push subscription for user:', userId, endpoint);
   return { success: true };
 }
+
+
+// ============================================================================
+// REGIONAL STATISTICS
+// ============================================================================
+
+export async function getOfficeCountByGovernorate() {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db
+    .select({
+      governorate: sanadOffices.governorate,
+      count: sql<number>`count(*)`,
+    })
+    .from(sanadOffices)
+    .where(eq(sanadOffices.status, "active"))
+    .groupBy(sanadOffices.governorate)
+    .orderBy(desc(sql`count(*)`));
+  
+  return result;
+}
+
+export async function getBookingCountByGovernorate() {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db
+    .select({
+      governorate: sanadOffices.governorate,
+      count: sql<number>`count(*)`,
+      revenue: sql<number>`sum(${bookings.price})`,
+    })
+    .from(bookings)
+    .innerJoin(sanadOffices, eq(bookings.officeId, sanadOffices.id))
+    .groupBy(sanadOffices.governorate)
+    .orderBy(desc(sql`count(*)`));
+  
+  return result;
+}
+
+export async function getServiceDemandByGovernorate() {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db
+    .select({
+      governorate: sanadOffices.governorate,
+      serviceName: sanadOfficeServices.serviceName,
+      count: sql<number>`count(*)`,
+    })
+    .from(bookings)
+    .innerJoin(sanadOffices, eq(bookings.officeId, sanadOffices.id))
+    .innerJoin(sanadOfficeServices, eq(bookings.serviceId, sanadOfficeServices.id))
+    .groupBy(sanadOffices.governorate, sanadOfficeServices.serviceName)
+    .orderBy(desc(sql`count(*)`))
+    .limit(50);
+  
+  return result;
+}

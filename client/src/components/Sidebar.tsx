@@ -20,6 +20,7 @@ import {
   MessageCircle,
   TrendingUp,
   MessageSquareText,
+  MapPin,
   Users,
   Activity,
   Clock,
@@ -153,6 +154,7 @@ export function Sidebar({ className }: SidebarProps) {
     navigation.push({ name: t("nav.contentTranslation"), href: "/admin/translations", icon: Languages, requiresAuth: true });
     navigation.push({ name: t("nav.translationRequests"), href: "/admin/translation-requests", icon: MessageSquareText, requiresAuth: true });
     navigation.push({ name: t("nav.translationAnalytics"), href: "/admin/translation-analytics", icon: TrendingUp, requiresAuth: true });
+    navigation.push({ name: t("nav.regionalStatistics"), href: "/admin/regional-statistics", icon: MapPin, requiresAuth: true });
     navigation.push({ name: t("nav.translationQuality"), href: "/admin/translation-quality", icon: Activity, requiresAuth: true });
     navigation.push({ name: t("nav.reviewQueue"), href: "/admin/review-queue", icon: MessageSquareText, requiresAuth: true });
     navigation.push({ name: t("nav.batchProcessing"), href: "/admin/batch-processing", icon: Zap, requiresAuth: true });
