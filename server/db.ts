@@ -617,7 +617,8 @@ export async function getAvailableTimeSlots(officeId: number, date: Date) {
   const db = await getDb();
   if (!db) return [];
   
-  const dayOfWeek = date.getDay();
+  // Use UTC to avoid timezone issues
+  const dayOfWeek = date.getUTCDay();
   
   // Get office availability for this day
   const availability = await db
