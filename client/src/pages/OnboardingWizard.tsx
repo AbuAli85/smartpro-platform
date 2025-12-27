@@ -10,9 +10,11 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { 
   CheckCircle, Building2, DollarSign, Calendar, 
-  Rocket, ArrowRight, ArrowLeft, Upload 
+  Rocket, ArrowRight, ArrowLeft, Upload, Eye 
 } from "lucide-react";
 import { useLocation } from "wouter";
+import DocumentUpload from "@/components/DocumentUpload";
+import OfficePreview from "@/components/OfficePreview";
 
 const STEPS = [
   { id: 1, title: "Office Profile", icon: Building2, description: "Complete your office information" },
@@ -24,6 +26,7 @@ export default function OnboardingWizard() {
   const [, setLocation] = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const [isComplete, setIsComplete] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   // Step 1: Office Profile
   const [logoUrl, setLogoUrl] = useState("");
@@ -232,41 +235,23 @@ export default function OnboardingWizard() {
           {/* Step 1: Office Profile */}
           {currentStep === 1 && (
             <div className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="logoUrl">Office Logo URL (Optional)</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="logoUrl"
-                    placeholder="https://example.com/logo.png"
-                    value={logoUrl}
-                    onChange={(e) => setLogoUrl(e.target.value)}
-                  />
-                  <Button variant="outline" size="icon">
-                    <Upload className="h-4 w-4" />
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Upload a professional logo for your office
-                </p>
-              </div>
+              <DocumentUpload
+                label="Office Logo (Optional)"
+                accept=".png,.jpg,.jpeg,.svg"
+                maxSizeMB={2}
+                onUploadComplete={(url) => setLogoUrl(url)}
+                currentUrl={logoUrl}
+                onRemove={() => setLogoUrl("")}
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="coverUrl">Cover Image URL (Optional)</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="coverUrl"
-                    placeholder="https://example.com/cover.jpg"
-                    value={coverUrl}
-                    onChange={(e) => setCoverUrl(e.target.value)}
-                  />
-                  <Button variant="outline" size="icon">
-                    <Upload className="h-4 w-4" />
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Add a cover image to make your profile stand out
-                </p>
-              </div>
+              <DocumentUpload
+                label="Cover Image (Optional)"
+                accept=".png,.jpg,.jpeg"
+                maxSizeMB={5}
+                onUploadComplete={(url) => setCoverUrl(url)}
+                currentUrl={coverUrl}
+                onRemove={() => setCoverUrl("")}
+              />
 
               <div className="space-y-2">
                 <Label htmlFor="tagline">Tagline *</Label>
@@ -298,10 +283,20 @@ export default function OnboardingWizard() {
               </div>
 
               <div className="flex justify-between pt-4">
-                <Button variant="outline" disabled>
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Previous
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" disabled>
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Previous
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => setShowPreview(true)}
+                    disabled={!office}
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    Preview Profile
+                  </Button>
+                </div>
                 <Button 
                   onClick={handleStep1Submit}
                   disabled={!tagline || !fullDescription || updateProfileMutation.isPending}
@@ -499,6 +494,28 @@ export default function OnboardingWizard() {
           Skip for now, I'll complete this later
         </Button>
       </div>
+
+      {/* Office Preview Dialog */}
+      {office && (
+        <OfficePreview
+          open={showPreview}
+          onOpenChange={setShowPreview}
+          office={{
+            name: office.officeName,
+            logoUrl: logoUrl || office.logoUrl || undefined,
+            coverImageUrl: coverUrl || office.coverImageUrl || undefined,
+            description: fullDescription || office.description || undefined,
+            governorate: office.governorate,
+            wilayat: office.wilayat,
+            phone: office.phone,
+            email: office.email,
+            website: office.website || undefined,
+            averageRating: parseFloat(office.averageRating),
+            totalReviews: office.totalReviews,
+            workingHours: workingHours,
+          }}
+        />
+      )}
     </div>
   );
 }

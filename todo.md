@@ -2879,3 +2879,15 @@ The booking form already includes:
 - [ ] Add custom requirements fields
 - [ ] Fix sanadOfficeServices schema structure
 - [ ] Add service activation/deactivation toggle
+
+
+## IMPLEMENTATION: Onboarding Wizard Polish (Dec 27, 2025)
+- [x] Verify and fix any remaining TypeScript errors
+- [x] Replace logo URL input with DocumentUpload component
+- [x] Replace cover image URL input with DocumentUpload component
+- [x] Add office profile preview dialog (OfficePreview component)
+- [x] Show preview with uploaded logo and cover
+- [x] Display office information as customers will see it
+- [x] Add "Preview Profile" button to onboarding wizard
+- [x] Include working hours in preview
+- [x] Show contact information and location
