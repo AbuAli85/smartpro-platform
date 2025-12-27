@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Building2, MapPin, Phone, Mail, FileText, CheckCircle2, ArrowRight, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import DocumentUpload from "@/components/DocumentUpload";
+import MultiDocumentUpload from "@/components/MultiDocumentUpload";
 
 const STEPS = [
   { id: 1, title: "Basic Information", icon: Building2 },
@@ -392,28 +393,30 @@ export default function OfficeRegistration() {
                     onRemove={() => handleInputChange("licenseDocumentUrl", "")}
                   />
 
-                  <DocumentUpload
+                  <MultiDocumentUpload
                     label="Certificates (Optional)"
                     accept=".pdf,.jpg,.jpeg,.png"
                     maxSizeMB={10}
-                    onUploadComplete={(url) => {
-                      const newUrls = [...formData.certificateUrls, url];
+                    maxFiles={5}
+                    onUploadComplete={(urls) => handleInputChange("certificateUrls", urls)}
+                    currentUrls={formData.certificateUrls}
+                    onRemove={(index) => {
+                      const newUrls = formData.certificateUrls.filter((_, i) => i !== index);
                       handleInputChange("certificateUrls", newUrls);
                     }}
-                    currentUrl={formData.certificateUrls[0]}
-                    onRemove={() => handleInputChange("certificateUrls", [])}
                   />
 
-                  <DocumentUpload
+                  <MultiDocumentUpload
                     label="Permits (Optional)"
                     accept=".pdf,.jpg,.jpeg,.png"
                     maxSizeMB={10}
-                    onUploadComplete={(url) => {
-                      const newUrls = [...formData.permitUrls, url];
+                    maxFiles={5}
+                    onUploadComplete={(urls) => handleInputChange("permitUrls", urls)}
+                    currentUrls={formData.permitUrls}
+                    onRemove={(index) => {
+                      const newUrls = formData.permitUrls.filter((_, i) => i !== index);
                       handleInputChange("permitUrls", newUrls);
                     }}
-                    currentUrl={formData.permitUrls[0]}
-                    onRemove={() => handleInputChange("permitUrls", [])}
                   />
                 </div>
 

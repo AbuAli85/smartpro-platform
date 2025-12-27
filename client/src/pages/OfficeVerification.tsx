@@ -27,6 +27,7 @@ import {
   Mail, Calendar, FileText, AlertCircle 
 } from "lucide-react";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import DocumentPreviewModal from "@/components/DocumentPreviewModal";
 
 function OfficeVerificationPage() {
   const [selectedOffice, setSelectedOffice] = useState<any>(null);
@@ -34,6 +35,9 @@ function OfficeVerificationPage() {
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const [verificationNotes, setVerificationNotes] = useState("");
+  const [previewDocuments, setPreviewDocuments] = useState<any[]>([]);
+  const [previewIndex, setPreviewIndex] = useState(0);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const { data: pendingOffices, isLoading, refetch } = trpc.admin.getPendingOfficeRegistrations.useQuery();
 
@@ -96,6 +100,53 @@ function OfficeVerificationPage() {
       officeId: selectedOffice.id,
       reason: rejectionReason,
     });
+  };
+
+  const handlePreviewDocuments = (office: any) => {
+    const docs = [];
+    
+    // Add license document
+    if (office.license_document_url) {
+      docs.push({
+        url: office.license_document_url,
+        label: "Business License",
+        type: office.license_document_url.match(/\.pdf$/i) ? "pdf" : "image",
+      });
+    }
+    
+    // Add certificates (handle both string and array)
+    if (office.certificate_urls) {
+      const certUrls = Array.isArray(office.certificate_urls) 
+        ? office.certificate_urls 
+        : [office.certificate_urls];
+      
+      certUrls.forEach((url: string, index: number) => {
+        docs.push({
+          url,
+          label: `Certificate ${index + 1}`,
+          type: url.match(/\.pdf$/i) ? "pdf" : "image",
+        });
+      });
+    }
+    
+    // Add permits (handle both string and array)
+    if (office.permit_urls) {
+      const permitUrls = Array.isArray(office.permit_urls) 
+        ? office.permit_urls 
+        : [office.permit_urls];
+      
+      permitUrls.forEach((url: string, index: number) => {
+        docs.push({
+          url,
+          label: `Permit ${index + 1}`,
+          type: url.match(/\.pdf$/i) ? "pdf" : "image",
+        });
+      });
+    }
+    
+    setPreviewDocuments(docs);
+    setPreviewIndex(0);
+    setIsPreviewOpen(true);
   };
 
   return (
@@ -310,10 +361,10 @@ function OfficeVerificationPage() {
                             size="sm" 
                             variant="outline" 
                             className="w-full mt-2"
-                            onClick={() => window.open(office.license_document_url, '_blank')}
+                            onClick={() => handlePreviewDocuments(office)}
                           >
                             <Eye className="h-4 w-4 mr-2" />
-                            View Document
+                            Preview All Documents
                           </Button>
                         </div>
                       )}
@@ -335,10 +386,10 @@ function OfficeVerificationPage() {
                             size="sm" 
                             variant="outline" 
                             className="w-full mt-2"
-                            onClick={() => window.open(office.certificate_urls, '_blank')}
+                            onClick={() => handlePreviewDocuments(office)}
                           >
                             <Eye className="h-4 w-4 mr-2" />
-                            View Document
+                            Preview All Documents
                           </Button>
                         </div>
                       )}
@@ -360,10 +411,10 @@ function OfficeVerificationPage() {
                             size="sm" 
                             variant="outline" 
                             className="w-full mt-2"
-                            onClick={() => window.open(office.permit_urls, '_blank')}
+                            onClick={() => handlePreviewDocuments(office)}
                           >
                             <Eye className="h-4 w-4 mr-2" />
-                            View Document
+                            Preview All Documents
                           </Button>
                         </div>
                       )}
@@ -488,6 +539,14 @@ function OfficeVerificationPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Document Preview Modal */}
+      <DocumentPreviewModal
+        documents={previewDocuments}
+        initialIndex={previewIndex}
+        open={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+      />
     </div>
   );
 }

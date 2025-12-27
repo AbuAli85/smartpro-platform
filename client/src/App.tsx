@@ -43,6 +43,7 @@ import RequestServicePage from "./pages/RequestServicePage";
 import MarketplaceBrowser from "./pages/MarketplaceBrowser";
 import MyServiceRequests from "./pages/MyServiceRequests";
 import OfficeRegistration from "./pages/OfficeRegistration";
+import ServiceCatalog from "./pages/ServiceCatalog";
 import UserManagement from "./pages/UserManagement";
 import OfficeVerification from "./pages/OfficeVerification";
 import OnboardingWizard from "./pages/OnboardingWizard";
@@ -95,6 +96,7 @@ function Router() {
       
       {/* Office Dashboard */}
       <Route path="/office-dashboard" component={OfficeDashboard} />
+      <Route path="/service-catalog" component={ServiceCatalog} />
       
       {/* Profile */}
       <Route path="/profile" component={Profile} />
