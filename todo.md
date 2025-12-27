@@ -2315,3 +2315,60 @@ The booking form already includes:
 - [ ] Add sort options (relevance, rating, price)
 - [ ] Show office cards with key info
 - [ ] Add "No results" state with suggestions
+
+
+## FEATURE: Review System UI Components
+### Frontend Implementation
+- [x] Create ReviewForm component with star rating widget (1-5 stars)
+- [x] Add multi-photo upload to ReviewForm (up to 5 images)
+- [x] Build ReviewList component to display reviews on office profiles
+- [x] Add helpful/not helpful voting buttons to each review
+- [x] Display review photos in gallery format
+- [x] Show vote counts (X people found this helpful)
+- [x] Integrate ReviewForm into My Bookings page (after booking completion)
+- [x] Integrate ReviewList into Office Profile page
+- [x] Add review submission success notification
+- [x] Add review filtering (most helpful, newest, highest/lowest rating)
+
+## FEATURE: Booking Cancellation Policy
+### Backend Implementation
+- [x] Add cancellation_policy field to sanad_offices table (24h/48h/7days)
+- [x] Add cancellation_reason and cancelled_at fields to bookings table
+- [x] Create calculateRefund function with penalty logic
+- [x] Create cancelBooking tRPC procedure
+- [x] Add cancellation notification email template
+- [x] Implement refund calculation based on time remaining
+- [x] Add penalty percentage configuration per office
+
+### Frontend Implementation
+- [x] Add Cancel Booking button to My Bookings page
+- [x] Create CancellationDialog with reason input
+- [x] Display refund amount preview before cancellation
+- [x] Show cancellation policy details (deadline, penalty)
+- [x] Add cancellation confirmation step
+- [x] Display cancellation success message with refund details
+- [x] Show cancelled bookings with status badge
+- [x] Add cancellation policy display on booking form
+
+## FEATURE: Advanced Search Page
+### Backend Implementation
+- [x] Create searchOffices tRPC procedure with filters
+- [x] Add location filtering (governorate, wilayat)
+- [x] Add service type filtering (multiple categories)
+- [x] Add price range filtering
+- [x] Add rating filtering (4+ stars, 3+ stars, etc.)
+- [x] Add availability filtering (available today/this week)
+- [x] Implement sorting (rating, reviews count, price, name)
+
+### Frontend Implementation
+- [x] Create AdvancedSearch page component
+- [x] Build search filters sidebar (location, service, price, rating)
+- [x] Add governorate dropdown with wilayat sub-options
+- [x] Add service category multi-select checkboxes
+- [x] Add price range slider
+- [x] Add rating filter buttons
+- [x] Build search results grid/list view
+- [x] Add sort dropdown (rating, reviews, price, name)
+- [x] Display result count and applied filters
+- [x] Add clear all filters button
+- [x] Add search route to navigation

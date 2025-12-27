@@ -8,6 +8,7 @@ import { Sidebar } from "./components/Sidebar";
 import Home from "./pages/Home";
 import OfficesList from "./pages/OfficesList";
 import OfficeProfile from "./pages/OfficeProfile";
+import AdvancedSearch from "./pages/AdvancedSearch";
 import CreateOffice from "./pages/CreateOffice";
 import MyOffices from "./pages/MyOffices";
 import Templates from "./pages/Templates";
@@ -47,6 +48,7 @@ function Router() {
       
       {/* Sanad Offices */}
       <Route path="/offices" component={OfficesList} />
+      <Route path="/search" component={AdvancedSearch} />
       <Route path="/offices/:slug" component={OfficeProfile} />
       <Route path="/create-office" component={CreateOffice} />
       <Route path="/my-offices" component={MyOffices} />

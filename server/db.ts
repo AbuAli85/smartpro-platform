@@ -190,12 +190,17 @@ export async function getSanadOfficeBySlug(slug: string) {
 
 export async function listSanadOffices(filters: {
   governorate?: string;
+  wilayat?: string;
   status?: string;
   search?: string;
   category?: string;
+  serviceTypes?: string[];
+  minPrice?: number;
+  maxPrice?: number;
   minRating?: number;
   availableToday?: boolean;
   availableThisWeek?: boolean;
+  sortBy?: string;
   limit?: number;
   offset?: number;
 }) {
@@ -207,6 +212,10 @@ export async function listSanadOffices(filters: {
 
   if (filters.governorate) {
     conditions.push(eq(sanadOffices.governorate, filters.governorate));
+  }
+
+  if (filters.wilayat) {
+    conditions.push(eq(sanadOffices.wilayat, filters.wilayat));
   }
 
   if (filters.status) {
@@ -234,8 +243,26 @@ export async function listSanadOffices(filters: {
     query = query.where(and(...conditions)) as any;
   }
 
+  // Apply sorting
+  let orderByClause;
+  switch (filters.sortBy) {
+    case "rating":
+      orderByClause = desc(sanadOffices.averageRating);
+      break;
+    case "reviews":
+      orderByClause = desc(sanadOffices.totalReviews);
+      break;
+    case "name":
+      orderByClause = sanadOffices.officeName;
+      break;
+    case "newest":
+    default:
+      orderByClause = desc(sanadOffices.createdAt);
+      break;
+  }
+
   const offices = await query
-    .orderBy(desc(sanadOffices.createdAt))
+    .orderBy(orderByClause)
     .limit(filters.limit || 20)
     .offset(filters.offset || 0);
 

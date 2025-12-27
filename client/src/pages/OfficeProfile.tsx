@@ -11,6 +11,7 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import ChatWidget from "@/components/ChatWidget";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ServiceFilters, ServiceFilterState } from "@/components/ServiceFilters";
+import { ReviewList } from "@/components/ReviewList";
 import { useMemo, useState } from "react";
 
 export default function OfficeProfile() {
@@ -290,48 +291,7 @@ export default function OfficeProfile() {
           </TabsContent>
 
           <TabsContent value="reviews" className="space-y-4">
-            {reviews && reviews.length > 0 ? (
-              reviews.map((review: any) => (
-                <Card key={review.id}>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 rounded-full bg-gradient-accent flex items-center justify-center text-white font-semibold">
-                          {review.userName?.charAt(0) || "U"}
-                        </div>
-                        <div>
-                          <p className="font-semibold">{review.userName || t("office.anonymous")}</p>
-                          <div className="flex items-center gap-1">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`w-4 h-4 ${
-                                  i < review.rating ? "fill-accent text-accent" : "text-muted"
-                                }`}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                      <span className="text-sm text-muted-foreground">
-                        {new Date(review.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </CardHeader>
-                  {review.reviewText && (
-                    <CardContent>
-                      <p className="text-muted-foreground">{review.reviewText}</p>
-                    </CardContent>
-                  )}
-                </Card>
-              ))
-            ) : (
-              <Card>
-                <CardContent className="py-8 text-center">
-                  <p className="text-muted-foreground">{t("office.noReviews")}</p>
-                </CardContent>
-              </Card>
-            )}
+            {office && <ReviewList officeId={office.id} />}
           </TabsContent>
         </Tabs>
       </div>

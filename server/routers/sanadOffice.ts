@@ -143,26 +143,36 @@ export const sanadOfficeRouter = router({
         page: z.number().int().min(1).default(1),
         limit: z.number().int().min(1).max(100).default(20),
         governorate: z.string().optional(),
+        wilayat: z.string().optional(),
         search: z.string().optional(),
         status: z.enum(["pending", "active", "suspended", "inactive"]).optional(),
         category: z.string().optional(),
+        serviceTypes: z.array(z.string()).optional(),
+        minPrice: z.number().min(0).optional(),
+        maxPrice: z.number().min(0).optional(),
         minRating: z.number().min(0).max(5).optional(),
         availableToday: z.boolean().optional(),
         availableThisWeek: z.boolean().optional(),
+        sortBy: z.enum(["rating", "reviews", "name", "newest"]).optional(),
       })
     )
     .query(async ({ ctx, input }) => {
-      const { page, limit, governorate, search, status, category, minRating, availableToday, availableThisWeek } = input;
+      const { page, limit, governorate, wilayat, search, status, category, serviceTypes, minPrice, maxPrice, minRating, availableToday, availableThisWeek, sortBy } = input;
       const offset = (page - 1) * limit;
 
       const result = await db.listSanadOffices({
         governorate,
+        wilayat,
         search,
         status: status || "active", // Default to active for public view
         category,
+        serviceTypes,
+        minPrice,
+        maxPrice,
         minRating,
         availableToday,
         availableThisWeek,
+        sortBy,
         limit,
         offset,
       });
