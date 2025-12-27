@@ -10,12 +10,19 @@ import { CanonicalURL } from "@/components/CanonicalURL";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import ChatWidget from "@/components/ChatWidget";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { ServiceFilters, ServiceFilterState } from "@/components/ServiceFilters";
+import { useMemo, useState } from "react";
 
 export default function OfficeProfile() {
   const { t } = useLanguage();
   const [, params] = useRoute("/offices/:slug");
   const slug = params?.slug || "";
   const { isAuthenticated } = useAuth();
+  const [filters, setFilters] = useState<ServiceFilterState>({
+    category: "all",
+    minPrice: 0,
+    maxPrice: 10000,
+  });
 
   const { data: office, isLoading } = trpc.sanadOffice.getBySlug.useQuery({ slug });
   const { data: reviews } = (trpc.booking as any).getOfficeReviews.useQuery(
@@ -27,6 +34,29 @@ export default function OfficeProfile() {
     { officeId: office?.id || 0 },
     { enabled: !!office?.id }
   );
+
+  // Calculate max price from services
+  const maxPrice = useMemo(() => {
+    if (!services || services.length === 0) return 10000;
+    return Math.max(...services.map(s => Number(s.price) || 0));
+  }, [services]);
+
+  // Filter services based on active filters
+  const filteredServices = useMemo(() => {
+    if (!services) return [];
+    return services.filter(service => {
+      // Category filter
+      if (filters.category !== "all" && service.category !== filters.category) {
+        return false;
+      }
+      // Price filter
+      const price = Number(service.price) || 0;
+      if (price < filters.minPrice || price > filters.maxPrice) {
+        return false;
+      }
+      return true;
+    });
+  }, [services, filters]);
 
   if (isLoading) {
     return (
@@ -192,18 +222,37 @@ export default function OfficeProfile() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="services">
+          <TabsContent value="services" className="space-y-4">
+            {/* Service Filters */}
+            {services && services.length > 0 && (
+              <ServiceFilters
+                onFilterChange={setFilters}
+                maxPrice={maxPrice}
+              />
+            )}
+
             <Card>
               <CardHeader>
-                <CardTitle>{t("office.availableServices")}</CardTitle>
-                <CardDescription>{t("office.servicesDescription")}</CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>{t("office.availableServices")}</CardTitle>
+                    <CardDescription>{t("office.servicesDescription")}</CardDescription>
+                  </div>
+                  {filteredServices.length > 0 && (
+                    <p className="text-sm text-muted-foreground">
+                      {t("services.resultsCount").replace("{count}", String(filteredServices.length))}
+                    </p>
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
                 {!services || services.length === 0 ? (
                   <p className="text-muted-foreground text-center py-8">{t("office.noServices")}</p>
+                ) : filteredServices.length === 0 ? (
+                  <p className="text-muted-foreground text-center py-8">No services match your filters. Try adjusting your criteria.</p>
                 ) : (
                   <div className="grid gap-4 md:grid-cols-2">
-                    {services.map((service) => (
+                    {filteredServices.map((service) => (
                       <Card key={service.id}>
                         <CardHeader>
                           <div className="flex justify-between items-start">

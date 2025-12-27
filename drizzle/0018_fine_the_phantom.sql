@@ -1,1 +1,2 @@
-ALTER TABLE `chat_conversations` MODIFY COLUMN `tags` json;
+-- Migration already applied to database
+-- Tags column modification already done

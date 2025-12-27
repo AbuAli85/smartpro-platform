@@ -370,6 +370,35 @@ export const reviews = mysqlTable("reviews", {
 export type Review = typeof reviews.$inferSelect;
 export type InsertReview = typeof reviews.$inferInsert;
 
+// Review Photos
+export const reviewPhotos = mysqlTable("review_photos", {
+  id: int("id").autoincrement().primaryKey(),
+  reviewId: int("reviewId").notNull(),
+  photoUrl: text("photoUrl").notNull(),
+  photoKey: text("photoKey").notNull(), // S3 key for deletion
+  uploadedAt: timestamp("uploadedAt").defaultNow().notNull(),
+}, (table) => ({
+  reviewIdx: index("review_idx").on(table.reviewId),
+}));
+
+export type ReviewPhoto = typeof reviewPhotos.$inferSelect;
+export type InsertReviewPhoto = typeof reviewPhotos.$inferInsert;
+
+// Review Votes (Helpful/Not Helpful)
+export const reviewVotes = mysqlTable("review_votes", {
+  id: int("id").autoincrement().primaryKey(),
+  reviewId: int("reviewId").notNull(),
+  userId: int("userId").notNull(),
+  voteType: mysqlEnum("voteType", ["helpful", "not_helpful"]).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  reviewUserIdx: index("review_user_idx").on(table.reviewId, table.userId),
+  reviewIdx: index("review_idx").on(table.reviewId),
+}));
+
+export type ReviewVote = typeof reviewVotes.$inferSelect;
+export type InsertReviewVote = typeof reviewVotes.$inferInsert;
+
 // ============================================================================
 // ACTIVITY LOG
 // ============================================================================

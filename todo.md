@@ -2234,3 +2234,65 @@ The booking form already includes:
 - Text: `text-white`
 
 **Result**: ✅ Both Book Service buttons (header + Quick Actions Bar) are now clearly visible
+
+
+## Service Filtering Feature (Dec 27, 2025)
+
+### Service Category & Price Filtering:
+- [x] Add category filter dropdown (legal, tax, registration, business)
+- [x] Add price range slider with min/max inputs
+- [x] Implement filter state management
+- [x] Update service display to show filtered results
+- [x] Add "Clear Filters" button
+- [x] Show filter count badge ("Active" indicator)
+- [x] Show results count
+- [ ] Persist filters in URL query params (optional enhancement)
+- [x] Add mobile-responsive filter panel
+
+## Review System Feature (Dec 27, 2025)
+
+### Database Schema:
+- [x] Create reviews table with rating, comment, photos (already exists)
+- [x] Create review_votes table for helpful/not helpful
+- [x] Add review_photos table for multiple images
+- [x] Add indexes for performance
+
+### Backend Implementation:
+- [ ] Create review submission procedure
+- [ ] Add photo upload to S3 for review images
+- [ ] Create get reviews procedure with pagination
+- [ ] Add vote on review procedure (helpful/not helpful)
+- [ ] Validate user completed booking before reviewing
+- [ ] Prevent duplicate reviews per booking
+
+### Frontend Implementation:
+- [ ] Create ReviewForm component with star rating
+- [ ] Add photo upload widget (multiple images)
+- [ ] Create ReviewList component with voting
+- [ ] Add review filtering (most helpful, recent, highest/lowest rating)
+- [ ] Show average rating on office profile
+- [ ] Add review submission from My Bookings page
+
+## Booking Cancellation Policy Feature (Dec 27, 2025)
+
+### Database Schema:
+- [ ] Add cancellation_policy to sanadOffices table
+- [ ] Add cancellation_deadline to bookings table
+- [ ] Add cancellation_reason, cancelled_at to bookings table
+- [ ] Add refund_amount, refund_status to bookings table
+
+### Backend Implementation:
+- [ ] Create cancellation policy configuration procedure
+- [ ] Add calculate refund amount logic (based on policy)
+- [ ] Create cancel booking procedure with refund calculation
+- [ ] Add automatic cancellation deadline calculation
+- [ ] Send cancellation confirmation email
+- [ ] Add refund processing integration (placeholder for payment gateway)
+
+### Frontend Implementation:
+- [ ] Add cancellation policy display on booking page
+- [ ] Create cancel booking modal with reason selection
+- [ ] Show refund amount before cancellation
+- [ ] Add cancellation deadline countdown
+- [ ] Update My Bookings to show cancellation option
+- [ ] Display refund status in booking details
