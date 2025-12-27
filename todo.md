@@ -2635,3 +2635,74 @@ The booking form already includes:
 - [x] Check OfficeProfile page routing and parameter extraction
 - [x] Fix office card links to pass correct office ID
 - [x] Test office navigation from all entry points
+
+
+## FEATURE: Complete Marketplace UI Pages (Dec 27, 2025)
+### Office-Facing Pages
+- [x] Create MarketplaceBrowser page for offices to browse service requests
+- [x] Add filters (service type, budget range, deadline, location)
+- [x] Build ServiceRequestCard component with request details
+- [x] Create BidSubmissionDialog with price and delivery time inputs
+- [x] Add bid preview before submission
+- [ ] Show office's submitted bids with status tracking
+- [ ] Add office selector to bid dialog (for users with multiple offices)
+
+### Customer-Facing Pages
+- [ ] Create MyServiceRequests page showing all posted requests
+- [ ] Build BidComparisonView component (side-by-side bid comparison)
+- [ ] Add bid acceptance confirmation dialog
+- [ ] Show bid statistics (average, lowest, highest)
+- [ ] Display office ratings and reviews in bid cards
+- [ ] Add request status tracking (open, bidding, accepted, completed)
+
+### Integration
+- [ ] Add marketplace link to office dashboard navigation
+- [ ] Add "My Requests" link to customer dashboard
+- [ ] Integrate marketplace with booking system (accepted bid → booking)
+- [ ] Add request expiry logic (auto-close after deadline)
+
+## FEATURE: Real-time WebSocket Notifications (Dec 27, 2025)
+### Backend Implementation
+- [ ] Set up WebSocket server with Socket.IO
+- [ ] Create notification channels (new_request, new_bid, bid_accepted)
+- [ ] Implement user-specific notification rooms
+- [ ] Add notification persistence to database
+- [ ] Create getUnreadNotifications procedure
+- [ ] Add markAsRead procedure
+
+### Frontend Implementation
+- [ ] Create WebSocket context provider
+- [ ] Build NotificationBell component with unread count badge
+- [ ] Create NotificationDropdown with real-time updates
+- [ ] Add toast notifications for important events
+- [ ] Implement notification sound (optional, user preference)
+- [ ] Add notification preferences page
+
+### Notification Types
+- [ ] Office: "New service request matching your services"
+- [ ] Customer: "New bid received on your request"
+- [ ] Customer: "Bid accepted - booking created"
+- [ ] Office: "Your bid was accepted"
+
+## FEATURE: Service Bundles (Dec 27, 2025)
+### Backend Implementation
+- [ ] Create service_bundles table (bundleId, name, description, discount%)
+- [ ] Create bundle_services junction table (bundleId, serviceId)
+- [ ] Add createBundle procedure (office owners only)
+- [ ] Add getBundlesByOffice procedure
+- [ ] Add calculateBundlePrice procedure (with discount logic)
+- [ ] Add bookBundle procedure (creates booking for all services)
+
+### Frontend Implementation
+- [ ] Create BundleManager page for office owners
+- [ ] Build CreateBundleDialog with service multi-select
+- [ ] Add discount percentage input with preview
+- [ ] Display bundles on office profile page
+- [ ] Create BundleCard component showing included services
+- [ ] Add "Book Bundle" button with bundle booking flow
+- [ ] Show savings amount prominently
+
+### Popular Bundle Examples
+- [ ] "Startup Package" (CR + Tax Registration + VAT)
+- [ ] "Business Expansion" (Branch Registration + License Renewal)
+- [ ] "Annual Compliance" (Tax Filing + Audit + License Renewal)
