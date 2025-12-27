@@ -367,6 +367,96 @@ export async function updateSanadOfficeService(id: number, updates: Partial<Sana
   await db.update(sanadOfficeServices).set(updates).where(eq(sanadOfficeServices.id, id));
 }
 
+// Service management functions for office profile editor
+export async function getServiceById(serviceId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const [service] = await db
+    .select()
+    .from(sanadOfficeServices)
+    .where(eq(sanadOfficeServices.id, serviceId))
+    .limit(1);
+
+  return service;
+}
+
+export async function addOfficeService(data: {
+  officeId: number;
+  serviceName: string;
+  serviceNameAr: string;
+  description?: string;
+  descriptionAr?: string;
+  price: number;
+  estimatedDays: number;
+  isActive: boolean;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .insert(sanadOfficeServices)
+    .values({
+      officeId: data.officeId,
+      serviceName: data.serviceName,
+      serviceNameAr: data.serviceNameAr,
+      category: "general", // Default category
+      description: data.description,
+      descriptionAr: data.descriptionAr,
+      price: data.price.toString(),
+      estimatedDeliveryDays: data.estimatedDays,
+      isActive: data.isActive,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+  return { success: true };
+}
+
+export async function updateOfficeService(data: {
+  serviceId: number;
+  serviceName?: string;
+  serviceNameAr?: string;
+  description?: string;
+  descriptionAr?: string;
+  price?: number;
+  estimatedDays?: number;
+  isActive?: boolean;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const updateData: any = {
+    updatedAt: new Date(),
+  };
+
+  if (data.serviceName !== undefined) updateData.serviceName = data.serviceName;
+  if (data.serviceNameAr !== undefined) updateData.serviceNameAr = data.serviceNameAr;
+  if (data.description !== undefined) updateData.description = data.description;
+  if (data.descriptionAr !== undefined) updateData.descriptionAr = data.descriptionAr;
+  if (data.price !== undefined) updateData.price = data.price.toString();
+  if (data.estimatedDays !== undefined) updateData.estimatedDeliveryDays = data.estimatedDays;
+  if (data.isActive !== undefined) updateData.isActive = data.isActive;
+
+  await db
+    .update(sanadOfficeServices)
+    .set(updateData)
+    .where(eq(sanadOfficeServices.id, data.serviceId));
+
+  return { success: true };
+}
+
+export async function deleteOfficeService(serviceId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .delete(sanadOfficeServices)
+    .where(eq(sanadOfficeServices.id, serviceId));
+
+  return { success: true };
+}
+
 // ============================================================================
 // DOCUMENT TEMPLATES
 // ============================================================================
@@ -828,6 +918,118 @@ export async function deleteOfficeAvailability(id: number) {
   if (!db) throw new Error("Database not available");
 
   await db.delete(officeAvailability).where(eq(officeAvailability.id, id));
+}
+
+/**
+ * Get availability by ID
+ */
+export async function getAvailabilityById(availabilityId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const [availability] = await db
+    .select()
+    .from(officeAvailability)
+    .where(eq(officeAvailability.id, availabilityId))
+    .limit(1);
+
+  return availability;
+}
+
+/**
+ * Upsert office availability (used by profile editor)
+ * This function either updates existing availability for a day or creates new one
+ */
+export async function upsertOfficeAvailability(data: {
+  officeId: number;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  slotDuration: number;
+  isAvailable?: boolean;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Check if availability exists for this day
+  const [existing] = await db
+    .select()
+    .from(officeAvailability)
+    .where(
+      and(
+        eq(officeAvailability.officeId, data.officeId),
+        eq(officeAvailability.dayOfWeek, data.dayOfWeek)
+      )
+    )
+    .limit(1);
+
+  if (existing) {
+    // Update existing
+    await db
+      .update(officeAvailability)
+      .set({
+        startTime: data.startTime,
+        endTime: data.endTime,
+        slotDuration: data.slotDuration,
+        isActive: data.isAvailable ?? true,
+        updatedAt: new Date(),
+      })
+      .where(eq(officeAvailability.id, existing.id));
+
+    return { success: true, id: existing.id };
+  } else {
+    // Insert new
+    await db
+      .insert(officeAvailability)
+      .values({
+        officeId: data.officeId,
+        dayOfWeek: data.dayOfWeek,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        slotDuration: data.slotDuration,
+        isActive: data.isAvailable ?? true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+    return { success: true };
+  }
+}
+
+/**
+ * Update office basic information
+ */
+export async function updateOfficeInfo(data: {
+  officeId: number;
+  officeName: string;
+  description?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  address?: string;
+  city?: string;
+  region?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const updateData: any = {
+    updatedAt: new Date(),
+  };
+
+  if (data.officeName) updateData.officeName = data.officeName;
+  if (data.description) updateData.description = data.description;
+  if (data.contactEmail) updateData.email = data.contactEmail;
+  if (data.contactPhone) updateData.phone = data.contactPhone;
+  if (data.address) updateData.addressLine1 = data.address;
+  if (data.city) updateData.wilayat = data.city;
+  if (data.region) updateData.governorate = data.region;
+
+  await db
+    .update(sanadOffices)
+    .set(updateData)
+    .where(eq(sanadOffices.id, data.officeId));
+
+  return { success: true };
 }
 
 // ============================================================================
@@ -4016,3 +4218,4 @@ export async function rollbackToVersion(versionId: number) {
 
   return version;
 }
+
