@@ -4292,3 +4292,114 @@ export async function rollbackToVersion(versionId: number) {
   return version;
 }
 
+// ============================================================================
+// REVIEW PHOTOS & VOTING
+// ============================================================================
+
+export async function createReviewPhoto(data: {
+  reviewId: number;
+  photoUrl: string;
+  photoKey: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { reviewPhotos } = await import("../drizzle/schema");
+  const [result] = await db.insert(reviewPhotos).values(data);
+  return result.insertId;
+}
+
+export async function getReviewPhotos(reviewId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { reviewPhotos } = await import("../drizzle/schema");
+  return await db
+    .select()
+    .from(reviewPhotos)
+    .where(eq(reviewPhotos.reviewId, reviewId));
+}
+
+export async function createReviewVote(data: {
+  reviewId: number;
+  userId: number;
+  voteType: "helpful" | "not_helpful";
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { reviewVotes } = await import("../drizzle/schema");
+  const [result] = await db.insert(reviewVotes).values(data);
+  return result.insertId;
+}
+
+export async function getUserReviewVote(reviewId: number, userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const { reviewVotes } = await import("../drizzle/schema");
+  const [vote] = await db
+    .select()
+    .from(reviewVotes)
+    .where(and(eq(reviewVotes.reviewId, reviewId), eq(reviewVotes.userId, userId)))
+    .limit(1);
+  
+  return vote || null;
+}
+
+export async function updateReviewVote(voteId: number, voteType: "helpful" | "not_helpful") {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { reviewVotes } = await import("../drizzle/schema");
+  await db
+    .update(reviewVotes)
+    .set({ voteType })
+    .where(eq(reviewVotes.id, voteId));
+}
+
+export async function getReviewVoteCounts(reviewId: number) {
+  const db = await getDb();
+  if (!db) return { helpful: 0, notHelpful: 0 };
+
+  const { reviewVotes } = await import("../drizzle/schema");
+  const votes = await db
+    .select()
+    .from(reviewVotes)
+    .where(eq(reviewVotes.reviewId, reviewId));
+
+  return {
+    helpful: votes.filter(v => v.voteType === "helpful").length,
+    notHelpful: votes.filter(v => v.voteType === "not_helpful").length,
+  };
+}
+
+export async function getOfficeReviewsWithDetails(officeId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { reviewPhotos, reviewVotes } = await import("../drizzle/schema");
+  
+  // Get reviews
+  const reviewsList = await db
+    .select()
+    .from(reviews)
+    .where(and(eq(reviews.officeId, officeId), eq(reviews.isVisible, true)))
+    .orderBy(desc(reviews.createdAt));
+
+  // Enhance with photos and votes
+  const enhancedReviews = await Promise.all(
+    reviewsList.map(async (review) => {
+      const photos = await getReviewPhotos(review.id);
+      const voteCounts = await getReviewVoteCounts(review.id);
+      
+      return {
+        ...review,
+        photos,
+        voteCounts,
+      };
+    })
+  );
+
+  return enhancedReviews;
+}

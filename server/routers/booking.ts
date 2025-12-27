@@ -419,11 +419,84 @@ export const bookingRouter = router({
       return { id: reviewId };
     }),
 
-  // Get office reviews
+  // Get office reviews with photos and vote counts
   getOfficeReviews: protectedProcedure
     .input(z.object({ officeId: z.number() }))
     .query(async ({ input }) => {
-      return await db.getOfficeReviews(input.officeId);
+      return await db.getOfficeReviewsWithDetails(input.officeId);
+    }),
+
+  // Upload review photo
+  uploadReviewPhoto: protectedProcedure
+    .input(
+      z.object({
+        reviewId: z.number(),
+        photoBase64: z.string(),
+        mimeType: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = ctx.user!;
+      
+      // Verify user owns the review
+      const review = await db.getReviewById(input.reviewId);
+      if (!review || review.userId !== user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You can only upload photos to your own reviews",
+        });
+      }
+
+      // Upload to S3
+      const { storagePut } = await import("../storage");
+      const buffer = Buffer.from(input.photoBase64, "base64");
+      const fileKey = `reviews/${input.reviewId}/${Date.now()}.${input.mimeType.split("/")[1]}`;
+      const { url } = await storagePut(fileKey, buffer, input.mimeType);
+
+      // Save to database
+      const photoId = await db.createReviewPhoto({
+        reviewId: input.reviewId,
+        photoUrl: url,
+        photoKey: fileKey,
+      });
+
+      return { id: photoId, url };
+    }),
+
+  // Vote on review (helpful/not helpful)
+  voteOnReview: protectedProcedure
+    .input(
+      z.object({
+        reviewId: z.number(),
+        voteType: z.enum(["helpful", "not_helpful"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = ctx.user!;
+      
+      // Check if user already voted
+      const existingVote = await db.getUserReviewVote(input.reviewId, user.id);
+      
+      if (existingVote) {
+        // Update existing vote
+        await db.updateReviewVote(existingVote.id, input.voteType);
+      } else {
+        // Create new vote
+        await db.createReviewVote({
+          reviewId: input.reviewId,
+          userId: user.id,
+          voteType: input.voteType,
+        });
+      }
+
+      return { success: true };
+    }),
+
+  // Get review vote counts
+  getReviewVotes: publicProcedure
+    .input(z.object({ reviewId: z.number() }))
+    .query(async ({ input }) => {
+      return await db.getReviewVoteCounts(input.reviewId);
     }),
 
   // Calculate cancellation refund/penalty

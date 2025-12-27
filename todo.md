@@ -2258,12 +2258,16 @@ The booking form already includes:
 - [x] Add indexes for performance
 
 ### Backend Implementation:
-- [ ] Create review submission procedure
-- [ ] Add photo upload to S3 for review images
-- [ ] Create get reviews procedure with pagination
-- [ ] Add vote on review procedure (helpful/not helpful)
-- [ ] Validate user completed booking before reviewing
-- [ ] Prevent duplicate reviews per booking
+- [x] Create review submission procedure (already exists)
+- [x] Add photo upload to S3 for review images
+- [x] Create get reviews procedure with photos and votes
+- [x] Add vote on review procedure (helpful/not helpful)
+- [x] Added uploadReviewPhoto mutation
+- [x] Added voteOnReview mutation  
+- [x] Added getReviewVotes query
+- [x] Enhanced getOfficeReviews with photos and vote counts
+- [ ] Validate user completed booking before reviewing (optional enhancement)
+- [ ] Prevent duplicate reviews per booking (optional enhancement)
 
 ### Frontend Implementation:
 - [ ] Create ReviewForm component with star rating
@@ -2296,3 +2300,18 @@ The booking form already includes:
 - [ ] Add cancellation deadline countdown
 - [ ] Update My Bookings to show cancellation option
 - [ ] Display refund status in booking details
+
+
+## Advanced Search Feature (Dec 27, 2025)
+
+### Multi-Office Search Implementation:
+- [ ] Create advanced search page component
+- [ ] Add location filter (governorate, wilayat)
+- [ ] Add service type filter
+- [ ] Add price range filter
+- [ ] Add rating filter (minimum stars)
+- [ ] Add search by office name
+- [ ] Implement search results with pagination
+- [ ] Add sort options (relevance, rating, price)
+- [ ] Show office cards with key info
+- [ ] Add "No results" state with suggestions
