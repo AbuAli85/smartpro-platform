@@ -410,3 +410,31 @@
 - [x] Add notification preferences in settings
 - [x] Handle notification click actions
 - [ ] Test on different browsers and devices
+
+
+## 🌐 Translation Review & Fixes
+
+### Translation Audit
+- [ ] Review all translation keys in LanguageContext
+- [ ] Check navigation translations
+- [ ] Check page titles and headings
+- [ ] Check form labels and placeholders
+- [ ] Check button and action texts
+- [ ] Check error messages
+- [ ] Check success messages
+- [ ] Check empty state messages
+- [ ] Check table headers and columns
+- [ ] Check modal and dialog content
+
+### Missing Translations
+- [ ] Identify untranslated strings
+- [ ] Add missing Arabic translations
+- [ ] Ensure translation key consistency
+- [ ] Verify RTL layout for Arabic
+
+### Translation Quality
+- [ ] Check for literal translations
+- [ ] Ensure cultural appropriateness
+- [ ] Verify professional terminology
+- [ ] Check grammar and spelling
+- [ ] Ensure consistent terminology across platform

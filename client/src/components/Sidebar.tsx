@@ -108,8 +108,8 @@ export function Sidebar({ className }: SidebarProps) {
       requiresAuth: true,
       items: [
         { name: t("nav.myBookings"), href: "/bookings", icon: Calendar, requiresAuth: true, requirePermission: "canCreateBooking" as const },
-        { name: "My Service Requests", href: "/my-requests", icon: Package, requiresAuth: true, requirePermission: "canPostServiceRequest" as const },
-        { name: "Browse Marketplace", href: "/marketplace", icon: Search, requiresAuth: true, requirePermission: "canSubmitBids" as const },
+        { name: t("nav.myServiceRequests"), href: "/my-requests", icon: Package, requiresAuth: true, requirePermission: "canPostServiceRequest" as const },
+        { name: t("nav.browseMarketplace"), href: "/marketplace", icon: Search, requiresAuth: true, requirePermission: "canSubmitBids" as const },
       ],
     },
     {
@@ -119,7 +119,7 @@ export function Sidebar({ className }: SidebarProps) {
       items: [
         { name: t("nav.myOffices"), href: "/my-offices", icon: Briefcase, requiresAuth: true, requirePermission: "canManageOffice" as const },
         { name: t("nav.ownerDashboard"), href: "/owner/dashboard", icon: Shield, requiresAuth: true, requirePermission: "canViewOfficeAnalytics" as const },
-        { name: "Office Analytics", href: "/owner/analytics", icon: BarChart3, requiresAuth: true, requirePermission: "canViewOfficeAnalytics" as const },
+        { name: t("nav.officeAnalytics"), href: "/owner/analytics", icon: BarChart3, requiresAuth: true, requirePermission: "canViewOfficeAnalytics" as const },
         { name: t("nav.chatInbox"), href: "/owner/chat", icon: MessageCircle, requiresAuth: true, requirePermission: "canAccessChatInbox" as const },
         { name: t("nav.chatAnalytics"), href: "/owner/chat-analytics", icon: TrendingUp, requiresAuth: true, requirePermission: "canViewChatAnalytics" as const },
         { name: t("nav.cannedResponses"), href: "/owner/canned-responses", icon: MessageSquareText, requiresAuth: true, requirePermission: "canManageCannedResponses" as const },
@@ -146,16 +146,16 @@ export function Sidebar({ className }: SidebarProps) {
   // Add admin links if user has admin permissions
   if (hasPermission("canAccessAdminPanel")) {
     navigation.push({ name: t("nav.adminDashboard"), href: "/admin", icon: Shield, requiresAuth: true });
-    navigation.push({ name: "User Management", href: "/admin/users", icon: Users, requiresAuth: true });
-    navigation.push({ name: "Office Verification", href: "/admin/office-verification", icon: Building2, requiresAuth: true });
+    navigation.push({ name: t("nav.userManagement"), href: "/admin/users", icon: Users, requiresAuth: true });
+    navigation.push({ name: t("nav.officeVerification"), href: "/admin/office-verification", icon: Building2, requiresAuth: true });
     navigation.push({ name: t("nav.adminAnalytics"), href: "/admin/analytics", icon: BarChart3, requiresAuth: true });
     navigation.push({ name: t("nav.contentTranslation"), href: "/admin/translations", icon: Languages, requiresAuth: true });
-    navigation.push({ name: "Translation Requests", href: "/admin/translation-requests", icon: MessageSquareText, requiresAuth: true });
-    navigation.push({ name: "Translation Analytics", href: "/admin/translation-analytics", icon: TrendingUp, requiresAuth: true });
-    navigation.push({ name: "Translation Quality", href: "/admin/translation-quality", icon: Activity, requiresAuth: true });
-    navigation.push({ name: "Review Queue", href: "/admin/review-queue", icon: MessageSquareText, requiresAuth: true });
-    navigation.push({ name: "Batch Processing", href: "/admin/batch-processing", icon: Zap, requiresAuth: true });
-    navigation.push({ name: "Translator Training", href: "/admin/training", icon: BookOpen, requiresAuth: true });
+    navigation.push({ name: t("nav.translationRequests"), href: "/admin/translation-requests", icon: MessageSquareText, requiresAuth: true });
+    navigation.push({ name: t("nav.translationAnalytics"), href: "/admin/translation-analytics", icon: TrendingUp, requiresAuth: true });
+    navigation.push({ name: t("nav.translationQuality"), href: "/admin/translation-quality", icon: Activity, requiresAuth: true });
+    navigation.push({ name: t("nav.reviewQueue"), href: "/admin/review-queue", icon: MessageSquareText, requiresAuth: true });
+    navigation.push({ name: t("nav.batchProcessing"), href: "/admin/batch-processing", icon: Zap, requiresAuth: true });
+    navigation.push({ name: t("nav.translatorTraining"), href: "/admin/training", icon: BookOpen, requiresAuth: true });
   }
 
   const filteredNavigation = navigation.filter((item) => {
