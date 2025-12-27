@@ -45,6 +45,17 @@ let _db: ReturnType<typeof drizzle> | null = null;
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
+      /**
+       * Note: MySQL DECIMAL fields are returned as strings by default to preserve precision.
+       * Drizzle ORM doesn't fully support mysql2's typeCast option, so decimals remain as strings.
+       * 
+       * This is actually fine for most use cases:
+       * - Superjson handles string decimals correctly (no serialization errors)
+       * - String decimals preserve exact precision (important for financial data)
+       * - Frontend can parse strings to numbers when needed for calculations
+       * 
+       * If you need numbers instead of strings, use the decimalToNumber() utility from decimal-utils.ts
+       */
       _db = drizzle(process.env.DATABASE_URL);
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
