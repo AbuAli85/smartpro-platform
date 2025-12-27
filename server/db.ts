@@ -196,6 +196,17 @@ export async function getSanadOfficeBySlug(slug: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+/**
+ * Get all offices (for admin/system operations)
+ */
+export async function getAllOffices() {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { sanadOffices } = await import("../drizzle/schema");
+  return await db.select().from(sanadOffices);
+}
+
 export async function listSanadOffices(filters: {
   governorate?: string;
   wilayat?: string;

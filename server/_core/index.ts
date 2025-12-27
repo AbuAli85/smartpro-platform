@@ -12,6 +12,7 @@ import { initializeCronJobs } from "./cronJobs";
 import sseRouter from "../routes/sse";
 import { startReminderScheduler } from "./reminderScheduler";
 import { startFollowUpJob } from "../jobs/followUpJob";
+import { initializeScheduledJobs } from "../jobs/scheduler";
 import { startQualityMonitoringScheduler } from "./qualityMonitoringJob";
 import { initializeWorkflowMonitoringJob } from "./workflowMonitoringJob";
 
@@ -86,6 +87,9 @@ async function startServer() {
     
     // Start background jobs
     startFollowUpJob();
+    
+    // Initialize scheduled jobs
+    initializeScheduledJobs();
   });
 }
 

@@ -187,3 +187,38 @@
 - [x] Create review analytics dashboard for offices
 - [x] Add helpful/not helpful voting on reviews
 - [x] Implement review reply functionality for office owners
+
+
+## 🤖 Automation Features
+
+### Automated Email Reminders for Document Expiry
+- [x] Create scheduled job to check document expiry dates daily
+- [x] Implement email template for 30-day expiry warning
+- [x] Implement email template for 7-day critical warning
+- [x] Implement email template for expired document alert
+- [x] Add job scheduler configuration (cron-based)
+- [x] Test email delivery for all three scenarios
+- [x] Add email tracking to prevent duplicate sends
+- [ ] Create admin dashboard to view sent reminders
+
+### Bundle Analytics Dashboard
+- [x] Create bundle_analytics table to track purchases
+- [x] Add tracking on bundle booking completion
+- [x] Build BundleAnalytics page component
+- [x] Show total bundle revenue vs individual service revenue
+- [x] Display most popular bundle combinations
+- [x] Add conversion rate metrics (views to purchases)
+- [x] Create time-series charts for bundle performance
+- [x] Show average savings per bundle purchase
+- [x] Add bundle comparison table
+
+### Review Incentive System
+- [x] Create review_requests table to track sent emails
+- [x] Build scheduled job to check completed bookings (24h ago)
+- [x] Create review request email template
+- [x] Add optional discount code generation
+- [x] Implement email sending logic with booking details
+- [x] Add one-click review submission link in email
+- [ ] Track email open rates and review completion rates
+- [ ] Create admin dashboard for review request analytics
+- [ ] Add opt-out mechanism for customers
