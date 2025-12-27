@@ -2427,3 +2427,30 @@ The booking form already includes:
 - [ ] Add confirmation animation on success
 - [ ] Create booking receipt PDF generation
 - [ ] Add "Book Again" quick action for repeat bookings
+
+
+## FEATURE: Service Comparison Tool (Dec 27, 2025)
+
+### Comparison Component
+- [x] Create ServiceComparison component with side-by-side layout
+- [x] Add service selection checkboxes (max 3 services)
+- [x] Display comparison table with key attributes
+- [x] Show pricing comparison with visual indicators
+- [x] Display turnaround time comparison
+- [x] List required documents side-by-side
+- [x] Show "What's Included" features comparison
+- [x] Add "Select This Service" button for each column
+
+### Integration
+- [x] Add "Compare Services" button to Step 1 (Service Selection)
+- [x] Create comparison dialog/modal
+- [x] Implement service selection state management
+- [x] Add comparison result to booking flow
+- [x] Show comparison badge count when services selected
+
+### UX Features
+- [x] Add visual highlights for best value/fastest service
+- [ ] Implement sticky header for comparison table
+- [x] Add mobile-responsive comparison view (swipeable cards)
+- [x] Show price difference percentages
+- [x] Add "Clear All" and "Close" actions

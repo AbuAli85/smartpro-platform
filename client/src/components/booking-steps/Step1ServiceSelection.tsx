@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Building2,
   Receipt,
@@ -37,22 +38,51 @@ interface Step1Props {
   services: Service[];
   selectedServiceId: string;
   onServiceSelect: (serviceId: string) => void;
+  comparisonMode?: boolean;
+  selectedForComparison?: string[];
+  onToggleComparison?: (serviceId: string) => void;
+  onOpenComparison?: () => void;
 }
 
 export function Step1ServiceSelection({
   services,
   selectedServiceId,
   onServiceSelect,
+  comparisonMode = false,
+  selectedForComparison = [],
+  onToggleComparison,
+  onOpenComparison,
 }: Step1Props) {
   const [expandedService, setExpandedService] = useState<number | null>(null);
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Select a Service</h2>
-        <p className="text-muted-foreground">
-          Choose the service you need. Click on a service to see more details.
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">Select a Service</h2>
+          <p className="text-muted-foreground">
+            Choose the service you need. Click on a service to see more details.
+          </p>
+        </div>
+        {onOpenComparison && onToggleComparison && (
+          <div className="flex flex-col items-end gap-2">
+            <Button
+              variant="outline"
+              onClick={onOpenComparison}
+              disabled={selectedForComparison.length < 2}
+            >
+              Compare Services
+              {selectedForComparison.length > 0 && (
+                <Badge variant="secondary" className="ml-2">
+                  {selectedForComparison.length}
+                </Badge>
+              )}
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              Select 2-3 services to compare
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -66,8 +96,9 @@ export function Step1ServiceSelection({
             <Card
               key={service.id}
               className={cn(
-                "cursor-pointer transition-all hover:shadow-md",
-                isSelected && "ring-2 ring-primary"
+                "cursor-pointer transition-all hover:shadow-md relative",
+                isSelected && "ring-2 ring-primary",
+                selectedForComparison.includes(service.id.toString()) && "ring-2 ring-blue-500"
               )}
               onClick={() => {
                 if (isExpanded) {
@@ -77,6 +108,18 @@ export function Step1ServiceSelection({
                 }
               }}
             >
+              {onToggleComparison && (
+                <div
+                  className="absolute top-3 right-3 z-10"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Checkbox
+                    checked={selectedForComparison.includes(service.id.toString())}
+                    onCheckedChange={() => onToggleComparison(service.id.toString())}
+                    disabled={!selectedForComparison.includes(service.id.toString()) && selectedForComparison.length >= 3}
+                  />
+                </div>
+              )}
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">

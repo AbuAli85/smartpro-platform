@@ -11,6 +11,7 @@ import { Step1ServiceSelection } from "@/components/booking-steps/Step1ServiceSe
 import { Step2ServiceRequirements } from "@/components/booking-steps/Step2ServiceRequirements";
 import { Step3TimeSlotSelection } from "@/components/booking-steps/Step3TimeSlotSelection";
 import { Step4ReviewConfirmation } from "@/components/booking-steps/Step4ReviewConfirmation";
+import { ServiceComparison } from "@/components/ServiceComparison";
 
 const WIZARD_STEPS = [
   {
@@ -50,6 +51,21 @@ export default function BookOffice() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [usePoints, setUsePoints] = useState(false);
+
+  // Comparison state
+  const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
+  const [comparisonOpen, setComparisonOpen] = useState(false);
+
+  const handleToggleComparison = (serviceId: string) => {
+    setSelectedForComparison((prev) => {
+      if (prev.includes(serviceId)) {
+        return prev.filter((id) => id !== serviceId);
+      } else if (prev.length < 3) {
+        return [...prev, serviceId];
+      }
+      return prev;
+    });
+  };
 
   // Get office details
   const { data: office } = trpc.sanadOffice.getBySlug.useQuery({ slug });
@@ -223,16 +239,37 @@ export default function BookOffice() {
           isSubmitting={createBookingMutation.isPending}
         >
           {currentStep === 1 && (
-            <Step1ServiceSelection
-              services={(services || []).map(s => ({
-                ...s,
-                estimatedDuration: s.estimatedDeliveryDays ? `${s.estimatedDeliveryDays} days` : "3-5 days",
-                price: s.price || "0",
-                description: s.description || undefined,
-              }))}
-              selectedServiceId={selectedServiceId}
-              onServiceSelect={setSelectedServiceId}
-            />
+            <>
+              <Step1ServiceSelection
+                services={(services || []).map(s => ({
+                  ...s,
+                  estimatedDuration: s.estimatedDeliveryDays ? `${s.estimatedDeliveryDays} days` : "3-5 days",
+                  price: s.price || "0",
+                  description: s.description || undefined,
+                }))}
+                selectedServiceId={selectedServiceId}
+                onServiceSelect={setSelectedServiceId}
+                selectedForComparison={selectedForComparison}
+                onToggleComparison={handleToggleComparison}
+                onOpenComparison={() => setComparisonOpen(true)}
+              />
+              <ServiceComparison
+                services={(services || []).map(s => ({
+                  ...s,
+                  estimatedDuration: s.estimatedDeliveryDays ? `${s.estimatedDeliveryDays} days` : "3-5 days",
+                  price: s.price || "0",
+                  description: s.description || undefined,
+                }))}
+                selectedServices={selectedForComparison}
+                onToggleService={handleToggleComparison}
+                onSelectService={(serviceId) => {
+                  setSelectedServiceId(serviceId);
+                  setComparisonOpen(false);
+                }}
+                open={comparisonOpen}
+                onOpenChange={setComparisonOpen}
+              />
+            </>
           )}
 
           {currentStep === 2 && selectedService && (
