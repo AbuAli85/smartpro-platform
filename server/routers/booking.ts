@@ -499,6 +499,40 @@ export const bookingRouter = router({
       return await db.getReviewVoteCounts(input.reviewId);
     }),
 
+  // Reply to a review (office owner)
+  replyToReview: protectedProcedure
+    .input(
+      z.object({
+        reviewId: z.number(),
+        responseText: z.string().min(10, "Response must be at least 10 characters"),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = ctx.user!;
+
+      // Get the review and verify office ownership
+      const review = await db.getReviewById(input.reviewId);
+      if (!review) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Review not found",
+        });
+      }
+
+      const office = await db.getOfficeById(review.officeId);
+      if (!office || office.ownerId !== user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You can only reply to reviews for your own office",
+        });
+      }
+
+      // Update the review with response
+      await db.addOwnerResponseToReview(input.reviewId, input.responseText);
+
+      return { success: true };
+    }),
+
   // Calculate cancellation refund/penalty
   calculateCancellation: protectedProcedure
     .input(z.object({ bookingId: z.number() }))

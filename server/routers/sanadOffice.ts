@@ -421,6 +421,37 @@ export const sanadOfficeRouter = router({
       return { success: true };
     }),
 
+  // Update document expiry dates
+  updateExpiryDates: protectedProcedure
+    .input(
+      z.object({
+        officeId: z.number(),
+        licenseExpiryDate: z.string().optional(),
+        tradeLicenseExpiryDate: z.string().optional(),
+        taxRegistrationExpiryDate: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { officeId, ...dates } = input;
+      
+      // Verify office ownership
+      const office = await db.getOfficeById(officeId);
+      if (!office || office.ownerId !== ctx.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have permission to update this office",
+        });
+      }
+
+      const updates: any = {};
+      if (dates.licenseExpiryDate) updates.licenseExpiryDate = new Date(dates.licenseExpiryDate);
+      if (dates.tradeLicenseExpiryDate) updates.tradeLicenseExpiryDate = new Date(dates.tradeLicenseExpiryDate);
+      if (dates.taxRegistrationExpiryDate) updates.taxRegistrationExpiryDate = new Date(dates.taxRegistrationExpiryDate);
+
+      await db.updateOfficeProfile(officeId, updates);
+      return { success: true };
+    }),
+
   // Service Management
   createService: protectedProcedure
     .input(z.object({

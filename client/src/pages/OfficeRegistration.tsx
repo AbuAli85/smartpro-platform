@@ -45,6 +45,9 @@ export default function OfficeRegistration() {
     licenseDocumentUrl: "",
     certificateUrls: [] as string[],
     permitUrls: [] as string[],
+    licenseExpiryDate: "",
+    tradeLicenseExpiryDate: "",
+    taxRegistrationExpiryDate: "",
     termsAccepted: false,
   });
 
@@ -384,14 +387,28 @@ export default function OfficeRegistration() {
                     </p>
                   </div>
 
-                  <DocumentUpload
-                    label="Business License *"
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    maxSizeMB={10}
-                    onUploadComplete={(url) => handleInputChange("licenseDocumentUrl", url)}
-                    currentUrl={formData.licenseDocumentUrl}
-                    onRemove={() => handleInputChange("licenseDocumentUrl", "")}
-                  />
+                  <div className="space-y-4">
+                    <DocumentUpload
+                      label="Business License *"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      maxSizeMB={10}
+                      onUploadComplete={(url) => handleInputChange("licenseDocumentUrl", url)}
+                      currentUrl={formData.licenseDocumentUrl}
+                      onRemove={() => handleInputChange("licenseDocumentUrl", "")}
+                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="licenseExpiryDate">License Expiry Date (Optional)</Label>
+                      <Input
+                        id="licenseExpiryDate"
+                        type="date"
+                        value={formData.licenseExpiryDate}
+                        onChange={(e) => handleInputChange("licenseExpiryDate", e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        We'll remind you before your license expires
+                      </p>
+                    </div>
+                  </div>
 
                   <MultiDocumentUpload
                     label="Certificates (Optional)"

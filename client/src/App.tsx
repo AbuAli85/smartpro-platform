@@ -44,6 +44,9 @@ import MarketplaceBrowser from "./pages/MarketplaceBrowser";
 import MyServiceRequests from "./pages/MyServiceRequests";
 import OfficeRegistration from "./pages/OfficeRegistration";
 import ServiceCatalog from "./pages/ServiceCatalog";
+import ServiceBundles from "./pages/ServiceBundles";
+import DocumentExpiryDashboard from "./pages/DocumentExpiryDashboard";
+import CustomerReviews from "./pages/CustomerReviews";
 import UserManagement from "./pages/UserManagement";
 import OfficeVerification from "./pages/OfficeVerification";
 import OnboardingWizard from "./pages/OnboardingWizard";
@@ -97,6 +100,9 @@ function Router() {
       {/* Office Dashboard */}
       <Route path="/office-dashboard" component={OfficeDashboard} />
       <Route path="/service-catalog" component={ServiceCatalog} />
+      <Route path="/service-bundles" component={ServiceBundles} />
+      <Route path="/document-expiry" component={DocumentExpiryDashboard} />
+      <Route path="/customer-reviews" component={CustomerReviews} />
       
       {/* Profile */}
       <Route path="/profile" component={Profile} />

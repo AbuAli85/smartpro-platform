@@ -104,6 +104,11 @@ export const sanadOffices = mysqlTable("sanad_offices", {
   certificateUrls: json("certificateUrls").$type<string[]>(),
   permitUrls: json("permitUrls").$type<string[]>(),
   
+  // Document Expiry Tracking
+  licenseExpiryDate: timestamp("licenseExpiryDate"),
+  tradeLicenseExpiryDate: timestamp("tradeLicenseExpiryDate"),
+  taxRegistrationExpiryDate: timestamp("taxRegistrationExpiryDate"),
+  
   // Analytics
   totalOrders: int("totalOrders").default(0).notNull(),
   completedOrders: int("completedOrders").default(0).notNull(),

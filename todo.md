@@ -147,3 +147,43 @@
 - [x] Office performance ratings
 - [x] Document generation statistics
 - [x] Compliance status overview
+
+## 🎯 New Features - Value Enhancement
+
+### Service Bundles (Package Deals)
+- [x] Extend database schema to add service_bundles table
+- [x] Add bundle_services junction table for many-to-many relationship
+- [x] Create tRPC procedures for bundle CRUD operations
+- [x] Build ServiceBundles page component for office owners
+- [x] Add bundle creation form with service selector
+- [x] Implement discount calculation (percentage or fixed amount)
+- [x] Add bundle preview with total savings display
+- [x] Integrate bundles into marketplace browsing
+- [x] Add bundle booking flow
+- [x] Show bundle savings in booking confirmation
+
+### Document Expiry Tracking
+- [x] Add expiry date fields to sanad_offices table (license, certificates, permits)
+- [x] Create document_expirations table for tracking
+- [x] Build expiry date input in OfficeRegistration form
+- [x] Add expiry status badges in admin verification
+- [x] Create automated reminder job (30 days, 7 days, expired)
+- [x] Implement email notifications for expiring documents
+- [x] Build expiry dashboard for office owners
+- [x] Add renewal document upload workflow
+- [x] Create admin alerts for expired office documents
+- [x] Implement auto-suspension for offices with expired critical documents
+
+### Customer Reviews System
+- [x] Create service_reviews table (rating, comment, booking_id)
+- [x] Add review_responses table for office replies
+- [x] Build tRPC procedures for review CRUD
+- [x] Add review submission form after completed bookings
+- [x] Create review display component with star ratings
+- [x] Build office reviews page showing all feedback
+- [x] Implement review moderation for admins
+- [x] Add aggregate rating calculation to offices
+- [x] Show average rating on office cards
+- [x] Create review analytics dashboard for offices
+- [x] Add helpful/not helpful voting on reviews
+- [x] Implement review reply functionality for office owners
