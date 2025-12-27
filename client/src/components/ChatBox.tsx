@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { io, Socket } from "socket.io-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, MessageCircle } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useSocket } from "@/contexts/SocketContext";
 
 interface Message {
   id: string;
@@ -21,7 +21,7 @@ interface ChatBoxProps {
 
 export default function ChatBox({ bookingId, officeName }: ChatBoxProps) {
   const { user } = useAuth();
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const { socket, isConnected } = useSocket();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -29,44 +29,44 @@ export default function ChatBox({ bookingId, officeName }: ChatBoxProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize Socket.IO connection
+  // Join chat room using shared socket
   useEffect(() => {
-    if (!user) return;
+    if (!user || !socket || !isConnected) return;
 
-    const socketInstance = io(window.location.origin, {
-      transports: ["websocket", "polling"],
+    console.log("[ChatBox] Joining chat room for booking", bookingId);
+    socket.emit("join_chat", {
+      bookingId,
+      userId: user.id,
     });
 
-    socketInstance.on("connect", () => {
-      console.log("Connected to chat server");
-      socketInstance.emit("join_chat", {
-        bookingId,
-        userId: user.id,
-      });
-    });
-
-    socketInstance.on("new_message", (message: Message) => {
+    // Set up message listeners
+    const handleNewMessage = (message: Message) => {
       setMessages((prev) => [...prev, message]);
-    });
+    };
 
-    socketInstance.on("user_typing", (data: { userName: string }) => {
+    const handleUserTyping = (data: { userName: string }) => {
       setTypingUser(data.userName);
-    });
+    };
 
-    socketInstance.on("user_stop_typing", () => {
+    const handleUserStopTyping = () => {
       setTypingUser(null);
-    });
+    };
 
-    setSocket(socketInstance);
+    socket.on("new_message", handleNewMessage);
+    socket.on("user_typing", handleUserTyping);
+    socket.on("user_stop_typing", handleUserStopTyping);
 
     return () => {
-      socketInstance.emit("leave_chat", {
+      console.log("[ChatBox] Leaving chat room for booking", bookingId);
+      socket.emit("leave_chat", {
         bookingId,
         userId: user.id,
       });
-      socketInstance.disconnect();
+      socket.off("new_message", handleNewMessage);
+      socket.off("user_typing", handleUserTyping);
+      socket.off("user_stop_typing", handleUserStopTyping);
     };
-  }, [bookingId, user]);
+  }, [bookingId, user, socket, isConnected]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {

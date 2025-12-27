@@ -2752,3 +2752,16 @@ The booking form already includes:
 - [x] Add SocketProvider to App.tsx component tree
 - [ ] Test WebSocket connection in development environment
 - [ ] Verify real-time notifications work correctly after fix
+
+
+## IMPLEMENTATION: WebSocket Infrastructure Improvements (Dec 27, 2025)
+- [x] Migrate ChatBox component to use shared SocketContext
+- [x] Migrate ChatWidget component to use shared SocketContext
+- [x] Migrate ChatInbox component to use shared SocketContext
+- [x] Create ConnectionStatusIndicator component
+- [x] Add connection status indicator to Sidebar header
+- [x] Implement offline queue system in SocketContext
+- [x] Add automatic retry logic for failed events
+- [x] Add toast notifications for connection status changes
+- [ ] Test connection status indicator with network throttling
+- [ ] Test offline queue with simulated disconnections

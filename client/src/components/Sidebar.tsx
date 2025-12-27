@@ -37,6 +37,7 @@ import { NotificationBadge } from "@/components/NotificationBadge";
 import { NotificationDropdown } from "./NotificationDropdown";
 import { LanguageToggle } from "./LanguageToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { ConnectionStatusIndicator } from "./ConnectionStatusIndicator";
 
 interface SidebarProps {
   className?: string;
@@ -140,7 +141,7 @@ export function Sidebar({ className }: SidebarProps) {
 
       {/* User Profile Section */}
       {user && (
-        <div className="p-4 border-b border-border">
+        <div className="p-4 border-b border-border space-y-3">
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10">
               <AvatarFallback className="bg-gradient-to-br from-[#003366] to-[#004488] text-white">
@@ -154,6 +155,11 @@ export function Sidebar({ className }: SidebarProps) {
               </div>
             )}
           </div>
+          {!isCollapsed && (
+            <div className="flex justify-center">
+              <ConnectionStatusIndicator />
+            </div>
+          )}
         </div>
       )}
 

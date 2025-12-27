@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { io, Socket } from "socket.io-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,6 +16,7 @@ import {
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
+import { useSocket } from "@/contexts/SocketContext";
 import { formatDistanceToNow } from "date-fns";
 import { requestNotificationPermission, sendChatNotification, canSendNotifications } from "@/lib/notifications";
 import { useLocation } from "wouter";
@@ -137,7 +137,7 @@ export default function ChatInbox() {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [filter, setFilter] = useState<"active" | "archived">("active");
   
-  const socketRef = useRef<Socket | null>(null);
+  const { socket, isConnected } = useSocket();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [, setLocation] = useLocation();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -259,21 +259,10 @@ export default function ChatInbox() {
 
   // Initialize Socket.io
   useEffect(() => {
-    if (!user || !selectedConversationId) return;
+    if (!user || !selectedConversationId || !socket || !isConnected) return;
 
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    const socket = io(window.location.origin, {
-      auth: { token },
-    });
-
-    socketRef.current = socket;
-
-    socket.on("connect", () => {
-      console.log("[ChatInbox] Connected to socket");
-      socket.emit("join_chat", { bookingId: selectedConversationId, userId: user.id });
-    });
+    console.log("[ChatInbox] Joining chat for conversation", selectedConversationId);
+    socket.emit("join_chat", { bookingId: selectedConversationId, userId: user.id });
 
     socket.on("new_message", (data: any) => {
       // Send browser notification if enabled and message is from another user
@@ -299,10 +288,11 @@ export default function ChatInbox() {
     });
 
     return () => {
-      if (socketRef.current) {
-        socketRef.current.emit("leave_chat", { bookingId: selectedConversationId, userId: user.id });
-        socketRef.current.disconnect();
-      }
+      console.log("[ChatInbox] Leaving chat for conversation", selectedConversationId);
+      socket.emit("leave_chat", { bookingId: selectedConversationId, userId: user.id });
+      socket.off("new_message");
+      socket.off("user_typing");
+      socket.off("user_stop_typing");
     };
   }, [user, selectedConversationId, refetchConversations]);
 
@@ -311,9 +301,9 @@ export default function ChatInbox() {
   };
 
   const handleSendMessage = () => {
-    if (!message.trim() || !socketRef.current || !user || !selectedConversationId) return;
+    if (!message.trim() || !socket || !user || !selectedConversationId) return;
 
-    socketRef.current.emit("send_message", {
+    socket.emit("send_message", {
       bookingId: selectedConversationId,
       userId: user.id,
       userName: user.name,

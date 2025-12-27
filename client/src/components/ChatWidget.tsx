@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { io, Socket } from "socket.io-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +8,7 @@ import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
 import { sendChatNotification, requestNotificationPermission, canSendNotifications } from "@/lib/notifications";
+import { useSocket } from "@/contexts/SocketContext";
 
 interface ChatWidgetProps {
   officeId: number;
@@ -34,7 +34,7 @@ export default function ChatWidget({ officeId, officeName }: ChatWidgetProps) {
   const [conversationId, setConversationId] = useState<number | null>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   
-  const socketRef = useRef<Socket | null>(null);
+  const { socket, isConnected } = useSocket();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -118,25 +118,14 @@ export default function ChatWidget({ officeId, officeName }: ChatWidgetProps) {
     }
   }, [isOpen, notificationsEnabled]);
 
-  // Initialize Socket.io
+  // Join chat using shared socket
   useEffect(() => {
-    if (!isOpen || !user || !conversationId) return;
+    if (!isOpen || !user || !conversationId || !socket || !isConnected) return;
 
-    const token = localStorage.getItem("token");
-    if (!token) return;
+    console.log("[ChatWidget] Joining chat for conversation", conversationId);
+    socket.emit("join_chat", { bookingId: conversationId, userId: user.id });
 
-    const socket = io(window.location.origin, {
-      auth: { token },
-    });
-
-    socketRef.current = socket;
-
-    socket.on("connect", () => {
-      console.log("[Chat] Connected to socket");
-      socket.emit("join_chat", { bookingId: conversationId, userId: user.id });
-    });
-
-    socket.on("new_message", (data: any) => {
+    const handleNewMessage = (data: any) => {
       const isFromOther = data.userId !== user.id;
       
       setMessages(prev => [...prev, {
@@ -166,9 +155,9 @@ export default function ChatWidget({ officeId, officeName }: ChatWidgetProps) {
           );
         }
       }
-    });
+    };
 
-    socket.on("user_typing", (data: any) => {
+    const handleUserTyping = (data: any) => {
       if (data.userId !== user.id) {
         setIsTyping(true);
         if (typingTimeoutRef.current) {
@@ -178,24 +167,29 @@ export default function ChatWidget({ officeId, officeName }: ChatWidgetProps) {
           setIsTyping(false);
         }, 3000);
       }
-    });
+    };
 
-    socket.on("user_stop_typing", (data: any) => {
+    const handleUserStopTyping = (data: any) => {
       if (data.userId !== user.id) {
         setIsTyping(false);
         if (typingTimeoutRef.current) {
           clearTimeout(typingTimeoutRef.current);
         }
       }
-    });
+    };
+
+    socket.on("new_message", handleNewMessage);
+    socket.on("user_typing", handleUserTyping);
+    socket.on("user_stop_typing", handleUserStopTyping);
 
     return () => {
-      if (socketRef.current) {
-        socketRef.current.emit("leave_chat", { bookingId: conversationId, userId: user.id });
-        socketRef.current.disconnect();
-      }
+      console.log("[ChatWidget] Leaving chat for conversation", conversationId);
+      socket.emit("leave_chat", { bookingId: conversationId, userId: user.id });
+      socket.off("new_message", handleNewMessage);
+      socket.off("user_typing", handleUserTyping);
+      socket.off("user_stop_typing", handleUserStopTyping);
     };
-  }, [isOpen, user, conversationId, isMinimized]);
+  }, [isOpen, user, conversationId, isMinimized, socket, isConnected, notificationsEnabled, officeName]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -239,8 +233,8 @@ export default function ChatWidget({ officeId, officeName }: ChatWidgetProps) {
       });
 
       // Also broadcast via Socket.io for real-time updates
-      if (socketRef.current?.connected) {
-        socketRef.current.emit("send_message", {
+      if (socket?.connected) {
+        socket.emit("send_message", {
           bookingId: conversationId,
           userId: user.id,
           userName: user.name,
@@ -249,8 +243,8 @@ export default function ChatWidget({ officeId, officeName }: ChatWidgetProps) {
       }
 
       // Stop typing indicator
-      if (socketRef.current?.connected) {
-        socketRef.current.emit("stop_typing", {
+      if (socket?.connected) {
+        socket.emit("stop_typing", {
           bookingId: conversationId,
           userId: user.id,
         });
@@ -263,9 +257,9 @@ export default function ChatWidget({ officeId, officeName }: ChatWidgetProps) {
   };
 
   const handleTyping = () => {
-    if (!socketRef.current || !user) return;
+    if (!socket || !user) return;
 
-    socketRef.current.emit("typing", {
+    socket.emit("typing", {
       bookingId: conversationId,
       userId: user.id,
       userName: user.name,
@@ -278,7 +272,7 @@ export default function ChatWidget({ officeId, officeName }: ChatWidgetProps) {
 
     // Stop typing after 2 seconds of inactivity
     typingTimeoutRef.current = setTimeout(() => {
-      socketRef.current?.emit("stop_typing", {
+      socket?.emit("stop_typing", {
         bookingId: conversationId,
         userId: user.id,
       });
