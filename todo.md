@@ -2839,3 +2839,10 @@ The booking form already includes:
 - [ ] Add onboarding progress tracking
 - [ ] Redirect approved offices to onboarding wizard
 - [ ] Allow skip and resume later functionality
+
+
+## BUG FIX: Vite HMR WebSocket Configuration (Dec 27, 2025)
+- [x] Fix Vite HMR WebSocket configuration to use correct proxy domain
+- [x] Update vite.config.ts with proper HMR settings (clientPort: 443, protocol: wss)
+- [x] Restart dev server to apply changes
+- [ ] Test hot reload functionality after fix
