@@ -99,7 +99,7 @@ export default function OfficesList() {
             <Button asChild size="lg" className="bg-gradient-accent hover:opacity-90">
               <Link href="/create-office" className="flex items-center gap-2">
                   <Plus className="w-4 h-4" />
-                  Register Your Office
+                  {t("offices.registerYourOffice")}
               </Link>
             </Button>
           )}
@@ -194,7 +194,7 @@ export default function OfficesList() {
                     )}
                     <CardTitle className="line-clamp-1">{office.officeName}</CardTitle>
                     <CardDescription className="line-clamp-2">
-                      {office.description || "Professional business services"}
+                      {office.description || t("offices.professionalServices")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-3">
@@ -208,24 +208,24 @@ export default function OfficesList() {
                         <span className="font-medium">{office.averageRating || "0.0"}</span>
                       </div>
                       <span className="text-sm text-muted-foreground">
-                        ({office.totalReviews || 0} reviews)
+                        ({office.totalReviews || 0} {t("offices.reviewsCount")})
                       </span>
                     </div>
                     <div className="flex gap-2 flex-wrap">
                       {office.verificationStatus === "verified" && (
                         <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
-                          ✓ Verified
+                          ✓ {t("offices.verified")}
                         </Badge>
                       )}
                       {office.autoAcceptBookings && (
-                        <Badge variant="secondary">Instant Booking</Badge>
+                        <Badge variant="secondary">{t("offices.instantBooking")}</Badge>
                       )}
                     </div>
                   </CardContent>
                   <CardFooter>
                     <Button asChild variant="default" className="w-full">
                       <Link href={`/offices/${office.id}`}>
-                        View Office
+                        {t("offices.viewOffice")}
                       </Link>
                     </Button>
                   </CardFooter>
@@ -241,17 +241,17 @@ export default function OfficesList() {
                   disabled={page === 1}
                   onClick={() => setPage(page - 1)}
                 >
-                  Previous
+                  {t("offices.previous")}
                 </Button>
                 <span className="flex items-center px-4 text-sm">
-                  Page {page} of {Math.ceil(data.total / data.limit)}
+                  {t("offices.page")} {page} {t("offices.of")} {Math.ceil(data.total / data.limit)}
                 </span>
                 <Button
                   variant="outline"
                   disabled={page >= Math.ceil(data.total / data.limit)}
                   onClick={() => setPage(page + 1)}
                 >
-                  Next
+                  {t("offices.next")}
                 </Button>
               </div>
             )}
@@ -261,16 +261,16 @@ export default function OfficesList() {
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
               <Building2 className="w-10 h-10 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">No offices found</h3>
+            <h3 className="text-lg font-semibold mb-2">{t("offices.noOfficesFound")}</h3>
             <p className="text-muted-foreground mb-6">
               {search || governorate
-                ? "Try adjusting your search criteria"
-                : "Be the first to register your Sanad office"}
+                ? t("offices.adjustSearchCriteria")
+                : t("offices.beFirstToRegister")}
             </p>
             {isAuthenticated && (
               <Button asChild>
                 <Link href="/create-office">
-                  Register Your Office
+                  {t("offices.registerYourOffice")}
                 </Link>
               </Button>
             )}

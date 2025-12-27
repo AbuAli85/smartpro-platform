@@ -40,6 +40,7 @@ import TranslationQualityDashboard from "./pages/TranslationQualityDashboard";
 import ReviewQueue from "./pages/ReviewQueue";
 import SmartBatchProcessing from "./pages/SmartBatchProcessing";
 import TranslatorTraining from "./pages/TranslatorTraining";
+import TranslationManagement from "./pages/TranslationManagement";
 import NotificationPreferences from "./pages/NotificationPreferences";
 import LanguageSettings from "./pages/LanguageSettings";
 import RequestServicePage from "./pages/RequestServicePage";
@@ -101,6 +102,7 @@ function Router() {
       <Route path="/admin/review-queue" component={ReviewQueue} />
       <Route path="/admin/batch-processing" component={SmartBatchProcessing} />
       <Route path="/admin/training" component={TranslatorTraining} />
+      <Route path="/admin/translation-management" component={TranslationManagement} />
       
       {/* Office Dashboard */}
       <Route path="/office-dashboard" component={OfficeDashboard} />

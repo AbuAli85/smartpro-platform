@@ -14,7 +14,7 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 // Translation dictionary
-const translations: Record<Language, Record<string, string>> = {
+export const translations: Record<Language, Record<string, string>> = {
   en: {
     // Navigation
     "nav.home": "Home",
@@ -166,6 +166,20 @@ const translations: Record<Language, Record<string, string>> = {
     "home.features.templatesDesc": "Access thousands of ready-to-use business document templates",
     "home.features.booking": "Online Booking",
     "home.features.bookingDesc": "Schedule appointments and manage bookings seamlessly",
+    
+    // Offices Page (Additional Keys)
+    "offices.registerYourOffice": "Register Your Office",
+    "offices.professionalServices": "Professional business services",
+    "offices.reviewsCount": "reviews",
+    "offices.verified": "Verified",
+    "offices.instantBooking": "Instant Booking",
+    "offices.viewOffice": "View Office",
+    "offices.previous": "Previous",
+    "offices.next": "Next",
+    "offices.page": "Page",
+    "offices.noOfficesFound": "No offices found",
+    "offices.adjustSearchCriteria": "Try adjusting your search criteria",
+    "offices.beFirstToRegister": "Be the first to register your Sanad office",
     
     // Feature Cards Section
     "home.featureCards.sectionBadge": "Platform Features",
@@ -522,6 +536,20 @@ const translations: Record<Language, Record<string, string>> = {
     "home.features.booking": "الحجز عبر الإنترنت",
     "home.features.bookingDesc": "جدولة المواعيد وإدارة الحجوزات بسهولة",
     
+    // Offices Page (Additional Keys)
+    "offices.registerYourOffice": "سجل مكتبك",
+    "offices.professionalServices": "خدمات أعمال محترفة",
+    "offices.reviewsCount": "تقييم",
+    "offices.verified": "موثق",
+    "offices.instantBooking": "حجز فوري",
+    "offices.viewOffice": "عرض المكتب",
+    "offices.previous": "السابق",
+    "offices.next": "التالي",
+    "offices.page": "صفحة",
+    "offices.noOfficesFound": "لم يتم العثور على مكاتب",
+    "offices.adjustSearchCriteria": "حاول تعديل معايير البحث",
+    "offices.beFirstToRegister": "كن أول من يسجل مكتب سند",
+    
     // Feature Cards Section
     "home.featureCards.sectionBadge": "ميزات المنصة",
     "home.featureCards.sectionTitle": "لماذا تختار SmartPro؟",
@@ -722,12 +750,29 @@ const translations: Record<Language, Record<string, string>> = {
   },
 };
 
+// Helper function to detect browser language
+function detectBrowserLanguage(): Language {
+  const browserLang = navigator.language || navigator.languages?.[0];
+  // Check if browser language is Arabic (ar, ar-*)
+  if (browserLang?.toLowerCase().startsWith('ar')) {
+    return 'ar';
+  }
+  // Default to English for all other languages
+  return 'en';
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [language, setLanguageState] = useState<Language>(() => {
-    // Load from localStorage or default to English
+    // Priority: localStorage > browser language > default (en)
     const saved = localStorage.getItem("smartpro-language");
-    return (saved === "ar" || saved === "en") ? saved : "en";
+    if (saved === "ar" || saved === "en") {
+      return saved;
+    }
+    // First visit: detect from browser
+    const detected = detectBrowserLanguage();
+    localStorage.setItem("smartpro-language", detected);
+    return detected;
   });
 
   const updateLanguageMutation = trpc.auth.updateLanguagePreference.useMutation();

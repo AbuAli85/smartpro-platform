@@ -157,6 +157,7 @@ export function Sidebar({ className }: SidebarProps) {
     navigation.push({ name: t("nav.reviewQueue"), href: "/admin/review-queue", icon: MessageSquareText, requiresAuth: true });
     navigation.push({ name: t("nav.batchProcessing"), href: "/admin/batch-processing", icon: Zap, requiresAuth: true });
     navigation.push({ name: t("nav.translatorTraining"), href: "/admin/training", icon: BookOpen, requiresAuth: true });
+    navigation.push({ name: "Translation Management", href: "/admin/translation-management", icon: Languages, requiresAuth: true });
   }
 
   const filteredNavigation = navigation.filter((item) => {
