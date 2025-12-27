@@ -634,6 +634,14 @@ export async function getUserBookings(userId: number) {
       updatedAt: bookings.updatedAt,
       officeName: sanadOffices.officeName,
       serviceName: sanadOfficeServices.serviceName,
+      // Office details
+      officePhone: sanadOffices.phone,
+      officeEmail: sanadOffices.email,
+      officeAddress: sanadOffices.addressLine1,
+      officeGovernorate: sanadOffices.governorate,
+      officeWilayat: sanadOffices.wilayat,
+      officeSlug: sanadOffices.slug,
+      officeRating: sanadOffices.averageRating,
     })
     .from(bookings)
     .leftJoin(sanadOffices, eq(bookings.officeId, sanadOffices.id))
@@ -648,11 +656,45 @@ export async function getOfficeBookings(officeId: number) {
   const db = await getDb();
   if (!db) return [];
 
-  return await db
-    .select()
+  const results = await db
+    .select({
+      id: bookings.id,
+      officeId: bookings.officeId,
+      serviceId: bookings.serviceId,
+      userId: bookings.userId,
+      bookingType: bookings.bookingType,
+      serviceDescription: bookings.serviceDescription,
+      requirements: bookings.requirements,
+      preferredDate: bookings.preferredDate,
+      scheduledDate: bookings.scheduledDate,
+      scheduledTime: bookings.scheduledTime,
+      duration: bookings.duration,
+      completedDate: bookings.completedDate,
+      status: bookings.status,
+      cancellationReason: bookings.cancellationReason,
+      cancelledBy: bookings.cancelledBy,
+      cancelledAt: bookings.cancelledAt,
+      cancellationPenalty: bookings.cancellationPenalty,
+      refundAmount: bookings.refundAmount,
+      price: bookings.price,
+      currency: bookings.currency,
+      paymentStatus: bookings.paymentStatus,
+      notes: bookings.notes,
+      createdAt: bookings.createdAt,
+      updatedAt: bookings.updatedAt,
+      serviceName: sanadOfficeServices.serviceName,
+      // Customer details
+      customerName: users.name,
+      customerEmail: users.email,
+      customerPhone: users.phone,
+    })
     .from(bookings)
+    .leftJoin(sanadOfficeServices, eq(bookings.serviceId, sanadOfficeServices.id))
+    .leftJoin(users, eq(bookings.userId, users.id))
     .where(eq(bookings.officeId, officeId))
     .orderBy(desc(bookings.createdAt));
+
+  return results;
 }
 
 export async function updateBooking(id: number, updates: Partial<Booking>) {

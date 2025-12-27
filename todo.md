@@ -2546,3 +2546,85 @@ The booking form already includes:
 - [x] Show reasons for each recommendation
 - [x] Add "Get Recommendations" button to Step 1
 - [x] Integrate quiz and results into booking flow
+
+
+## FEATURE: Enhanced My Bookings Page (Dec 27, 2025)
+### Backend Implementation
+- [x] Add getBookingDetails procedure with role-based data
+- [x] Include office information in booking response
+- [x] Include customer information for office/admin views
+- [x] Add booking timeline/history tracking
+- [ ] Create admin booking management procedures
+
+### Frontend Implementation
+- [x] Redesign BookingsList with detailed cards
+- [x] Add role-based information display (customer/office/admin)
+- [x] Show office details for customer view
+- [x] Show customer details for office/admin view
+- [x] Add booking timeline component
+- [x] Display service requirements and notes
+- [x] Add quick actions (contact, reschedule, cancel)
+
+## FEATURE: Service Request Marketplace (Dec 27, 2025)
+### Backend Implementation
+- [ ] Create service_requests table (customer posts need)
+- [ ] Create service_bids table (offices bid on requests)
+- [ ] Add createServiceRequest procedure
+- [ ] Add listServiceRequests procedure (for offices)
+- [ ] Add createBid procedure
+- [ ] Add acceptBid procedure (converts to booking)
+- [ ] Add notification system for new requests/bids
+
+### Frontend Implementation
+- [ ] Create "Request a Service" page for customers
+- [ ] Build service request form (type, budget, deadline, description)
+- [ ] Create marketplace page for offices to browse requests
+- [ ] Build bidding interface for offices
+- [ ] Create bid management page for customers
+- [ ] Add bid comparison and acceptance UI
+- [ ] Show active requests in customer dashboard
+
+## FEATURE: Booking Draft Auto-Save (Dec 27, 2025)
+### Implementation
+- [ ] Create useBookingAutoSave hook with localStorage
+- [ ] Implement 30-second auto-save interval
+- [ ] Add draft expiry logic (7 days)
+- [ ] Create ResumeDraftDialog component
+- [ ] Integrate auto-save into BookOffice page
+- [ ] Add manual save draft button
+- [ ] Clear draft after successful booking
+- [ ] Test draft restoration flow
+
+## FEATURE: Service Bundles (Dec 27, 2025)
+### Backend Implementation
+- [ ] Create service_bundles table
+- [ ] Create bundle_services junction table
+- [ ] Add createBundle procedure
+- [ ] Add getBundles procedure
+- [ ] Calculate bundle discount pricing
+- [ ] Support bundle booking (creates multiple bookings)
+
+### Frontend Implementation
+- [ ] Create bundle creation form for offices
+- [ ] Display bundles on office profile
+- [ ] Add bundle cards with included services
+- [ ] Show savings amount vs individual pricing
+- [ ] Support bundle booking in wizard
+- [ ] Add bundle management to office dashboard
+
+## FEATURE: Smart Follow-up Email System (Dec 27, 2025)
+### Backend Implementation
+- [ ] Create email_campaigns table
+- [ ] Create abandoned_bookings tracking
+- [ ] Build incomplete booking detection cron job
+- [ ] Create follow-up email templates
+- [ ] Build complementary service recommendation logic
+- [ ] Add sendFollowUpEmail procedure
+- [ ] Schedule daily follow-up job
+
+### Frontend Implementation
+- [ ] Create email campaign management page (admin)
+- [ ] Add follow-up email preview
+- [ ] Build email template editor
+- [ ] Add unsubscribe functionality
+- [ ] Display follow-up statistics

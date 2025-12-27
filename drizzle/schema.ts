@@ -1213,3 +1213,85 @@ export const untranslatedContentAlerts = mysqlTable("untranslated_content_alerts
 
 export type UntranslatedContentAlert = typeof untranslatedContentAlerts.$inferSelect;
 export type InsertUntranslatedContentAlert = typeof untranslatedContentAlerts.$inferInsert;
+
+
+// ============================================================================
+// SERVICE REQUEST MARKETPLACE
+// ============================================================================
+
+export const serviceRequests = mysqlTable("service_requests", {
+  id: int("id").primaryKey().autoincrement(),
+  userId: int("user_id").notNull(),
+  
+  // Request details
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  serviceType: varchar("service_type", { length: 100 }).notNull(),
+  category: varchar("category", { length: 100 }),
+  
+  // Requirements
+  requirements: text("requirements"),
+  documents: json("documents"), // Array of uploaded document URLs
+  
+  // Budget and timeline
+  budgetMin: decimal("budget_min", { precision: 10, scale: 2 }),
+  budgetMax: decimal("budget_max", { precision: 10, scale: 2 }),
+  currency: varchar("currency", { length: 3 }).default("OMR").notNull(),
+  deadline: timestamp("deadline"),
+  urgency: mysqlEnum("urgency", ["low", "medium", "high", "urgent"]).default("medium"),
+  
+  // Location preferences
+  governorate: varchar("governorate", { length: 100 }),
+  wilayat: varchar("wilayat", { length: 100 }),
+  remoteAccepted: boolean("remote_accepted").default(true),
+  
+  // Status
+  status: mysqlEnum("status", ["open", "bidding", "awarded", "in_progress", "completed", "cancelled"]).default("open").notNull(),
+  acceptedBidId: int("accepted_bid_id"),
+  
+  // Metadata
+  viewCount: int("view_count").default(0),
+  bidCount: int("bid_count").default(0),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
+}, (table) => ({
+  userIdx: index("user_idx").on(table.userId),
+  statusIdx: index("status_idx").on(table.status),
+  categoryIdx: index("category_idx").on(table.category),
+  urgencyIdx: index("urgency_idx").on(table.urgency),
+  locationIdx: index("location_idx").on(table.governorate, table.wilayat),
+}));
+
+export const serviceBids = mysqlTable("service_bids", {
+  id: int("id").primaryKey().autoincrement(),
+  requestId: int("request_id").notNull(),
+  officeId: int("office_id").notNull(),
+  
+  // Bid details
+  proposedPrice: decimal("proposed_price", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default("OMR").notNull(),
+  estimatedDuration: varchar("estimated_duration", { length: 100 }), // e.g., "3-5 days"
+  
+  // Proposal
+  coverLetter: text("cover_letter").notNull(),
+  methodology: text("methodology"),
+  portfolio: json("portfolio"), // Array of past work examples
+  
+  // Status
+  status: mysqlEnum("status", ["pending", "accepted", "rejected", "withdrawn"]).default("pending").notNull(),
+  
+  // Metadata
+  viewedByCustomer: boolean("viewed_by_customer").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
+}, (table) => ({
+  requestIdx: index("request_idx").on(table.requestId),
+  officeIdx: index("office_idx").on(table.officeId),
+  statusIdx: index("status_idx").on(table.status),
+}));
+
+export type ServiceRequest = typeof serviceRequests.$inferSelect;
+export type InsertServiceRequest = typeof serviceRequests.$inferInsert;
+export type ServiceBid = typeof serviceBids.$inferSelect;
+export type InsertServiceBid = typeof serviceBids.$inferInsert;
