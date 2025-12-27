@@ -1,0 +1,70 @@
+{
+  "query": "SELECT oa.*, o.slug, o.id as officeId\nFROM office_availability oa\nJOIN sanad_offices o ON oa.officeId = o.id\nWHERE o.slug = 'test-office-filters-1766758228421'\nORDER BY oa.dayOfWeek",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute SELECT oa.*, o.slug, o.id as officeId\nFROM office_availability oa\nJOIN sanad_offices o ON oa.officeId = o.id\nWHERE o.slug = 'test-office-filters-1766758228421'\nORDER BY oa.dayOfWeek",
+  "rows": [
+    {
+      "id": "30001",
+      "officeId": "30020",
+      "dayOfWeek": "1",
+      "startTime": "09:00:00",
+      "endTime": "17:00:00",
+      "slotDuration": "60",
+      "isActive": "1",
+      "createdAt": "2025-12-27 00:37:10",
+      "updatedAt": "2025-12-27 00:37:10",
+      "slug": "test-office-filters-1766758228421"
+    },
+    {
+      "id": "30003",
+      "officeId": "30020",
+      "dayOfWeek": "2",
+      "startTime": "09:00:00",
+      "endTime": "17:00:00",
+      "slotDuration": "60",
+      "isActive": "1",
+      "createdAt": "2025-12-27 00:37:10",
+      "updatedAt": "2025-12-27 00:37:10",
+      "slug": "test-office-filters-1766758228421"
+    },
+    {
+      "id": "30004",
+      "officeId": "30020",
+      "dayOfWeek": "3",
+      "startTime": "09:00:00",
+      "endTime": "17:00:00",
+      "slotDuration": "60",
+      "isActive": "1",
+      "createdAt": "2025-12-27 00:37:10",
+      "updatedAt": "2025-12-27 00:37:10",
+      "slug": "test-office-filters-1766758228421"
+    },
+    {
+      "id": "30005",
+      "officeId": "30020",
+      "dayOfWeek": "4",
+      "startTime": "09:00:00",
+      "endTime": "17:00:00",
+      "slotDuration": "60",
+      "isActive": "1",
+      "createdAt": "2025-12-27 00:37:10",
+      "updatedAt": "2025-12-27 00:37:10",
+      "slug": "test-office-filters-1766758228421"
+    },
+    {
+      "id": "30002",
+      "officeId": "30020",
+      "dayOfWeek": "5",
+      "startTime": "09:00:00",
+      "endTime": "17:00:00",
+      "slotDuration": "60",
+      "isActive": "1",
+      "createdAt": "2025-12-27 00:37:10",
+      "updatedAt": "2025-12-27 00:37:10",
+      "slug": "test-office-filters-1766758228421"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tofficeId\tdayOfWeek\tstartTime\tendTime\tslotDuration\tisActive\tcreatedAt\tupdatedAt\tslug\tofficeId\n30001\t30020\t1\t09:00:00\t17:00:00\t60\t1\t2025-12-27 00:37:10\t2025-12-27 00:37:10\ttest-office-filters-1766758228421\t30020\n30003\t30020\t2\t09:00:00\t17:00:00\t60\t1\t2025-12-27 00:37:10\t2025-12-27 00:37:10\ttest-office-filters-1766758228421\t30020\n30004\t30020\t3\t09:00:00\t17:00:00\t60\t1\t2025-12-27 00:37:10\t2025-12-27 00:37:10\ttest-office-filters-1766758228421\t30020\n30005\t30020\t4\t09:00:00\t17:00:00\t60\t1\t2025-12-27 00:37:10\t2025-12-27 00:37:10\ttest-office-filters-1766758228421\t30020\n30002\t30020\t5\t09:00:00\t17:00:00\t60\t1\t2025-12-27 00:37:10\t2025-12-27 00:37:10\ttest-office-filters-1766758228421\t30020\n",
+  "stderr": "",
+  "execution_time_ms": 1495
+}
