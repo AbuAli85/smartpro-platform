@@ -2145,3 +2145,21 @@
 - [ ] Discuss additional restrictions with user
 - [ ] Implement any requested access controls
 - [ ] Update documentation
+
+
+## URGENT: User-Reported Issues (Dec 27, 2025)
+
+### Missing Book Service Button:
+- [x] Investigate why Book Service button is not visible on office profile
+- [x] Found button exists but may be hidden or off-screen
+- [x] Added prominent "Quick Actions Bar" before tabs
+- [x] Added translation keys for new UI elements
+- [ ] Test booking flow from office profile page
+
+### Chat Widget Empty State:
+- [x] Debug why chat shows "Start a conversation" instead of message history
+- [x] Found conversation ID extraction issue in ChatWidget
+- [x] Fixed conversation ID parsing to handle nested objects
+- [x] Added comprehensive logging for debugging
+- [ ] Test conversation creation and message loading
+- [ ] Verify messages persist after page refresh

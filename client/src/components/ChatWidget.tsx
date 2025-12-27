@@ -75,9 +75,24 @@ export default function ChatWidget({ officeId, officeName }: ChatWidgetProps) {
 
   useEffect(() => {
     if (conversation) {
+      console.log('[Chat] Conversation data received:', conversation);
       // Handle both direct ID and nested conversation object
-      const id = typeof conversation === 'number' ? conversation : conversation.conversation?.id;
-      setConversationId(id);
+      let id: number | undefined;
+      
+      if (typeof conversation === 'number') {
+        id = conversation;
+      } else if (conversation.conversation?.id) {
+        id = conversation.conversation.id;
+      } else if ((conversation as any).id) {
+        id = (conversation as any).id;
+      }
+      
+      console.log('[Chat] Extracted conversation ID:', id);
+      if (id) {
+        setConversationId(id);
+      } else {
+        console.error('[Chat] Could not extract conversation ID from:', conversation);
+      }
     }
   }, [conversation]);
 

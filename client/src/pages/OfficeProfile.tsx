@@ -131,16 +131,34 @@ export default function OfficeProfile() {
               </div>
             </div>
 
-            {isAuthenticated && (
-              <Button asChild size="lg" className="bg-gradient-accent">
-                <Link href={`/offices/${slug}/book`} className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    {t("office.bookService")}
-                </Link>
-              </Button>
-            )}
+            <div className="flex gap-3">
+              {isAuthenticated && (
+                <Button asChild size="lg" className="bg-gradient-accent">
+                  <Link href={`/offices/${slug}/book`} className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      {t("office.bookService")}
+                  </Link>
+                </Button>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Quick Actions Bar */}
+        {isAuthenticated && services && services.length > 0 && (
+          <div className="mb-6 p-4 bg-muted/50 rounded-lg border border-border flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-lg">{t("office.readyToBook")}</h3>
+              <p className="text-sm text-muted-foreground">{t("office.selectServiceAndBook")}</p>
+            </div>
+            <Button asChild size="lg" className="bg-gradient-accent">
+              <Link href={`/offices/${slug}/book`} className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  {t("office.bookService")}
+              </Link>
+            </Button>
+          </div>
+        )}
 
         {/* Tabs */}
         <Tabs defaultValue="about" className="space-y-6">

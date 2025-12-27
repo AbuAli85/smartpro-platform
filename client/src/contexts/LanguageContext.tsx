@@ -68,6 +68,8 @@ const translations: Record<Language, Record<string, string>> = {
     "office.noServices": "No services listed yet",
     "office.anonymous": "Anonymous",
     "office.noReviews": "No reviews yet. Be the first to review!",
+    "office.readyToBook": "Ready to book a service?",
+    "office.selectServiceAndBook": "Select from our available services and schedule your appointment",
     "admin.contentTranslation": "Content Translation",
     "admin.contentTranslationDesc": "Manage Arabic translations for offices and templates",
     "admin.offices": "Offices",
