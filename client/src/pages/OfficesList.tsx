@@ -224,7 +224,7 @@ export default function OfficesList() {
                   </CardContent>
                   <CardFooter>
                     <Button asChild variant="default" className="w-full">
-                      <Link href={`/offices/${office.slug}`}>
+                      <Link href={`/offices/${office.id}`}>
                         View Office
                       </Link>
                     </Button>

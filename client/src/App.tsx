@@ -49,7 +49,7 @@ function Router() {
       {/* Sanad Offices */}
       <Route path="/offices" component={OfficesList} />
       <Route path="/search" component={AdvancedSearch} />
-      <Route path="/offices/:slug" component={OfficeProfile} />
+      <Route path="/offices/:id" component={OfficeProfile} />
       <Route path="/create-office" component={CreateOffice} />
       <Route path="/my-offices" component={MyOffices} />
       
@@ -58,7 +58,7 @@ function Router() {
       <Route path="/templates/:id" component={TemplateDetail} />
       
       {/* Bookings */}
-      <Route path="/offices/:slug/book" component={BookOffice} />
+      <Route path="/offices/:id/book" component={BookOffice} />
       <Route path="/bookings" component={BookingsList} />
       
       {/* Documents */}

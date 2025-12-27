@@ -255,7 +255,7 @@ export default function BookingsList() {
                           <Button
                             variant="outline"
                             className="w-full"
-                            onClick={() => setLocation(`/offices/${booking.officeSlug}`)}
+                            onClick={() => setLocation(`/offices/${booking.officeId}`)}
                           >
                             <Building2 className="w-4 h-4 mr-2" />
                             View Office Profile

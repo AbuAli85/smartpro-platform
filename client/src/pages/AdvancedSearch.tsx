@@ -372,7 +372,7 @@ export default function AdvancedSearch() {
                         </Badge>
                       </div>
                       <Button asChild className="w-full">
-                        <Link href={`/offices/${office.slug}`}>
+                        <Link href={`/offices/${office.id}`}>
                           View Details
                         </Link>
                       </Button>

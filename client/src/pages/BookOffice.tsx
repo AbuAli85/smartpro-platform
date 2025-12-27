@@ -41,9 +41,9 @@ const WIZARD_STEPS = [
 
 export default function BookOffice() {
   const { t } = useLanguage();
-  const [, params] = useRoute("/offices/:slug/book");
+  const [, params] = useRoute("/offices/:id/book");
   const [, setLocation] = useLocation();
-  const slug = params?.slug || "";
+  const officeId = params?.id ? parseInt(params.id) : 0;
 
   // Wizard state
   const [currentStep, setCurrentStep] = useState(1);
@@ -93,7 +93,7 @@ export default function BookOffice() {
   };
 
   // Get office details
-  const { data: office } = trpc.sanadOffice.getBySlug.useQuery({ slug });
+  const { data: office } = trpc.sanadOffice.getById.useQuery({ id: officeId }, { enabled: officeId > 0 });
 
   // Get recommendations query
   const { data: recommendations } = trpc.sanadOffice.recommendServices.useQuery(
@@ -252,7 +252,7 @@ export default function BookOffice() {
         <div className="container py-6">
           <Button
             variant="ghost"
-            onClick={() => setLocation(`/offices/${slug}`)}
+            onClick={() => setLocation(`/offices/${officeId}`)}
             className="mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />

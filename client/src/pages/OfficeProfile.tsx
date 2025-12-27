@@ -16,8 +16,8 @@ import { useMemo, useState } from "react";
 
 export default function OfficeProfile() {
   const { t } = useLanguage();
-  const [, params] = useRoute("/offices/:slug");
-  const slug = params?.slug || "";
+  const [, params] = useRoute("/offices/:id");
+  const officeId = params?.id ? parseInt(params.id) : 0;
   const { isAuthenticated } = useAuth();
   const [filters, setFilters] = useState<ServiceFilterState>({
     category: "all",
@@ -25,7 +25,7 @@ export default function OfficeProfile() {
     maxPrice: 10000,
   });
 
-  const { data: office, isLoading } = trpc.sanadOffice.getBySlug.useQuery({ slug });
+  const { data: office, isLoading } = trpc.sanadOffice.getById.useQuery({ id: officeId }, { enabled: officeId > 0 });
   const { data: reviews } = (trpc.booking as any).getOfficeReviews.useQuery(
     { officeId: office?.id || 0 },
     { enabled: !!office?.id }
@@ -90,7 +90,7 @@ export default function OfficeProfile() {
 
   return (
     <>
-      <CanonicalURL path={`/offices/${slug}`} />
+      <CanonicalURL path={`/offices/${officeId}`} />
       <div className="min-h-screen flex flex-col bg-background">
       
 
@@ -165,7 +165,7 @@ export default function OfficeProfile() {
             <div className="flex gap-3">
               {isAuthenticated && (
                 <Button asChild size="lg" className="bg-[#003366] hover:bg-[#002244] text-white">
-                  <Link href={`/offices/${slug}/book`} className="flex items-center gap-2">
+                  <Link href={`/offices/${officeId}/book`} className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     {t("office.bookService")}
                   </Link>
@@ -183,7 +183,7 @@ export default function OfficeProfile() {
               <p className="text-sm text-muted-foreground">{t("office.selectServiceAndBook")}</p>
             </div>
             <Button asChild size="lg" className="bg-[#003366] hover:bg-[#002244] text-white">
-              <Link href={`/offices/${slug}/book`} className="flex items-center gap-2">
+              <Link href={`/offices/${officeId}/book`} className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
                   {t("office.bookService")}
               </Link>

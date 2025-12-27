@@ -2628,3 +2628,10 @@ The booking form already includes:
 - [ ] Build email template editor
 - [ ] Add unsubscribe functionality
 - [ ] Display follow-up statistics
+
+
+## BUG FIX: Office Not Found - Null ID in URL (Dec 27, 2025)
+- [x] Investigate why office ID is null in /offices/null route
+- [x] Check OfficeProfile page routing and parameter extraction
+- [x] Fix office card links to pass correct office ID
+- [x] Test office navigation from all entry points
