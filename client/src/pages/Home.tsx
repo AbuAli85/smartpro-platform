@@ -11,10 +11,13 @@ import { StructuredData, getSmartProOrganizationSchema } from "@/components/Stru
 import { CanonicalURL } from "@/components/CanonicalURL";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useRegionalContent } from "@/hooks/useRegionalContent";
+import { RegionSelector } from "@/components/RegionSelector";
 
 export default function Home() {
   const { t } = useLanguage();
   const { user } = useAuth();
+  const { region, setRegion, getRegionalContent } = useRegionalContent();
 
   return (
     <>
@@ -29,16 +32,20 @@ export default function Home() {
           
           <div className="container relative">
             <div className="mx-auto max-w-4xl text-center">
+              {/* Region Selector */}
+              <div className="flex justify-center mb-6">
+                <RegionSelector value={region} onChange={setRegion} className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2" />
+              </div>
               <Badge className="mb-6 bg-white/20 text-white border-white/30 hover:bg-white/30">
                 🚀 The Future of Business Services
               </Badge>
               
               <h1 className="text-5xl font-bold tracking-tight text-white sm:text-7xl mb-6">
-                {t("home.hero.title")}
+                {getRegionalContent("home.hero.title")}
               </h1>
               
               <p className="mt-6 text-xl leading-8 text-blue-100 max-w-2xl mx-auto">
-                {t("home.hero.subtitle")}
+                {getRegionalContent("home.hero.subtitle")}
               </p>
               
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">

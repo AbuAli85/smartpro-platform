@@ -72,7 +72,7 @@ export default function BookingsList() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <div className="container py-8">
-        <Breadcrumb items={[{ label: "My Bookings" }]} className="mb-6" />
+        <Breadcrumb items={[{ label: t("bookings.title") }]} className="mb-6" />
         <h1 className="text-4xl font-bold mb-8">{t("bookings.title")}</h1>
         
         <Tabs defaultValue="list" className="w-full">
@@ -109,7 +109,7 @@ export default function BookingsList() {
                           <div className="flex items-center gap-3 mb-2">
                             <Building2 className="w-5 h-5 text-primary" />
                             <CardTitle className="text-xl">
-                              {booking.serviceName || "Service Booking"}
+                              {booking.serviceName || t("bookings.serviceBookingDefault")}
                             </CardTitle>
                             <Badge className={getStatusColor(booking.status)}>
                               {booking.status}
@@ -163,7 +163,7 @@ export default function BookingsList() {
                                         month: "long",
                                         day: "numeric",
                                       })
-                                    : "Date not scheduled"}
+                                     : t("bookings.dateNotScheduled")}
                                 </span>
                               </div>
                               {booking.scheduledTime && (
@@ -176,7 +176,7 @@ export default function BookingsList() {
                                 <div className="flex items-center gap-2">
                                   <DollarSign className="w-4 h-4 text-muted-foreground" />
                                   <span className="text-sm font-semibold">
-                                    {booking.price} {booking.currency || "OMR"}
+                                     {booking.price} {booking.currency || t("bookings.defaultCurrency")}
                                   </span>
                                 </div>
                               )}
@@ -359,7 +359,7 @@ export default function BookingsList() {
         <ReviewDialog
           bookingId={reviewBooking.id}
           officeId={reviewBooking.officeId}
-          officeName={reviewBooking.officeName || "Office"}
+          officeName={reviewBooking.officeName || t("bookings.office")}
           open={true}
           onOpenChange={(open) => {
             if (!open) {

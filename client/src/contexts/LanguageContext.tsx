@@ -129,6 +129,21 @@ export const translations: Record<Language, Record<string, string>> = {
     "templates.noTemplatesFound": "No templates found",
     "templates.tryAdjustingFilters": "Try adjusting your search or filters",
     
+    // Bookings List (Additional)
+    "bookings.serviceBookingDefault": "Service Booking",
+    "bookings.dateNotScheduled": "Date not scheduled",
+    "bookings.defaultCurrency": "OMR",
+    
+    // Regions
+    "region.allOman": "All Oman",
+    "region.muscat": "Muscat",
+    "region.dhofar": "Dhofar",
+    "region.batinah": "Batinah",
+    "region.sharqiyah": "Sharqiyah",
+    "region.dakhliyah": "Dakhliyah",
+    "region.selectRegion": "Select Region",
+    "region.yourRegion": "Your Region",
+    
     // Service Filters
     "services.filters": "Filters",
     "services.active": "Active",
@@ -533,6 +548,21 @@ export const translations: Record<Language, Record<string, string>> = {
     "templates.page": "صفحة",
     "templates.noTemplatesFound": "لم يتم العثور على قوالب",
     "templates.tryAdjustingFilters": "حاول تعديل البحث أو الفلاتر",
+    
+    // Bookings List (Additional)
+    "bookings.serviceBookingDefault": "حجز خدمة",
+    "bookings.dateNotScheduled": "لم يتم تحديد التاريخ",
+    "bookings.defaultCurrency": "ر.ع.",
+    
+    // Regions
+    "region.allOman": "جميع عمان",
+    "region.muscat": "مسقط",
+    "region.dhofar": "ظفار",
+    "region.batinah": "الباطنة",
+    "region.sharqiyah": "الشرقية",
+    "region.dakhliyah": "الداخلية",
+    "region.selectRegion": "اختر المنطقة",
+    "region.yourRegion": "منطقتك",
     
     // Service Filters
     "services.filters": "الفلاتر",
