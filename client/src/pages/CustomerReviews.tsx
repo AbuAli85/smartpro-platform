@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ReviewResponseAssistant } from "@/components/ReviewResponseAssistant";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -20,6 +21,7 @@ export default function CustomerReviews() {
   const [isReplyDialogOpen, setIsReplyDialogOpen] = useState(false);
   const [selectedReview, setSelectedReview] = useState<any>(null);
   const [replyText, setReplyText] = useState("");
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
 
   // Get user's office
   const { data: userOffices } = trpc.sanadOffice.getMyOffices.useQuery();
@@ -357,17 +359,51 @@ export default function CustomerReviews() {
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Textarea
-                  placeholder="Write your response here..."
-                  value={replyText}
-                  onChange={(e) => setReplyText(e.target.value)}
-                  rows={5}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Tip: Be professional, empathetic, and solution-oriented
-                </p>
-              </div>
+              {!showAIAssistant ? (
+                <div className="space-y-2">
+                  <Textarea
+                    placeholder="Write your response here..."
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    rows={5}
+                  />
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-muted-foreground">
+                      Tip: Be professional, empathetic, and solution-oriented
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowAIAssistant(true)}
+                    >
+                      <Star className="h-4 w-4 mr-2" />
+                      Get AI Suggestions
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <ReviewResponseAssistant
+                    review={{
+                      id: selectedReview.id,
+                      rating: selectedReview.rating,
+                      comment: selectedReview.reviewText || "",
+                      customerName: selectedReview.userName || "Customer",
+                    }}
+                    onResponseSubmit={(response) => {
+                      setReplyText(response);
+                      setShowAIAssistant(false);
+                    }}
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowAIAssistant(false)}
+                  >
+                    Back to Manual Entry
+                  </Button>
+                </div>
+              )}
             </div>
           )}
 

@@ -48,6 +48,7 @@ import ServiceBundles from "./pages/ServiceBundles";
 import DocumentExpiryDashboard from "./pages/DocumentExpiryDashboard";
 import CustomerReviews from "./pages/CustomerReviews";
 import BundleAnalytics from "./pages/BundleAnalytics";
+import BundleRecommendations from "./pages/BundleRecommendations";
 import UserManagement from "./pages/UserManagement";
 import OfficeVerification from "./pages/OfficeVerification";
 import OnboardingWizard from "./pages/OnboardingWizard";
@@ -105,6 +106,7 @@ function Router() {
       <Route path="/document-expiry" component={DocumentExpiryDashboard} />
       <Route path="/customer-reviews" component={CustomerReviews} />
       <Route path="/bundle-analytics" component={BundleAnalytics} />
+      <Route path="/bundle-recommendations" component={BundleRecommendations} />
       
       {/* Profile */}
       <Route path="/profile" component={Profile} />

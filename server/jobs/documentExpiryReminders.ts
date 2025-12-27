@@ -1,5 +1,6 @@
 import * as db from "../db";
 import { sendEmail } from "../_core/email";
+import { sendSMS } from "../_core/sms";
 
 interface ExpiryCheck {
   officeId: number;
@@ -63,6 +64,11 @@ export async function checkDocumentExpiry() {
       try {
         await sendExpiryReminderEmail(check);
         successCount++;
+        
+        // Send SMS for critical alerts (7 days or expired)
+        if (check.daysUntilExpiry <= 7) {
+          await sendExpirySMS(check);
+        }
       } catch (error) {
         console.error(
           `[Document Expiry] Failed to send email to ${check.ownerEmail}:`,
@@ -246,4 +252,43 @@ async function sendExpiryReminderEmail(check: ExpiryCheck) {
   });
 
   console.log(`[Document Expiry] Sent ${urgencyLevel} email to ${ownerEmail} for ${documentType}`);
+}
+
+/**
+ * Send SMS alert for critical document expiry
+ */
+async function sendExpirySMS(check: ExpiryCheck) {
+  const { officeName, documentType, daysUntilExpiry, officeId } = check;
+
+  // Get office phone number
+  const office = await db.getOfficeById(officeId);
+  if (!office || !office.phone) {
+    console.log(`[Document Expiry] No phone number for office ${officeId}, skipping SMS`);
+    return;
+  }
+
+  let message: string;
+
+  if (daysUntilExpiry === 0 || daysUntilExpiry < 0) {
+    message = `🚨 URGENT: Your ${documentType} has EXPIRED. Renew immediately to avoid service suspension. - SmartPro`;
+  } else if (daysUntilExpiry <= 7) {
+    message = `⚠️ CRITICAL: Your ${documentType} expires in ${daysUntilExpiry} days. Please renew now. - SmartPro`;
+  } else {
+    return; // Only send SMS for critical alerts
+  }
+
+  try {
+    const success = await sendSMS({
+      to: office.phone,
+      message: message,
+    });
+
+    if (success) {
+      console.log(`[Document Expiry] Sent SMS to ${office.phone} for ${documentType}`);
+    } else {
+      console.error(`[Document Expiry] Failed to send SMS to ${office.phone}`);
+    }
+  } catch (error) {
+    console.error(`[Document Expiry] Error sending SMS:`, error);
+  }
 }

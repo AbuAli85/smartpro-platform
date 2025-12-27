@@ -222,3 +222,38 @@
 - [ ] Track email open rates and review completion rates
 - [ ] Create admin dashboard for review request analytics
 - [ ] Add opt-out mechanism for customers
+
+
+## 🚀 Advanced Features
+
+### SMS Notifications Integration (Twilio)
+- [x] Add Twilio SMS helper function using existing credentials
+- [x] Extend document expiry job to send SMS for 7-day alerts
+- [x] Extend document expiry job to send SMS for expired alerts
+- [x] Format SMS messages for mobile readability
+- [x] Add phone number validation and formatting
+- [x] Track SMS delivery status
+- [ ] Add SMS notification preferences to office settings
+- [ ] Create SMS delivery log table
+
+### Predictive Bundle Recommendations
+- [x] Create bundle_purchase_patterns table for tracking
+- [x] Analyze historical purchase data for patterns
+- [x] Build recommendation algorithm based on service combinations
+- [x] Create BundleRecommendations component for office dashboard
+- [x] Show suggested bundle combinations with confidence scores
+- [x] Display predicted revenue impact for each suggestion
+- [x] Add pricing optimization suggestions
+- [ ] Implement A/B testing framework for bundle pricing
+- [ ] Create admin analytics for recommendation performance
+
+### AI-Powered Review Response Templates
+- [x] Integrate LLM for sentiment analysis
+- [x] Build response generation based on review content
+- [x] Create ReviewResponseAssistant component
+- [x] Add tone selection (professional, friendly, apologetic)
+- [x] Generate 3 response suggestions per review
+- [x] Allow editing before posting
+- [ ] Track which suggestions are used
+- [ ] Learn from office owner edits to improve suggestions
+- [ ] Add common response templates library
