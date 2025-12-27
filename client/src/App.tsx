@@ -64,6 +64,7 @@ import { useNotifications } from "./hooks/useNotifications";
 import { useMarketplaceNotifications } from "./hooks/useMarketplaceNotifications";
 import { SocketProvider } from "./contexts/SocketContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 function Router() {
   return (
@@ -97,27 +98,103 @@ function Router() {
       <Route path="/documents" component={MyDocuments} />
       
       {/* Admin Panel */}
-      <Route path="/admin" component={AdminDashboard} />
-      <Route path="/admin/users" component={UserManagement} />
-      <Route path="/admin/office-verification" component={OfficeVerification} />
-      <Route path="/admin/analytics" component={AdminAnalytics} />
-      <Route path="/admin/translation-requests" component={TranslationRequestQueue} />
-      <Route path="/admin/translation-analytics" component={TranslationAnalytics} />
-      <Route path="/admin/regional-statistics" component={RegionalStatistics} />
-      <Route path="/admin/translation-quality" component={TranslationQualityDashboard} />
-      <Route path="/admin/review-queue" component={ReviewQueue} />
-      <Route path="/admin/batch-processing" component={SmartBatchProcessing} />
-      <Route path="/admin/training" component={TranslatorTraining} />
-      <Route path="/admin/translation-management" component={TranslationManagement} />
+      <Route path="/admin">
+        <ProtectedRoute requirePermission="canAccessAdminPanel">
+          <AdminDashboard />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/users">
+        <ProtectedRoute requirePermission="canManageUsers">
+          <UserManagement />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/office-verification">
+        <ProtectedRoute requirePermission="canVerifyOffices">
+          <OfficeVerification />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/analytics">
+        <ProtectedRoute requirePermission="canViewSystemAnalytics">
+          <AdminAnalytics />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/translation-requests">
+        <ProtectedRoute requirePermission="canManageTranslations">
+          <TranslationRequestQueue />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/translation-analytics">
+        <ProtectedRoute requirePermission="canManageTranslations">
+          <TranslationAnalytics />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/regional-statistics">
+        <ProtectedRoute requirePermission="canViewSystemAnalytics">
+          <RegionalStatistics />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/translation-quality">
+        <ProtectedRoute requirePermission="canManageTranslations">
+          <TranslationQualityDashboard />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/review-queue">
+        <ProtectedRoute requirePermission="canManageTranslations">
+          <ReviewQueue />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/batch-processing">
+        <ProtectedRoute requirePermission="canManageTranslations">
+          <SmartBatchProcessing />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/training">
+        <ProtectedRoute requirePermission="canManageTranslations">
+          <TranslatorTraining />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/translation-management">
+        <ProtectedRoute requirePermission="canManageTranslations">
+          <TranslationManagement />
+        </ProtectedRoute>
+      </Route>
       
       {/* Office Dashboard */}
-      <Route path="/office-dashboard" component={OfficeDashboard} />
-      <Route path="/service-catalog" component={ServiceCatalog} />
-      <Route path="/service-bundles" component={ServiceBundles} />
-      <Route path="/document-expiry" component={DocumentExpiryDashboard} />
-      <Route path="/customer-reviews" component={CustomerReviews} />
-      <Route path="/bundle-analytics" component={BundleAnalytics} />
-      <Route path="/bundle-recommendations" component={BundleRecommendations} />
+      <Route path="/office-dashboard">
+        <ProtectedRoute requirePermission="canManageOffice">
+          <OfficeDashboard />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/service-catalog">
+        <ProtectedRoute requirePermission="canManageOffice">
+          <ServiceCatalog />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/service-bundles">
+        <ProtectedRoute requirePermission="canManageOffice">
+          <ServiceBundles />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/document-expiry">
+        <ProtectedRoute requirePermission="canManageOffice">
+          <DocumentExpiryDashboard />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/customer-reviews">
+        <ProtectedRoute requirePermission="canManageOffice">
+          <CustomerReviews />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/bundle-analytics">
+        <ProtectedRoute requirePermission="canManageOffice">
+          <BundleAnalytics />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/bundle-recommendations">
+        <ProtectedRoute requirePermission="canManageOffice">
+          <BundleRecommendations />
+        </ProtectedRoute>
+      </Route>
       
       {/* Profile */}
       <Route path="/profile" component={Profile} />
@@ -133,16 +210,56 @@ function Router() {
       <Route path="/admin/analytics" component={AdminAnalytics} />
       
       {/* Office Owner */}
-      <Route path="/owner/dashboard" component={OfficeOwnerDashboard} />
-      <Route path="/owner/analytics" component={OfficeAnalytics} />
-      <Route path="/owner/templates" component={TemplateManager} />
-      <Route path="/admin/template-upload" component={TemplateUploadManager} />
-      <Route path="/owner/chat" component={ChatInbox} />
-      <Route path="/owner/chat-analytics" component={ChatAnalytics} />
-      <Route path="/owner/canned-responses" component={CannedResponses} />
-      <Route path="/owner/staff" component={StaffManagement} />
-      <Route path="/owner/staff-performance" component={StaffPerformance} />
-      <Route path="/owner/follow-up-settings" component={FollowUpSettings} />
+      <Route path="/owner/dashboard">
+        <ProtectedRoute requirePermission="canViewOfficeAnalytics">
+          <OfficeOwnerDashboard />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/owner/analytics">
+        <ProtectedRoute requirePermission="canViewOfficeAnalytics">
+          <OfficeAnalytics />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/owner/templates">
+        <ProtectedRoute requirePermission="canManageTemplates">
+          <TemplateManager />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/template-upload">
+        <ProtectedRoute requirePermission="canManageTemplates">
+          <TemplateUploadManager />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/owner/chat">
+        <ProtectedRoute requirePermission="canAccessChatInbox">
+          <ChatInbox />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/owner/chat-analytics">
+        <ProtectedRoute requirePermission="canViewChatAnalytics">
+          <ChatAnalytics />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/owner/canned-responses">
+        <ProtectedRoute requirePermission="canManageCannedResponses">
+          <CannedResponses />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/owner/staff">
+        <ProtectedRoute requirePermission="canManageStaff">
+          <StaffManagement />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/owner/staff-performance">
+        <ProtectedRoute requirePermission="canManageStaff">
+          <StaffPerformance />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/owner/follow-up-settings">
+        <ProtectedRoute requirePermission="canManageOffice">
+          <FollowUpSettings />
+        </ProtectedRoute>
+      </Route>
       
       {/* 404 */}
       <Route path="/404" component={NotFound} />

@@ -980,3 +980,35 @@ Note: This feature requires more extensive context system changes and will be im
 - [x] Import COOKIE_NAME from shared/const for consistency
 - [x] Test SSE connection establishes successfully
 - [x] Verify real-time notifications work correctly
+
+
+## 🔐 Role-Based Access Control Audit (Dec 28, 2025)
+
+### Navigation & Sidebar Issues
+- [x] Review sidebar navigation - currently shows all admin links at bottom (not grouped)
+- [x] Implement proper navigation grouping by role
+- [x] Hide admin section completely for non-admin users
+- [x] Hide office management section for regular users
+- [x] Show only relevant sections based on user role
+
+### Route Protection Issues
+- [x] Add route-level protection for admin pages
+- [x] Add route-level protection for office owner pages
+- [x] Add route-level protection for staff-only pages
+- [x] Redirect unauthorized users to 403 or home page
+- [x] Test direct URL access for protected routes
+
+### User Role Definitions
+- [x] Document expected access for each role:
+  * Regular User (user): Home, Offices, Templates, Bookings, Profile, Loyalty
+  * Sanad Owner (sanad_owner): + Office Management, Staff, Chat, Analytics
+  * Sanad Staff (sanad_staff): + Limited office features, Chat
+  * SME Owner (sme_owner): + Service Requests, Marketplace
+  * Admin (admin): All features + Admin Panel
+  * Government Official (government_official): Read-only analytics, verification
+
+### Component-Level Protection
+- [x] Add permission checks to page components (via ProtectedRoute)
+- [x] Show appropriate empty states for unauthorized access
+- [x] Hide action buttons based on permissions (via navigation filtering)
+- [x] Disable features user doesn't have access to

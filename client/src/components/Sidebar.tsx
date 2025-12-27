@@ -134,6 +134,25 @@ export function Sidebar({ className }: SidebarProps) {
       ],
     },
     {
+      title: "Admin Panel",
+      requiresAuth: true,
+      requirePermission: "canAccessAdminPanel" as const,
+      items: [
+        { name: t("nav.adminDashboard"), href: "/admin", icon: Shield, requiresAuth: true, requirePermission: "canAccessAdminPanel" as const },
+        { name: t("nav.userManagement"), href: "/admin/users", icon: Users, requiresAuth: true, requirePermission: "canManageUsers" as const },
+        { name: t("nav.officeVerification"), href: "/admin/office-verification", icon: Building2, requiresAuth: true, requirePermission: "canVerifyOffices" as const },
+        { name: t("nav.adminAnalytics"), href: "/admin/analytics", icon: BarChart3, requiresAuth: true, requirePermission: "canViewSystemAnalytics" as const },
+        { name: t("nav.regionalStatistics"), href: "/admin/regional-statistics", icon: MapPin, requiresAuth: true, requirePermission: "canViewSystemAnalytics" as const },
+        { name: "Translation Management", href: "/admin/translation-management", icon: Languages, requiresAuth: true, requirePermission: "canManageTranslations" as const },
+        { name: t("nav.translationRequests"), href: "/admin/translation-requests", icon: MessageSquareText, requiresAuth: true, requirePermission: "canManageTranslations" as const },
+        { name: t("nav.translationAnalytics"), href: "/admin/translation-analytics", icon: TrendingUp, requiresAuth: true, requirePermission: "canManageTranslations" as const },
+        { name: t("nav.translationQuality"), href: "/admin/translation-quality", icon: Activity, requiresAuth: true, requirePermission: "canManageTranslations" as const },
+        { name: t("nav.reviewQueue"), href: "/admin/review-queue", icon: MessageSquareText, requiresAuth: true, requirePermission: "canManageTranslations" as const },
+        { name: t("nav.batchProcessing"), href: "/admin/batch-processing", icon: Zap, requiresAuth: true, requirePermission: "canManageTranslations" as const },
+        { name: t("nav.translatorTraining"), href: "/admin/training", icon: BookOpen, requiresAuth: true, requirePermission: "canManageTranslations" as const },
+      ],
+    },
+    {
       title: "Rewards & Profile",
       requiresAuth: true,
       items: [
@@ -146,35 +165,33 @@ export function Sidebar({ className }: SidebarProps) {
     },
   ];
 
-  // Flatten for backward compatibility
-  const navigation: NavItem[] = navigationGroups.flatMap(group => group.items);
-
-  // Add admin links if user has admin permissions
-  if (hasPermission("canAccessAdminPanel")) {
-    navigation.push({ name: t("nav.adminDashboard"), href: "/admin", icon: Shield, requiresAuth: true });
-    navigation.push({ name: t("nav.userManagement"), href: "/admin/users", icon: Users, requiresAuth: true });
-    navigation.push({ name: t("nav.officeVerification"), href: "/admin/office-verification", icon: Building2, requiresAuth: true });
-    navigation.push({ name: t("nav.adminAnalytics"), href: "/admin/analytics", icon: BarChart3, requiresAuth: true });
-    navigation.push({ name: t("nav.contentTranslation"), href: "/admin/translations", icon: Languages, requiresAuth: true });
-    navigation.push({ name: t("nav.translationRequests"), href: "/admin/translation-requests", icon: MessageSquareText, requiresAuth: true });
-    navigation.push({ name: t("nav.translationAnalytics"), href: "/admin/translation-analytics", icon: TrendingUp, requiresAuth: true });
-    navigation.push({ name: t("nav.regionalStatistics"), href: "/admin/regional-statistics", icon: MapPin, requiresAuth: true });
-    navigation.push({ name: t("nav.translationQuality"), href: "/admin/translation-quality", icon: Activity, requiresAuth: true });
-    navigation.push({ name: t("nav.reviewQueue"), href: "/admin/review-queue", icon: MessageSquareText, requiresAuth: true });
-    navigation.push({ name: t("nav.batchProcessing"), href: "/admin/batch-processing", icon: Zap, requiresAuth: true });
-    navigation.push({ name: t("nav.translatorTraining"), href: "/admin/training", icon: BookOpen, requiresAuth: true });
-    navigation.push({ name: "Translation Management", href: "/admin/translation-management", icon: Languages, requiresAuth: true });
-  }
-
-  const filteredNavigation = navigation.filter((item) => {
+  // Filter navigation groups based on permissions
+  const filteredNavigationGroups = navigationGroups.filter((group) => {
     // Filter by auth requirement
-    if (item.requiresAuth && !user) return false;
+    if (group.requiresAuth && !user) return false;
     
     // Filter by permission requirement
-    if (item.requirePermission && !hasPermission(item.requirePermission as any)) return false;
+    if (group.requirePermission && !hasPermission(group.requirePermission as any)) return false;
     
-    return true;
+    // Filter items within the group
+    const filteredItems = group.items.filter((item) => {
+      if (item.requiresAuth && !user) return false;
+      if (item.requirePermission && !hasPermission(item.requirePermission as any)) return false;
+      return true;
+    });
+    
+    // Only show group if it has visible items
+    return filteredItems.length > 0;
   });
+  
+  // Flatten for backward compatibility
+  const filteredNavigation = filteredNavigationGroups.flatMap(group => 
+    group.items.filter((item) => {
+      if (item.requiresAuth && !user) return false;
+      if (item.requirePermission && !hasPermission(item.requirePermission as any)) return false;
+      return true;
+    })
+  );
 
   const handleLogout = async () => {
     await logout();
@@ -248,32 +265,47 @@ export function Sidebar({ className }: SidebarProps) {
 
       {/* Navigation Links */}
       <ScrollArea className="flex-1 px-3 py-4">
-        <nav className="space-y-1">
-          {filteredNavigation.map((item) => {
-            const Icon = item.icon;
-            const isActive = location === item.href;
-            return (
-              <Link key={item.href} href={item.href}>
-                <div
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer relative",
-                    isActive
-                      ? "bg-[#003366] text-white"
-                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                  )}
-                  onClick={() => setIsMobileOpen(false)}
-                >
-                  <div className="relative">
-                    <Icon className="h-5 w-5 flex-shrink-0" />
-                    {item.name === "My Bookings" && notificationCounts?.bookings && (
-                      <NotificationBadge count={notificationCounts.bookings} />
-                    )}
-                  </div>
-                  {!isCollapsed && <span>{item.name}</span>}
-                </div>
-              </Link>
-            );
-          })}
+        <nav className="space-y-6">
+          {filteredNavigationGroups.map((group, groupIndex) => (
+            <div key={groupIndex} className="space-y-1">
+              {!isCollapsed && (
+                <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  {group.title}
+                </h3>
+              )}
+              {group.items
+                .filter((item) => {
+                  if (item.requiresAuth && !user) return false;
+                  if (item.requirePermission && !hasPermission(item.requirePermission as any)) return false;
+                  return true;
+                })
+                .map((item) => {
+                  const Icon = item.icon;
+                  const isActive = location === item.href;
+                  return (
+                    <Link key={item.href} href={item.href}>
+                      <div
+                        className={cn(
+                          "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer relative",
+                          isActive
+                            ? "bg-[#003366] text-white"
+                            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                        )}
+                        onClick={() => setIsMobileOpen(false)}
+                      >
+                        <div className="relative">
+                          <Icon className="h-5 w-5 flex-shrink-0" />
+                          {item.name === t("nav.myBookings") && notificationCounts?.bookings && (
+                            <NotificationBadge count={notificationCounts.bookings} />
+                          )}
+                        </div>
+                        {!isCollapsed && <span>{item.name}</span>}
+                      </div>
+                    </Link>
+                  );
+                })}
+            </div>
+          ))}
         </nav>
       </ScrollArea>
 
