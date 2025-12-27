@@ -111,6 +111,15 @@ export const adminRouter = router({
         });
       }
 
+      // Send real-time notification via Socket.IO
+      if (office?.ownerId) {
+        const { notifyOfficeApproved } = await import("../_core/socket");
+        notifyOfficeApproved(office.ownerId, {
+          officeId: input.officeId,
+          officeName: office.officeName,
+        });
+      }
+
       return { success: true };
     }),
 
@@ -140,6 +149,16 @@ export const adminRouter = router({
           officeEmail: office.email,
           officeName: office.officeName,
           status: "rejected",
+          reason: input.reason,
+        });
+      }
+
+      // Send real-time notification via Socket.IO
+      if (office?.ownerId) {
+        const { notifyOfficeRejected } = await import("../_core/socket");
+        notifyOfficeRejected(office.ownerId, {
+          officeId: input.officeId,
+          officeName: office.officeName,
           reason: input.reason,
         });
       }

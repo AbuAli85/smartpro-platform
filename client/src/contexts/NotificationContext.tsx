@@ -1,4 +1,4 @@
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useSocket } from "./SocketContext";
@@ -43,6 +43,19 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
       staleTime: 30000, // Consider data fresh for 30s
     }
   );
+
+  // Listen for real-time notification updates from Socket.IO
+  useEffect(() => {
+    const handleNotificationUpdate = () => {
+      console.log('[Notifications] Real-time update received, refetching...');
+      refetch();
+    };
+
+    window.addEventListener('notification:update', handleNotificationUpdate);
+    return () => {
+      window.removeEventListener('notification:update', handleNotificationUpdate);
+    };
+  }, [refetch]);
 
   const value: NotificationContextType = {
     unreadCount: notificationCounts?.unreadNotifications || 0,

@@ -130,6 +130,8 @@ export const sanadOffices = mysqlTable("sanad_offices", {
   statusIdx: index("status_idx").on(table.status),
   governorateIdx: index("governorate_idx").on(table.governorate),
   verificationIdx: index("verification_idx").on(table.verificationStatus),
+  // Composite index for leaderboard queries (verification + region)
+  leaderboardIdx: index("leaderboard_idx").on(table.verificationStatus, table.governorate),
 }));
 
 export type SanadOffice = typeof sanadOffices.$inferSelect;

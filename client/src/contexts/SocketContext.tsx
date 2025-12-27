@@ -91,6 +91,50 @@ export function SocketProvider({ children }: SocketProviderProps) {
       processEventQueue(newSocket);
     });
 
+    // Real-time notification handlers
+    newSocket.on("booking:new", (data: { bookingId: number; officeName: string }) => {
+      console.log("[Socket.IO] New booking notification:", data);
+      toast.info("New Booking", {
+        description: `You have a new booking request from ${data.officeName}`,
+      });
+      // Trigger notification context refetch
+      window.dispatchEvent(new CustomEvent('notification:update'));
+    });
+
+    newSocket.on("booking:updated", (data: { bookingId: number; status: string }) => {
+      console.log("[Socket.IO] Booking updated:", data);
+      toast.info("Booking Updated", {
+        description: `Your booking status has been updated to ${data.status}`,
+      });
+      window.dispatchEvent(new CustomEvent('notification:update'));
+    });
+
+    newSocket.on("message:new", (data: { messageId: number; from: string; preview: string }) => {
+      console.log("[Socket.IO] New message:", data);
+      toast.info(`New message from ${data.from}`, {
+        description: data.preview,
+      });
+      window.dispatchEvent(new CustomEvent('notification:update'));
+    });
+
+    newSocket.on("office:approved", (data: { officeId: number; officeName: string }) => {
+      console.log("[Socket.IO] Office approved:", data);
+      toast.success("Office Approved! 🎉", {
+        description: `${data.officeName} has been verified and is now live`,
+        duration: 5000,
+      });
+      window.dispatchEvent(new CustomEvent('notification:update'));
+    });
+
+    newSocket.on("office:rejected", (data: { officeId: number; officeName: string; reason: string }) => {
+      console.log("[Socket.IO] Office rejected:", data);
+      toast.error("Office Registration Rejected", {
+        description: data.reason,
+        duration: 5000,
+      });
+      window.dispatchEvent(new CustomEvent('notification:update'));
+    });
+
     setSocket(newSocket);
 
     // Cleanup on unmount

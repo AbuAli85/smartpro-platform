@@ -196,3 +196,70 @@ export function notifyNewServiceRequest(officeOwnerIds: number[], requestData: {
 
   console.log(`[Socket.IO] Notified ${officeOwnerIds.length} offices about new request`);
 }
+
+/**
+ * Notify user about new booking
+ */
+export function notifyNewBooking(userId: number, bookingData: {
+  bookingId: number;
+  officeName: string;
+}) {
+  emitMarketplaceNotification(userId, "booking:new", {
+    ...bookingData,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+/**
+ * Notify user about booking status update
+ */
+export function notifyBookingUpdated(userId: number, bookingData: {
+  bookingId: number;
+  status: string;
+}) {
+  emitMarketplaceNotification(userId, "booking:updated", {
+    ...bookingData,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+/**
+ * Notify user about new message
+ */
+export function notifyNewMessage(userId: number, messageData: {
+  messageId: number;
+  from: string;
+  preview: string;
+}) {
+  emitMarketplaceNotification(userId, "message:new", {
+    ...messageData,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+/**
+ * Notify office owner about office approval
+ */
+export function notifyOfficeApproved(ownerId: number, officeData: {
+  officeId: number;
+  officeName: string;
+}) {
+  emitMarketplaceNotification(ownerId, "office:approved", {
+    ...officeData,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+/**
+ * Notify office owner about office rejection
+ */
+export function notifyOfficeRejected(ownerId: number, officeData: {
+  officeId: number;
+  officeName: string;
+  reason: string;
+}) {
+  emitMarketplaceNotification(ownerId, "office:rejected", {
+    ...officeData,
+    timestamp: new Date().toISOString(),
+  });
+}
