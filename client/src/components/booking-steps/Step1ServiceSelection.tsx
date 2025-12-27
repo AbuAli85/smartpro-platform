@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronUp,
+  Sparkles,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -42,6 +43,7 @@ interface Step1Props {
   selectedForComparison?: string[];
   onToggleComparison?: (serviceId: string) => void;
   onOpenComparison?: () => void;
+  onOpenRecommendation?: () => void;
 }
 
 export function Step1ServiceSelection({
@@ -52,6 +54,7 @@ export function Step1ServiceSelection({
   selectedForComparison = [],
   onToggleComparison,
   onOpenComparison,
+  onOpenRecommendation,
 }: Step1Props) {
   const [expandedService, setExpandedService] = useState<number | null>(null);
 
@@ -64,25 +67,37 @@ export function Step1ServiceSelection({
             Choose the service you need. Click on a service to see more details.
           </p>
         </div>
-        {onOpenComparison && onToggleComparison && (
-          <div className="flex flex-col items-end gap-2">
+        <div className="flex flex-col items-end gap-2">
+          {onOpenRecommendation && (
             <Button
-              variant="outline"
-              onClick={onOpenComparison}
-              disabled={selectedForComparison.length < 2}
+              variant="default"
+              onClick={onOpenRecommendation}
+              className="gap-2"
             >
-              Compare Services
-              {selectedForComparison.length > 0 && (
-                <Badge variant="secondary" className="ml-2">
-                  {selectedForComparison.length}
-                </Badge>
-              )}
+              <Sparkles className="w-4 h-4" />
+              Get Recommendations
             </Button>
-            <p className="text-xs text-muted-foreground">
-              Select 2-3 services to compare
-            </p>
-          </div>
-        )}
+          )}
+          {onOpenComparison && onToggleComparison && (
+            <>
+              <Button
+                variant="outline"
+                onClick={onOpenComparison}
+                disabled={selectedForComparison.length < 2}
+              >
+                Compare Services
+                {selectedForComparison.length > 0 && (
+                  <Badge variant="secondary" className="ml-2">
+                    {selectedForComparison.length}
+                  </Badge>
+                )}
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                Select 2-3 services to compare
+              </p>
+            </>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

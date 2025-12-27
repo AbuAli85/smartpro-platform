@@ -4,6 +4,7 @@ import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import * as db from "../db";
 import { logActivity } from "../db";
 import { localizeArray } from "../helpers/i18n";
+import { getServiceRecommendations, QuestionnaireAnswers } from "../serviceRecommendation";
 
 // Validation schemas
 const createSanadOfficeSchema = z.object({
@@ -467,6 +468,34 @@ export const sanadOfficeRouter = router({
     .mutation(async ({ ctx, input }) => {
       await db.updateSanadOfficeService(input.serviceId, { isActive: false });
       return { success: true };
+    }),
+
+  // Get service recommendations based on questionnaire
+  recommendServices: publicProcedure
+    .input(z.object({
+      officeId: z.number(),
+      answers: z.object({
+        businessType: z.enum(["startup", "sme", "enterprise", "individual"]),
+        urgency: z.enum(["immediate", "within_week", "within_month", "flexible"]),
+        budget: z.enum(["low", "medium", "high", "no_limit"]),
+        complexity: z.enum(["simple", "moderate", "complex"]),
+        documentsReady: z.enum(["yes", "partial", "no"]),
+      }),
+    }))
+    .query(async ({ input }) => {
+      const services = await db.getSanadOfficeServices(input.officeId);
+      const mappedServices = services.map(s => ({
+        id: s.id,
+        serviceName: s.serviceName,
+        price: s.price || "0",
+        estimatedDeliveryDays: s.estimatedDeliveryDays,
+      }));
+      const recommendations = getServiceRecommendations(
+        mappedServices,
+        input.answers as QuestionnaireAnswers,
+        3
+      );
+      return recommendations;
     }),
 
   // Translation Management (Admin only)

@@ -12,6 +12,8 @@ import { Step2ServiceRequirements } from "@/components/booking-steps/Step2Servic
 import { Step3TimeSlotSelection } from "@/components/booking-steps/Step3TimeSlotSelection";
 import { Step4ReviewConfirmation } from "@/components/booking-steps/Step4ReviewConfirmation";
 import { ServiceComparison } from "@/components/ServiceComparison";
+import { ServiceRecommendationQuiz } from "@/components/ServiceRecommendationQuiz";
+import { RecommendationResults } from "@/components/RecommendationResults";
 import { getServiceConfig } from "@/../../shared/serviceRequirements";
 
 const WIZARD_STEPS = [
@@ -57,6 +59,11 @@ export default function BookOffice() {
   const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
   const [comparisonOpen, setComparisonOpen] = useState(false);
 
+  // Recommendation state
+  const [quizOpen, setQuizOpen] = useState(false);
+  const [recommendationsOpen, setRecommendationsOpen] = useState(false);
+  const [quizAnswers, setQuizAnswers] = useState<any>(null);
+
   const handleToggleComparison = (serviceId: string) => {
     setSelectedForComparison((prev) => {
       if (prev.includes(serviceId)) {
@@ -68,8 +75,36 @@ export default function BookOffice() {
     });
   };
 
+  // Recommendation handlers
+  const handleQuizComplete = (answers: any) => {
+    setQuizAnswers(answers);
+    setQuizOpen(false);
+    // Wait for quiz to close, then show results
+    setTimeout(() => {
+      setRecommendationsOpen(true);
+    }, 300);
+  };
+
+  const handleSelectRecommendedService = (serviceId: string) => {
+    setSelectedServiceId(serviceId);
+    toast.success("Service Selected", {
+      description: "Based on your preferences, this service is a great match!",
+    });
+  };
+
   // Get office details
   const { data: office } = trpc.sanadOffice.getBySlug.useQuery({ slug });
+
+  // Get recommendations query
+  const { data: recommendations } = trpc.sanadOffice.recommendServices.useQuery(
+    {
+      officeId: office?.id || 0,
+      answers: quizAnswers,
+    },
+    {
+      enabled: !!office && !!quizAnswers,
+    }
+  );
 
   // Get available services for this office
   const { data: services } = trpc.sanadOffice.getServices.useQuery(
@@ -251,6 +286,18 @@ export default function BookOffice() {
                 selectedForComparison={selectedForComparison}
                 onToggleComparison={handleToggleComparison}
                 onOpenComparison={() => setComparisonOpen(true)}
+                onOpenRecommendation={() => setQuizOpen(true)}
+              />
+              <ServiceRecommendationQuiz
+                open={quizOpen}
+                onOpenChange={setQuizOpen}
+                onComplete={handleQuizComplete}
+              />
+              <RecommendationResults
+                open={recommendationsOpen}
+                onOpenChange={setRecommendationsOpen}
+                recommendations={recommendations || []}
+                onSelectService={handleSelectRecommendedService}
               />
               <ServiceComparison
                 services={(services || []).map(s => ({

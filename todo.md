@@ -2460,3 +2460,89 @@ The booking form already includes:
 - [x] Fix getServiceConfig import in BookOffice.tsx (use ES6 import instead of require)
 - [x] Verify no other require() usage in client-side code
 - [x] Test booking page loads without console errors
+
+
+## FEATURE: Booking Progress Auto-Save (Dec 27, 2025)
+
+### Auto-Save Implementation
+- [ ] Create useBookingAutoSave custom hook
+- [ ] Implement localStorage save every 30 seconds
+- [ ] Save booking state (step, service, formData, date, time)
+- [ ] Add draft detection on page load
+- [ ] Create "Resume Draft" dialog component
+- [ ] Show draft timestamp and preview
+- [ ] Add "Start Fresh" vs "Resume" options
+- [ ] Clear draft after successful booking
+- [ ] Handle draft expiration (7 days old)
+
+### UX Features
+- [ ] Show auto-save indicator (e.g., "Draft saved at 2:30 PM")
+- [ ] Add manual "Save Draft" button
+- [ ] Toast notification when draft restored
+- [ ] Draft counter in booking wizard header
+
+
+## FEATURE: Smart Service Recommendation Engine (Dec 27, 2025)
+
+### Questionnaire System
+- [ ] Create ServiceRecommendation component
+- [ ] Design 5-question questionnaire (business type, urgency, budget, complexity, documents)
+- [ ] Build question flow with progress indicator
+- [ ] Add skip/back navigation
+- [ ] Create recommendation algorithm
+- [ ] Display top 3 recommended services with match scores
+
+### Backend Integration
+- [ ] Create recommendServices tRPC procedure
+- [ ] Implement scoring algorithm based on answers
+- [ ] Weight factors (budget: 30%, urgency: 25%, complexity: 25%, business type: 20%)
+- [ ] Return services with match percentage
+
+### UX Features
+- [ ] Add "Get Recommendations" button to Step 1
+- [ ] Show recommendation results in card format
+- [ ] Display "Why we recommend this" explanation
+- [ ] Allow direct service selection from recommendations
+- [ ] Add "Retake Quiz" option
+
+
+## FEATURE: Real-time Availability Updates (Dec 27, 2025)
+
+### WebSocket Backend
+- [ ] Set up Socket.IO server integration
+- [ ] Create booking events (booking_created, booking_cancelled)
+- [ ] Implement room-based subscriptions (per office)
+- [ ] Broadcast availability changes to connected clients
+- [ ] Add connection authentication
+
+### Frontend Integration
+- [ ] Create useRealtimeAvailability hook
+- [ ] Connect to WebSocket on Step 3 (time slot selection)
+- [ ] Listen for availability updates
+- [ ] Update time slot UI in real-time
+- [ ] Show "Just booked" indicator on newly unavailable slots
+- [ ] Display connection status indicator
+
+### UX Features
+- [ ] Animate slot changes (fade out when booked)
+- [ ] Show "X people viewing this office" counter
+- [ ] Add reconnection logic for dropped connections
+- [ ] Toast notification when selected slot becomes unavailable
+
+
+## FEATURE: Service Recommendation Engine (Dec 27, 2025)
+### Backend Implementation
+- [x] Create recommendation scoring algorithm
+- [x] Define service compatibility matrix
+- [x] Create recommendServices tRPC procedure
+- [x] Add weighted scoring based on questionnaire answers
+
+### Frontend Implementation
+- [x] Create ServiceRecommendationQuiz component
+- [x] Build 5-question questionnaire UI
+- [x] Add progress indicator to quiz
+- [x] Create RecommendationResults component
+- [x] Display top 3 recommendations with match scores
+- [x] Show reasons for each recommendation
+- [x] Add "Get Recommendations" button to Step 1
+- [x] Integrate quiz and results into booking flow
