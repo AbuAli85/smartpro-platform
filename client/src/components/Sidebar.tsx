@@ -58,28 +58,71 @@ export function Sidebar({ className }: SidebarProps) {
     { enabled: !!user, refetchInterval: 30000 } // Refetch every 30 seconds
   );
 
-  const navigation = [
-    { name: t("nav.home"), href: "/", icon: Home },
-    { name: t("nav.sanadOffices"), href: "/offices", icon: Building2 },
-    { name: t("nav.documentTemplates"), href: "/templates", icon: FileText, requirePermission: "canViewTemplates" as const },
-    { name: t("nav.myBookings"), href: "/bookings", icon: Calendar, requiresAuth: true, requirePermission: "canCreateBooking" as const },
-    { name: "My Service Requests", href: "/my-requests", icon: Package, requiresAuth: true, requirePermission: "canPostServiceRequest" as const },
-    { name: "Browse Marketplace", href: "/marketplace", icon: Search, requiresAuth: true, requirePermission: "canSubmitBids" as const },
-    { name: t("nav.myOffices"), href: "/my-offices", icon: Briefcase, requiresAuth: true, requirePermission: "canManageOffice" as const },
-    { name: t("nav.ownerDashboard"), href: "/owner/dashboard", icon: Shield, requiresAuth: true, requirePermission: "canViewOfficeAnalytics" as const },
-    { name: "Office Analytics", href: "/owner/analytics", icon: BarChart3, requiresAuth: true, requirePermission: "canViewOfficeAnalytics" as const },
-    { name: t("nav.chatInbox"), href: "/owner/chat", icon: MessageCircle, requiresAuth: true, requirePermission: "canAccessChatInbox" as const },
-    { name: t("nav.chatAnalytics"), href: "/owner/chat-analytics", icon: TrendingUp, requiresAuth: true, requirePermission: "canViewChatAnalytics" as const },
-    { name: t("nav.cannedResponses"), href: "/owner/canned-responses", icon: MessageSquareText, requiresAuth: true, requirePermission: "canManageCannedResponses" as const },
-    { name: t("nav.staffManagement"), href: "/owner/staff", icon: Users, requiresAuth: true, requirePermission: "canManageStaff" as const },
-    { name: t("nav.staffPerformance"), href: "/owner/staff-performance", icon: Activity, requiresAuth: true, requirePermission: "canManageStaff" as const },
-    { name: t("nav.followUpSettings"), href: "/owner/follow-up-settings", icon: Clock, requiresAuth: true, requirePermission: "canManageOffice" as const },
-    { name: t("nav.loyaltyRewards"), href: "/loyalty", icon: Award, requiresAuth: true },
-    { name: t("nav.referFriends"), href: "/refer", icon: Gift, requiresAuth: true },
-    { name: t("nav.analytics"), href: "/analytics", icon: BarChart3, requiresAuth: true },
-    { name: t("nav.userProfile"), href: "/profile", icon: User, requiresAuth: true },
-    { name: t("nav.notificationPreferences"), href: "/notifications", icon: Bell, requiresAuth: true },
+  // Define navigation item type
+  type NavItem = {
+    name: string;
+    href: string;
+    icon: any;
+    requiresAuth?: boolean;
+    requirePermission?: any; // Use any to avoid type conflicts with permission keys
+  };
+
+  type NavGroup = {
+    title: string;
+    requiresAuth?: boolean;
+    requirePermission?: string;
+    items: NavItem[];
+  };
+
+  // Organize navigation into logical groups
+  const navigationGroups: NavGroup[] = [
+    {
+      title: "Main",
+      items: [
+        { name: t("nav.home"), href: "/", icon: Home },
+        { name: t("nav.sanadOffices"), href: "/offices", icon: Building2 },
+        { name: t("nav.documentTemplates"), href: "/templates", icon: FileText, requirePermission: "canViewTemplates" as const },
+      ],
+    },
+    {
+      title: "My Services",
+      requiresAuth: true,
+      items: [
+        { name: t("nav.myBookings"), href: "/bookings", icon: Calendar, requiresAuth: true, requirePermission: "canCreateBooking" as const },
+        { name: "My Service Requests", href: "/my-requests", icon: Package, requiresAuth: true, requirePermission: "canPostServiceRequest" as const },
+        { name: "Browse Marketplace", href: "/marketplace", icon: Search, requiresAuth: true, requirePermission: "canSubmitBids" as const },
+      ],
+    },
+    {
+      title: "Office Management",
+      requiresAuth: true,
+      requirePermission: "canManageOffice" as const,
+      items: [
+        { name: t("nav.myOffices"), href: "/my-offices", icon: Briefcase, requiresAuth: true, requirePermission: "canManageOffice" as const },
+        { name: t("nav.ownerDashboard"), href: "/owner/dashboard", icon: Shield, requiresAuth: true, requirePermission: "canViewOfficeAnalytics" as const },
+        { name: "Office Analytics", href: "/owner/analytics", icon: BarChart3, requiresAuth: true, requirePermission: "canViewOfficeAnalytics" as const },
+        { name: t("nav.chatInbox"), href: "/owner/chat", icon: MessageCircle, requiresAuth: true, requirePermission: "canAccessChatInbox" as const },
+        { name: t("nav.chatAnalytics"), href: "/owner/chat-analytics", icon: TrendingUp, requiresAuth: true, requirePermission: "canViewChatAnalytics" as const },
+        { name: t("nav.cannedResponses"), href: "/owner/canned-responses", icon: MessageSquareText, requiresAuth: true, requirePermission: "canManageCannedResponses" as const },
+        { name: t("nav.staffManagement"), href: "/owner/staff", icon: Users, requiresAuth: true, requirePermission: "canManageStaff" as const },
+        { name: t("nav.staffPerformance"), href: "/owner/staff-performance", icon: Activity, requiresAuth: true, requirePermission: "canManageStaff" as const },
+        { name: t("nav.followUpSettings"), href: "/owner/follow-up-settings", icon: Clock, requiresAuth: true, requirePermission: "canManageOffice" as const },
+      ],
+    },
+    {
+      title: "Rewards & Profile",
+      requiresAuth: true,
+      items: [
+        { name: t("nav.loyaltyRewards"), href: "/loyalty", icon: Award, requiresAuth: true },
+        { name: t("nav.referFriends"), href: "/refer", icon: Gift, requiresAuth: true },
+        { name: t("nav.userProfile"), href: "/profile", icon: User, requiresAuth: true },
+        { name: t("nav.notificationPreferences"), href: "/notifications", icon: Bell, requiresAuth: true },
+      ],
+    },
   ];
+
+  // Flatten for backward compatibility
+  const navigation: NavItem[] = navigationGroups.flatMap(group => group.items);
 
   // Add admin links if user has admin permissions
   if (hasPermission("canAccessAdminPanel")) {
@@ -101,7 +144,7 @@ export function Sidebar({ className }: SidebarProps) {
     if (item.requiresAuth && !user) return false;
     
     // Filter by permission requirement
-    if (item.requirePermission && !hasPermission(item.requirePermission)) return false;
+    if (item.requirePermission && !hasPermission(item.requirePermission as any)) return false;
     
     return true;
   });

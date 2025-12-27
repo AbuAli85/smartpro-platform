@@ -49,7 +49,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
     }
 
     // Create single shared socket connection
-    const newSocket = io({
+    const newSocket = io(window.location.origin, {
       transports: ["websocket", "polling"],
       reconnection: true,
       reconnectionDelay: 1000,
