@@ -1,0 +1,18 @@
+{
+  "query": "SHOW COLUMNS FROM users LIKE 'preferredLanguage'",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute SHOW COLUMNS FROM users LIKE 'preferredLanguage'",
+  "rows": [
+    {
+      "Field": "preferredLanguage",
+      "Type": "varchar(10)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "en",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\npreferredLanguage\tvarchar(10)\tYES\t\ten\t\n",
+  "stderr": "",
+  "execution_time_ms": 1601
+}

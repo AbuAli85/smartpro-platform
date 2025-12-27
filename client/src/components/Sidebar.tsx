@@ -30,6 +30,7 @@ import {
   BookOpen,
   Package,
   Search,
+  Trophy,
 } from "lucide-react";
 import { useState } from "react";
 import { useSwipeable } from "react-swipeable";
@@ -101,6 +102,7 @@ export function Sidebar({ className }: SidebarProps) {
       items: [
         { name: t("nav.home"), href: "/", icon: Home },
         { name: t("nav.sanadOffices"), href: "/offices", icon: Building2 },
+        { name: t("nav.leaderboards"), href: "/leaderboards", icon: Trophy },
         { name: t("nav.documentTemplates"), href: "/templates", icon: FileText, requirePermission: "canViewTemplates" as const },
       ],
     },

@@ -1359,3 +1359,64 @@ export type ServiceBundle = typeof serviceBundles.$inferSelect;
 export type InsertServiceBundle = typeof serviceBundles.$inferInsert;
 export type BundleService = typeof bundleServices.$inferSelect;
 export type InsertBundleService = typeof bundleServices.$inferInsert;
+
+// ============================================================================
+// REGIONAL CAMPAIGNS
+// ============================================================================
+
+export const regionalCampaigns = mysqlTable("regional_campaigns", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Campaign Details
+  title: varchar("title", { length: 255 }).notNull(),
+  titleAr: varchar("titleAr", { length: 255 }),
+  description: text("description").notNull(),
+  descriptionAr: text("descriptionAr"),
+  
+  // Targeting
+  targetRegion: varchar("targetRegion", { length: 100 }).notNull(), // "Muscat", "Dhofar", "all", etc.
+  targetUserSegment: mysqlEnum("targetUserSegment", ["all", "new_users", "returning_users", "high_value"]).default("all").notNull(),
+  
+  // Campaign Type
+  campaignType: mysqlEnum("campaignType", ["seasonal", "promotional", "awareness", "special_event"]).default("promotional").notNull(),
+  
+  // Visual Elements
+  bannerImageUrl: text("bannerImageUrl"),
+  backgroundColor: varchar("backgroundColor", { length: 20 }).default("#003366"),
+  textColor: varchar("textColor", { length: 20 }).default("#FFFFFF"),
+  
+  // Call to Action
+  ctaText: varchar("ctaText", { length: 100 }),
+  ctaTextAr: varchar("ctaTextAr", { length: 100 }),
+  ctaLink: varchar("ctaLink", { length: 500 }),
+  
+  // Discount/Offer
+  discountPercentage: int("discountPercentage"), // e.g., 20 for 20% off
+  discountCode: varchar("discountCode", { length: 50 }),
+  
+  // Scheduling
+  startDate: timestamp("startDate").notNull(),
+  endDate: timestamp("endDate").notNull(),
+  
+  // Status
+  isActive: boolean("isActive").default(true).notNull(),
+  priority: int("priority").default(0).notNull(), // Higher priority shows first
+  
+  // Analytics
+  impressions: int("impressions").default(0).notNull(),
+  clicks: int("clicks").default(0).notNull(),
+  conversions: int("conversions").default(0).notNull(),
+  
+  // Metadata
+  createdBy: int("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  regionIdx: index("region_idx").on(table.targetRegion),
+  activeIdx: index("active_idx").on(table.isActive),
+  dateIdx: index("date_idx").on(table.startDate, table.endDate),
+  priorityIdx: index("priority_idx").on(table.priority),
+}));
+
+export type RegionalCampaign = typeof regionalCampaigns.$inferSelect;
+export type InsertRegionalCampaign = typeof regionalCampaigns.$inferInsert;

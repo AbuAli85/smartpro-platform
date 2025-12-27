@@ -37,6 +37,7 @@ import ContentTranslation from "./pages/ContentTranslation";
 import TranslationRequestQueue from "./pages/TranslationRequestQueue";
 import TranslationAnalytics from "./pages/TranslationAnalytics";
 import RegionalStatistics from "./pages/RegionalStatistics";
+import RegionalLeaderboards from "./pages/RegionalLeaderboards";
 import TranslationQualityDashboard from "./pages/TranslationQualityDashboard";
 import ReviewQueue from "./pages/ReviewQueue";
 import SmartBatchProcessing from "./pages/SmartBatchProcessing";
@@ -69,6 +70,7 @@ function Router() {
       
       {/* Sanad Offices */}
       <Route path="/offices" component={OfficesList} />
+      <Route path="/leaderboards" component={RegionalLeaderboards} />
       <Route path="/search" component={AdvancedSearch} />
       <Route path="/offices/:id" component={OfficeProfile} />
       <Route path="/register-office" component={OfficeRegistration} />

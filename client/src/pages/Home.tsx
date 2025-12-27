@@ -14,6 +14,8 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { useRegionalContent } from "@/hooks/useRegionalContent";
 import { RegionSelector } from "@/components/RegionSelector";
 import { FeaturedRegionalServices } from "@/components/FeaturedRegionalServices";
+import { RecommendedOffices } from "@/components/RecommendedOffices";
+import { CampaignBanner } from "@/components/CampaignBanner";
 
 export default function Home() {
   const { t } = useLanguage();
@@ -243,8 +245,14 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Campaign Banner */}
+        <CampaignBanner />
+
         {/* Featured Regional Services */}
         <FeaturedRegionalServices />
+
+        {/* Recommended Offices */}
+        <RecommendedOffices />
 
         {/* How It Works Section */}
         <section className="py-20 lg:py-32">
