@@ -2192,3 +2192,45 @@
 - [x] Include office name and message preview
 - [x] Click notification to open chat widget
 - [ ] Test notifications on different browsers
+
+
+## Service Selection in Booking Form (Dec 27, 2025)
+
+### Service Dropdown Implementation:
+- [x] Fetch services for selected office (already implemented)
+- [x] Add service dropdown to booking form (already implemented)
+- [x] Pre-fill pricing from selected service (already implemented)
+- [x] Display estimated delivery time (already implemented)
+- [x] Update booking creation to include service ID (already implemented)
+- [x] Show service description in booking form (already implemented)
+- [x] Handle service selection changes (already implemented)
+- [x] Validate service selection before submission (already implemented)
+
+**Status**: ✅ ALL FEATURES ALREADY IMPLEMENTED
+
+The booking form already includes:
+- Service dropdown with name, price, and estimated delivery days
+- Service description display below dropdown
+- Price calculation in booking summary
+- Service ID sent to backend on booking creation
+- Validation requiring service selection
+- Loyalty points integration with discount calculation
+
+
+## Book Service Button Visibility Issue (Dec 27, 2025)
+
+### Issue:
+- [x] Quick Actions Bar appears but Book Service button is not visible
+- [x] Investigate button rendering condition
+- [x] Check if button is hidden by CSS or conditional logic
+- [x] Fix button visibility - replaced undefined bg-gradient-accent with explicit colors
+- [x] Test on office profile page - both buttons now visible
+
+**Root Cause**: The `bg-gradient-accent` Tailwind class was not defined in CSS, causing buttons to have no background color.
+
+**Solution**: Replaced `bg-gradient-accent` with explicit color values:
+- Background: `bg-[#003366]` (SmartPro brand color)
+- Hover: `hover:bg-[#002244]`
+- Text: `text-white`
+
+**Result**: ✅ Both Book Service buttons (header + Quick Actions Bar) are now clearly visible

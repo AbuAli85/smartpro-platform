@@ -133,10 +133,10 @@ export default function OfficeProfile() {
 
             <div className="flex gap-3">
               {isAuthenticated && (
-                <Button asChild size="lg" className="bg-gradient-accent">
+                <Button asChild size="lg" className="bg-[#003366] hover:bg-[#002244] text-white">
                   <Link href={`/offices/${slug}/book`} className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      {t("office.bookService")}
+                    <Calendar className="w-4 h-4" />
+                    {t("office.bookService")}
                   </Link>
                 </Button>
               )}
@@ -151,7 +151,7 @@ export default function OfficeProfile() {
               <h3 className="font-semibold text-lg">{t("office.readyToBook")}</h3>
               <p className="text-sm text-muted-foreground">{t("office.selectServiceAndBook")}</p>
             </div>
-            <Button asChild size="lg" className="bg-gradient-accent">
+            <Button asChild size="lg" className="bg-[#003366] hover:bg-[#002244] text-white">
               <Link href={`/offices/${slug}/book`} className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
                   {t("office.bookService")}
