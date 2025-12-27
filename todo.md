@@ -2743,3 +2743,12 @@ The booking form already includes:
 - [x] Calculate bundle pricing with discount
 - [ ] Add bundle analytics to office dashboard
 - [ ] Write unit tests for bundle pricing calculations
+
+
+## BUG FIX: WebSocket Connection Issues (Dec 27, 2025)
+- [x] Diagnose why Socket.io is connecting to wss://sanad.thesmartpro.io instead of current origin
+- [x] Create shared SocketContext to prevent multiple Socket.io instances
+- [x] Fix useMarketplaceNotifications hook to use shared socket
+- [x] Add SocketProvider to App.tsx component tree
+- [ ] Test WebSocket connection in development environment
+- [ ] Verify real-time notifications work correctly after fix

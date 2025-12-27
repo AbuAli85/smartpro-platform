@@ -44,6 +44,7 @@ import MarketplaceBrowser from "./pages/MarketplaceBrowser";
 import MyServiceRequests from "./pages/MyServiceRequests";
 import { useNotifications } from "./hooks/useNotifications";
 import { useMarketplaceNotifications } from "./hooks/useMarketplaceNotifications";
+import { SocketProvider } from "./contexts/SocketContext";
 
 function Router() {
   return (
@@ -123,8 +124,9 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">
-        <TooltipProvider>
-          <Toaster />
+        <SocketProvider>
+          <TooltipProvider>
+            <Toaster />
           <div className="flex h-screen overflow-hidden">
             <Sidebar />
             <main className="flex-1 overflow-y-auto bg-background">
@@ -133,7 +135,8 @@ function App() {
               </div>
             </main>
           </div>
-        </TooltipProvider>
+          </TooltipProvider>
+        </SocketProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

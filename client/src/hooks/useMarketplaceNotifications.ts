@@ -1,30 +1,16 @@
 import { useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { io, Socket } from "socket.io-client";
 import { toast } from "sonner";
-
-let socket: Socket | null = null;
+import { useSocket } from "@/contexts/SocketContext";
 
 export function useMarketplaceNotifications() {
   const { user } = useAuth();
+  const { socket, isConnected } = useSocket();
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !socket || !isConnected) return;
 
-    // Initialize socket connection if not already connected
-    if (!socket) {
-      socket = io(window.location.origin, {
-        transports: ["websocket", "polling"],
-      });
-
-      socket.on("connect", () => {
-        console.log("[Marketplace] Connected to WebSocket");
-      });
-
-      socket.on("disconnect", () => {
-        console.log("[Marketplace] Disconnected from WebSocket");
-      });
-    }
+    console.log("[Marketplace] Setting up marketplace notifications");
 
     // Join marketplace room for this user
     socket.emit("join_marketplace", { userId: user.id });
@@ -83,5 +69,5 @@ export function useMarketplaceNotifications() {
         socket.off("marketplace:new_request");
       }
     };
-  }, [user]);
+  }, [user, socket, isConnected]);
 }
