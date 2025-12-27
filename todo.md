@@ -972,3 +972,11 @@ Note: This feature requires more extensive context system changes and will be im
 - [x] Add edit buttons for each section
 - [x] Allow navigation back to edit specific fields
 - [x] Add confirmation checkbox before submit
+
+
+## 🐛 SSE Authentication Fix (Dec 28, 2025)
+- [x] Identify cookie name mismatch in useNotifications hook
+- [x] Fix cookie name from 'auth_token' to 'app_session_id' (COOKIE_NAME constant)
+- [x] Import COOKIE_NAME from shared/const for consistency
+- [x] Test SSE connection establishes successfully
+- [x] Verify real-time notifications work correctly

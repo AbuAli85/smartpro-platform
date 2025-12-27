@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
+import { COOKIE_NAME } from "@shared/const";
 
 type NotificationEvent = {
   type: "connected" | "heartbeat" | "booking_created" | "booking_updated" | "booking_cancelled" | "new_review" | "new_inquiry";
@@ -26,10 +27,10 @@ export function useNotifications() {
     }
 
     try {
-      // Get auth token from cookie or localStorage
+      // Get session token from cookie
       const token = document.cookie
         .split("; ")
-        .find((row) => row.startsWith("auth_token="))
+        .find((row) => row.startsWith(`${COOKIE_NAME}=`))
         ?.split("=")[1];
 
       if (!token) {
