@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS service_bids (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  request_id INT NOT NULL,\n  office_id INT NOT NULL,\n  proposed_price DECIMAL(10,2) NOT NULL,\n  currency VARCHAR(3) DEFAULT 'OMR' NOT NULL,\n  estimated_duration VARCHAR(100),\n  cover_letter TEXT NOT NULL,\n  methodology TEXT,\n  portfolio JSON,\n  status ENUM('pending', 'accepted', 'rejected', 'withdrawn') DEFAULT 'pending' NOT NULL,\n  viewed_by_customer BOOLEAN DEFAULT FALSE,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX request_idx (request_id),\n  INDEX office_idx (office_id),\n  INDEX status_idx (status)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute CREATE TABLE IF NOT EXISTS service_bids (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  request_id INT NOT NULL,\n  office_id INT NOT NULL,\n  proposed_price DECIMAL(10,2) NOT NULL,\n  currency VARCHAR(3) DEFAULT 'OMR' NOT NULL,\n  estimated_duration VARCHAR(100),\n  cover_letter TEXT NOT NULL,\n  methodology TEXT,\n  portfolio JSON,\n  status ENUM('pending', 'accepted', 'rejected', 'withdrawn') DEFAULT 'pending' NOT NULL,\n  viewed_by_customer BOOLEAN DEFAULT FALSE,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX request_idx (request_id),\n  INDEX office_idx (office_id),\n  INDEX status_idx (status)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1610
+}

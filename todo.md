@@ -2567,17 +2567,17 @@ The booking form already includes:
 
 ## FEATURE: Service Request Marketplace (Dec 27, 2025)
 ### Backend Implementation
-- [ ] Create service_requests table (customer posts need)
-- [ ] Create service_bids table (offices bid on requests)
-- [ ] Add createServiceRequest procedure
-- [ ] Add listServiceRequests procedure (for offices)
-- [ ] Add createBid procedure
-- [ ] Add acceptBid procedure (converts to booking)
-- [ ] Add notification system for new requests/bids
+- [x] Create service_requests table (customer posts need)
+- [x] Create service_bids table (offices bid on requests)
+- [x] Add createServiceRequest procedure
+- [x] Add listServiceRequests procedure (for offices)
+- [x] Add createBid procedure
+- [x] Add acceptBid procedure (converts to booking)
+- [x] Add notification system for new requests/bids
 
 ### Frontend Implementation
-- [ ] Create "Request a Service" page for customers
-- [ ] Build service request form (type, budget, deadline, description)
+- [x] Create "Request a Service" page for customers
+- [x] Build service request form (type, budget, deadline, description)
 - [ ] Create marketplace page for offices to browse requests
 - [ ] Build bidding interface for offices
 - [ ] Create bid management page for customers

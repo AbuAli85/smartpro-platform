@@ -28,6 +28,10 @@ import {
   translationActivityLog,
   translationMemory,
   translationVersions,
+  serviceRequests,
+  serviceBids,
+  type ServiceRequest,
+  type ServiceBid,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -4471,4 +4475,170 @@ export async function getOfficeReviewsWithDetails(officeId: number) {
   );
 
   return enhancedReviews;
+}
+
+
+// ============================================================================
+// SERVICE REQUEST MARKETPLACE
+// ============================================================================
+
+export async function createServiceRequest(request: Partial<ServiceRequest>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(serviceRequests).values(request as any);
+  return Number(result[0].insertId);
+}
+
+export async function listServiceRequests(filters: {
+  category?: string;
+  governorate?: string;
+  urgency?: string;
+  status?: string;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  let query = db.select().from(serviceRequests);
+
+  const conditions = [];
+  if (filters.category) {
+    conditions.push(eq(serviceRequests.category, filters.category));
+  }
+  if (filters.governorate) {
+    conditions.push(eq(serviceRequests.governorate, filters.governorate));
+  }
+  if (filters.urgency) {
+    conditions.push(eq(serviceRequests.urgency, filters.urgency as any));
+  }
+  if (filters.status) {
+    conditions.push(eq(serviceRequests.status, filters.status as any));
+  }
+
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
+  }
+
+  return await query.orderBy(desc(serviceRequests.createdAt));
+}
+
+export async function getUserServiceRequests(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(serviceRequests)
+    .where(eq(serviceRequests.userId, userId))
+    .orderBy(desc(serviceRequests.createdAt));
+}
+
+export async function getServiceRequest(requestId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const results = await db
+    .select()
+    .from(serviceRequests)
+    .where(eq(serviceRequests.id, requestId))
+    .limit(1);
+
+  return results.length > 0 ? results[0] : null;
+}
+
+export async function updateServiceRequest(
+  requestId: number,
+  updates: Partial<ServiceRequest>
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(serviceRequests)
+    .set(updates)
+    .where(eq(serviceRequests.id, requestId));
+}
+
+export async function createServiceBid(bid: Partial<ServiceBid>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(serviceBids).values(bid as any);
+  return Number(result[0].insertId);
+}
+
+export async function getServiceBid(bidId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const results = await db
+    .select()
+    .from(serviceBids)
+    .where(eq(serviceBids.id, bidId))
+    .limit(1);
+
+  return results.length > 0 ? results[0] : null;
+}
+
+export async function getRequestBids(requestId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select({
+      id: serviceBids.id,
+      requestId: serviceBids.requestId,
+      officeId: serviceBids.officeId,
+      proposedPrice: serviceBids.proposedPrice,
+      currency: serviceBids.currency,
+      estimatedDuration: serviceBids.estimatedDuration,
+      coverLetter: serviceBids.coverLetter,
+      methodology: serviceBids.methodology,
+      portfolio: serviceBids.portfolio,
+      status: serviceBids.status,
+      viewedByCustomer: serviceBids.viewedByCustomer,
+      createdAt: serviceBids.createdAt,
+      // Office details
+      officeName: sanadOffices.officeName,
+      officeRating: sanadOffices.averageRating,
+      officePhone: sanadOffices.phone,
+    })
+    .from(serviceBids)
+    .leftJoin(sanadOffices, eq(serviceBids.officeId, sanadOffices.id))
+    .where(eq(serviceBids.requestId, requestId))
+    .orderBy(desc(serviceBids.createdAt));
+}
+
+export async function updateServiceBid(bidId: number, updates: Partial<ServiceBid>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(serviceBids).set(updates).where(eq(serviceBids.id, bidId));
+}
+
+export async function getOfficeBids(officeId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select({
+      id: serviceBids.id,
+      requestId: serviceBids.requestId,
+      proposedPrice: serviceBids.proposedPrice,
+      currency: serviceBids.currency,
+      estimatedDuration: serviceBids.estimatedDuration,
+      status: serviceBids.status,
+      viewedByCustomer: serviceBids.viewedByCustomer,
+      createdAt: serviceBids.createdAt,
+      // Request details
+      requestTitle: serviceRequests.title,
+      requestDescription: serviceRequests.description,
+      requestBudgetMax: serviceRequests.budgetMax,
+      requestDeadline: serviceRequests.deadline,
+      requestStatus: serviceRequests.status,
+    })
+    .from(serviceBids)
+    .leftJoin(serviceRequests, eq(serviceBids.requestId, serviceRequests.id))
+    .where(eq(serviceBids.officeId, officeId))
+    .orderBy(desc(serviceBids.createdAt));
 }
