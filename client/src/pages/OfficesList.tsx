@@ -12,6 +12,7 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { AdvancedFilters, type FilterState } from "@/components/AdvancedFilters";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useRegionalContent, getGovernoratesForRegion } from "@/hooks/useRegionalContent";
+import { OMAN_GOVERNORATES, getBilingualLabel } from "../../../shared/omanLocations";
 
 export default function OfficesList() {
   const { t } = useLanguage();
@@ -81,19 +82,8 @@ export default function OfficesList() {
     }
   }, [data?.offices, sortBy]);
 
-  const governorates = [
-    "Muscat",
-    "Dhofar",
-    "Musandam",
-    "Al Buraimi",
-    "Ad Dakhiliyah",
-    "Al Batinah North",
-    "Al Batinah South",
-    "Ash Sharqiyah North",
-    "Ash Sharqiyah South",
-    "Al Dhahirah",
-    "Al Wusta",
-  ];
+  // Use bilingual governorates from shared constants
+  const governorates = OMAN_GOVERNORATES;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -147,8 +137,8 @@ export default function OfficesList() {
             <SelectContent>
               <SelectItem value="all">{t("offices.allRegions")}</SelectItem>
               {governorates.map((gov) => (
-                <SelectItem key={gov} value={gov}>
-                  {gov}
+                <SelectItem key={gov.value} value={gov.value}>
+                  {getBilingualLabel(gov.labelEn, gov.labelAr)}
                 </SelectItem>
               ))}
             </SelectContent>

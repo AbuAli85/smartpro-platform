@@ -13,6 +13,7 @@ import { Building2, MapPin, Phone, Mail, FileText, CheckCircle2, ArrowRight, Arr
 import { cn } from "@/lib/utils";
 import DocumentUpload from "@/components/DocumentUpload";
 import MultiDocumentUpload from "@/components/MultiDocumentUpload";
+import { OMAN_GOVERNORATES, OMAN_CITIES, getCitiesByGovernorate, getBilingualLabel } from "../../../shared/omanLocations";
 
 const STEPS = [
   { id: 1, title: "Basic Information", icon: Building2 },
@@ -68,6 +69,16 @@ export default function OfficeRegistration() {
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
+
+  // Handle governorate change - clear city selection
+  const handleGovernorateChange = (value: string) => {
+    setFormData(prev => ({ ...prev, region: value, city: "" }));
+  };
+
+  // Get filtered cities based on selected governorate
+  const availableCities = formData.region 
+    ? getCitiesByGovernorate(formData.region)
+    : OMAN_CITIES;
 
   const handleServiceToggle = (serviceId: string) => {
     setFormData(prev => ({
@@ -274,45 +285,36 @@ export default function OfficeRegistration() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="city">City *</Label>
-                    <Select value={formData.city} onValueChange={(value) => handleInputChange("city", value)}>
+                    <Label htmlFor="region">Governorate *</Label>
+                    <Select value={formData.region} onValueChange={handleGovernorateChange}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select city" />
+                        <SelectValue placeholder="Select governorate" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Muscat">Muscat</SelectItem>
-                        <SelectItem value="Salalah">Salalah</SelectItem>
-                        <SelectItem value="Sohar">Sohar</SelectItem>
-                        <SelectItem value="Nizwa">Nizwa</SelectItem>
-                        <SelectItem value="Sur">Sur</SelectItem>
-                        <SelectItem value="Ibri">Ibri</SelectItem>
-                        <SelectItem value="Rustaq">Rustaq</SelectItem>
-                        <SelectItem value="Barka">Barka</SelectItem>
-                        <SelectItem value="Ibra">Ibra</SelectItem>
-                        <SelectItem value="Samail">Samail</SelectItem>
-                        <SelectItem value="Khasab">Khasab</SelectItem>
-                        <SelectItem value="Bahla">Bahla</SelectItem>
+                        {OMAN_GOVERNORATES.map((gov) => (
+                          <SelectItem key={gov.value} value={gov.value}>
+                            {getBilingualLabel(gov.labelEn, gov.labelAr)}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="region">Region *</Label>
-                    <Select value={formData.region} onValueChange={(value) => handleInputChange("region", value)}>
+                    <Label htmlFor="city">City *</Label>
+                    <Select 
+                      value={formData.city} 
+                      onValueChange={(value) => handleInputChange("city", value)}
+                      disabled={!formData.region}
+                    >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select region" />
+                        <SelectValue placeholder={formData.region ? "Select city" : "Select governorate first"} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Muscat">Muscat Governorate</SelectItem>
-                        <SelectItem value="Dhofar">Dhofar Governorate</SelectItem>
-                        <SelectItem value="Musandam">Musandam Governorate</SelectItem>
-                        <SelectItem value="Al Buraimi">Al Buraimi Governorate</SelectItem>
-                        <SelectItem value="Al Dakhiliyah">Al Dakhiliyah Governorate</SelectItem>
-                        <SelectItem value="Al Batinah North">Al Batinah North Governorate</SelectItem>
-                        <SelectItem value="Al Batinah South">Al Batinah South Governorate</SelectItem>
-                        <SelectItem value="Ash Sharqiyah North">Ash Sharqiyah North Governorate</SelectItem>
-                        <SelectItem value="Ash Sharqiyah South">Ash Sharqiyah South Governorate</SelectItem>
-                        <SelectItem value="Ad Dhahirah">Ad Dhahirah Governorate</SelectItem>
-                        <SelectItem value="Al Wusta">Al Wusta Governorate</SelectItem>
+                        {availableCities.map((city) => (
+                          <SelectItem key={city.value} value={city.value}>
+                            {getBilingualLabel(city.labelEn, city.labelAr)}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>

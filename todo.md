@@ -867,3 +867,27 @@ Note: This feature requires more extensive context system changes and will be im
 - [x] Update OfficeRegistration form dropdowns
 - [x] Fix phone number placeholder to +968 (Oman code)
 - [x] Verify no other Saudi data in codebase
+
+
+## 🌍 Location Enhancements (Bilingual + Smart Filtering)
+
+### Bilingual City/Region Names
+- [x] Create omanLocations.ts constants file with Arabic names
+- [x] Structure data: governorate → cities mapping (90+ cities)
+- [x] Update OfficeRegistration dropdowns to show bilingual labels
+- [x] Add Arabic translations for all 11 governorates
+- [x] Add Arabic translations for all cities
+
+### Smart City Filtering
+- [x] Implement city filtering based on selected governorate
+- [x] Update city dropdown to only show cities from selected region
+- [x] Handle edge case when governorate changes
+- [x] Clear city selection when governorate changes
+- [x] Disable city dropdown until governorate is selected
+
+### Location-Based Search
+- [x] Add governorate filter to OfficesList page
+- [x] Update dropdowns with bilingual labels
+- [x] Use shared omanLocations constants
+- [x] Backend already supports governorate filtering
+- [x] Test filtering functionality
