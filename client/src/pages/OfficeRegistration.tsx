@@ -11,6 +11,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Building2, MapPin, Phone, Mail, FileText, CheckCircle2, ArrowRight, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
+import DocumentUpload from "@/components/DocumentUpload";
 
 const STEPS = [
   { id: 1, title: "Basic Information", icon: Building2 },
@@ -371,6 +372,49 @@ export default function OfficeRegistration() {
                       </div>
                     ))}
                   </div>
+                </div>
+
+                {/* Document Uploads */}
+                <div className="space-y-4 border-t pt-6">
+                  <div>
+                    <h4 className="font-semibold mb-4">Required Documents</h4>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Please upload the following documents for verification. All documents will be reviewed by our team.
+                    </p>
+                  </div>
+
+                  <DocumentUpload
+                    label="Business License *"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    maxSizeMB={10}
+                    onUploadComplete={(url) => handleInputChange("licenseDocumentUrl", url)}
+                    currentUrl={formData.licenseDocumentUrl}
+                    onRemove={() => handleInputChange("licenseDocumentUrl", "")}
+                  />
+
+                  <DocumentUpload
+                    label="Certificates (Optional)"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    maxSizeMB={10}
+                    onUploadComplete={(url) => {
+                      const newUrls = [...formData.certificateUrls, url];
+                      handleInputChange("certificateUrls", newUrls);
+                    }}
+                    currentUrl={formData.certificateUrls[0]}
+                    onRemove={() => handleInputChange("certificateUrls", [])}
+                  />
+
+                  <DocumentUpload
+                    label="Permits (Optional)"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    maxSizeMB={10}
+                    onUploadComplete={(url) => {
+                      const newUrls = [...formData.permitUrls, url];
+                      handleInputChange("permitUrls", newUrls);
+                    }}
+                    currentUrl={formData.permitUrls[0]}
+                    onRemove={() => handleInputChange("permitUrls", [])}
+                  />
                 </div>
 
                 <div className="border-t pt-6">
