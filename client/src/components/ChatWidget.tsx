@@ -54,6 +54,19 @@ export default function ChatWidget({ officeId, officeName }: ChatWidgetProps) {
     { enabled: !!user, refetchInterval: 30000 } // Poll every 30s
   );
 
+  // Send message mutation
+  const sendMessageMutation = trpc.chat.sendMessage.useMutation({
+    onSuccess: (data) => {
+      console.log('[Chat] Message saved to database:', data);
+      // Refetch messages to show the new message
+      refetchMessages();
+    },
+    onError: (error) => {
+      console.error('[Chat] Failed to save message:', error);
+      toast.error('Failed to send message');
+    },
+  });
+
   useEffect(() => {
     if (unreadData) {
       setUnreadCount(unreadData.count);
@@ -142,23 +155,65 @@ export default function ChatWidget({ officeId, officeName }: ChatWidgetProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleSendMessage = () => {
-    if (!message.trim() || !socketRef.current || !user) return;
-
-    socketRef.current.emit("send_message", {
-      bookingId: conversationId,
-      userId: user.id,
-      userName: user.name,
-      message: message.trim(),
+  const handleSendMessage = async () => {
+    console.log('[Chat] handleSendMessage called', {
+      hasMessage: !!message.trim(),
+      hasUser: !!user,
+      conversationId,
     });
 
-    setMessage("");
+    if (!message.trim()) {
+      console.log('[Chat] No message to send');
+      return;
+    }
+
+    if (!user) {
+      console.error('[Chat] User not authenticated');
+      toast.error('Please login to send messages');
+      return;
+    }
+
+    if (!conversationId) {
+      console.error('[Chat] No conversation ID');
+      toast.error('Conversation not initialized');
+      return;
+    }
+
+    const messageText = message.trim();
+    console.log('[Chat] Sending message:', messageText);
     
-    // Stop typing indicator
-    socketRef.current.emit("stop_typing", {
-      bookingId: conversationId,
-      userId: user.id,
-    });
+    // Clear input immediately for better UX
+    setMessage("");
+
+    try {
+      // Save message to database via tRPC
+      await sendMessageMutation.mutateAsync({
+        conversationId,
+        message: messageText,
+      });
+
+      // Also broadcast via Socket.io for real-time updates
+      if (socketRef.current?.connected) {
+        socketRef.current.emit("send_message", {
+          bookingId: conversationId,
+          userId: user.id,
+          userName: user.name,
+          message: messageText,
+        });
+      }
+
+      // Stop typing indicator
+      if (socketRef.current?.connected) {
+        socketRef.current.emit("stop_typing", {
+          bookingId: conversationId,
+          userId: user.id,
+        });
+      }
+    } catch (error) {
+      console.error('[Chat] Error sending message:', error);
+      // Restore message on error
+      setMessage(messageText);
+    }
   };
 
   const handleTyping = () => {

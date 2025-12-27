@@ -181,6 +181,42 @@ export const chatRouter = router({
       return { success: true };
     }),
 
+  // Send message
+  sendMessage: protectedProcedure
+    .input(z.object({
+      conversationId: z.number(),
+      message: z.string().min(1),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // Verify user has access to this conversation
+      const conversation = await db.getChatConversationById(input.conversationId);
+      if (!conversation) {
+        throw new Error("Conversation not found");
+      }
+
+      // Determine sender type
+      let senderType: "user" | "office" = "user";
+      if (conversation.userId !== ctx.user.id) {
+        // Check if user is office owner or staff
+        const offices = await db.getOfficesByOwner(ctx.user.id);
+        const hasAccess = offices.some(o => o.id === conversation.officeId);
+        if (!hasAccess) {
+          throw new Error("Access denied");
+        }
+        senderType = "office";
+      }
+
+      // Save message to database
+      const savedMessage = await db.sendMessage({
+        conversationId: input.conversationId,
+        senderId: ctx.user.id,
+        senderType,
+        message: input.message,
+      });
+
+      return { success: true, message: savedMessage };
+    }),
+
   // Translate message
   translateMessage: protectedProcedure
     .input(z.object({

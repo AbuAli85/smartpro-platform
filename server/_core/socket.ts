@@ -1,5 +1,6 @@
 import { Server as HttpServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
+import * as db from "../db";
 
 let io: SocketIOServer | null = null;
 
@@ -28,22 +29,46 @@ export function initializeSocket(httpServer: HttpServer) {
     });
 
     // Send a message
-    socket.on("send_message", (data: {
+    socket.on("send_message", async (data: {
       bookingId: number;
       userId: number;
       userName: string;
       message: string;
     }) => {
       const room = `booking_${data.bookingId}`;
-      const messageData = {
-        ...data,
-        timestamp: new Date().toISOString(),
-        id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      };
+      
+      try {
+        // Get conversation to determine sender type
+        const conversation = await db.getChatConversationById(data.bookingId);
+        if (!conversation) {
+          console.error(`[Socket.IO] Conversation ${data.bookingId} not found`);
+          return;
+        }
 
-      // Broadcast to all users in the room (including sender)
-      io?.to(room).emit("new_message", messageData);
-      console.log(`[Socket.IO] Message sent in room ${room}`);
+        // Determine sender type
+        const senderType = conversation.userId === data.userId ? "user" : "office";
+
+        // Save message to database
+        const savedMessage = await db.sendMessage({
+          conversationId: data.bookingId,
+          senderId: data.userId,
+          senderType,
+          message: data.message,
+        });
+
+        const messageData = {
+          ...data,
+          id: savedMessage.id,
+          timestamp: savedMessage.createdAt.toISOString(),
+          senderType,
+        };
+
+        // Broadcast to all users in the room (including sender)
+        io?.to(room).emit("new_message", messageData);
+        console.log(`[Socket.IO] Message saved and sent in room ${room}`);
+      } catch (error) {
+        console.error(`[Socket.IO] Error saving message:`, error);
+      }
     });
 
     // Typing indicator

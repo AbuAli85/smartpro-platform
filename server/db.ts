@@ -3403,6 +3403,46 @@ export async function uploadChatAttachment(file: Buffer, fileName: string, mimeT
   };
 }
 
+export async function sendMessage(data: {
+  conversationId: number;
+  senderId: number;
+  senderType: "user" | "office";
+  message: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { chatMessages, chatConversations } = await import("../drizzle/schema");
+  
+  const [newMessage] = await db
+    .insert(chatMessages)
+    .values({
+      conversationId: data.conversationId,
+      senderId: data.senderId,
+      senderType: data.senderType,
+      message: data.message,
+      messageType: "text",
+    })
+    .$returningId();
+  
+  // Update conversation's last message
+  await db
+    .update(chatConversations)
+    .set({
+      lastMessageAt: new Date(),
+      lastMessagePreview: data.message.substring(0, 100),
+    })
+    .where(eq(chatConversations.id, data.conversationId));
+  
+  // Get the full message with ID
+  const messages = await db
+    .select()
+    .from(chatMessages)
+    .where(eq(chatMessages.id, newMessage.id));
+  
+  return messages[0];
+}
+
 export async function sendFileMessage(data: {
   conversationId: number;
   senderId: number;

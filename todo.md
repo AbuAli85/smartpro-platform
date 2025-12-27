@@ -2118,3 +2118,30 @@
 - [x] Display service name in booking titles (e.g., "Legal Consultation - Test Office")
 - [x] Verified both fixes working in production
 
+
+
+## Chat System & Access Control Tasks (Dec 27, 2025)
+
+### Chat Message Persistence Fix:
+- [x] Debug chat message sending issue
+- [x] Check Socket.io event handling
+- [x] Verify message persistence to database
+- [x] Added tRPC sendMessage mutation
+- [x] Updated Socket.io to save messages to DB
+- [x] Updated ChatWidget to use tRPC as primary method
+- [x] Added comprehensive error handling and logging
+- [x] Implemented dual-layer architecture (tRPC + Socket.io)
+- [ ] Test real-time message display (pending re-authentication)
+- [ ] Verify chat history loading (pending re-authentication)
+
+### Complete Booking Flow Test:
+- [ ] Test service selection
+- [ ] Test date/time slot selection
+- [ ] Test booking submission
+- [ ] Verify email notifications
+- [ ] Check booking dashboard display
+
+### Access Controls (if needed):
+- [ ] Discuss additional restrictions with user
+- [ ] Implement any requested access controls
+- [ ] Update documentation
