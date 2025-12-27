@@ -280,14 +280,18 @@ export default function OfficeRegistration() {
                         <SelectValue placeholder="Select city" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Riyadh">Riyadh</SelectItem>
-                        <SelectItem value="Jeddah">Jeddah</SelectItem>
-                        <SelectItem value="Dammam">Dammam</SelectItem>
-                        <SelectItem value="Mecca">Mecca</SelectItem>
-                        <SelectItem value="Medina">Medina</SelectItem>
-                        <SelectItem value="Khobar">Khobar</SelectItem>
-                        <SelectItem value="Tabuk">Tabuk</SelectItem>
-                        <SelectItem value="Abha">Abha</SelectItem>
+                        <SelectItem value="Muscat">Muscat</SelectItem>
+                        <SelectItem value="Salalah">Salalah</SelectItem>
+                        <SelectItem value="Sohar">Sohar</SelectItem>
+                        <SelectItem value="Nizwa">Nizwa</SelectItem>
+                        <SelectItem value="Sur">Sur</SelectItem>
+                        <SelectItem value="Ibri">Ibri</SelectItem>
+                        <SelectItem value="Rustaq">Rustaq</SelectItem>
+                        <SelectItem value="Barka">Barka</SelectItem>
+                        <SelectItem value="Ibra">Ibra</SelectItem>
+                        <SelectItem value="Samail">Samail</SelectItem>
+                        <SelectItem value="Khasab">Khasab</SelectItem>
+                        <SelectItem value="Bahla">Bahla</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -298,12 +302,17 @@ export default function OfficeRegistration() {
                         <SelectValue placeholder="Select region" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Riyadh">Riyadh Region</SelectItem>
-                        <SelectItem value="Makkah">Makkah Region</SelectItem>
-                        <SelectItem value="Eastern">Eastern Region</SelectItem>
-                        <SelectItem value="Madinah">Madinah Region</SelectItem>
-                        <SelectItem value="Asir">Asir Region</SelectItem>
-                        <SelectItem value="Tabuk">Tabuk Region</SelectItem>
+                        <SelectItem value="Muscat">Muscat Governorate</SelectItem>
+                        <SelectItem value="Dhofar">Dhofar Governorate</SelectItem>
+                        <SelectItem value="Musandam">Musandam Governorate</SelectItem>
+                        <SelectItem value="Al Buraimi">Al Buraimi Governorate</SelectItem>
+                        <SelectItem value="Al Dakhiliyah">Al Dakhiliyah Governorate</SelectItem>
+                        <SelectItem value="Al Batinah North">Al Batinah North Governorate</SelectItem>
+                        <SelectItem value="Al Batinah South">Al Batinah South Governorate</SelectItem>
+                        <SelectItem value="Ash Sharqiyah North">Ash Sharqiyah North Governorate</SelectItem>
+                        <SelectItem value="Ash Sharqiyah South">Ash Sharqiyah South Governorate</SelectItem>
+                        <SelectItem value="Ad Dhahirah">Ad Dhahirah Governorate</SelectItem>
+                        <SelectItem value="Al Wusta">Al Wusta Governorate</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -315,7 +324,7 @@ export default function OfficeRegistration() {
                     <Input
                       id="phone"
                       type="tel"
-                      placeholder="+966 XX XXX XXXX"
+                      placeholder="+968 XX XXX XXXX"
                       value={formData.phone}
                       onChange={(e) => handleInputChange("phone", e.target.value)}
                     />

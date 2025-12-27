@@ -857,3 +857,13 @@ Note: This feature requires more extensive context system changes and will be im
 - [x] Add detailed error messages for debugging
 - [ ] WebSocket connection retries (normal behavior, not critical)
 - [ ] Test document generation with real template after upload
+
+
+## 🗺️ Fix City/Region Data (Oman vs Saudi Arabia)
+
+- [x] Investigate where city/region data is coming from
+- [x] Find hardcoded Saudi Arabia cities/regions in OfficeRegistration.tsx
+- [x] Replace with Oman governorates and cities
+- [x] Update OfficeRegistration form dropdowns
+- [x] Fix phone number placeholder to +968 (Oman code)
+- [x] Verify no other Saudi data in codebase
