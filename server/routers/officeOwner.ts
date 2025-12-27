@@ -2,6 +2,7 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import * as db from "../db";
 import { TRPCError } from "@trpc/server";
+import { sendOfficeRegistrationConfirmationEmail } from "../_core/emailTemplates";
 
 export const officeOwnerRouter = router({
   // Register a new Sanad office
@@ -34,6 +35,9 @@ export const officeOwnerRouter = router({
       if (ctx.user.role === "user") {
         await db.updateUserRole(ctx.user.id, "sanad_owner");
       }
+
+      // Send confirmation email
+      await sendOfficeRegistrationConfirmationEmail(input.email, input.officeName);
 
       return { officeId, message: "Office registered successfully. Pending verification." };
     }),
@@ -356,5 +360,127 @@ export const officeOwnerRouter = router({
       }
 
       return await db.deleteOfficeAvailability(input.availabilityId);
+    }),
+
+  // Update office profile (onboarding step 1)
+  updateOfficeProfile: protectedProcedure
+    .input(z.object({
+      officeId: z.number(),
+      logoUrl: z.string().url().optional(),
+      coverUrl: z.string().url().optional(),
+      tagline: z.string(),
+      description: z.string(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      // Verify ownership
+      const offices = await db.getOfficesByOwner(ctx.user.id);
+      const ownsOffice = offices.some(o => o.id === input.officeId);
+      
+      if (!ownsOffice) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You do not own this office",
+        });
+      }
+
+      // Update office profile fields
+      const updates: any = {};
+      if (input.logoUrl) updates.logoUrl = input.logoUrl;
+      if (input.coverUrl) updates.coverImageUrl = input.coverUrl;
+      if (input.description) updates.description = input.description;
+      
+      if (Object.keys(updates).length > 0) {
+        await db.updateSanadOffice(input.officeId, updates);
+      }
+
+      return { success: true };
+    }),
+
+  // Update office services (onboarding step 2) - TODO: Implement after fixing service schema
+  // updateOfficeServices: protectedProcedure
+  //   .input(z.object({
+  //     officeId: z.number(),
+  //     serviceIds: z.array(z.number()),
+  //     pricing: z.record(z.number()),
+  //   }))
+  //   .mutation(async ({ input, ctx }) => {
+  //     // Verify ownership
+  //     const offices = await db.getOfficesByOwner(ctx.user.id);
+  //     const ownsOffice = offices.some(o => o.id === input.officeId);
+  //     
+  //     if (!ownsOffice) {
+  //       throw new TRPCError({
+  //         code: "FORBIDDEN",
+  //         message: "You do not own this office",
+  //       });
+  //     }
+
+  //     await db.updateOfficeServices(
+  //       input.officeId,
+  //       input.serviceIds,
+  //       input.pricing as Record<number, number>
+  //     );
+
+  //     return { success: true };
+  //   }),
+
+  // Update office availability (onboarding step 3)
+  updateOfficeAvailability: protectedProcedure
+    .input(z.object({
+      officeId: z.number(),
+      workingHours: z.record(z.object({
+        enabled: z.boolean(),
+        start: z.string(),
+        end: z.string(),
+      })),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      // Verify ownership
+      const offices = await db.getOfficesByOwner(ctx.user.id);
+      const ownsOffice = offices.some(o => o.id === input.officeId);
+      
+      if (!ownsOffice) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You do not own this office",
+        });
+      }
+
+      await db.updateOfficeWorkingHours(
+        input.officeId,
+        input.workingHours as Record<string, { enabled: boolean; start: string; end: string }>
+      );
+
+      return { success: true };
+    }),
+
+  // Activate office (onboarding step 4)
+  activateOffice: protectedProcedure
+    .input(z.object({
+      officeId: z.number(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      // Verify ownership
+      const offices = await db.getOfficesByOwner(ctx.user.id);
+      const ownsOffice = offices.some(o => o.id === input.officeId);
+      
+      if (!ownsOffice) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You do not own this office",
+        });
+      }
+
+      await db.toggleOfficeStatus(input.officeId, true);
+
+      await db.logActivity({
+        userId: ctx.user.id,
+        action: "activated",
+        entityType: "office",
+        entityId: input.officeId,
+        description: "Completed onboarding and activated office",
+      });
+
+      return { success: true };
     }),
 });

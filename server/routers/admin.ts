@@ -5,6 +5,7 @@ import * as db from "../db";
 import { sql } from "drizzle-orm";
 import { notifyOwner } from "../_core/notification";
 import { sendOfficeVerificationEmail } from "../_core/emailSms";
+import { sendRoleChangeNotificationEmail } from "../_core/emailTemplates";
 
 // Admin-only procedure
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -30,6 +31,12 @@ export const adminRouter = router({
       role: z.enum(["user", "admin", "sanad_owner", "sanad_staff", "sme_owner", "gig_worker", "government_official"]),
     }))
     .mutation(async ({ ctx, input }) => {
+      // Get user details before update
+      const users = await db.getAllUsers();
+      const user = users.find(u => u.id === input.userId);
+      const oldRole = user?.role || "user";
+
+      // Update role
       await db.updateUserRole(input.userId, input.role);
 
       await db.logActivity({
@@ -37,8 +44,18 @@ export const adminRouter = router({
         action: "updated",
         entityType: "user",
         entityId: input.userId,
-        description: `Changed user role to ${input.role}`,
+        description: `Changed user role from ${oldRole} to ${input.role}`,
       });
+
+      // Send email notification if user has email
+      if (user?.email) {
+        await sendRoleChangeNotificationEmail(
+          user.email,
+          user.name || "User",
+          oldRole,
+          input.role
+        );
+      }
 
       return { success: true };
     }),
@@ -49,10 +66,86 @@ export const adminRouter = router({
     return stats;
   }),
 
+  // Get pending office registrations for verification
+  getPendingOfficeRegistrations: adminProcedure.query(async () => {
+    return await db.getPendingOfficeRegistrations();
+  }),
+
   // Get pending office verifications
   getPendingOffices: adminProcedure.query(async () => {
     return await db.getPendingOffices();
   }),
+
+  // Approve office registration
+  approveOfficeRegistration: adminProcedure
+    .input(z.object({ 
+      officeId: z.number(),
+      notes: z.string().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      await db.approveOfficeRegistration(input.officeId, input.notes);
+
+      await db.logActivity({
+        userId: ctx.user!.id,
+        action: "approved",
+        entityType: "office",
+        entityId: input.officeId,
+        description: `Approved office registration${input.notes ? `: ${input.notes}` : ''}`,
+      });
+
+      // Get office details for notification
+      const office = await db.getSanadOfficeById(input.officeId);
+      
+      // Notify owner about approval
+      await notifyOwner({
+        title: "Office Approved",
+        content: `${office?.officeName || 'Office'} has been approved and is now active on the platform.`,
+      });
+
+      // Send email to office
+      if (office?.email) {
+        await sendOfficeVerificationEmail({
+          officeEmail: office.email,
+          officeName: office.officeName,
+          status: "approved",
+        });
+      }
+
+      return { success: true };
+    }),
+
+  // Reject office registration
+  rejectOfficeRegistration: adminProcedure
+    .input(z.object({ 
+      officeId: z.number(),
+      reason: z.string(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      await db.rejectOfficeRegistration(input.officeId, input.reason);
+
+      await db.logActivity({
+        userId: ctx.user!.id,
+        action: "rejected",
+        entityType: "office",
+        entityId: input.officeId,
+        description: `Rejected office registration: ${input.reason}`,
+      });
+
+      // Get office details for notification
+      const office = await db.getSanadOfficeById(input.officeId);
+      
+      // Send rejection email to office
+      if (office?.email) {
+        await sendOfficeVerificationEmail({
+          officeEmail: office.email,
+          officeName: office.officeName,
+          status: "rejected",
+          reason: input.reason,
+        });
+      }
+
+      return { success: true };
+    }),
 
   // Approve office
   approveOffice: adminProcedure

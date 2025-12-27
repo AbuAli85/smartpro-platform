@@ -277,3 +277,155 @@ export async function sendMonthlyActivityEmail(
   const { subject, html } = generateMonthlyActivityEmail({ userName, month, year, stats });
   return sendEmail({ to, subject, text: `Your ${month} ${year} activity summary on SmartPro`, html });
 }
+
+/**
+ * Office registration confirmation email template
+ */
+export function generateOfficeRegistrationConfirmationEmail(params: {
+  officeName: string;
+}): { subject: string; html: string; text: string } {
+  const content = `
+    <div class="content">
+      <h2 style="color: #003366; margin-top: 0;">Registration Received</h2>
+      <p>Dear ${params.officeName},</p>
+      <p>Thank you for registering your office on the SmartPro platform! We have received your registration and our team is currently reviewing your application.</p>
+      
+      <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0; border-radius: 4px;">
+        <h3 style="color: #1565c0; margin-top: 0; font-size: 16px;">What happens next:</h3>
+        <ol style="line-height: 1.8; margin: 10px 0; color: #424242;">
+          <li>Our verification team will review your office details and documents</li>
+          <li>You will receive an email notification once the review is complete (typically within 2-3 business days)</li>
+          <li>If approved, you'll be guided through completing your office profile</li>
+        </ol>
+      </div>
+      
+      <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e9ecef; color: #666; font-size: 14px;">
+        If you have any questions, please contact us at <a href="mailto:support@smartpro.om" style="color: #003366;">support@smartpro.om</a>
+      </p>
+    </div>
+  `;
+
+  const text = `
+Dear ${params.officeName},
+
+Thank you for registering your office on the SmartPro platform!
+
+We have received your registration and our team is currently reviewing your application.
+
+What happens next:
+1. Our verification team will review your office details and documents
+2. You will receive an email notification once the review is complete (typically within 2-3 business days)
+3. If approved, you'll be guided through completing your office profile
+
+If you have any questions, please contact us at support@smartpro.om.
+
+Best regards,
+MOCIP - SmartPro Team
+  `.trim();
+
+  return {
+    subject: "Registration Received - SmartPro Platform",
+    html: baseTemplate(content),
+    text,
+  };
+}
+
+/**
+ * Role change notification email template
+ */
+export function generateRoleChangeEmail(params: {
+  userName: string;
+  oldRole: string;
+  newRole: string;
+}): { subject: string; html: string; text: string } {
+  const roleLabels: Record<string, string> = {
+    user: "User",
+    admin: "Administrator",
+    sanad_owner: "Sanad Office Owner",
+    sanad_staff: "Sanad Office Staff",
+    sme_owner: "SME Owner",
+    gig_worker: "Gig Worker",
+    government_official: "Government Official",
+  };
+
+  const oldRoleLabel = roleLabels[params.oldRole] || params.oldRole;
+  const newRoleLabel = roleLabels[params.newRole] || params.newRole;
+
+  const content = `
+    <div class="content">
+      <h2 style="color: #003366; margin-top: 0;">Role Updated</h2>
+      <p>Dear ${params.userName},</p>
+      <p>Your role on the SmartPro platform has been updated.</p>
+      
+      <div style="background: white; padding: 20px; margin: 20px 0; border-radius: 8px; border: 1px solid #e9ecef;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 10px 0; color: #666; font-weight: 600;">Previous Role:</td>
+            <td style="padding: 10px 0; color: #333; text-align: right;">${oldRoleLabel}</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px 0; color: #666; font-weight: 600; border-top: 1px solid #e9ecef;">New Role:</td>
+            <td style="padding: 10px 0; color: #003366; font-weight: 600; text-align: right; border-top: 1px solid #e9ecef;">${newRoleLabel}</td>
+          </tr>
+        </table>
+      </div>
+      
+      <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 4px;">
+        <p style="margin: 0; color: #856404; line-height: 1.6;">
+          ⚠️ This change may affect your access to certain features and pages on the platform. Please log in to see your updated permissions.
+        </p>
+      </div>
+      
+      <a href="https://smartpro.om/dashboard" class="button">View Dashboard</a>
+      
+      <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e9ecef; color: #666; font-size: 14px;">
+        If you have any questions about this change, please contact us at <a href="mailto:support@smartpro.om" style="color: #003366;">support@smartpro.om</a>
+      </p>
+    </div>
+  `;
+
+  const text = `
+Dear ${params.userName},
+
+Your role on the SmartPro platform has been updated.
+
+Previous Role: ${oldRoleLabel}
+New Role: ${newRoleLabel}
+
+This change may affect your access to certain features and pages on the platform. Please log in to see your updated permissions.
+
+If you have any questions about this change, please contact us at support@smartpro.om.
+
+Best regards,
+MOCIP - SmartPro Team
+  `.trim();
+
+  return {
+    subject: "Your Role Has Been Updated - SmartPro Platform",
+    html: baseTemplate(content),
+    text,
+  };
+}
+
+/**
+ * Helper function to send office registration confirmation email
+ */
+export async function sendOfficeRegistrationConfirmationEmail(to: string, officeName: string) {
+  const { sendEmail } = await import("./emailSms");
+  const { subject, html, text } = generateOfficeRegistrationConfirmationEmail({ officeName });
+  return sendEmail({ to, subject, text, html });
+}
+
+/**
+ * Helper function to send role change notification email
+ */
+export async function sendRoleChangeNotificationEmail(
+  to: string,
+  userName: string,
+  oldRole: string,
+  newRole: string
+) {
+  const { sendEmail } = await import("./emailSms");
+  const { subject, html, text } = generateRoleChangeEmail({ userName, oldRole, newRole });
+  return sendEmail({ to, subject, text, html });
+}

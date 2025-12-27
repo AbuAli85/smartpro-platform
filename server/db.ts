@@ -4965,3 +4965,137 @@ export async function createOffice(officeData: {
     throw error;
   }
 }
+
+
+// Get pending office registrations for verification
+export async function getPendingOfficeRegistrations() {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get pending registrations: database not available");
+    return [];
+  }
+
+  try {
+    return await db
+      .select()
+      .from(sanadOffices)
+      .where(eq(sanadOffices.verificationStatus, "pending_verification"))
+      .orderBy(desc(sanadOffices.createdAt));
+  } catch (error) {
+    console.error("[Database] Failed to get pending registrations:", error);
+    return [];
+  }
+}
+
+// Approve office registration
+export async function approveOfficeRegistration(officeId: number, notes?: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot approve registration: database not available");
+    throw new Error("Database not available");
+  }
+
+  try {
+    await db
+      .update(sanadOffices)
+      .set({
+        status: "active",
+        verificationStatus: "verified",
+        verifiedAt: new Date(),
+      })
+      .where(eq(sanadOffices.id, officeId));
+
+    console.log(`[Database] Approved office registration ${officeId}${notes ? ` with notes: ${notes}` : ''}`);
+  } catch (error) {
+    console.error("[Database] Failed to approve registration:", error);
+    throw error;
+  }
+}
+
+// Reject office registration
+export async function rejectOfficeRegistration(officeId: number, reason: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot reject registration: database not available");
+    throw new Error("Database not available");
+  }
+
+  try {
+    await db
+      .update(sanadOffices)
+      .set({
+        status: "suspended",
+        verificationStatus: "rejected",
+      })
+      .where(eq(sanadOffices.id, officeId));
+
+    console.log(`[Database] Rejected office registration ${officeId}: ${reason}`);
+  } catch (error) {
+    console.error("[Database] Failed to reject registration:", error);
+    throw error;
+  }
+}
+
+
+// Update office services (onboarding) - TODO: Fix schema mismatch
+// export async function updateOfficeServices(
+//   officeId: number,
+//   serviceIds: number[],
+//   pricing: Record<number, number>
+// ) {
+//   const db = await getDb();
+//   if (!db) {
+//     console.warn("[Database] Cannot update office services: database not available");
+//     throw new Error("Database not available");
+//   }
+
+//   try {
+//     // Delete existing services
+//     await db
+//       .delete(sanadOfficeServices)
+//       .where(eq(sanadOfficeServices.officeId, officeId));
+
+//     // Insert new services with pricing
+//     if (serviceIds.length > 0) {
+//       await db.insert(sanadOfficeServices).values(
+//         serviceIds.map(serviceId => ({
+//           officeId,
+//           serviceId,
+//           price: pricing[serviceId] || 0,
+//         }))
+//       );
+//     }
+
+//     console.log(`[Database] Updated services for office ${officeId}`);
+//   } catch (error) {
+//     console.error("[Database] Failed to update office services:", error);
+//     throw error;
+//   }
+// }
+
+// Update office working hours (onboarding)
+export async function updateOfficeWorkingHours(
+  officeId: number,
+  workingHours: Record<string, { enabled: boolean; start: string; end: string }>
+) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update working hours: database not available");
+    throw new Error("Database not available");
+  }
+
+  try {
+    // Store working hours as JSON in the office record
+    await db
+      .update(sanadOffices)
+      .set({
+        workingHours: JSON.stringify(workingHours),
+      })
+      .where(eq(sanadOffices.id, officeId));
+
+    console.log(`[Database] Updated working hours for office ${officeId}`);
+  } catch (error) {
+    console.error("[Database] Failed to update working hours:", error);
+    throw error;
+  }
+}

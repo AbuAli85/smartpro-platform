@@ -44,6 +44,8 @@ import MarketplaceBrowser from "./pages/MarketplaceBrowser";
 import MyServiceRequests from "./pages/MyServiceRequests";
 import OfficeRegistration from "./pages/OfficeRegistration";
 import UserManagement from "./pages/UserManagement";
+import OfficeVerification from "./pages/OfficeVerification";
+import OnboardingWizard from "./pages/OnboardingWizard";
 import { useNotifications } from "./hooks/useNotifications";
 import { useMarketplaceNotifications } from "./hooks/useMarketplaceNotifications";
 import { SocketProvider } from "./contexts/SocketContext";
@@ -58,6 +60,7 @@ function Router() {
       <Route path="/search" component={AdvancedSearch} />
       <Route path="/offices/:id" component={OfficeProfile} />
       <Route path="/register-office" component={OfficeRegistration} />
+      <Route path="/onboarding" component={OnboardingWizard} />
       <Route path="/create-office" component={CreateOffice} />
       <Route path="/my-offices" component={MyOffices} />
       
@@ -80,6 +83,7 @@ function Router() {
       {/* Admin Panel */}
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/users" component={UserManagement} />
+      <Route path="/admin/office-verification" component={OfficeVerification} />
       <Route path="/admin/analytics" component={AdminAnalytics} />
       <Route path="/admin/translation-requests" component={TranslationRequestQueue} />
       <Route path="/admin/translation-analytics" component={TranslationAnalytics} />

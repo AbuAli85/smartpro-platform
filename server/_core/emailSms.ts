@@ -170,9 +170,17 @@ export async function sendOfficeVerificationEmail(params: {
     ? `
 Dear ${params.officeName},
 
-Congratulations! Your office has been approved and is now active on the SmartPro platform.
+Congratulations! Your office registration has been approved.
 
-You can now start receiving bookings from SMEs across Oman.
+Your office is now active on the SmartPro platform and visible to SMEs across Oman.
+
+Next Steps:
+1. Complete your office profile
+2. Add your services and pricing
+3. Configure your availability schedule
+4. Start receiving bookings
+
+Login to your dashboard to get started: https://smartpro.om/dashboard
 
 Best regards,
 MOCIP - SmartPro Team
@@ -180,11 +188,15 @@ MOCIP - SmartPro Team
     : `
 Dear ${params.officeName},
 
-We regret to inform you that your office registration has been rejected.
+Thank you for your interest in joining the SmartPro platform.
+
+After careful review, we regret to inform you that your office registration has not been approved at this time.
 
 Reason: ${params.reason || "Not specified"}
 
-Please contact us for more information.
+If you believe this decision was made in error or would like to address the issues mentioned, please contact us at support@smartpro.om.
+
+You are welcome to reapply once the concerns have been addressed.
 
 Best regards,
 MOCIP - SmartPro Team
