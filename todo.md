@@ -1012,3 +1012,26 @@ Note: This feature requires more extensive context system changes and will be im
 - [x] Show appropriate empty states for unauthorized access
 - [x] Hide action buttons based on permissions (via navigation filtering)
 - [x] Disable features user doesn't have access to
+
+
+## 🎯 Role Awareness & Engagement Enhancements (Dec 28, 2025)
+
+### Role Badge Display
+- [x] Add role badge component with color coding
+- [x] Display badge next to user name in sidebar
+- [x] Map role types to user-friendly labels
+- [x] Style badges with appropriate colors per role
+
+### Feature Discovery Tooltip
+- [x] Create "What you can do" tooltip component
+- [x] Generate permission-based feature list
+- [x] Add info icon next to role badge
+- [x] Show tooltip on hover/click
+- [x] Include links to key features
+
+### Role Upgrade CTA
+- [x] Add "Become an Office Owner" CTA for regular users
+- [x] Position CTA prominently in sidebar
+- [x] Link to office registration page
+- [x] Hide CTA for users who already own offices
+- [x] Add icon and compelling copy

@@ -43,6 +43,9 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { ConnectionStatusIndicator } from "./ConnectionStatusIndicator";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
 import { useNotifications } from "@/contexts/NotificationContext";
+import { RoleBadge } from "./RoleBadge";
+import { FeatureDiscoveryCard } from "./FeatureDiscoveryCard";
+import { UpgradeCTA } from "./UpgradeCTA";
 
 interface SidebarProps {
   className?: string;
@@ -252,6 +255,9 @@ export function Sidebar({ className }: SidebarProps) {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
                 <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                <div className="mt-1.5">
+                  <RoleBadge role={user.role as any} showTooltip />
+                </div>
               </div>
             )}
           </div>
@@ -265,6 +271,12 @@ export function Sidebar({ className }: SidebarProps) {
 
       {/* Navigation Links */}
       <ScrollArea className="flex-1 px-3 py-4">
+        {/* Feature Discovery Card */}
+        {!isCollapsed && <FeatureDiscoveryCard />}
+        
+        {/* Upgrade CTA */}
+        {!isCollapsed && <UpgradeCTA />}
+        
         <nav className="space-y-6">
           {filteredNavigationGroups.map((group, groupIndex) => (
             <div key={groupIndex} className="space-y-1">
