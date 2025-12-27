@@ -1035,3 +1035,17 @@ Note: This feature requires more extensive context system changes and will be im
 - [x] Link to office registration page
 - [x] Hide CTA for users who already own offices
 - [x] Add icon and compelling copy
+
+
+## 🐛 tRPC Error Fixes (Dec 28, 2025)
+
+### Missing Procedures
+- [x] Add offices.myOffices procedure to server/routers.ts
+- [x] Add offices router alias for frontend consistency
+- [x] Verify all frontend tRPC calls have corresponding backend procedures
+
+### Data Transformation Issues
+- [x] Fix "Unable to transform response from server" errors
+- [x] Check Date serialization in responses (superjson properly configured)
+- [x] Verify superjson is properly handling all data types
+- [x] Fix function name mismatch (getSanadOfficesByOwnerId)

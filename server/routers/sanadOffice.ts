@@ -529,6 +529,13 @@ export const sanadOfficeRouter = router({
       return recommendations;
     }),
 
+  // Get offices owned by current user
+  myOffices: protectedProcedure.query(async ({ ctx }) => {
+    const user = ctx.user!;
+    const offices = await db.getSanadOfficesByOwnerId(user.id);
+    return offices;
+  }),
+
   // Translation Management (Admin only)
   updateTranslation: protectedProcedure
     .input(z.object({

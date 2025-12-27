@@ -104,6 +104,7 @@ export const appRouter = router({
 
   // SmartPro feature routers
   sanadOffice: sanadOfficeRouter,
+  offices: sanadOfficeRouter, // Alias for frontend consistency
   documentTemplate: documentTemplateRouter,
   booking: bookingRouter,
   sitemap: sitemapRouter,
