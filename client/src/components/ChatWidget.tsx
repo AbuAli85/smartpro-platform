@@ -8,6 +8,7 @@ import { MessageCircle, Send, X, Minimize2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
+import { sendChatNotification, requestNotificationPermission, canSendNotifications } from "@/lib/notifications";
 
 interface ChatWidgetProps {
   officeId: number;
@@ -31,15 +32,17 @@ export default function ChatWidget({ officeId, officeName }: ChatWidgetProps) {
   const [isTyping, setIsTyping] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [conversationId, setConversationId] = useState<number | null>(null);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   
   const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Get or create conversation
-  const { data: conversation } = trpc.chat.getOrCreateConversation.useQuery(
+  // Note: Backend protectedProcedure handles auth, so we only check if widget is open
+  const { data: conversation, isLoading: conversationLoading } = trpc.chat.getOrCreateConversation.useQuery(
     { officeId },
-    { enabled: isOpen && !!user }
+    { enabled: isOpen }
   );
 
   // Get messages
@@ -103,6 +106,18 @@ export default function ChatWidget({ officeId, officeName }: ChatWidgetProps) {
     }
   }, [chatMessages]);
 
+  // Request notification permission when chat opens
+  useEffect(() => {
+    if (isOpen && !notificationsEnabled) {
+      requestNotificationPermission().then(permission => {
+        if (permission === 'granted') {
+          setNotificationsEnabled(true);
+          console.log('[Chat] Notifications enabled');
+        }
+      });
+    }
+  }, [isOpen, notificationsEnabled]);
+
   // Initialize Socket.io
   useEffect(() => {
     if (!isOpen || !user || !conversationId) return;
@@ -122,18 +137,34 @@ export default function ChatWidget({ officeId, officeName }: ChatWidgetProps) {
     });
 
     socket.on("new_message", (data: any) => {
+      const isFromOther = data.userId !== user.id;
+      
       setMessages(prev => [...prev, {
         id: Date.now(),
         senderId: data.userId,
-        senderType: data.userId === user.id ? "user" : "office",
+        senderType: isFromOther ? "office" : "user",
         message: data.message,
         createdAt: new Date(data.timestamp),
       }]);
       scrollToBottom();
       
-      // Update unread count if minimized
-      if (isMinimized && data.userId !== user.id) {
+      // Update unread count if minimized or closed
+      if (isFromOther && (isMinimized || !isOpen)) {
         setUnreadCount(prev => prev + 1);
+        
+        // Show browser notification if chat is closed or minimized
+        if (notificationsEnabled && canSendNotifications()) {
+          sendChatNotification(
+            officeName,
+            data.message,
+            conversationId,
+            () => {
+              setIsOpen(true);
+              setIsMinimized(false);
+              setUnreadCount(0);
+            }
+          );
+        }
       }
     });
 

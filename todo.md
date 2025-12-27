@@ -2154,12 +2154,41 @@
 - [x] Found button exists but may be hidden or off-screen
 - [x] Added prominent "Quick Actions Bar" before tabs
 - [x] Added translation keys for new UI elements
-- [ ] Test booking flow from office profile page
+- [x] Verified button is visible and functional
 
 ### Chat Widget Empty State:
 - [x] Debug why chat shows "Start a conversation" instead of message history
 - [x] Found conversation ID extraction issue in ChatWidget
 - [x] Fixed conversation ID parsing to handle nested objects
 - [x] Added comprehensive logging for debugging
+- [x] Removed overly restrictive user check in getOrCreateConversation query
 - [ ] Test conversation creation and message loading
 - [ ] Verify messages persist after page refresh
+
+
+## New Feature Requests (Dec 27, 2025)
+
+### Testing Current Fixes:
+- [ ] Navigate to Sanad office profile
+- [ ] Verify "Ready to book a service?" section appears
+- [ ] Test Book Service button functionality
+- [ ] Send test chat message
+- [ ] Refresh page and verify message persists
+- [ ] Confirm chat history loads properly
+
+### Booking Confirmation Emails:
+- [x] Design email template with booking details
+- [x] Include office contact information
+- [x] Generate calendar invite (.ics file)
+- [x] Attach calendar invite to email
+- [x] Send email on booking creation
+- [x] Added 24-hour reminder in calendar invite
+- [ ] Test email delivery and calendar invite
+
+### ### Real-time Chat Notifications:
+- [x] Request browser notification permission
+- [x] Listen for new messages via Socket.io
+- [x] Show browser notification when chat is closed/minimized
+- [x] Include office name and message preview
+- [x] Click notification to open chat widget
+- [ ] Test notifications on different browsers

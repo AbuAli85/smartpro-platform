@@ -105,21 +105,35 @@ const templates = {
 type TemplateType = keyof typeof templates;
 type Language = "en" | "ar";
 
+interface EmailAttachment {
+  filename: string;
+  content: string; // Base64 encoded or plain text
+  contentType?: string;
+}
+
 export async function sendBilingualEmail(
   to: string,
   templateType: TemplateType,
   data: any,
-  language: Language = "en"
+  language: Language = "en",
+  attachments?: EmailAttachment[]
 ) {
   const template = templates[templateType][language];
   
   try {
-    const result = await resend.emails.send({
+    const emailPayload: any = {
       from: process.env.RESEND_FROM_EMAIL || "noreply@smartpro.om",
       to,
       subject: template.subject,
       html: template.html(data),
-    });
+    };
+
+    // Add attachments if provided
+    if (attachments && attachments.length > 0) {
+      emailPayload.attachments = attachments;
+    }
+
+    const result = await resend.emails.send(emailPayload);
 
     console.log(`Email sent successfully to ${to} in ${language}:`, result);
     return { success: true, result };

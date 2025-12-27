@@ -5,6 +5,7 @@ import * as db from "../db";
 import { notifyOwner } from "../_core/notification";
 import { sendBilingualEmail, getUserLanguage } from "../_core/emailNotifications";
 import { sendBilingualSMS } from "../_core/smsNotifications";
+import { generateBookingCalendarInvite } from "../_core/calendarInvite";
 import { calculateCancellation, cancelBooking } from "../cancellationPolicy";
 import { emitBookingNotification } from "../_core/notifications";
 
@@ -128,8 +129,58 @@ export const bookingRouter = router({
         }
       }
 
-      // Send bilingual email confirmation to user
-      if (user.email) {
+      // Send bilingual email confirmation to user with calendar invite
+      if (user.email && input.scheduledDate && input.scheduledTime) {
+        const userLanguage = getUserLanguage(user.preferredLanguage);
+        
+        // Generate calendar invite
+        const appointmentDateTime = new Date(input.scheduledDate);
+        const [hours, minutes] = input.scheduledTime.split(':').map(Number);
+        appointmentDateTime.setHours(hours, minutes, 0, 0);
+        
+        // Get service name for calendar invite
+        let serviceName = input.serviceDescription;
+        if (input.serviceId) {
+          const service = await db.getServiceById(input.serviceId);
+          if (service) {
+            serviceName = service.serviceName;
+          }
+        }
+        
+        const calendarInvite = generateBookingCalendarInvite({
+          bookingId,
+          serviceName,
+          officeName: office.officeName,
+          officeAddress: `${office.wilayat}, ${office.governorate}`,
+          officePhone: office.phone || '',
+          appointmentDate: appointmentDateTime,
+          durationMinutes: input.duration,
+          userName: user.name || 'User',
+          userEmail: user.email,
+          officeEmail: office.email || 'noreply@smartpro.om',
+        });
+        
+        await sendBilingualEmail(
+          user.email,
+          "bookingConfirmation",
+          {
+            customerName: user.name || "User",
+            officeName: office.officeName,
+            bookingDate: appointmentDateTime.toLocaleDateString(),
+            bookingTime: input.scheduledTime,
+            bookingId: bookingId.toString(),
+          },
+          userLanguage,
+          [
+            {
+              filename: `booking-${bookingId}.ics`,
+              content: Buffer.from(calendarInvite).toString('base64'),
+              contentType: 'text/calendar',
+            },
+          ]
+        );
+      } else if (user.email) {
+        // Send email without calendar invite if date/time not provided
         const userLanguage = getUserLanguage(user.preferredLanguage);
         await sendBilingualEmail(
           user.email,
