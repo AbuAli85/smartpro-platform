@@ -24,39 +24,82 @@ export async function generateDocumentFromTemplate(
   templateName: string
 ): Promise<{ url: string; fileKey: string }> {
   try {
+    // Validate template buffer
+    if (!templateBuffer || templateBuffer.length === 0) {
+      throw new Error('Template buffer is empty or invalid');
+    }
+
     // Load the template
-    const zip = new PizZip(templateBuffer);
-    const doc = new Docxtemplater(zip, {
-      paragraphLoop: true,
-      linebreaks: true,
-      nullGetter: () => '', // Return empty string for null/undefined values
-    });
+    let zip: PizZip;
+    try {
+      zip = new PizZip(templateBuffer);
+    } catch (error: any) {
+      throw new Error(`Failed to parse DOCX file: ${error.message}. The file may be corrupted or not a valid .docx format.`);
+    }
+
+    // Initialize docxtemplater with error handling
+    let doc: Docxtemplater;
+    try {
+      doc = new Docxtemplater(zip, {
+        paragraphLoop: true,
+        linebreaks: true,
+        nullGetter: () => '', // Return empty string for null/undefined values
+      });
+    } catch (error: any) {
+      throw new Error(`Failed to initialize docxtemplater: ${error.message}`);
+    }
 
     // Process data to add automatic Hijri dates
     const processedData = processDataWithHijriDates(data);
+    console.log('Processed data for template:', Object.keys(processedData));
 
     // Replace placeholders
-    doc.render(processedData);
+    try {
+      doc.render(processedData);
+    } catch (error: any) {
+      // Docxtemplater provides detailed error information
+      if (error.properties && error.properties.errors) {
+        const errorDetails = error.properties.errors.map((e: any) => 
+          `${e.message} at ${e.part}`
+        ).join(', ');
+        throw new Error(`Template rendering failed: ${errorDetails}`);
+      }
+      throw new Error(`Failed to render template: ${error.message}`);
+    }
 
     // Generate the document
-    const buffer = doc.getZip().generate({
-      type: 'nodebuffer',
-      compression: 'DEFLATE',
-    });
+    let buffer: Buffer;
+    try {
+      buffer = doc.getZip().generate({
+        type: 'nodebuffer',
+        compression: 'DEFLATE',
+      }) as Buffer;
+    } catch (error: any) {
+      throw new Error(`Failed to generate document buffer: ${error.message}`);
+    }
 
     // Upload to S3
     const timestamp = Date.now();
-    const fileKey = `generated-documents/${timestamp}-${templateName}.docx`;
-    const { url } = await storagePut(
-      fileKey,
-      buffer,
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    );
+    const sanitizedName = templateName.replace(/[^a-zA-Z0-9-_]/g, '_');
+    const fileKey = `generated-documents/${timestamp}-${sanitizedName}.docx`;
+    
+    let url: string;
+    try {
+      const result = await storagePut(
+        fileKey,
+        buffer,
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      );
+      url = result.url;
+    } catch (error: any) {
+      throw new Error(`Failed to upload document to storage: ${error.message}`);
+    }
 
     return { url, fileKey };
   } catch (error: any) {
     console.error('Error generating document from template:', error);
-    throw new Error(`Failed to generate document: ${error.message}`);
+    // Re-throw with full error details
+    throw new Error(error.message || 'Unknown error occurred during document generation');
   }
 }
 

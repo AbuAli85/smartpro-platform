@@ -217,21 +217,38 @@ export const documentTemplateRouter = router({
       }
 
       // Download template file from S3
-      const response = await fetch(template.templateFileUrl);
-      if (!response.ok) {
+      let templateBuffer: Buffer;
+      try {
+        const response = await fetch(template.templateFileUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        templateBuffer = Buffer.from(await response.arrayBuffer());
+      } catch (error) {
+        console.error("Failed to download template file:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to download template file",
+          message: `Failed to download template file: ${error instanceof Error ? error.message : 'Unknown error'}`,
         });
       }
-      const templateBuffer = Buffer.from(await response.arrayBuffer());
 
       // Generate document from template
-      const { url, fileKey } = await generateDocumentFromTemplate(
-        templateBuffer,
-        input.filledData,
-        input.documentName
-      );
+      let url: string, fileKey: string;
+      try {
+        const result = await generateDocumentFromTemplate(
+          templateBuffer,
+          input.filledData,
+          input.documentName
+        );
+        url = result.url;
+        fileKey = result.fileKey;
+      } catch (error) {
+        console.error("Failed to generate document:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to generate document: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        });
+      }
 
       // Save the generated document
       const docId = await db.createGeneratedDocument({
