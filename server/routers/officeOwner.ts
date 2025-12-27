@@ -4,6 +4,40 @@ import * as db from "../db";
 import { TRPCError } from "@trpc/server";
 
 export const officeOwnerRouter = router({
+  // Register a new Sanad office
+  registerOffice: protectedProcedure
+    .input(z.object({
+      officeName: z.string().min(3),
+      officeNameAr: z.string().optional(),
+      description: z.string().min(20),
+      descriptionAr: z.string().optional(),
+      licenseNumber: z.string(),
+      address: z.string(),
+      addressAr: z.string().optional(),
+      city: z.string(),
+      region: z.string(),
+      phone: z.string(),
+      email: z.string().email(),
+      website: z.string().url().optional(),
+      serviceIds: z.array(z.number()),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      // Create the office
+      const officeId = await db.createOffice({
+        ...input,
+        ownerId: ctx.user.id,
+        isVerified: false, // Requires admin verification
+        isAvailable: false, // Not available until verified
+      });
+
+      // Update user role to sanad_owner if not already
+      if (ctx.user.role === "user") {
+        await db.updateUserRole(ctx.user.id, "sanad_owner");
+      }
+
+      return { officeId, message: "Office registered successfully. Pending verification." };
+    }),
+
   // Get offices owned by the current user
   getMyOffices: protectedProcedure.query(async ({ ctx }) => {
     const offices = await db.getOfficesByOwner(ctx.user.id);

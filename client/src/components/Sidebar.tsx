@@ -38,6 +38,7 @@ import { NotificationDropdown } from "./NotificationDropdown";
 import { LanguageToggle } from "./LanguageToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ConnectionStatusIndicator } from "./ConnectionStatusIndicator";
+import { useRoleAccess } from "@/hooks/useRoleAccess";
 
 interface SidebarProps {
   className?: string;
@@ -47,6 +48,7 @@ export function Sidebar({ className }: SidebarProps) {
   const { t } = useLanguage();
   const [location] = useLocation();
   const { user, logout } = useAuth();
+  const { hasPermission, hasRole } = useRoleAccess();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   
@@ -59,18 +61,18 @@ export function Sidebar({ className }: SidebarProps) {
   const navigation = [
     { name: t("nav.home"), href: "/", icon: Home },
     { name: t("nav.sanadOffices"), href: "/offices", icon: Building2 },
-    { name: t("nav.documentTemplates"), href: "/templates", icon: FileText },
-    { name: t("nav.myBookings"), href: "/bookings", icon: Calendar, requiresAuth: true },
-    { name: "My Service Requests", href: "/my-requests", icon: Package, requiresAuth: true },
-    { name: "Browse Marketplace", href: "/marketplace", icon: Search, requiresAuth: true },
-    { name: t("nav.myOffices"), href: "/my-offices", icon: Briefcase, requiresAuth: true },
-    { name: t("nav.ownerDashboard"), href: "/owner/dashboard", icon: Shield, requiresAuth: true },
-    { name: t("nav.chatInbox"), href: "/owner/chat", icon: MessageCircle, requiresAuth: true },
-    { name: t("nav.chatAnalytics"), href: "/owner/chat-analytics", icon: TrendingUp, requiresAuth: true },
-    { name: t("nav.cannedResponses"), href: "/owner/canned-responses", icon: MessageSquareText, requiresAuth: true },
-    { name: t("nav.staffManagement"), href: "/owner/staff", icon: Users, requiresAuth: true },
-    { name: t("nav.staffPerformance"), href: "/owner/staff-performance", icon: Activity, requiresAuth: true },
-    { name: t("nav.followUpSettings"), href: "/owner/follow-up-settings", icon: Clock, requiresAuth: true },
+    { name: t("nav.documentTemplates"), href: "/templates", icon: FileText, requirePermission: "canViewTemplates" as const },
+    { name: t("nav.myBookings"), href: "/bookings", icon: Calendar, requiresAuth: true, requirePermission: "canCreateBooking" as const },
+    { name: "My Service Requests", href: "/my-requests", icon: Package, requiresAuth: true, requirePermission: "canPostServiceRequest" as const },
+    { name: "Browse Marketplace", href: "/marketplace", icon: Search, requiresAuth: true, requirePermission: "canSubmitBids" as const },
+    { name: t("nav.myOffices"), href: "/my-offices", icon: Briefcase, requiresAuth: true, requirePermission: "canManageOffice" as const },
+    { name: t("nav.ownerDashboard"), href: "/owner/dashboard", icon: Shield, requiresAuth: true, requirePermission: "canViewOfficeAnalytics" as const },
+    { name: t("nav.chatInbox"), href: "/owner/chat", icon: MessageCircle, requiresAuth: true, requirePermission: "canAccessChatInbox" as const },
+    { name: t("nav.chatAnalytics"), href: "/owner/chat-analytics", icon: TrendingUp, requiresAuth: true, requirePermission: "canViewChatAnalytics" as const },
+    { name: t("nav.cannedResponses"), href: "/owner/canned-responses", icon: MessageSquareText, requiresAuth: true, requirePermission: "canManageCannedResponses" as const },
+    { name: t("nav.staffManagement"), href: "/owner/staff", icon: Users, requiresAuth: true, requirePermission: "canManageStaff" as const },
+    { name: t("nav.staffPerformance"), href: "/owner/staff-performance", icon: Activity, requiresAuth: true, requirePermission: "canManageStaff" as const },
+    { name: t("nav.followUpSettings"), href: "/owner/follow-up-settings", icon: Clock, requiresAuth: true, requirePermission: "canManageOffice" as const },
     { name: t("nav.loyaltyRewards"), href: "/loyalty", icon: Award, requiresAuth: true },
     { name: t("nav.referFriends"), href: "/refer", icon: Gift, requiresAuth: true },
     { name: t("nav.analytics"), href: "/analytics", icon: BarChart3, requiresAuth: true },
@@ -78,9 +80,10 @@ export function Sidebar({ className }: SidebarProps) {
     { name: t("nav.notificationPreferences"), href: "/notifications", icon: Bell, requiresAuth: true },
   ];
 
-  // Add admin link if user is admin
-  if (user?.role === "admin") {
+  // Add admin links if user has admin permissions
+  if (hasPermission("canAccessAdminPanel")) {
     navigation.push({ name: t("nav.adminDashboard"), href: "/admin", icon: Shield, requiresAuth: true });
+    navigation.push({ name: "User Management", href: "/admin/users", icon: Users, requiresAuth: true });
     navigation.push({ name: t("nav.adminAnalytics"), href: "/admin/analytics", icon: BarChart3, requiresAuth: true });
     navigation.push({ name: t("nav.contentTranslation"), href: "/admin/translations", icon: Languages, requiresAuth: true });
     navigation.push({ name: "Translation Requests", href: "/admin/translation-requests", icon: MessageSquareText, requiresAuth: true });
@@ -91,7 +94,15 @@ export function Sidebar({ className }: SidebarProps) {
     navigation.push({ name: "Translator Training", href: "/admin/training", icon: BookOpen, requiresAuth: true });
   }
 
-  const filteredNavigation = navigation.filter((item) => !item.requiresAuth || user);
+  const filteredNavigation = navigation.filter((item) => {
+    // Filter by auth requirement
+    if (item.requiresAuth && !user) return false;
+    
+    // Filter by permission requirement
+    if (item.requirePermission && !hasPermission(item.requirePermission)) return false;
+    
+    return true;
+  });
 
   const handleLogout = async () => {
     await logout();

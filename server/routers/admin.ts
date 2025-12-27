@@ -18,6 +18,31 @@ const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
 });
 
 export const adminRouter = router({
+  // Get all users
+  getAllUsers: adminProcedure.query(async () => {
+    return await db.getAllUsers();
+  }),
+
+  // Update user role
+  updateUserRole: adminProcedure
+    .input(z.object({
+      userId: z.number(),
+      role: z.enum(["user", "admin", "sanad_owner", "sanad_staff", "sme_owner", "gig_worker", "government_official"]),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      await db.updateUserRole(input.userId, input.role);
+
+      await db.logActivity({
+        userId: ctx.user!.id,
+        action: "updated",
+        entityType: "user",
+        entityId: input.userId,
+        description: `Changed user role to ${input.role}`,
+      });
+
+      return { success: true };
+    }),
+
   // Get platform statistics
   getStats: adminProcedure.query(async () => {
     const stats = await db.getPlatformStatistics();

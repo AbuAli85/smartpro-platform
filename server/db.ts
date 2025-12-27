@@ -4877,3 +4877,91 @@ export async function getAllActiveBundles() {
 
   return bundlesWithServices;
 }
+
+
+// Update user role
+export async function updateUserRole(userId: number, role: "user" | "admin" | "sanad_owner" | "sanad_staff" | "sme_owner" | "gig_worker" | "government_official") {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update user role: database not available");
+    return;
+  }
+
+  try {
+    await db
+      .update(users)
+      .set({ role })
+      .where(eq(users.id, userId));
+    console.log(`[Database] Updated user ${userId} role to ${role}`);
+  } catch (error) {
+    console.error("[Database] Failed to update user role:", error);
+    throw error;
+  }
+}
+
+// Create a new Sanad office
+export async function createOffice(officeData: {
+  officeName: string;
+  officeNameAr?: string;
+  description: string;
+  descriptionAr?: string;
+  licenseNumber: string;
+  address: string;
+  addressAr?: string;
+  city: string;
+  region: string;
+  phone: string;
+  email: string;
+  website?: string;
+  ownerId: number;
+  isVerified: boolean;
+  isAvailable: boolean;
+  serviceIds: number[];
+}) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create office: database not available");
+    throw new Error("Database not available");
+  }
+
+  try {
+    // Generate slug from office name
+    const slug = officeData.officeName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      + "-" + Date.now();
+
+    // Insert office
+    const [result] = await db.insert(sanadOffices).values({
+      officeName: officeData.officeName,
+      officeNameAr: officeData.officeNameAr || null,
+      slug,
+      commercialRegistration: officeData.licenseNumber,
+      description: officeData.description,
+      descriptionAr: officeData.descriptionAr || null,
+      addressLine1: officeData.address,
+      governorate: officeData.region,
+      wilayat: officeData.city,
+      phone: officeData.phone,
+      email: officeData.email,
+      website: officeData.website || null,
+      ownerId: officeData.ownerId,
+      status: officeData.isVerified ? "active" : "pending",
+      verificationStatus: officeData.isVerified ? "verified" : "pending_verification",
+      createdBy: officeData.ownerId,
+      updatedBy: officeData.ownerId,
+    });
+
+    const officeId = result.insertId;
+
+    // Note: Office services will be added separately by the office owner
+    // after registration is approved
+
+    console.log(`[Database] Created office ${officeId}`);
+    return officeId;
+  } catch (error) {
+    console.error("[Database] Failed to create office:", error);
+    throw error;
+  }
+}

@@ -42,6 +42,8 @@ import NotificationPreferences from "./pages/NotificationPreferences";
 import RequestServicePage from "./pages/RequestServicePage";
 import MarketplaceBrowser from "./pages/MarketplaceBrowser";
 import MyServiceRequests from "./pages/MyServiceRequests";
+import OfficeRegistration from "./pages/OfficeRegistration";
+import UserManagement from "./pages/UserManagement";
 import { useNotifications } from "./hooks/useNotifications";
 import { useMarketplaceNotifications } from "./hooks/useMarketplaceNotifications";
 import { SocketProvider } from "./contexts/SocketContext";
@@ -55,6 +57,7 @@ function Router() {
       <Route path="/offices" component={OfficesList} />
       <Route path="/search" component={AdvancedSearch} />
       <Route path="/offices/:id" component={OfficeProfile} />
+      <Route path="/register-office" component={OfficeRegistration} />
       <Route path="/create-office" component={CreateOffice} />
       <Route path="/my-offices" component={MyOffices} />
       
@@ -74,9 +77,10 @@ function Router() {
       {/* Documents */}
       <Route path="/documents" component={MyDocuments} />
       
-      {/* Admin */}
+      {/* Admin Panel */}
       <Route path="/admin" component={AdminDashboard} />
-      <Route path="/admin/translations" component={ContentTranslation} />
+      <Route path="/admin/users" component={UserManagement} />
+      <Route path="/admin/analytics" component={AdminAnalytics} />
       <Route path="/admin/translation-requests" component={TranslationRequestQueue} />
       <Route path="/admin/translation-analytics" component={TranslationAnalytics} />
       <Route path="/admin/translation-quality" component={TranslationQualityDashboard} />
