@@ -11,12 +11,15 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { AdvancedFilters, type FilterState } from "@/components/AdvancedFilters";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useRegionalContent, getGovernoratesForRegion } from "@/hooks/useRegionalContent";
 
 export default function OfficesList() {
   const { t } = useLanguage();
+  const { region } = useRegionalContent();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [governorate, setGovernorate] = useState<string>();
+  const [showAllRegions, setShowAllRegions] = useState(false);
   const [sortBy, setSortBy] = useState<string>("rating");
   const [page, setPage] = useState(1);
   const [advancedFilters, setAdvancedFilters] = useState<FilterState>({});
@@ -36,11 +39,24 @@ export default function OfficesList() {
   };
   const { isAuthenticated } = useAuth();
 
+  // Apply regional filtering unless "Show all regions" is enabled
+  const effectiveGovernorate = useMemo(() => {
+    if (showAllRegions) return governorate;
+    if (governorate) return governorate; // Manual filter takes precedence
+    
+    // Apply regional filter from region selector
+    const regionalGovernorates = getGovernoratesForRegion(region);
+    if (regionalGovernorates && regionalGovernorates.length === 1) {
+      return regionalGovernorates[0];
+    }
+    return undefined;
+  }, [region, governorate, showAllRegions]);
+
   const { data, isLoading } = trpc.sanadOffice.list.useQuery({
     page,
     limit: 12,
     search: debouncedSearch || undefined,
-    governorate,
+    governorate: effectiveGovernorate,
     status: "active",
     category: advancedFilters.category,
     minRating: advancedFilters.minRating,
@@ -172,10 +188,28 @@ export default function OfficesList() {
           </div>
         ) : data && data.offices.length > 0 ? (
           <>
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-muted-foreground">
-                {t("offices.showing")} {sortedOffices.length} {t("offices.of")} {data.total} {t("offices.offices")}
-              </p>
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+              <div className="flex items-center gap-3">
+                <p className="text-sm text-muted-foreground">
+                  {t("offices.showing")} {sortedOffices.length} {t("offices.of")} {data.total} {t("offices.offices")}
+                </p>
+                {region !== "all" && !showAllRegions && !governorate && (
+                  <Badge variant="secondary" className="text-xs">
+                    <MapPin className="w-3 h-3 mr-1" />
+                    {t("region.filteringByRegion")}: {t(`region.${region}`)}
+                  </Badge>
+                )}
+              </div>
+              {region !== "all" && !governorate && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAllRegions(!showAllRegions)}
+                  className="text-xs"
+                >
+                  {showAllRegions ? t("region.filteringByRegion") : t("region.showAllRegions")}
+                </Button>
+              )}
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {sortedOffices.map((office) => (

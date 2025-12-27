@@ -143,6 +143,9 @@ export const translations: Record<Language, Record<string, string>> = {
     "region.dakhliyah": "Dakhliyah",
     "region.selectRegion": "Select Region",
     "region.yourRegion": "Your Region",
+    "region.showingOfficesIn": "Showing offices in",
+    "region.showAllRegions": "Show all regions",
+    "region.filteringByRegion": "Filtering by selected region",
     
     // Service Filters
     "services.filters": "Filters",
@@ -563,6 +566,9 @@ export const translations: Record<Language, Record<string, string>> = {
     "region.dakhliyah": "الداخلية",
     "region.selectRegion": "اختر المنطقة",
     "region.yourRegion": "منطقتك",
+    "region.showingOfficesIn": "عرض المكاتب في",
+    "region.showAllRegions": "عرض جميع المناطق",
+    "region.filteringByRegion": "التصفية حسب المنطقة المختارة",
     
     // Service Filters
     "services.filters": "الفلاتر",

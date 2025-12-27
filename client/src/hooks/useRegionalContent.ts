@@ -3,6 +3,32 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 export type Region = "all" | "muscat" | "dhofar" | "batinah" | "sharqiyah" | "dakhliyah";
 
+// Map region codes to actual governorate names in database
+export const regionToGovernorate: Record<Region, string | null> = {
+  all: null, // Show all offices
+  muscat: "Muscat",
+  dhofar: "Dhofar",
+  batinah: "Al Batinah North", // Default to North, but will match both
+  sharqiyah: "Ash Sharqiyah North", // Default to North, but will match both
+  dakhliyah: "Ad Dakhiliyah",
+};
+
+// Get all governorates that match a region (for regions split into North/South)
+export function getGovernoratesForRegion(region: Region): string[] | null {
+  if (region === "all") return null;
+  
+  const mapping: Record<Region, string[]> = {
+    all: [],
+    muscat: ["Muscat"],
+    dhofar: ["Dhofar"],
+    batinah: ["Al Batinah North", "Al Batinah South"],
+    sharqiyah: ["Ash Sharqiyah North", "Ash Sharqiyah South"],
+    dakhliyah: ["Ad Dakhiliyah"],
+  };
+  
+  return mapping[region];
+}
+
 interface RegionalContent {
   en: string;
   ar: string;
