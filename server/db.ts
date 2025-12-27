@@ -2057,6 +2057,36 @@ export async function cancelFollowup(followupId: number) {
 /**
  * Get office performance metrics for admin dashboard
  */
+/**
+ * Save office performance metrics
+ */
+export async function saveOfficePerformanceMetrics(metrics: {
+  officeId: number;
+  averageRating: number;
+  totalReviews: number;
+  responseTimeHours: number;
+  completionRate: number;
+  sentimentScore: number;
+  compositeScore: number;
+  rank: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Store in office metadata or separate performance table
+  // For now, we'll update the office record with performance data
+  await db
+    .update(sanadOffices)
+    .set({
+      performanceScore: metrics.compositeScore.toString(),
+      performanceRank: metrics.rank,
+      updatedAt: new Date(),
+    })
+    .where(eq(sanadOffices.id, metrics.officeId));
+
+  console.log(`[DB] Saved performance metrics for office ${metrics.officeId}`);
+}
+
 export async function getOfficePerformanceMetrics(params: {
   startDate: Date;
   endDate: Date;

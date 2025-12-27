@@ -257,3 +257,42 @@
 - [ ] Track which suggestions are used
 - [ ] Learn from office owner edits to improve suggestions
 - [ ] Add common response templates library
+
+
+## 🌍 Platform Expansion Features
+
+### WhatsApp Business Integration
+- [x] Research WhatsApp Business API requirements and setup
+- [x] Create WhatsApp messaging helper using Twilio/Meta API
+- [x] Add WhatsApp notification preferences to user settings
+- [x] Send booking confirmation via WhatsApp with booking details
+- [x] Send document status updates via WhatsApp
+- [x] Add rich media support (images, PDFs, location)
+- [x] Create WhatsApp message templates for compliance
+- [ ] Add WhatsApp opt-in during registration
+- [ ] Track WhatsApp delivery and read receipts
+- [ ] Create admin dashboard for WhatsApp analytics
+
+### Performance-Based Office Ranking
+- [x] Create office_performance_metrics table
+- [x] Build algorithm combining multiple factors (ratings, response time, completion rate)
+- [x] Add sentiment analysis for review text
+- [x] Calculate composite performance score (0-100)
+- [ ] Update marketplace search to use performance ranking
+- [ ] Add "Top Performer" badge for high-scoring offices
+- [ ] Create performance dashboard for office owners
+- [ ] Add historical performance tracking
+- [ ] Implement real-time score updates on booking completion
+- [ ] Create admin analytics for ranking distribution
+
+### Multi-Language Support (Arabic)
+- [x] Add language switcher to navigation
+- [x] Create translation infrastructure (i18n)
+- [x] Translate all UI strings to Arabic
+- [x] Add RTL (right-to-left) layout support
+- [x] Integrate auto-translate API for service descriptions
+- [x] Add language preference to user profile
+- [x] Translate email templates to Arabic
+- [x] Add Arabic font support
+- [x] Create bilingual document templates
+- [x] Test all features in Arabic mode

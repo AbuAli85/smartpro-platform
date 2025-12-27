@@ -211,6 +211,13 @@
       "when": 1766845836825,
       "tag": "0029_hesitant_pride",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "5",
+      "when": 1766853013423,
+      "tag": "0030_noisy_banshee",
+      "breakpoints": true
     }
   ]
 }

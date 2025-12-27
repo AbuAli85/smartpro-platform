@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "01b92d2e-75ff-4d31-9e13-f6c43488a15a",
-  "prevId": "646e71f0-971d-4fd5-92fc-4d61a40f1479",
+  "id": "ad2af6bd-e96b-4821-8a84-2238f4ca0fa9",
+  "prevId": "01b92d2e-75ff-4d31-9e13-f6c43488a15a",
   "tables": {
     "activity_log": {
       "name": "activity_log",
@@ -3409,6 +3409,22 @@
           "autoincrement": false,
           "default": 0
         },
+        "performanceScore": {
+          "name": "performanceScore",
+          "type": "decimal(5,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'0'"
+        },
+        "performanceRank": {
+          "name": "performanceRank",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
+        },
         "createdAt": {
           "name": "createdAt",
           "type": "timestamp",
@@ -5257,6 +5273,14 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "whatsappEnabled": {
+          "name": "whatsappEnabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
         },
         "referralCode": {
           "name": "referralCode",

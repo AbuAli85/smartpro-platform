@@ -26,6 +26,7 @@ export const users = mysqlTable("users", {
     reminders: boolean;
     marketing: boolean;
   }>(),
+  whatsappEnabled: boolean("whatsappEnabled").default(false),
   referralCode: varchar("referralCode", { length: 20 }).unique(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -114,6 +115,10 @@ export const sanadOffices = mysqlTable("sanad_offices", {
   completedOrders: int("completedOrders").default(0).notNull(),
   averageRating: decimal("averageRating", { precision: 3, scale: 2 }).default("0.00").notNull(),
   totalReviews: int("totalReviews").default(0).notNull(),
+  
+  // Performance Ranking
+  performanceScore: decimal("performanceScore", { precision: 5, scale: 2 }).default("0"),
+  performanceRank: int("performanceRank").default(0),
   
   // Audit
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -807,8 +812,8 @@ export const scheduledFollowups = mysqlTable("scheduled_followups", {
   // Status
   status: mysqlEnum("status", ["pending", "sent", "cancelled"]).notNull().default("pending"),
   sentAt: timestamp("sentAt"),
-  
-  // Metadata
+
+  // Timestamps
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

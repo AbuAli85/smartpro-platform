@@ -5,6 +5,7 @@ import * as db from "../db";
 import { notifyOwner } from "../_core/notification";
 import { sendBilingualEmail, getUserLanguage } from "../_core/emailNotifications";
 import { sendBilingualSMS } from "../_core/smsNotifications";
+import { sendBookingConfirmation } from "../_core/whatsapp";
 import { generateBookingCalendarInvite } from "../_core/calendarInvite";
 import { calculateCancellation, cancelBooking } from "../cancellationPolicy";
 import { emitBookingNotification } from "../_core/notifications";
@@ -205,6 +206,19 @@ export const bookingRouter = router({
         bookingId,
         actionUrl: `/bookings`,
       });
+
+      // Send WhatsApp confirmation if user has phone number and WhatsApp enabled
+      if (user.phone && user.whatsappEnabled) {
+        await sendBookingConfirmation(user.phone, {
+          bookingId: bookingId.toString(),
+          officeName: office.officeName,
+          serviceName: input.serviceDescription,
+          appointmentDate: input.scheduledDate
+            ? new Date(input.scheduledDate).toLocaleDateString()
+            : "TBD",
+          totalPrice: "0.000", // TODO: Calculate actual price from service
+        });
+      }
 
       return { id: bookingId };
     }),
