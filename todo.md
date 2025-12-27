@@ -2706,3 +2706,40 @@ The booking form already includes:
 - [ ] "Startup Package" (CR + Tax Registration + VAT)
 - [ ] "Business Expansion" (Branch Registration + License Renewal)
 - [ ] "Annual Compliance" (Tax Filing + Audit + License Renewal)
+
+
+## IMPLEMENTATION: Customer Bid Management Page (Dec 27, 2025)
+- [x] Create MyServiceRequests.tsx page component
+- [x] Fetch user's service requests with bids using tRPC
+- [x] Display request cards with status badges and bid counts
+- [x] Build BidComparisonTable component for side-by-side comparison
+- [x] Add accept bid button with confirmation dialog
+- [x] Implement one-click booking creation from accepted bid
+- [ ] Add reject bid functionality
+- [ ] Show request timeline and activity history
+- [x] Add navigation link to sidebar
+- [ ] Write unit tests for bid acceptance flow
+
+## IMPLEMENTATION: Real-time Marketplace Notifications (Dec 27, 2025)
+- [x] Extend Socket.io server with marketplace event handlers
+- [x] Add marketplace:newRequest event (notify matching offices)
+- [x] Add marketplace:newBid event (notify request owner)
+- [x] Add marketplace:bidAccepted event (notify office)
+- [x] Create useMarketplaceNotifications hook
+- [x] Integrate notification listeners in MarketplaceBrowser
+- [x] Integrate notification listeners in MyServiceRequests
+- [x] Add toast notifications with office/customer names
+- [ ] Test real-time notification delivery
+
+## IMPLEMENTATION: Service Bundles Feature (Dec 27, 2025)
+- [x] Create service_bundles and bundle_services tables in schema
+- [x] Add createBundle, getBundles, updateBundle, deleteBundle helpers
+- [x] Create serviceBundle tRPC router with CRUD procedures
+- [ ] Build BundleManager page for office owners
+- [ ] Create CreateBundleDialog with service multi-select
+- [ ] Add discount percentage slider with price preview
+- [ ] Display bundles on office profile page with BundleCard
+- [ ] Integrate bundle booking into booking wizard
+- [x] Calculate bundle pricing with discount
+- [ ] Add bundle analytics to office dashboard
+- [ ] Write unit tests for bundle pricing calculations

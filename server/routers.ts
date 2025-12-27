@@ -36,6 +36,7 @@ import { smartBatchProcessingRouter } from "./routers/smartBatchProcessing";
 import { analyticsExportRouter } from "./routers/analyticsExport";
 import { translatorTrainingRouter } from "./routers/translatorTraining";
 import { serviceMarketplaceRouter } from "./routers/serviceMarketplace";
+import { serviceBundleRouter } from "./routers/serviceBundle";
 
 export const appRouter = router({
   system: systemRouter,
@@ -130,6 +131,7 @@ export const appRouter = router({
   analyticsExport: analyticsExportRouter,
   translatorTraining: translatorTrainingRouter,
   serviceMarketplace: serviceMarketplaceRouter,
+  serviceBundle: serviceBundleRouter,
 });
 
 export type AppRouter = typeof appRouter;

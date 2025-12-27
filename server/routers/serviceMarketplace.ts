@@ -2,6 +2,7 @@ import { z } from "zod";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import * as db from "../db";
 import { TRPCError } from "@trpc/server";
+import { notifyNewBid, notifyBidAccepted } from "../_core/socket";
 
 export const serviceMarketplaceRouter = router({
   // Create a new service request (customer)
@@ -130,6 +131,18 @@ export const serviceMarketplaceRouter = router({
         actionUrl: `/marketplace/requests/${input.requestId}`,
       });
 
+      // Real-time notification via WebSocket
+      const office = await db.getSanadOfficeById(input.officeId);
+      if (office) {
+        notifyNewBid(request.userId, {
+          requestId: input.requestId,
+          requestTitle: request.title,
+          officeName: office.officeName,
+          price: input.proposedPrice.toString(),
+          estimatedDuration: input.estimatedDuration,
+        });
+      }
+
       return { id: bidId };
     }),
 
@@ -183,14 +196,25 @@ export const serviceMarketplaceRouter = router({
         bookingType: "marketplace",
       });
 
-      // Notify office
-      await db.createNotification({
-        userId: bid.officeId, // This should be office owner ID
-        type: "booking",
-        title: "Bid Accepted!",
-        message: `Your bid on "${request.title}" has been accepted`,
-        actionUrl: `/bookings/${bookingId}`,
-      });
+      // Get office owner for notification
+      const office = await db.getSanadOfficeById(bid.officeId);
+      if (office && office.createdBy) {
+        // Notify office owner
+        await db.createNotification({
+          userId: office.createdBy, // Office owner ID
+          type: "booking",
+          title: "Bid Accepted!",
+          message: `Your bid on "${request.title}" has been accepted`,
+          actionUrl: `/bookings/${bookingId}`,
+        });
+
+        // Real-time notification via WebSocket
+        notifyBidAccepted(office.createdBy, {
+          requestTitle: request.title,
+          customerName: user.name || "Customer",
+          price: bid.proposedPrice,
+        });
+      }
 
       return { bookingId };
     }),

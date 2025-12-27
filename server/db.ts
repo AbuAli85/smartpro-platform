@@ -32,6 +32,10 @@ import {
   serviceBids,
   type ServiceRequest,
   type ServiceBid,
+  serviceBundles,
+  bundleServices,
+  type ServiceBundle,
+  type BundleService,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -4526,11 +4530,45 @@ export async function getUserServiceRequests(userId: number) {
   const db = await getDb();
   if (!db) return [];
 
-  return await db
+  const requests = await db
     .select()
     .from(serviceRequests)
     .where(eq(serviceRequests.userId, userId))
     .orderBy(desc(serviceRequests.createdAt));
+
+  // For each request, fetch bids with office info
+  const requestsWithBids = await Promise.all(
+    requests.map(async (request) => {
+      const bids = await db
+        .select({
+          id: serviceBids.id,
+          requestId: serviceBids.requestId,
+          officeId: serviceBids.officeId,
+          price: serviceBids.proposedPrice,
+          estimatedDuration: serviceBids.estimatedDuration,
+          coverLetter: serviceBids.coverLetter,
+          status: serviceBids.status,
+          createdAt: serviceBids.createdAt,
+          office: {
+            id: sanadOffices.id,
+            officeName: sanadOffices.officeName,
+            governorate: sanadOffices.governorate,
+            wilayat: sanadOffices.wilayat,
+          },
+        })
+        .from(serviceBids)
+        .leftJoin(sanadOffices, eq(serviceBids.officeId, sanadOffices.id))
+        .where(eq(serviceBids.requestId, request.id))
+        .orderBy(desc(serviceBids.createdAt));
+
+      return {
+        ...request,
+        bids,
+      };
+    })
+  );
+
+  return requestsWithBids;
 }
 
 export async function getServiceRequest(requestId: number) {
@@ -4641,4 +4679,201 @@ export async function getOfficeBids(officeId: number) {
     .leftJoin(serviceRequests, eq(serviceBids.requestId, serviceRequests.id))
     .where(eq(serviceBids.officeId, officeId))
     .orderBy(desc(serviceBids.createdAt));
+}
+
+
+// ============================================
+// SERVICE BUNDLES
+// ============================================
+
+export async function createServiceBundle(data: {
+  officeId: number;
+  name: string;
+  description?: string;
+  discountPercentage: string;
+  validFrom?: Date;
+  validUntil?: Date;
+  createdBy: number;
+  services: Array<{
+    serviceId: number;
+    serviceName: string;
+    servicePrice: string;
+  }>;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Create bundle
+  const result = await db.insert(serviceBundles).values({
+    officeId: data.officeId,
+    name: data.name,
+    description: data.description,
+    discountPercentage: data.discountPercentage,
+    validFrom: data.validFrom,
+    validUntil: data.validUntil,
+    createdBy: data.createdBy,
+    isActive: true,
+  });
+
+  const bundleId = Number(result[0].insertId);
+
+  // Add services to bundle
+  if (data.services && data.services.length > 0) {
+    await db.insert(bundleServices).values(
+      data.services.map((service) => ({
+        bundleId,
+        serviceId: service.serviceId,
+        serviceName: service.serviceName,
+        servicePrice: service.servicePrice,
+      }))
+    );
+  }
+
+  return bundleId;
+}
+
+export async function getOfficeBundles(officeId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const bundles = await db
+    .select()
+    .from(serviceBundles)
+    .where(and(eq(serviceBundles.officeId, officeId), eq(serviceBundles.isActive, true)))
+    .orderBy(desc(serviceBundles.createdAt));
+
+  // For each bundle, fetch services
+  const bundlesWithServices = await Promise.all(
+    bundles.map(async (bundle) => {
+      const services = await db
+        .select()
+        .from(bundleServices)
+        .where(eq(bundleServices.bundleId, bundle.id));
+
+      // Calculate total price and discounted price
+      const totalPrice = services.reduce((sum, s) => sum + parseFloat(s.servicePrice), 0);
+      const discountAmount = (totalPrice * parseFloat(bundle.discountPercentage)) / 100;
+      const finalPrice = totalPrice - discountAmount;
+
+      return {
+        ...bundle,
+        services,
+        totalPrice: totalPrice.toFixed(2),
+        discountAmount: discountAmount.toFixed(2),
+        finalPrice: finalPrice.toFixed(2),
+      };
+    })
+  );
+
+  return bundlesWithServices;
+}
+
+export async function getServiceBundle(bundleId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const results = await db
+    .select()
+    .from(serviceBundles)
+    .where(eq(serviceBundles.id, bundleId))
+    .limit(1);
+
+  if (results.length === 0) return null;
+
+  const bundle = results[0];
+
+  // Fetch services
+  const services = await db
+    .select()
+    .from(bundleServices)
+    .where(eq(bundleServices.bundleId, bundle.id));
+
+  // Calculate pricing
+  const totalPrice = services.reduce((sum, s) => sum + parseFloat(s.servicePrice), 0);
+  const discountAmount = (totalPrice * parseFloat(bundle.discountPercentage)) / 100;
+  const finalPrice = totalPrice - discountAmount;
+
+  return {
+    ...bundle,
+    services,
+    totalPrice: totalPrice.toFixed(2),
+    discountAmount: discountAmount.toFixed(2),
+    finalPrice: finalPrice.toFixed(2),
+  };
+}
+
+export async function updateServiceBundle(
+  bundleId: number,
+  updates: Partial<{
+    name: string;
+    description: string;
+    discountPercentage: string;
+    validFrom: Date;
+    validUntil: Date;
+    isActive: boolean;
+  }>
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(serviceBundles).set(updates).where(eq(serviceBundles.id, bundleId));
+}
+
+export async function deleteServiceBundle(bundleId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Soft delete by setting isActive to false
+  await db.update(serviceBundles).set({ isActive: false }).where(eq(serviceBundles.id, bundleId));
+}
+
+export async function getAllActiveBundles() {
+  const db = await getDb();
+  if (!db) return [];
+
+  const bundles = await db
+    .select({
+      id: serviceBundles.id,
+      officeId: serviceBundles.officeId,
+      name: serviceBundles.name,
+      description: serviceBundles.description,
+      discountPercentage: serviceBundles.discountPercentage,
+      validFrom: serviceBundles.validFrom,
+      validUntil: serviceBundles.validUntil,
+      createdAt: serviceBundles.createdAt,
+      office: {
+        id: sanadOffices.id,
+        officeName: sanadOffices.officeName,
+        governorate: sanadOffices.governorate,
+        wilayat: sanadOffices.wilayat,
+      },
+    })
+    .from(serviceBundles)
+    .leftJoin(sanadOffices, eq(serviceBundles.officeId, sanadOffices.id))
+    .where(eq(serviceBundles.isActive, true))
+    .orderBy(desc(serviceBundles.createdAt));
+
+  // For each bundle, fetch services
+  const bundlesWithServices = await Promise.all(
+    bundles.map(async (bundle) => {
+      const services = await db
+        .select()
+        .from(bundleServices)
+        .where(eq(bundleServices.bundleId, bundle.id));
+
+      const totalPrice = services.reduce((sum, s) => sum + parseFloat(s.servicePrice), 0);
+      const discountAmount = (totalPrice * parseFloat(bundle.discountPercentage)) / 100;
+      const finalPrice = totalPrice - discountAmount;
+
+      return {
+        ...bundle,
+        services,
+        totalPrice: totalPrice.toFixed(2),
+        discountAmount: discountAmount.toFixed(2),
+        finalPrice: finalPrice.toFixed(2),
+      };
+    })
+  );
+
+  return bundlesWithServices;
 }

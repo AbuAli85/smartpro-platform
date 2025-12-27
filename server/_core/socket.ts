@@ -95,6 +95,20 @@ export function initializeSocket(httpServer: HttpServer) {
       });
     });
 
+    // Marketplace: Join user-specific room for notifications
+    socket.on("join_marketplace", (data: { userId: number }) => {
+      const room = `user_${data.userId}`;
+      socket.join(room);
+      console.log(`[Socket.IO] User ${data.userId} joined marketplace room: ${room}`);
+    });
+
+    // Marketplace: Leave user-specific room
+    socket.on("leave_marketplace", (data: { userId: number }) => {
+      const room = `user_${data.userId}`;
+      socket.leave(room);
+      console.log(`[Socket.IO] User ${data.userId} left marketplace room: ${room}`);
+    });
+
     socket.on("disconnect", () => {
       console.log(`[Socket.IO] Client disconnected: ${socket.id}`);
     });
@@ -106,4 +120,79 @@ export function initializeSocket(httpServer: HttpServer) {
 
 export function getIO(): SocketIOServer | null {
   return io;
+}
+
+/**
+ * Emit marketplace notification to a specific user
+ */
+export function emitMarketplaceNotification(userId: number, event: string, data: any) {
+  if (!io) {
+    console.warn("[Socket.IO] Cannot emit marketplace notification - io not initialized");
+    return;
+  }
+  
+  const room = `user_${userId}`;
+  io.to(room).emit(event, data);
+  console.log(`[Socket.IO] Emitted ${event} to user ${userId}`);
+}
+
+/**
+ * Notify customer when new bid is received
+ */
+export function notifyNewBid(customerId: number, bidData: {
+  requestId: number;
+  requestTitle: string;
+  officeName: string;
+  price: string;
+  estimatedDuration: string;
+}) {
+  emitMarketplaceNotification(customerId, "marketplace:new_bid", {
+    type: "new_bid",
+    message: `New bid received from ${bidData.officeName}`,
+    ...bidData,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+/**
+ * Notify office when their bid is accepted
+ */
+export function notifyBidAccepted(officeOwnerId: number, bidData: {
+  requestTitle: string;
+  customerName: string;
+  price: string;
+}) {
+  emitMarketplaceNotification(officeOwnerId, "marketplace:bid_accepted", {
+    type: "bid_accepted",
+    message: `Your bid for "${bidData.requestTitle}" was accepted!`,
+    ...bidData,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+/**
+ * Notify matching offices when new service request is posted
+ */
+export function notifyNewServiceRequest(officeOwnerIds: number[], requestData: {
+  requestId: number;
+  title: string;
+  serviceType: string;
+  budget: string;
+  deadline: string;
+}) {
+  if (!io) {
+    console.warn("[Socket.IO] Cannot notify new service request - io not initialized");
+    return;
+  }
+
+  officeOwnerIds.forEach((ownerId) => {
+    emitMarketplaceNotification(ownerId, "marketplace:new_request", {
+      type: "new_request",
+      message: `New service request: ${requestData.title}`,
+      ...requestData,
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  console.log(`[Socket.IO] Notified ${officeOwnerIds.length} offices about new request`);
 }

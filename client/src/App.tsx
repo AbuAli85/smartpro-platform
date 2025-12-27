@@ -39,7 +39,11 @@ import ReviewQueue from "./pages/ReviewQueue";
 import SmartBatchProcessing from "./pages/SmartBatchProcessing";
 import TranslatorTraining from "./pages/TranslatorTraining";
 import NotificationPreferences from "./pages/NotificationPreferences";
+import RequestServicePage from "./pages/RequestServicePage";
+import MarketplaceBrowser from "./pages/MarketplaceBrowser";
+import MyServiceRequests from "./pages/MyServiceRequests";
 import { useNotifications } from "./hooks/useNotifications";
+import { useMarketplaceNotifications } from "./hooks/useMarketplaceNotifications";
 
 function Router() {
   return (
@@ -60,6 +64,11 @@ function Router() {
       {/* Bookings */}
       <Route path="/offices/:id/book" component={BookOffice} />
       <Route path="/bookings" component={BookingsList} />
+      
+      {/* Marketplace */}
+      <Route path="/request-service" component={RequestServicePage} />
+      <Route path="/marketplace" component={MarketplaceBrowser} />
+      <Route path="/my-requests" component={MyServiceRequests} />
       
       {/* Documents */}
       <Route path="/documents" component={MyDocuments} />
@@ -109,6 +118,7 @@ function Router() {
 function App() {
   // Initialize real-time notifications
   useNotifications();
+  useMarketplaceNotifications();
 
   return (
     <ErrorBoundary>

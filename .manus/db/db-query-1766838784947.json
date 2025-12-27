@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `service_bundles` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `office_id` int NOT NULL,\n  `name` varchar(200) NOT NULL,\n  `description` text,\n  `discount_percentage` decimal(5,2) NOT NULL,\n  `valid_from` timestamp NULL,\n  `valid_until` timestamp NULL,\n  `is_active` boolean DEFAULT true NOT NULL,\n  `created_by` int,\n  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX `office_idx` (`office_id`),\n  INDEX `active_idx` (`is_active`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute CREATE TABLE IF NOT EXISTS `service_bundles` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `office_id` int NOT NULL,\n  `name` varchar(200) NOT NULL,\n  `description` text,\n  `discount_percentage` decimal(5,2) NOT NULL,\n  `valid_from` timestamp NULL,\n  `valid_until` timestamp NULL,\n  `is_active` boolean DEFAULT true NOT NULL,\n  `created_by` int,\n  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,\n  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX `office_idx` (`office_id`),\n  INDEX `active_idx` (`is_active`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1733
+}

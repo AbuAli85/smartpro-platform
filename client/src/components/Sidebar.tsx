@@ -27,6 +27,8 @@ import {
   Bell,
   Zap,
   BookOpen,
+  Package,
+  Search,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -58,6 +60,8 @@ export function Sidebar({ className }: SidebarProps) {
     { name: t("nav.sanadOffices"), href: "/offices", icon: Building2 },
     { name: t("nav.documentTemplates"), href: "/templates", icon: FileText },
     { name: t("nav.myBookings"), href: "/bookings", icon: Calendar, requiresAuth: true },
+    { name: "My Service Requests", href: "/my-requests", icon: Package, requiresAuth: true },
+    { name: "Browse Marketplace", href: "/marketplace", icon: Search, requiresAuth: true },
     { name: t("nav.myOffices"), href: "/my-offices", icon: Briefcase, requiresAuth: true },
     { name: t("nav.ownerDashboard"), href: "/owner/dashboard", icon: Shield, requiresAuth: true },
     { name: t("nav.chatInbox"), href: "/owner/chat", icon: MessageCircle, requiresAuth: true },

@@ -1295,3 +1295,52 @@ export type ServiceRequest = typeof serviceRequests.$inferSelect;
 export type InsertServiceRequest = typeof serviceRequests.$inferInsert;
 export type ServiceBid = typeof serviceBids.$inferSelect;
 export type InsertServiceBid = typeof serviceBids.$inferInsert;
+
+// ============================================
+// SERVICE BUNDLES
+// ============================================
+
+export const serviceBundles = mysqlTable("service_bundles", {
+  id: int("id").primaryKey().autoincrement(),
+  officeId: int("office_id").notNull(),
+  
+  // Bundle details
+  name: varchar("name", { length: 200 }).notNull(),
+  description: text("description"),
+  
+  // Pricing
+  discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }).notNull(), // e.g., 15.00 for 15% off
+  validFrom: timestamp("valid_from"),
+  validUntil: timestamp("valid_until"),
+  
+  // Status
+  isActive: boolean("is_active").default(true).notNull(),
+  
+  // Metadata
+  createdBy: int("created_by"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
+}, (table) => ({
+  officeIdx: index("office_idx").on(table.officeId),
+  activeIdx: index("active_idx").on(table.isActive),
+}));
+
+export const bundleServices = mysqlTable("bundle_services", {
+  id: int("id").primaryKey().autoincrement(),
+  bundleId: int("bundle_id").notNull(),
+  serviceId: int("service_id").notNull(),
+  
+  // Service details (denormalized for display)
+  serviceName: varchar("service_name", { length: 200 }).notNull(),
+  servicePrice: decimal("service_price", { precision: 10, scale: 2 }).notNull(),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  bundleIdx: index("bundle_idx").on(table.bundleId),
+  serviceIdx: index("service_idx").on(table.serviceId),
+}));
+
+export type ServiceBundle = typeof serviceBundles.$inferSelect;
+export type InsertServiceBundle = typeof serviceBundles.$inferInsert;
+export type BundleService = typeof bundleServices.$inferSelect;
+export type InsertBundleService = typeof bundleServices.$inferInsert;
