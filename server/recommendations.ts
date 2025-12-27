@@ -135,7 +135,7 @@ export async function getRecommendedOffices(
         ), 0)`,
       })
       .from(sanadOffices)
-      .where(sql`${sanadOffices.verificationStatus} = 'approved'`);
+      .where(sql`${sanadOffices.verificationStatus} = 'verified'`);
 
     // Get user's booking history if authenticated
     let userBookedOfficeIds: number[] = [];
@@ -226,7 +226,7 @@ export async function getTopOfficesByRegion(
       .from(sanadOffices)
       .where(
         and(
-          sql`${sanadOffices.verificationStatus} = 'approved'`,
+          sql`${sanadOffices.verificationStatus} = 'verified'`,
           eq(sanadOffices.governorate, region)
         )
       );

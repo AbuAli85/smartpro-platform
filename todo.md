@@ -1,5 +1,26 @@
 # SmartPro Platform - Feature Tracking
 
+## 🔴 CRITICAL BUG FIXES (Dec 28, 2025)
+
+### Connection & Authentication Issues
+- [x] Fix WebSocket offline status showing in sidebar
+- [x] Resolve "No auth token found for SSE connection" errors
+- [x] Fix 429 Too Many Requests errors on notification endpoints
+- [x] Fix failed fetch requests to auth.getNotificationCounts
+
+### Data Loading Issues
+- [x] Fix empty Regional Leaderboards page (No Offices Found)
+- [x] Ensure leaderboard data loads properly for all regions
+- [x] Add loading states and error handling
+
+### UI/UX Improvements
+- [x] Improve connection status indicator visibility
+- [x] Add better error messages for users
+- [x] Enhance empty states with actionable CTAs
+- [x] Add retry mechanisms for failed requests
+
+---
+
 ## 🚀 Current Sprint - Regional Enhancement Features (Phase 4)
 
 ### Smart Regional Office Recommendations
@@ -891,3 +912,11 @@ Note: This feature requires more extensive context system changes and will be im
 - [x] Use shared omanLocations constants
 - [x] Backend already supports governorate filtering
 - [x] Test filtering functionality
+
+
+## 🔧 Fix Registration Form Field Order
+
+- [ ] Swap City and Region field order (Region should be first)
+- [ ] Verify city filtering logic works correctly
+- [ ] Test that city dropdown shows only filtered cities
+- [ ] Ensure bilingual labels display correctly

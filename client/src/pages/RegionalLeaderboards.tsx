@@ -218,7 +218,21 @@ export default function RegionalLeaderboards() {
               <CardContent className="p-12 text-center">
                 <Trophy className="h-16 w-16 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">{t("leaderboards.noOffices")}</h3>
-                <p className="text-gray-600">{t("leaderboards.noOfficesDesc")}</p>
+                <p className="text-gray-600 mb-4">{t("leaderboards.noOfficesDesc")}</p>
+                <p className="text-sm text-muted-foreground mb-6">
+                  No verified offices in {selectedRegion} yet
+                </p>
+                <div className="flex gap-3 justify-center">
+                  <Button variant="outline" onClick={() => window.location.reload()}>
+                    Refresh
+                  </Button>
+                  <Button asChild>
+                    <Link href="/register-office">
+                      Register Your Office
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}

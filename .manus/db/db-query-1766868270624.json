@@ -1,0 +1,60 @@
+{
+  "query": "SELECT id, officeName, ownerId, status, verificationStatus, governorate, wilayat, createdAt FROM sanad_offices ORDER BY createdAt DESC LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute SELECT id, officeName, ownerId, status, verificationStatus, governorate, wilayat, createdAt FROM sanad_offices ORDER BY createdAt DESC LIMIT 5",
+  "rows": [
+    {
+      "id": "60011",
+      "officeName": "Muscat Horizon ",
+      "ownerId": "180170",
+      "status": "pending",
+      "verificationStatus": "pending_verification",
+      "governorate": "Muscat",
+      "wilayat": "Muscat",
+      "createdAt": "2025-12-27 20:38:04"
+    },
+    {
+      "id": "60010",
+      "officeName": "Integration Test Office",
+      "ownerId": "1",
+      "status": "active",
+      "verificationStatus": "verified",
+      "governorate": "Muscat",
+      "wilayat": "Muscat",
+      "createdAt": "2025-12-27 09:37:27"
+    },
+    {
+      "id": "60009",
+      "officeName": "Budget Accounting Office",
+      "ownerId": "1",
+      "status": "active",
+      "verificationStatus": "verified",
+      "governorate": "Dhofar",
+      "wilayat": "Salalah",
+      "createdAt": "2025-12-27 09:37:22"
+    },
+    {
+      "id": "60008",
+      "officeName": "Premium Legal Services",
+      "ownerId": "1",
+      "status": "active",
+      "verificationStatus": "verified",
+      "governorate": "Muscat",
+      "wilayat": "Bousher",
+      "createdAt": "2025-12-27 09:37:22"
+    },
+    {
+      "id": "60007",
+      "officeName": "Test Cancellation Office",
+      "ownerId": "1",
+      "status": "active",
+      "verificationStatus": "verified",
+      "governorate": "Muscat",
+      "wilayat": "Muscat",
+      "createdAt": "2025-12-27 09:37:19"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tofficeName\townerId\tstatus\tverificationStatus\tgovernorate\twilayat\tcreatedAt\n60011\tMuscat Horizon \t180170\tpending\tpending_verification\tMuscat\tMuscat\t2025-12-27 20:38:04\n60010\tIntegration Test Office\t1\tactive\tverified\tMuscat\tMuscat\t2025-12-27 09:37:27\n60009\tBudget Accounting Office\t1\tactive\tverified\tDhofar\tSalalah\t2025-12-27 09:37:22\n60008\tPremium Legal Services\t1\tactive\tverified\tMuscat\tBousher\t2025-12-27 09:37:22\n60007\tTest Cancellation Office\t1\tactive\tverified\tMuscat\tMuscat\t2025-12-27 09:37:19\n",
+  "stderr": "",
+  "execution_time_ms": 1618
+}

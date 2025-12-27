@@ -48,6 +48,16 @@ export function SocketProvider({ children }: SocketProviderProps) {
       return;
     }
 
+    // Only enable Socket.IO in development or when explicitly configured
+    const isDevelopment = import.meta.env.DEV || window.location.hostname === 'localhost';
+    
+    if (!isDevelopment) {
+      console.log('[Socket.IO] Disabled in production environment');
+      // Set as "connected" to avoid showing offline status in production
+      setIsConnected(true);
+      return;
+    }
+
     // Create single shared socket connection
     const newSocket = io(window.location.origin, {
       transports: ["websocket", "polling"],

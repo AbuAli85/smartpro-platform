@@ -63,6 +63,7 @@ import OfficeAnalytics from "./pages/OfficeAnalytics";
 import { useNotifications } from "./hooks/useNotifications";
 import { useMarketplaceNotifications } from "./hooks/useMarketplaceNotifications";
 import { SocketProvider } from "./contexts/SocketContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
 
 function Router() {
   return (
@@ -159,7 +160,8 @@ function App() {
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">
         <SocketProvider>
-          <TooltipProvider>
+          <NotificationProvider>
+            <TooltipProvider>
             <Toaster />
           <div className="flex h-screen overflow-hidden">
             <Sidebar />
@@ -171,7 +173,8 @@ function App() {
             </main>
             <BottomNavigation />
           </div>
-          </TooltipProvider>
+            </TooltipProvider>
+          </NotificationProvider>
         </SocketProvider>
       </ThemeProvider>
     </ErrorBoundary>

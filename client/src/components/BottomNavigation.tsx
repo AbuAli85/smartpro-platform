@@ -4,18 +4,15 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { NotificationBadge } from "@/components/NotificationBadge";
-import { trpc } from "@/lib/trpc";
+import { useNotifications } from "@/contexts/NotificationContext";
 
 export function BottomNavigation() {
   const [location] = useLocation();
   const { user } = useAuth();
   const { t } = useLanguage();
 
-  // Fetch notification counts
-  const { data: notificationCounts } = trpc.auth.getNotificationCounts.useQuery(
-    undefined,
-    { enabled: !!user, refetchInterval: 30000 }
-  );
+  // Get notification counts from context
+  const { bookingCount } = useNotifications();
 
   if (!user) return null;
 
@@ -29,7 +26,7 @@ export function BottomNavigation() {
       icon: Calendar,
       label: t("nav.myBookings"),
       href: "/bookings",
-      badge: notificationCounts?.bookings,
+      badge: bookingCount,
     },
     {
       icon: MessageCircle,

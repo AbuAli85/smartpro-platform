@@ -42,6 +42,7 @@ import { LanguageToggle } from "./LanguageToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ConnectionStatusIndicator } from "./ConnectionStatusIndicator";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
+import { useNotifications } from "@/contexts/NotificationContext";
 
 interface SidebarProps {
   className?: string;
@@ -73,11 +74,12 @@ export function Sidebar({ className }: SidebarProps) {
     preventScrollOnSwipe: true,
   });
   
-  // Fetch notification counts
-  const { data: notificationCounts } = trpc.auth.getNotificationCounts.useQuery(
-    undefined,
-    { enabled: !!user, refetchInterval: 30000 } // Refetch every 30 seconds
-  );
+  // Get notification counts from context (single source of truth)
+  const { bookingCount, messageCount } = useNotifications();
+  const notificationCounts = {
+    bookings: bookingCount,
+    messages: messageCount,
+  };
 
   // Define navigation item type
   type NavItem = {
