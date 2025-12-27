@@ -283,6 +283,93 @@ function OfficeVerificationPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Document Preview Section */}
+                {(office.license_document_url || office.certificate_urls || office.permit_urls) && (
+                  <div className="mt-6 pt-6 border-t">
+                    <h4 className="font-semibold mb-4 flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      Uploaded Documents
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {office.license_document_url && (
+                        <div className="border rounded-lg p-4">
+                          <p className="text-sm font-medium mb-2">Business License</p>
+                          {office.license_document_url.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+                            <img 
+                              src={office.license_document_url} 
+                              alt="Business License" 
+                              className="w-full h-48 object-contain bg-muted rounded"
+                            />
+                          ) : (
+                            <div className="w-full h-48 bg-muted rounded flex items-center justify-center">
+                              <FileText className="h-12 w-12 text-muted-foreground" />
+                            </div>
+                          )}
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="w-full mt-2"
+                            onClick={() => window.open(office.license_document_url, '_blank')}
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            View Document
+                          </Button>
+                        </div>
+                      )}
+                      {office.certificate_urls && (
+                        <div className="border rounded-lg p-4">
+                          <p className="text-sm font-medium mb-2">Certificates</p>
+                          {office.certificate_urls.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+                            <img 
+                              src={office.certificate_urls} 
+                              alt="Certificates" 
+                              className="w-full h-48 object-contain bg-muted rounded"
+                            />
+                          ) : (
+                            <div className="w-full h-48 bg-muted rounded flex items-center justify-center">
+                              <FileText className="h-12 w-12 text-muted-foreground" />
+                            </div>
+                          )}
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="w-full mt-2"
+                            onClick={() => window.open(office.certificate_urls, '_blank')}
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            View Document
+                          </Button>
+                        </div>
+                      )}
+                      {office.permit_urls && (
+                        <div className="border rounded-lg p-4">
+                          <p className="text-sm font-medium mb-2">Permits</p>
+                          {office.permit_urls.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+                            <img 
+                              src={office.permit_urls} 
+                              alt="Permits" 
+                              className="w-full h-48 object-contain bg-muted rounded"
+                            />
+                          ) : (
+                            <div className="w-full h-48 bg-muted rounded flex items-center justify-center">
+                              <FileText className="h-12 w-12 text-muted-foreground" />
+                            </div>
+                          )}
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="w-full mt-2"
+                            onClick={() => window.open(office.permit_urls, '_blank')}
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            View Document
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}

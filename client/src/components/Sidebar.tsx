@@ -67,6 +67,7 @@ export function Sidebar({ className }: SidebarProps) {
     { name: "Browse Marketplace", href: "/marketplace", icon: Search, requiresAuth: true, requirePermission: "canSubmitBids" as const },
     { name: t("nav.myOffices"), href: "/my-offices", icon: Briefcase, requiresAuth: true, requirePermission: "canManageOffice" as const },
     { name: t("nav.ownerDashboard"), href: "/owner/dashboard", icon: Shield, requiresAuth: true, requirePermission: "canViewOfficeAnalytics" as const },
+    { name: "Office Analytics", href: "/owner/analytics", icon: BarChart3, requiresAuth: true, requirePermission: "canViewOfficeAnalytics" as const },
     { name: t("nav.chatInbox"), href: "/owner/chat", icon: MessageCircle, requiresAuth: true, requirePermission: "canAccessChatInbox" as const },
     { name: t("nav.chatAnalytics"), href: "/owner/chat-analytics", icon: TrendingUp, requiresAuth: true, requirePermission: "canViewChatAnalytics" as const },
     { name: t("nav.cannedResponses"), href: "/owner/canned-responses", icon: MessageSquareText, requiresAuth: true, requirePermission: "canManageCannedResponses" as const },

@@ -483,4 +483,32 @@ export const officeOwnerRouter = router({
 
       return { success: true };
     }),
+
+  // Get office analytics data
+  getOfficeAnalytics: protectedProcedure
+    .input(z.object({
+      period: z.enum(["7days", "30days", "90days", "1year"]),
+    }))
+    .query(async ({ ctx, input }) => {
+      const offices = await db.getOfficesByOwner(ctx.user.id);
+      if (!offices || offices.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "No office found" });
+      }
+
+      const office = offices[0];
+      const now = new Date();
+      const periodDays = {
+        "7days": 7,
+        "30days": 30,
+        "90days": 90,
+        "1year": 365,
+      }[input.period];
+
+      const startDate = new Date(now.getTime() - periodDays * 24 * 60 * 60 * 1000);
+
+      // Get analytics data
+      const analytics = await db.getOfficeAnalyticsData(office.id, startDate, now);
+
+      return analytics;
+    }),
 });

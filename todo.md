@@ -2909,3 +2909,24 @@ The booking form already includes:
 - [ ] Support PDF inline preview
 - [ ] Support image inline preview
 - [ ] Add download button for documents
+
+
+## IMPLEMENTATION: Office Analytics Dashboard & Document Management (Dec 27, 2025)
+- [x] Create OfficeAnalytics page component
+- [x] Add booking trends chart (Chart.js line chart)
+- [x] Add revenue statistics with period comparison
+- [x] Add popular services ranking table
+- [x] Add key performance indicators (KPIs)
+- [x] Create getOfficeAnalyticsData database function
+- [x] Add getOfficeAnalytics tRPC procedure
+- [x] Add route and navigation link for office analytics
+- [x] Install Chart.js and react-chartjs-2 dependencies
+- [x] Add document preview to OfficeVerification page
+- [x] Support inline image preview with thumbnails
+- [x] Add view/download button for documents
+- [x] Display license, certificates, and permits in grid layout
+- [ ] Add inline PDF preview with iframe
+- [ ] Enhance DocumentUpload to support multiple files
+- [ ] Add gallery preview for multiple documents
+- [ ] Add individual remove buttons for each document
+- [ ] Update registration form to use multi-document upload

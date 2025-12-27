@@ -46,6 +46,7 @@ import OfficeRegistration from "./pages/OfficeRegistration";
 import UserManagement from "./pages/UserManagement";
 import OfficeVerification from "./pages/OfficeVerification";
 import OnboardingWizard from "./pages/OnboardingWizard";
+import OfficeAnalytics from "./pages/OfficeAnalytics";
 import { useNotifications } from "./hooks/useNotifications";
 import { useMarketplaceNotifications } from "./hooks/useMarketplaceNotifications";
 import { SocketProvider } from "./contexts/SocketContext";
@@ -109,6 +110,7 @@ function Router() {
       
       {/* Office Owner */}
       <Route path="/owner/dashboard" component={OfficeOwnerDashboard} />
+      <Route path="/owner/analytics" component={OfficeAnalytics} />
       <Route path="/owner/templates" component={TemplateManager} />
       <Route path="/owner/chat" component={ChatInbox} />
       <Route path="/owner/chat-analytics" component={ChatAnalytics} />
