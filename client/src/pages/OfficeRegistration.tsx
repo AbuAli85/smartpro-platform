@@ -52,11 +52,17 @@ export default function OfficeRegistration() {
     termsAccepted: false,
   });
 
+  const utils = trpc.useUtils();
+  
   const registerOfficeMutation = trpc.officeOwner.registerOffice.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Office registered successfully!", {
         description: "Your application is under review. We'll notify you once approved.",
       });
+      
+      // Invalidate the getMyOffices query to refetch updated list
+      await utils.officeOwner.getMyOffices.invalidate();
+      
       setLocation("/my-offices");
     },
     onError: (error: any) => {

@@ -940,3 +940,11 @@ Note: This feature requires more extensive context system changes and will be im
 - [x] Add index on sanad_offices.governorate column
 - [x] Add composite index on (verificationStatus, governorate)
 - [x] Verify query performance improvements
+
+## 🐛 Registration Bug Fix (Dec 28, 2025)
+
+- [x] Debug why newly registered offices don't appear in My Offices page
+- [x] Test registration flow with new office to reproduce issue
+- [x] Check if tRPC query cache needs manual invalidation after registration
+- [x] Add automatic cache invalidation or refetch after successful registration
+- [x] Ensure immediate display after successful registration
