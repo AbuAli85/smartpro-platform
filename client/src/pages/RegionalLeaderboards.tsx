@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Star, MapPin, TrendingUp, Trophy, Medal, Award, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 
@@ -47,14 +47,10 @@ export default function RegionalLeaderboards() {
           <div className="text-center text-white">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Trophy className="h-8 w-8" />
-              <h1 className="text-4xl font-bold">
-                {language === "ar" ? "لوحات الصدارة الإقليمية" : "Regional Leaderboards"}
-              </h1>
+              <h1 className="text-4xl font-bold">{t("leaderboards.title")}</h1>
             </div>
             <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-              {language === "ar"
-                ? "اكتشف أفضل مكاتب الخدمات في كل منطقة بناءً على الأداء والتقييمات"
-                : "Discover the top-performing service offices in each region based on performance and ratings"}
+              {t("leaderboards.subtitle")}
             </p>
           </div>
         </div>
@@ -104,15 +100,14 @@ export default function RegionalLeaderboards() {
               {/* Region Header */}
               <div className="text-center mb-8">
                 <h2 className="text-2xl font-bold mb-2">
-                  {language === "ar"
-                    ? `أفضل 10 مكاتب في ${regions.find((r) => r.name === selectedRegion)?.nameAr}`
-                    : `Top 10 Offices in ${selectedRegion}`}
+                  {t("leaderboards.topOfficesIn").replace(
+                    "{region}",
+                    language === "ar"
+                      ? regions.find((r) => r.name === selectedRegion)?.nameAr || selectedRegion
+                      : selectedRegion
+                  )}
                 </h2>
-                <p className="text-gray-600">
-                  {language === "ar"
-                    ? `تم تصنيفها بناءً على التقييمات والحجوزات المكتملة والأداء العام`
-                    : `Ranked by ratings, completed bookings, and overall performance`}
-                </p>
+                <p className="text-gray-600">{t("leaderboards.rankedBy")}</p>
               </div>
 
               {/* Leaderboard List */}
@@ -163,7 +158,7 @@ export default function RegionalLeaderboards() {
                                 </div>
                               </div>
                               <Badge className={`${getRankBadgeColor(rank)} border`}>
-                                {language === "ar" ? `المركز ${rank}` : `Rank #${rank}`}
+                                {t("leaderboards.rank").replace("{rank}", rank.toString())}
                               </Badge>
                             </div>
 
@@ -175,23 +170,19 @@ export default function RegionalLeaderboards() {
                                   <span>{office.rating.toFixed(1)}</span>
                                 </div>
                                 <div className="text-xs text-gray-600">
-                                  {office.reviewCount} {language === "ar" ? "تقييم" : "reviews"}
+                                  {office.reviewCount} {t("leaderboards.reviews")}
                                 </div>
                               </div>
                               <div>
                                 <div className="text-sm font-semibold">{office.completedBookings}</div>
-                                <div className="text-xs text-gray-600">
-                                  {language === "ar" ? "حجز مكتمل" : "completed"}
-                                </div>
+                                <div className="text-xs text-gray-600">{t("leaderboards.completed")}</div>
                               </div>
                               <div>
                                 <div className="flex items-center gap-1 text-sm font-semibold">
                                   <TrendingUp className="h-4 w-4 text-green-600" />
                                   <span>{office.score.toFixed(0)}</span>
                                 </div>
-                                <div className="text-xs text-gray-600">
-                                  {language === "ar" ? "نقاط الأداء" : "score"}
-                                </div>
+                                <div className="text-xs text-gray-600">{t("leaderboards.score")}</div>
                               </div>
                             </div>
 
@@ -208,7 +199,7 @@ export default function RegionalLeaderboards() {
                             {/* View Office Button */}
                             <Button asChild size="sm" variant="outline">
                               <Link href={`/office/${office.id}`}>
-                                {language === "ar" ? "عرض المكتب" : "View Office"}
+                                {t("leaderboards.viewOffice")}
                                 <ArrowRight
                                   className={`h-4 w-4 ${language === "ar" ? "mr-2 rotate-180" : "ml-2"}`}
                                 />
@@ -226,14 +217,8 @@ export default function RegionalLeaderboards() {
             <Card>
               <CardContent className="p-12 text-center">
                 <Trophy className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">
-                  {language === "ar" ? "لا توجد مكاتب" : "No Offices Found"}
-                </h3>
-                <p className="text-gray-600">
-                  {language === "ar"
-                    ? "لا توجد مكاتب موثقة في هذه المنطقة حالياً"
-                    : "No verified offices in this region yet"}
-                </p>
+                <h3 className="text-xl font-semibold mb-2">{t("leaderboards.noOffices")}</h3>
+                <p className="text-gray-600">{t("leaderboards.noOfficesDesc")}</p>
               </CardContent>
             </Card>
           )}
@@ -243,17 +228,11 @@ export default function RegionalLeaderboards() {
       {/* CTA Section */}
       <section className="py-12 bg-white border-t">
         <div className="container text-center">
-          <h2 className="text-2xl font-bold mb-4">
-            {language === "ar" ? "هل تريد أن يظهر مكتبك هنا؟" : "Want Your Office to Appear Here?"}
-          </h2>
-          <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            {language === "ar"
-              ? "انضم إلى SmartPro وقدم خدمات عالية الجودة لتحسين تصنيفك والوصول إلى لوحة الصدارة"
-              : "Join SmartPro and provide excellent service to improve your ranking and reach the leaderboard"}
-          </p>
+          <h2 className="text-2xl font-bold mb-4">{t("leaderboards.ctaTitle")}</h2>
+          <p className="text-gray-600 mb-6 max-w-2xl mx-auto">{t("leaderboards.ctaDesc")}</p>
           <Button asChild size="lg">
             <Link href="/register-office">
-              {language === "ar" ? "سجل مكتبك" : "Register Your Office"}
+              {t("leaderboards.registerOffice")}
               <ArrowRight className={`h-5 w-5 ${language === "ar" ? "mr-2 rotate-180" : "ml-2"}`} />
             </Link>
           </Button>
