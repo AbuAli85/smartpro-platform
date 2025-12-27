@@ -211,7 +211,13 @@ export const documentTemplates = mysqlTable("document_templates", {
   description: text("description"),
   descriptionAr: text("descriptionAr"),
   
-  // Template content
+  // DOCX Template File (replaces Google Docs approach)
+  templateFileUrl: text("templateFileUrl"), // S3 URL to .docx template file
+  templateFileKey: varchar("templateFileKey", { length: 500 }), // S3 file key
+  googleDocId: varchar("googleDocId", { length: 255 }), // Legacy: Google Doc template ID
+  useGoogleDocs: boolean("useGoogleDocs").default(false).notNull(), // Legacy: Use Google Docs
+  
+  // Template content (legacy jsPDF system)
   templateContent: text("templateContent").notNull(), // HTML or JSON template
   variables: json("variables").$type<Array<{
     name: string;

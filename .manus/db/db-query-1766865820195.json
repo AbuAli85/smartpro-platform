@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE document_templates \nADD COLUMN templateFileUrl TEXT DEFAULT NULL,\nADD COLUMN templateFileKey VARCHAR(500) DEFAULT NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute ALTER TABLE document_templates \nADD COLUMN templateFileUrl TEXT DEFAULT NULL,\nADD COLUMN templateFileKey VARCHAR(500) DEFAULT NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2324
+}

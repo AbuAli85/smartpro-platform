@@ -3802,6 +3802,19 @@ export async function updateOfficeTranslation(
     .where(eq(sanadOffices.id, officeId));
 }
 
+export async function updateTemplateFile(
+  templateId: number,
+  fileData: { templateFileUrl: string; templateFileKey: string }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(documentTemplates)
+    .set(fileData)
+    .where(eq(documentTemplates.id, templateId));
+}
+
 export async function updateTemplateTranslation(
   templateId: number,
   translations: { templateNameAr?: string; descriptionAr?: string },

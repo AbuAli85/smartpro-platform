@@ -27,6 +27,7 @@ import Analytics from "./pages/Analytics";
 import AdminAnalytics from "./pages/AdminAnalytics";
 import OfficeOwnerDashboard from "./pages/OfficeOwnerDashboard";
 import TemplateManager from "./pages/TemplateManager";
+import TemplateUploadManager from "./pages/TemplateUploadManager";
 import ChatInbox from "./pages/ChatInbox";
 import ChatAnalytics from "./pages/ChatAnalytics";
 import CannedResponses from "./pages/CannedResponses";
@@ -134,6 +135,7 @@ function Router() {
       <Route path="/owner/dashboard" component={OfficeOwnerDashboard} />
       <Route path="/owner/analytics" component={OfficeAnalytics} />
       <Route path="/owner/templates" component={TemplateManager} />
+      <Route path="/admin/template-upload" component={TemplateUploadManager} />
       <Route path="/owner/chat" component={ChatInbox} />
       <Route path="/owner/chat-analytics" component={ChatAnalytics} />
       <Route path="/owner/canned-responses" component={CannedResponses} />

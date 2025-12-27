@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "ff46f8a4-b8ff-4110-8d3f-b092f9f03ebe",
-  "prevId": "a6c7636a-fc96-4fdf-9ef5-820e5e1e6ec0",
+  "id": "6a261055-bd9a-49a2-a660-519dd14ad6ed",
+  "prevId": "ff46f8a4-b8ff-4110-8d3f-b092f9f03ebe",
   "tables": {
     "activity_log": {
       "name": "activity_log",
@@ -1252,6 +1252,20 @@
         "descriptionAr": {
           "name": "descriptionAr",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "templateFileUrl": {
+          "name": "templateFileUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "templateFileKey": {
+          "name": "templateFileKey",
+          "type": "varchar(500)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false

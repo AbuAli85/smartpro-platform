@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { ArrowLeft, FileText, Download, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, FileText, Download, CheckCircle2, Loader2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DynamicTemplateForm } from "@/components/DynamicTemplateForm";
 
 export default function TemplateDetail() {
   const [, params] = useRoute("/templates/:id");
@@ -19,6 +20,14 @@ export default function TemplateDetail() {
 
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [documentName, setDocumentName] = useState("");
+  const [generatedDocUrl, setGeneratedDocUrl] = useState<string | null>(null);
+  const [useDynamicForm, setUseDynamicForm] = useState(false);
+
+  // Fetch placeholders if template has DOCX file
+  const { data: placeholdersData } = trpc.documentTemplate.getTemplatePlaceholders.useQuery(
+    { templateId },
+    { enabled: templateId > 0 && !!template?.templateFileUrl }
+  );
 
   const { data: template, isLoading } = trpc.documentTemplate.getById.useQuery(
     { id: templateId },
@@ -40,6 +49,36 @@ export default function TemplateDetail() {
       });
     },
   });
+
+  // DOCX generation mutation
+  const generateDocxMutation = trpc.documentTemplate.generateFromDocx.useMutation({
+    onSuccess: (data) => {
+      toast.success("Document Generated!", {
+        description: "Your professional DOCX document is ready for download.",
+      });
+      setGeneratedDocUrl(data.url);
+    },
+    onError: (error) => {
+      toast.error("Generation Failed", {
+        description: error.message,
+      });
+    },
+  });
+
+  // Determine if we should use dynamic form (has DOCX template)
+  const shouldUseDynamicForm = template?.templateFileUrl && placeholdersData?.placeholders;
+
+  const handleDynamicFormSubmit = (data: Record<string, any>) => {
+    if (!template) return;
+
+    const docName = `${template.templateName}_${Date.now()}`;
+    
+    generateDocxMutation.mutate({
+      templateId: template.id,
+      documentName: docName,
+      filledData: data,
+    });
+  };
 
   const handleInputChange = (name: string, value: any) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -141,16 +180,25 @@ export default function TemplateDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Form */}
           <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Fill Document Details</CardTitle>
-                <CardDescription>
-                  Complete the form below to generate your document
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Document Name */}
-                <div>
+            {/* Show dynamic form if DOCX template exists */}
+            {shouldUseDynamicForm ? (
+              <DynamicTemplateForm
+                placeholders={placeholdersData.placeholders}
+                onSubmit={handleDynamicFormSubmit}
+                isGenerating={generateDocxMutation.isPending}
+                generatedDocUrl={generatedDocUrl || undefined}
+              />
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Fill Document Details</CardTitle>
+                  <CardDescription>
+                    Complete the form below to generate your document
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Document Name */}
+                  <div>
                   <Label htmlFor="documentName">
                     Document Name <span className="text-red-500">*</span>
                   </Label>
@@ -162,9 +210,9 @@ export default function TemplateDetail() {
                   />
                 </div>
 
-                {/* Dynamic Fields */}
-                {template.variables.map((variable) => (
-                  <div key={variable.name}>
+                  {/* Dynamic Fields */}
+                  {template.variables.map((variable) => (
+                    <div key={variable.name}>
                     <Label htmlFor={variable.name}>
                       {variable.label}
                       {variable.required && <span className="text-red-500 ml-1">*</span>}
@@ -206,12 +254,12 @@ export default function TemplateDetail() {
                   </div>
                 ))}
 
-                <Button
-                  onClick={handleGenerate}
-                  disabled={generateMutation.isPending}
-                  className="w-full"
-                  size="lg"
-                >
+                  <Button
+                    onClick={handleGenerate}
+                    disabled={generateMutation.isPending}
+                    className="w-full"
+                    size="lg"
+                  >
                   {generateMutation.isPending ? (
                     <>Generating...</>
                   ) : (
@@ -220,9 +268,10 @@ export default function TemplateDetail() {
                       Generate Document
                     </>
                   )}
-                </Button>
-              </CardContent>
-            </Card>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Info Sidebar */}

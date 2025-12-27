@@ -776,3 +776,74 @@ Note: This feature requires more extensive context system changes and will be im
 - [ ] NOC General - Multi-purpose official format
 - [ ] Tax Registration Form - Tax Authority format
 - [ ] Work Permit Application - Ministry of Labor format
+
+
+---
+
+## 📄 DOCX Template System Implementation (Simpler Approach)
+
+### Phase 1: Setup & Installation
+- [x] Install docxtemplater and pizzip packages
+- [x] Install hijri-converter package (already done)
+- [x] Create Hijri date converter utility (already done)
+- [x] Add templateFileUrl field to document_templates table
+- [x] Create docxTemplater.ts helper module
+
+### Phase 2: Admin Template Upload System
+- [x] Add uploadTemplateFile tRPC procedure
+- [x] Add generateFromDocx tRPC procedure
+- [x] Add getTemplatePlaceholders tRPC procedure
+- [x] Integrate with S3 for template file storage
+- [x] Add updateTemplateFile database function
+- [x] Create TemplateUpload admin page UI
+- [x] Build .docx file upload component with validation
+- [x] Add template preview functionality
+
+### Phase 3: Placeholder Replacement Engine
+- [x] Create docxTemplater.ts helper module
+- [x] Build placeholder replacement function ({{fieldName}} → value)
+- [x] Integrate Hijri date auto-conversion for date fields
+- [x] Add support for conditional sections (optional fields)
+- [x] Smart field type detection (email, phone, date, etc.)
+- [x] Automatic Hijri date insertion for all date fields
+
+### Phase 4: Template Preview Gallery
+- [ ] Generate thumbnail previews for each template
+- [ ] Create TemplatePreviewGallery component
+- [ ] Add thumbnail grid view on Templates page
+- [ ] Implement preview modal with sample data
+- [ ] Add "Use This Template" CTA on previews
+
+### Phase 5: Testing & Migration
+- [ ] Create professional Omani templates for all 12 documents
+- [ ] Test placeholder replacement with real data
+- [ ] Verify Arabic text rendering and RTL support
+- [ ] Test Hijri date conversion accuracy
+- [ ] Migrate existing templates to new system
+- [ ] Update user documentation
+- [ ] Create checkpoint and deliver
+
+
+## 🤖 Automatic Form Generation & Document Creation
+
+### Dynamic Form Generator
+- [x] Create DynamicTemplateForm component
+- [x] Implement smart field type detection (name, email, date, phone, etc.)
+- [x] Add field validation based on placeholder names
+- [x] Generate form fields automatically from placeholders
+- [x] Add Hijri date picker for date fields
+
+### Document Generation UI
+- [x] Update TemplateDetail page with form generator
+- [x] Add "Generate Document" button and workflow
+- [x] Show placeholder preview before generation
+- [x] Implement document generation with progress indicator
+- [x] Add download button for generated .docx file
+- [x] Show success message with download link
+
+### Testing & Delivery
+- [ ] Test with user's existing templates
+- [ ] Verify placeholder replacement accuracy
+- [ ] Test Hijri date conversion
+- [ ] Verify .docx file quality
+- [x] Create checkpoint and deliver

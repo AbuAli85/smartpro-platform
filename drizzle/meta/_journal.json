@@ -218,6 +218,20 @@
       "when": 1766853013423,
       "tag": "0030_noisy_banshee",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "5",
+      "when": 1766865453304,
+      "tag": "0031_harsh_metal_master",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "5",
+      "when": 1766866345439,
+      "tag": "0032_bright_nightshade",
+      "breakpoints": true
     }
   ]
 }
