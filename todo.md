@@ -729,7 +729,7 @@ Note: This feature requires more extensive context system changes and will be im
 - [x] Fix any missing or incomplete translations
 
 
-## 🔧 Homepage Translation Fixes
+### 📄 Document Templates Review & Format Update
 
 ### Issues Found in Screenshots
 - [x] Fix "The Future of Business Services 🚀" badge - not translated
@@ -746,3 +746,33 @@ Note: This feature requires more extensive context system changes and will be im
 - [x] Fix "Register Your Office Now" button - not translated
 - [x] Fix footer sections and links - not translated
 - [x] Fix service card titles (Accounting & Tax, Legal Services, Business Registration) - showing English
+
+### Template Format Updates
+- [x] Add official headers with ministry/authority references
+- [x] Include both Hijri and Gregorian date formats
+- [x] Add official stamp and signature sections
+- [x] Use formal Arabic legal terminology
+- [x] Include proper reference number formats
+- [x] Add validity period notes
+- [x] Include anti-forgery warnings to follow official Omani government format
+- [ ] Ensure professional and formal language in all documents
+- [ ] Add proper Arabic official terminology
+- [ ] Include required legal disclaimers in Arabic
+- [ ] Verify document headers follow Omani standards
+- [ ] Check date formats (Hijri + Gregorian where applicable)
+- [ ] Ensure proper official stamps and signature sections
+- [ ] Add ministry/authority reference numbers format
+
+### Template-Specific Updates
+- [ ] Salary Certificate - Official format with company letterhead
+- [ ] NOC for Bank Account - Follow Central Bank of Oman format
+- [ ] Employment Contract - Align with Oman Labor Law requirements
+- [ ] Experience Certificate - Standard HR format
+- [ ] Power of Attorney - Legal document format per Omani law
+- [ ] Tenancy Contract - Follow Ministry of Housing standards
+- [ ] Partnership Agreement - Commercial law compliance
+- [ ] NOC for Visa Transfer - Immigration format
+- [ ] Business License Application - MOCI format
+- [ ] NOC General - Multi-purpose official format
+- [ ] Tax Registration Form - Tax Authority format
+- [ ] Work Permit Application - Ministry of Labor format
