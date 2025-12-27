@@ -2454,3 +2454,9 @@ The booking form already includes:
 - [x] Add mobile-responsive comparison view (swipeable cards)
 - [x] Show price difference percentages
 - [x] Add "Clear All" and "Close" actions
+
+
+## BUG FIX: Console Errors - require is not defined (Dec 27, 2025)
+- [x] Fix getServiceConfig import in BookOffice.tsx (use ES6 import instead of require)
+- [x] Verify no other require() usage in client-side code
+- [x] Test booking page loads without console errors

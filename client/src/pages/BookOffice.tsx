@@ -12,6 +12,7 @@ import { Step2ServiceRequirements } from "@/components/booking-steps/Step2Servic
 import { Step3TimeSlotSelection } from "@/components/booking-steps/Step3TimeSlotSelection";
 import { Step4ReviewConfirmation } from "@/components/booking-steps/Step4ReviewConfirmation";
 import { ServiceComparison } from "@/components/ServiceComparison";
+import { getServiceConfig } from "@/../../shared/serviceRequirements";
 
 const WIZARD_STEPS = [
   {
@@ -135,9 +136,7 @@ export default function BookOffice() {
     if (!selectedService) return false;
 
     // Check if all required fields are filled
-    const config = require("@/../../shared/serviceRequirements").getServiceConfig(
-      selectedService.serviceName
-    );
+    const config = getServiceConfig(selectedService.serviceName);
 
     const requiredFields = config.formFields.filter((field: any) => field.required);
     const missingFields = requiredFields.filter(
