@@ -12,7 +12,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Download, Upload, Languages, CheckCircle2, AlertCircle, Info } from "lucide-react";
+import { Search, Download, Upload, Languages, CheckCircle2, AlertCircle, Info, X } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Breadcrumb } from "@/components/Breadcrumb";
 
@@ -92,8 +100,100 @@ export default function TranslationManagement() {
     }
   };
 
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [importPreview, setImportPreview] = useState<Array<{key: string, en: string, ar: string}>>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.type !== "text/csv" && !file.name.endsWith(".csv")) {
+        toast.error("Please select a CSV file");
+        return;
+      }
+      setCsvFile(file);
+      processCSV(file);
+    }
+  };
+
+  const processCSV = async (file: File) => {
+    setIsProcessing(true);
+    try {
+      const text = await file.text();
+      const lines = text.split("\n").filter(line => line.trim());
+      
+      if (lines.length < 2) {
+        toast.error("CSV file is empty or invalid");
+        setIsProcessing(false);
+        return;
+      }
+
+      // Parse header
+      const header = lines[0].split(",").map(h => h.trim().replace(/"/g, ""));
+      const keyIndex = header.indexOf("Key");
+      const enIndex = header.indexOf("English");
+      const arIndex = header.indexOf("Arabic");
+
+      if (keyIndex === -1 || enIndex === -1 || arIndex === -1) {
+        toast.error("CSV must have columns: Key, English, Arabic");
+        setIsProcessing(false);
+        return;
+      }
+
+      // Parse data
+      const updates: Array<{key: string, en: string, ar: string}> = [];
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(",").map(v => v.trim().replace(/^"|"$/g, ""));
+        if (values.length >= 3) {
+          const key = values[keyIndex];
+          const en = values[enIndex];
+          const ar = values[arIndex];
+          
+          // Only include rows with changes
+          const existing = translationKeys.find(t => t.key === key);
+          if (existing && (existing.en !== en || existing.ar !== ar)) {
+            updates.push({ key, en, ar });
+          }
+        }
+      }
+
+      setImportPreview(updates);
+      toast.success(`Found ${updates.length} translation updates`);
+    } catch (error) {
+      toast.error("Failed to parse CSV file");
+      console.error(error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const handleImport = () => {
-    toast.info("Import functionality coming soon");
+    setImportDialogOpen(true);
+  };
+
+  const handleConfirmImport = () => {
+    if (importPreview.length === 0) {
+      toast.error("No changes to import");
+      return;
+    }
+
+    // Generate code snippet for manual update
+    const codeSnippet = importPreview.map(item => 
+      `// ${item.key}\n"${item.key}": "${item.en}",  // English\n"${item.key}": "${item.ar}",  // Arabic`
+    ).join("\n\n");
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(codeSnippet).then(() => {
+      toast.success("Translation updates copied to clipboard!", {
+        description: "Paste into LanguageContext.tsx to apply changes"
+      });
+      setImportDialogOpen(false);
+      setCsvFile(null);
+      setImportPreview([]);
+    }).catch(() => {
+      toast.error("Failed to copy to clipboard");
+    });
   };
 
   return (
@@ -182,7 +282,7 @@ export default function TranslationManagement() {
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={handleImport}>
                 <Upload className="w-4 h-4 mr-2" />
-                Import
+                Import CSV
               </Button>
               <Button variant="outline" size="sm" onClick={handleExport}>
                 <Download className="w-4 h-4 mr-2" />
@@ -297,6 +397,94 @@ export default function TranslationManagement() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Import Dialog */}
+      <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Import Translations from CSV</DialogTitle>
+            <DialogDescription>
+              Upload a CSV file with columns: Key, English, Arabic. Only changed translations will be imported.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* File Upload */}
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+              <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <input
+                type="file"
+                accept=".csv"
+                onChange={handleFileSelect}
+                className="hidden"
+                id="csv-upload"
+              />
+              <label htmlFor="csv-upload">
+                <Button variant="outline" asChild>
+                  <span>Select CSV File</span>
+                </Button>
+              </label>
+              {csvFile && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  Selected: {csvFile.name}
+                </p>
+              )}
+            </div>
+
+            {/* Preview */}
+            {isProcessing && (
+              <div className="text-center py-4">
+                <p className="text-sm text-muted-foreground">Processing CSV file...</p>
+              </div>
+            )}
+
+            {importPreview.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="font-semibold text-sm">Preview ({importPreview.length} changes)</h4>
+                <div className="border rounded-lg max-h-64 overflow-y-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[30%]">Key</TableHead>
+                        <TableHead className="w-[35%]">English</TableHead>
+                        <TableHead className="w-[35%]">Arabic</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {importPreview.slice(0, 10).map((item, idx) => (
+                        <TableRow key={idx}>
+                          <TableCell className="font-mono text-xs">{item.key}</TableCell>
+                          <TableCell className="text-sm">{item.en}</TableCell>
+                          <TableCell className="text-sm" dir="rtl">{item.ar}</TableCell>
+                        </TableRow>
+                      ))}
+                      {importPreview.length > 10 && (
+                        <TableRow>
+                          <TableCell colSpan={3} className="text-center text-sm text-muted-foreground">
+                            ... and {importPreview.length - 10} more
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setImportDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleConfirmImport}
+              disabled={importPreview.length === 0 || isProcessing}
+            >
+              Copy Updates to Clipboard
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

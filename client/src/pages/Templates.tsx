@@ -10,17 +10,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Search, Filter, Download, Eye } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-const CATEGORIES = [
-  { value: "all", label: "All Templates" },
-  { value: "employment", label: "Employment" },
-  { value: "noc", label: "NOC Certificates" },
-  { value: "business", label: "Business" },
-  { value: "legal", label: "Legal" },
-  { value: "immigration", label: "Immigration" },
-];
+// Categories will be translated dynamically in the component
 
 export default function Templates() {
   const { t } = useLanguage();
+  
+  // Categories with translations
+  const CATEGORIES = [
+    { value: "all", label: t("templates.allTemplates") },
+    { value: "employment", label: t("templates.employment") },
+    { value: "noc", label: t("templates.nocCertificates") },
+    { value: "business", label: t("templates.business") },
+    { value: "legal", label: t("templates.legal") },
+    { value: "immigration", label: t("templates.immigration") },
+  ];
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [page, setPage] = useState(1);
@@ -106,12 +109,12 @@ export default function Templates() {
                       <div className="flex gap-2">
                         {template.isOfficial && (
                           <Badge variant="secondary" className="bg-green-100 text-green-800">
-                            Official
+                            {t("templates.official")}
                           </Badge>
                         )}
                         {template.isPremium && (
                           <Badge variant="secondary" className="bg-[#FFD700] text-gray-900">
-                            Premium
+                            {t("templates.premium")}
                           </Badge>
                         )}
                       </div>
@@ -140,7 +143,7 @@ export default function Templates() {
                       <Link href={`/templates/${template.id}`}>
                         <Button size="sm" className="gap-2">
                           <Eye className="h-4 w-4" />
-                          View
+                          {t("templates.view")}
                         </Button>
                       </Link>
                     </div>
@@ -157,17 +160,17 @@ export default function Templates() {
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
                 >
-                  Previous
+                  {t("templates.previous")}
                 </Button>
                 <span className="flex items-center px-4 text-sm text-gray-600">
-                  Page {page} of {Math.ceil(data.total / data.limit)}
+                  {t("templates.page")} {page} {t("offices.of")} {Math.ceil(data.total / data.limit)}
                 </span>
                 <Button
                   variant="outline"
                   onClick={() => setPage((p) => p + 1)}
                   disabled={page >= Math.ceil(data.total / data.limit)}
                 >
-                  Next
+                  {t("templates.next")}
                 </Button>
               </div>
             )}
@@ -175,8 +178,8 @@ export default function Templates() {
         ) : (
           <div className="text-center py-12">
             <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No templates found</h3>
-            <p className="text-gray-500">Try adjusting your search or filters</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">{t("templates.noTemplatesFound")}</h3>
+            <p className="text-gray-500">{t("templates.tryAdjustingFilters")}</p>
           </div>
         )}
       </div>

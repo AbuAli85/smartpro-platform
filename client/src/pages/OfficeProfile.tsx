@@ -250,7 +250,7 @@ export default function OfficeProfile() {
                 {!services || services.length === 0 ? (
                   <p className="text-muted-foreground text-center py-8">{t("office.noServices")}</p>
                 ) : filteredServices.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">No services match your filters. Try adjusting your criteria.</p>
+                  <p className="text-muted-foreground text-center py-8">{t("office.noServicesMatchFilters")}</p>
                 ) : (
                   <div className="grid gap-4 md:grid-cols-2">
                     {filteredServices.map((service) => (
@@ -271,13 +271,13 @@ export default function OfficeProfile() {
                             <div className="flex items-center gap-1">
                               <DollarSign className="h-4 w-4 text-muted-foreground" />
                               <span className="font-semibold">
-                                {service.price ? `${service.price} ${service.currency}` : "Custom Quote"}
+                                {service.price ? `${service.price} ${service.currency}` : t("office.customQuote")}
                               </span>
                             </div>
                             {service.estimatedDeliveryDays && (
                               <div className="flex items-center gap-1">
                                 <Clock className="h-4 w-4 text-muted-foreground" />
-                                <span>{service.estimatedDeliveryDays} days</span>
+                                <span>{service.estimatedDeliveryDays} {t("office.days")}</span>
                               </div>
                             )}
                           </div>

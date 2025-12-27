@@ -16,31 +16,32 @@ import { ServiceRecommendationQuiz } from "@/components/ServiceRecommendationQui
 import { RecommendationResults } from "@/components/RecommendationResults";
 import { getServiceConfig } from "@/../../shared/serviceRequirements";
 
-const WIZARD_STEPS = [
-  {
-    id: 1,
-    title: "Select Service",
-    description: "Choose your service",
-  },
-  {
-    id: 2,
-    title: "Requirements",
-    description: "Provide details",
-  },
-  {
-    id: 3,
-    title: "Date & Time",
-    description: "Pick a slot",
-  },
-  {
-    id: 4,
-    title: "Review",
-    description: "Confirm booking",
-  },
-];
-
 export default function BookOffice() {
   const { t } = useLanguage();
+  
+  // Wizard steps with translations
+  const WIZARD_STEPS = [
+    {
+      id: 1,
+      title: t("booking.selectService"),
+      description: t("booking.chooseYourService"),
+    },
+    {
+      id: 2,
+      title: t("booking.requirements"),
+      description: t("booking.provideDetails"),
+    },
+    {
+      id: 3,
+      title: t("booking.dateTime"),
+      description: t("booking.pickSlot"),
+    },
+    {
+      id: 4,
+      title: t("booking.review"),
+      description: t("booking.confirmBooking"),
+    },
+  ];
   const [, params] = useRoute("/offices/:id/book");
   const [, setLocation] = useLocation();
   const officeId = params?.id ? parseInt(params.id) : 0;
@@ -87,8 +88,8 @@ export default function BookOffice() {
 
   const handleSelectRecommendedService = (serviceId: string) => {
     setSelectedServiceId(serviceId);
-    toast.success("Service Selected", {
-      description: "Based on your preferences, this service is a great match!",
+    toast.success(t("booking.serviceSelected"), {
+      description: t("booking.serviceMatchDescription"),
     });
   };
 
@@ -152,7 +153,7 @@ export default function BookOffice() {
       setLocation("/bookings");
     },
     onError: (error) => {
-      toast.error("Booking Failed", {
+      toast.error(t("booking.bookingFailed"), {
         description: error.message,
       });
     },
@@ -161,7 +162,7 @@ export default function BookOffice() {
   // Validation functions for each step
   const validateStep1 = () => {
     if (!selectedServiceId) {
-      toast.error("Please select a service");
+      toast.error(t("booking.pleaseSelectService"));
       return false;
     }
     return true;
@@ -179,8 +180,8 @@ export default function BookOffice() {
     );
 
     if (missingFields.length > 0) {
-      toast.error("Missing Required Information", {
-        description: `Please fill in: ${missingFields.map((f: any) => f.label).join(", ")}`,
+      toast.error(t("booking.missingRequiredInfo"), {
+        description: t("booking.pleaseFillIn").replace("{fields}", missingFields.map((f: any) => f.label).join(", ")),
       });
       return false;
     }
@@ -190,11 +191,11 @@ export default function BookOffice() {
 
   const validateStep3 = () => {
     if (!selectedDate) {
-      toast.error("Please select a date");
+      toast.error(t("booking.pleaseSelectDate"));
       return false;
     }
     if (!selectedTime) {
-      toast.error("Please select a time slot");
+      toast.error(t("booking.pleaseSelectTimeSlot"));
       return false;
     }
     return true;
@@ -225,7 +226,7 @@ export default function BookOffice() {
     createBookingMutation.mutate({
       officeId: office.id,
       serviceId: parseInt(selectedServiceId),
-      serviceDescription: serviceDescription || "Service booking",
+      serviceDescription: serviceDescription || t("booking.serviceBooking"),
       requirements: formData.additionalNotes || "",
       scheduledDate: selectedDate!.toISOString(),
       scheduledTime: selectedTime,
