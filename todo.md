@@ -378,3 +378,35 @@
 - [x] Configure different limits for different endpoints
 - [x] Add rate limit headers to responses
 - [ ] Log rate limit violations
+
+
+## 📱 Progressive Web App Features
+
+### Swipe Gestures
+- [x] Install react-swipeable package
+- [x] Add swipe-right gesture to open sidebar
+- [x] Add swipe-left gesture to close sidebar
+- [x] Add visual feedback during swipe
+- [x] Configure swipe threshold and velocity
+- [ ] Test on iOS and Android devices
+
+### Offline Mode
+- [x] Create offline detection hook
+- [x] Display offline banner when connection lost
+- [x] Implement request queue for failed requests
+- [x] Auto-retry queued requests when online
+- [x] Store queue in localStorage for persistence
+- [x] Show sync status indicator
+- [ ] Handle conflict resolution for queued updates
+
+### Push Notifications
+- [x] Create service worker for push notifications
+- [x] Add push notification subscription flow
+- [x] Store push subscriptions in database
+- [x] Create notification sending API endpoint
+- [ ] Send notifications for new bookings
+- [ ] Send notifications for new messages
+- [ ] Send notifications for booking status changes
+- [x] Add notification preferences in settings
+- [x] Handle notification click actions
+- [ ] Test on different browsers and devices

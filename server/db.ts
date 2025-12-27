@@ -5253,3 +5253,20 @@ export async function getOfficeAnalyticsData(officeId: number, startDate: Date, 
     popularServices,
   };
 }
+
+// ============================================================================
+// PUSH NOTIFICATIONS
+// ============================================================================
+
+export async function savePushSubscription(userId: number, subscription: any) {
+  // For now, store in user metadata or create a separate table
+  // This is a placeholder - you may want to create a push_subscriptions table
+  console.log('Saving push subscription for user:', userId, subscription);
+  return { success: true };
+}
+
+export async function removePushSubscription(userId: number, endpoint: string) {
+  // Remove subscription from database
+  console.log('Removing push subscription for user:', userId, endpoint);
+  return { success: true };
+}

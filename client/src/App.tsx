@@ -6,6 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { Sidebar } from "@/components/Sidebar";
 import { BottomNavigation } from "@/components/BottomNavigation";
+import { OfflineBanner } from "@/components/OfflineBanner";
 import Home from "./pages/Home";
 import OfficesList from "./pages/OfficesList";
 import OfficeProfile from "./pages/OfficeProfile";
@@ -152,6 +153,7 @@ function App() {
             <Toaster />
           <div className="flex h-screen overflow-hidden">
             <Sidebar />
+            <OfflineBanner />
             <main className="flex-1 overflow-y-auto bg-background pb-16 lg:pb-0">
               <div className="transition-opacity duration-200">
                 <Router />

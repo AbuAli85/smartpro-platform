@@ -31,6 +31,7 @@ import {
   Search,
 } from "lucide-react";
 import { useState } from "react";
+import { useSwipeable } from "react-swipeable";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
 import { NotificationBadge } from "@/components/NotificationBadge";
@@ -51,6 +52,24 @@ export function Sidebar({ className }: SidebarProps) {
   const { hasPermission, hasRole } = useRoleAccess();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  
+  // Swipe handlers for mobile
+  const swipeHandlers = useSwipeable({
+    onSwipedRight: () => {
+      if (!isMobileOpen && window.innerWidth < 1024) {
+        setIsMobileOpen(true);
+      }
+    },
+    onSwipedLeft: () => {
+      if (isMobileOpen) {
+        setIsMobileOpen(false);
+      }
+    },
+    trackMouse: false,
+    trackTouch: true,
+    delta: 50, // Minimum swipe distance
+    preventScrollOnSwipe: true,
+  });
   
   // Fetch notification counts
   const { data: notificationCounts } = trpc.auth.getNotificationCounts.useQuery(
@@ -289,6 +308,13 @@ export function Sidebar({ className }: SidebarProps) {
         />
       )}
 
+      {/* Swipe Area for Opening Sidebar */}
+      <div
+        {...swipeHandlers}
+        className="lg:hidden fixed left-0 top-0 bottom-0 w-8 z-30"
+        style={{ touchAction: 'pan-y' }}
+      />
+
       {/* Desktop Sidebar */}
       <aside
         className={cn(
@@ -302,6 +328,7 @@ export function Sidebar({ className }: SidebarProps) {
 
       {/* Mobile Sidebar */}
       <aside
+        {...swipeHandlers}
         className={cn(
           "lg:hidden fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-300",
           isMobileOpen ? "translate-x-0" : "-translate-x-full"

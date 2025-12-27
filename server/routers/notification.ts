@@ -38,4 +38,24 @@ export const notificationRouter = router({
     await db.markAllNotificationsAsRead(user.id);
     return { success: true };
   }),
+
+  // Subscribe to push notifications
+  subscribeToPush: protectedProcedure
+    .input(z.object({ subscription: z.any() }))
+    .mutation(async ({ ctx, input }) => {
+      const user = ctx.user!;
+      // Store subscription in database
+      await db.savePushSubscription(user.id, input.subscription);
+      return { success: true };
+    }),
+
+  // Unsubscribe from push notifications
+  unsubscribeFromPush: protectedProcedure
+    .input(z.object({ endpoint: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const user = ctx.user!;
+      // Remove subscription from database
+      await db.removePushSubscription(user.id, input.endpoint);
+      return { success: true };
+    }),
 });
