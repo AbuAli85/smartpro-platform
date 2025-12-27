@@ -23,15 +23,16 @@ export default function TemplateDetail() {
   const [generatedDocUrl, setGeneratedDocUrl] = useState<string | null>(null);
   const [useDynamicForm, setUseDynamicForm] = useState(false);
 
+  // Fetch template first
+  const { data: template, isLoading } = trpc.documentTemplate.getById.useQuery(
+    { id: templateId },
+    { enabled: templateId > 0 }
+  );
+
   // Fetch placeholders if template has DOCX file
   const { data: placeholdersData } = trpc.documentTemplate.getTemplatePlaceholders.useQuery(
     { templateId },
     { enabled: templateId > 0 && !!template?.templateFileUrl }
-  );
-
-  const { data: template, isLoading } = trpc.documentTemplate.getById.useQuery(
-    { id: templateId },
-    { enabled: templateId > 0 }
   );
 
   const generateMutation = trpc.documentTemplate.generate.useMutation({
