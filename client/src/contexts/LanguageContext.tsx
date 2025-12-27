@@ -167,6 +167,29 @@ const translations: Record<Language, Record<string, string>> = {
     "home.features.booking": "Online Booking",
     "home.features.bookingDesc": "Schedule appointments and manage bookings seamlessly",
     
+    // Feature Cards Section
+    "home.featureCards.sectionBadge": "Platform Features",
+    "home.featureCards.sectionTitle": "Why Choose SmartPro?",
+    "home.featureCards.sectionSubtitle": "Everything you need to manage business services in one place",
+    "home.featureCards.verifiedOffices": "Verified Sanad Offices",
+    "home.featureCards.verifiedOfficesDesc": "Browse hundreds of verified professional offices with transparent pricing and reviews",
+    "home.featureCards.exploreOffices": "Explore Offices",
+    "home.featureCards.marketplace": "Service Marketplace",
+    "home.featureCards.marketplaceDesc": "Post service requests and receive competitive bids from multiple offices",
+    "home.featureCards.browseMarketplace": "Browse Marketplace",
+    "home.featureCards.documentTemplates": "Document Templates",
+    "home.featureCards.documentTemplatesDesc": "Access ready-to-use templates for contracts, applications, and business documents",
+    "home.featureCards.viewTemplates": "View Templates",
+    "home.featureCards.easyBooking": "Easy Booking",
+    "home.featureCards.easyBookingDesc": "Schedule appointments, track progress, and manage all your bookings in one dashboard",
+    "home.featureCards.myBookings": "My Bookings",
+    "home.featureCards.realtimeChat": "Real-time Chat",
+    "home.featureCards.realtimeChatDesc": "Communicate directly with offices, get instant updates, and resolve queries quickly",
+    "home.featureCards.openChat": "Open Chat",
+    "home.featureCards.loyaltyRewards": "Loyalty Rewards",
+    "home.featureCards.loyaltyRewardsDesc": "Earn points with every booking and redeem them for discounts on future services",
+    "home.featureCards.viewRewards": "View Rewards",
+    
     // Common
     "common.signIn": "Sign In",
     "common.signOut": "Sign Out",
@@ -299,6 +322,19 @@ const translations: Record<Language, Record<string, string>> = {
     "notifications.remindersDesc": "Receive reminders about upcoming appointments",
     "notifications.marketing": "Marketing & Updates",
     "notifications.marketingDesc": "Get news about new features and special offers",
+    
+    // Settings
+    "settings.languageSettings": "Language Settings",
+    "settings.languageSettingsDesc": "Choose your preferred language for the platform interface",
+    "settings.preferredLanguage": "Preferred Language",
+    "settings.preferredLanguageDesc": "Select your preferred language for the interface",
+    "settings.selectLanguage": "Select Language",
+    "settings.languageUpdated": "Language preference updated successfully",
+    "settings.languageUpdateFailed": "Failed to update language preference",
+    "settings.languageInfo": "About Language Settings",
+    "settings.languageInfoPoint1": "Your language preference will be saved to your account",
+    "settings.languageInfoPoint2": "The interface will update immediately after saving",
+    "settings.languageInfoPoint3": "This setting will sync across all your devices",
     
     // Profile
     "profile.title": "My Profile",
@@ -486,6 +522,29 @@ const translations: Record<Language, Record<string, string>> = {
     "home.features.booking": "الحجز عبر الإنترنت",
     "home.features.bookingDesc": "جدولة المواعيد وإدارة الحجوزات بسهولة",
     
+    // Feature Cards Section
+    "home.featureCards.sectionBadge": "ميزات المنصة",
+    "home.featureCards.sectionTitle": "لماذا تختار SmartPro؟",
+    "home.featureCards.sectionSubtitle": "كل ما تحتاجه لإدارة خدمات الأعمال في مكان واحد",
+    "home.featureCards.verifiedOffices": "مكاتب سند موثقة",
+    "home.featureCards.verifiedOfficesDesc": "تصفح مئات المكاتب المهنية الموثقة مع أسعار شفافة وتقييمات",
+    "home.featureCards.exploreOffices": "استكشف المكاتب",
+    "home.featureCards.marketplace": "سوق الخدمات",
+    "home.featureCards.marketplaceDesc": "انشر طلبات الخدمة واستقبل عروضًا تنافسية من مكاتب متعددة",
+    "home.featureCards.browseMarketplace": "تصفح السوق",
+    "home.featureCards.documentTemplates": "قوالب المستندات",
+    "home.featureCards.documentTemplatesDesc": "احصل على قوالب جاهزة للاستخدام للعقود والطلبات ومستندات الأعمال",
+    "home.featureCards.viewTemplates": "عرض القوالب",
+    "home.featureCards.easyBooking": "حجز سهل",
+    "home.featureCards.easyBookingDesc": "جدول المواعيد وتتبع التقدم وأدر جميع حجوزاتك في لوحة واحدة",
+    "home.featureCards.myBookings": "حجوزاتي",
+    "home.featureCards.realtimeChat": "دردشة فورية",
+    "home.featureCards.realtimeChatDesc": "تواصل مباشرة مع المكاتب واحصل على تحديثات فورية وحل الاستفسارات بسرعة",
+    "home.featureCards.openChat": "فتح الدردشة",
+    "home.featureCards.loyaltyRewards": "مكافآت الولاء",
+    "home.featureCards.loyaltyRewardsDesc": "اكسب نقاطًا مع كل حجز واستبدلها بخصومات على الخدمات المستقبلية",
+    "home.featureCards.viewRewards": "عرض المكافآت",
+    
     // Common
     "common.signIn": "تسجيل الدخول",
     "common.signOut": "تسجيل الخروج",
@@ -615,6 +674,19 @@ const translations: Record<Language, Record<string, string>> = {
     "notifications.remindersDesc": "تلقي تذكيرات حول المواعيد القادمة",
     "notifications.marketing": "التسويق والتحديثات",
     "notifications.marketingDesc": "احصل على أخبار حول الميزات الجديدة والعروض الخاصة",
+    
+    // Settings
+    "settings.languageSettings": "إعدادات اللغة",
+    "settings.languageSettingsDesc": "اختر لغتك المفضلة لواجهة المنصة",
+    "settings.preferredLanguage": "اللغة المفضلة",
+    "settings.preferredLanguageDesc": "اختر لغتك المفضلة للواجهة",
+    "settings.selectLanguage": "اختر اللغة",
+    "settings.languageUpdated": "تم تحديث تفضيل اللغة بنجاح",
+    "settings.languageUpdateFailed": "فشل تحديث تفضيل اللغة",
+    "settings.languageInfo": "حول إعدادات اللغة",
+    "settings.languageInfoPoint1": "سيتم حفظ تفضيل اللغة في حسابك",
+    "settings.languageInfoPoint2": "سيتم تحديث الواجهة فورًا بعد الحفظ",
+    "settings.languageInfoPoint3": "سيتم مزامنة هذا الإعداد عبر جميع أجهزتك",
     
     // Profile
     "profile.title": "الملف الشخصي",

@@ -102,12 +102,12 @@ export default function Home() {
         <section className="py-20 lg:py-32 bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-800">
           <div className="container">
             <div className="mx-auto max-w-2xl text-center mb-16">
-              <Badge className="mb-4">Platform Features</Badge>
+              <Badge className="mb-4">{t("home.featureCards.sectionBadge")}</Badge>
               <h2 className="text-4xl font-bold tracking-tight">
-                Why Choose SmartPro?
+                {t("home.featureCards.sectionTitle")}
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Everything you need to manage business services in one place
+                {t("home.featureCards.sectionSubtitle")}
               </p>
             </div>
 
@@ -118,15 +118,15 @@ export default function Home() {
                   <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
                     <Building2 className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <CardTitle>Verified Sanad Offices</CardTitle>
+                  <CardTitle>{t("home.featureCards.verifiedOffices")}</CardTitle>
                   <CardDescription>
-                    Browse hundreds of verified professional offices with transparent pricing and reviews
+                    {t("home.featureCards.verifiedOfficesDesc")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Button asChild variant="link" className="p-0 h-auto">
                     <Link href="/offices">
-                      Explore Offices <ArrowRight className="ml-1 h-4 w-4" />
+                      {t("home.featureCards.exploreOffices")} <ArrowRight className="ml-1 h-4 w-4" />
                     </Link>
                   </Button>
                 </CardContent>
@@ -138,15 +138,15 @@ export default function Home() {
                   <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
                     <Search className="w-6 h-6 text-green-600 dark:text-green-400" />
                   </div>
-                  <CardTitle>Service Marketplace</CardTitle>
+                  <CardTitle>{t("home.featureCards.marketplace")}</CardTitle>
                   <CardDescription>
-                    Post service requests and receive competitive bids from multiple offices
+                    {t("home.featureCards.marketplaceDesc")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Button asChild variant="link" className="p-0 h-auto">
                     <Link href="/marketplace">
-                      Browse Marketplace <ArrowRight className="ml-1 h-4 w-4" />
+                      {t("home.featureCards.browseMarketplace")} <ArrowRight className="ml-1 h-4 w-4" />
                     </Link>
                   </Button>
                 </CardContent>
@@ -158,15 +158,15 @@ export default function Home() {
                   <div className="w-12 h-12 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-4">
                     <FileText className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                   </div>
-                  <CardTitle>Document Templates</CardTitle>
+                  <CardTitle>{t("home.featureCards.documentTemplates")}</CardTitle>
                   <CardDescription>
-                    Access ready-to-use templates for contracts, applications, and business documents
+                    {t("home.featureCards.documentTemplatesDesc")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Button asChild variant="link" className="p-0 h-auto">
                     <Link href="/templates">
-                      View Templates <ArrowRight className="ml-1 h-4 w-4" />
+                      {t("home.featureCards.viewTemplates")} <ArrowRight className="ml-1 h-4 w-4" />
                     </Link>
                   </Button>
                 </CardContent>
@@ -178,15 +178,15 @@ export default function Home() {
                   <div className="w-12 h-12 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mb-4">
                     <Calendar className="w-6 h-6 text-orange-600 dark:text-orange-400" />
                   </div>
-                  <CardTitle>Easy Booking</CardTitle>
+                  <CardTitle>{t("home.featureCards.easyBooking")}</CardTitle>
                   <CardDescription>
-                    Schedule appointments, track progress, and manage all your bookings in one dashboard
+                    {t("home.featureCards.easyBookingDesc")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Button asChild variant="link" className="p-0 h-auto">
                     <Link href="/bookings">
-                      My Bookings <ArrowRight className="ml-1 h-4 w-4" />
+                      {t("home.featureCards.myBookings")} <ArrowRight className="ml-1 h-4 w-4" />
                     </Link>
                   </Button>
                 </CardContent>
@@ -198,15 +198,15 @@ export default function Home() {
                   <div className="w-12 h-12 rounded-lg bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center mb-4">
                     <MessageCircle className="w-6 h-6 text-pink-600 dark:text-pink-400" />
                   </div>
-                  <CardTitle>Real-time Chat</CardTitle>
+                  <CardTitle>{t("home.featureCards.realtimeChat")}</CardTitle>
                   <CardDescription>
-                    Communicate directly with offices, get instant updates, and resolve queries quickly
+                    {t("home.featureCards.realtimeChatDesc")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Button asChild variant="link" className="p-0 h-auto">
                     <Link href="/owner/chat">
-                      Open Chat <ArrowRight className="ml-1 h-4 w-4" />
+                      {t("home.featureCards.openChat")} <ArrowRight className="ml-1 h-4 w-4" />
                     </Link>
                   </Button>
                 </CardContent>
@@ -218,15 +218,15 @@ export default function Home() {
                   <div className="w-12 h-12 rounded-lg bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center mb-4">
                     <Award className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
                   </div>
-                  <CardTitle>Loyalty Rewards</CardTitle>
+                  <CardTitle>{t("home.featureCards.loyaltyRewards")}</CardTitle>
                   <CardDescription>
-                    Earn points with every booking and redeem them for discounts on future services
+                    {t("home.featureCards.loyaltyRewardsDesc")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Button asChild variant="link" className="p-0 h-auto">
                     <Link href="/loyalty">
-                      View Rewards <ArrowRight className="ml-1 h-4 w-4" />
+                      {t("home.featureCards.viewRewards")} <ArrowRight className="ml-1 h-4 w-4" />
                     </Link>
                   </Button>
                 </CardContent>

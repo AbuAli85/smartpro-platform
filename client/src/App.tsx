@@ -41,6 +41,7 @@ import ReviewQueue from "./pages/ReviewQueue";
 import SmartBatchProcessing from "./pages/SmartBatchProcessing";
 import TranslatorTraining from "./pages/TranslatorTraining";
 import NotificationPreferences from "./pages/NotificationPreferences";
+import LanguageSettings from "./pages/LanguageSettings";
 import RequestServicePage from "./pages/RequestServicePage";
 import MarketplaceBrowser from "./pages/MarketplaceBrowser";
 import MyServiceRequests from "./pages/MyServiceRequests";
@@ -113,6 +114,7 @@ function Router() {
       {/* Profile */}
       <Route path="/profile" component={Profile} />
       <Route path="/notifications" component={NotificationPreferences} />
+      <Route path="/language-settings" component={LanguageSettings} />
       
       {/* Loyalty */}
       <Route path="/loyalty" component={LoyaltyDashboard} />

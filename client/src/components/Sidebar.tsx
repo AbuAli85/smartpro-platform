@@ -136,6 +136,7 @@ export function Sidebar({ className }: SidebarProps) {
         { name: t("nav.referFriends"), href: "/refer", icon: Gift, requiresAuth: true },
         { name: t("nav.userProfile"), href: "/profile", icon: User, requiresAuth: true },
         { name: t("nav.notificationPreferences"), href: "/notifications", icon: Bell, requiresAuth: true },
+        { name: t("settings.languageSettings"), href: "/language-settings", icon: Languages, requiresAuth: true },
       ],
     },
   ];
