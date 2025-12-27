@@ -2075,3 +2075,46 @@
 - [ ] Add peak booking times analysis
 - [ ] Create date range filters
 - [ ] Test analytics with real data
+
+## User Booking Flow Testing & Fixes
+- [ ] Browse offices as user
+- [ ] Select office and view services
+- [ ] Complete booking with time slot selection
+- [ ] Verify booking confirmation
+- [ ] Check email notifications received
+- [ ] Test booking cancellation
+- [ ] Document all issues found
+- [ ] Fix identified issues
+- [ ] Verify all fixes work correctly
+
+## User Booking Flow Test Results (Dec 27, 2025)
+
+### ✅ Working Features:
+- [x] Browse offices page displays correctly
+- [x] Office details page shows services, reviews, contact info
+- [x] Service selection dropdown works with 4 services
+- [x] Calendar date selection works correctly
+- [x] Time slot loading fixed (timezone bug resolved - getUTCDay)
+- [x] 8 time slots display for weekdays (09:00-16:00)
+- [x] Service description textarea accepts input
+- [x] Booking submission successful
+- [x] Success toast notification displays
+- [x] Booking appears in My Bookings list
+- [x] Email notification sent via Resend API
+- [x] Badge counter updates (shows 3 bookings)
+- [x] Cancel Booking button available
+- [x] Loyalty points option displays correctly
+
+### ❌ Issues Found:
+- [ ] Fix translation key bug: "booking.backToOffice" shows raw key
+- [ ] Improve booking titles: Change generic "Office Booking" to service-specific titles
+
+
+## User Booking Flow Fixes (Dec 27, 2025)
+
+### ✅ Completed Fixes:
+- [x] Fix translation key bug: Changed BookOffice from useTranslation to useLanguage hook
+- [x] Fix booking titles: Updated getUserBookings to join with services table
+- [x] Display service name in booking titles (e.g., "Legal Consultation - Test Office")
+- [x] Verified both fixes working in production
+

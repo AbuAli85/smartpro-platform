@@ -88,7 +88,9 @@ export default function BookingsList() {
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div>
-                          <CardTitle className="text-xl">{booking.officeName || "Office Booking"}</CardTitle>
+                          <CardTitle className="text-xl">
+                            {booking.serviceName ? `${booking.serviceName} - ${booking.officeName}` : (booking.officeName || "Office Booking")}
+                          </CardTitle>
                           <CardDescription className="mt-2">
                             {booking.serviceDescription}
                           </CardDescription>

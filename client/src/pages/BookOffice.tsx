@@ -10,11 +10,11 @@ import { Calendar } from "@/components/ui/calendar";
 import { toast } from "sonner";
 import { ArrowLeft, Calendar as CalendarIcon, Clock, CheckCircle2, Gift } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/contexts/LanguageContext";
 import ChatWidget from "@/components/ChatWidget";
 
 export default function BookOffice() {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const [, params] = useRoute("/offices/:slug/book");
   const [, setLocation] = useLocation();
   const slug = params?.slug || "";

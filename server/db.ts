@@ -577,11 +577,44 @@ export async function getUserBookings(userId: number) {
   const db = await getDb();
   if (!db) return [];
 
-  return await db
-    .select()
+  const results = await db
+    .select({
+      id: bookings.id,
+      officeId: bookings.officeId,
+      serviceId: bookings.serviceId,
+      userId: bookings.userId,
+      bookingType: bookings.bookingType,
+      serviceDescription: bookings.serviceDescription,
+      requirements: bookings.requirements,
+      preferredDate: bookings.preferredDate,
+      scheduledDate: bookings.scheduledDate,
+      scheduledTime: bookings.scheduledTime,
+      duration: bookings.duration,
+      completedDate: bookings.completedDate,
+      status: bookings.status,
+      cancellationReason: bookings.cancellationReason,
+      cancelledBy: bookings.cancelledBy,
+      cancelledAt: bookings.cancelledAt,
+      cancellationPenalty: bookings.cancellationPenalty,
+      refundAmount: bookings.refundAmount,
+      price: bookings.price,
+      currency: bookings.currency,
+      paymentStatus: bookings.paymentStatus,
+      notes: bookings.notes,
+      reminder24hSent: bookings.reminder24hSent,
+      reminder1hSent: bookings.reminder1hSent,
+      createdAt: bookings.createdAt,
+      updatedAt: bookings.updatedAt,
+      officeName: sanadOffices.officeName,
+      serviceName: sanadOfficeServices.serviceName,
+    })
     .from(bookings)
+    .leftJoin(sanadOffices, eq(bookings.officeId, sanadOffices.id))
+    .leftJoin(sanadOfficeServices, eq(bookings.serviceId, sanadOfficeServices.id))
     .where(eq(bookings.userId, userId))
     .orderBy(desc(bookings.createdAt));
+
+  return results;
 }
 
 export async function getOfficeBookings(officeId: number) {
