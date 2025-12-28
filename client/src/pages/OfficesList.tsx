@@ -14,6 +14,8 @@ import { AdvancedFilters, type FilterState } from "@/components/AdvancedFilters"
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useRegionalContent, getGovernoratesForRegion } from "@/hooks/useRegionalContent";
 import { OMAN_GOVERNORATES, getBilingualLabel } from "../../../shared/omanLocations";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { PullToRefreshIndicator } from "@/components/PullToRefreshIndicator";
 
 export default function OfficesList() {
   const { t } = useLanguage();
@@ -25,6 +27,7 @@ export default function OfficesList() {
   const [sortBy, setSortBy] = useState<string>("rating");
   const [page, setPage] = useState(1);
   const [advancedFilters, setAdvancedFilters] = useState<FilterState>({});
+  const [isRefreshing, setIsRefreshing] = useState(false);
   
   // Debounce search input
   useEffect(() => {
@@ -54,7 +57,7 @@ export default function OfficesList() {
     return undefined;
   }, [region, governorate, showAllRegions]);
 
-  const { data, isLoading } = trpc.sanadOffice.list.useQuery({
+  const { data, isLoading, refetch } = trpc.sanadOffice.list.useQuery({
     page,
     limit: 12,
     search: debouncedSearch || undefined,
@@ -64,6 +67,14 @@ export default function OfficesList() {
     minRating: advancedFilters.minRating,
     availableToday: advancedFilters.availableToday,
     availableThisWeek: advancedFilters.availableThisWeek,
+  });
+
+  // Pull-to-refresh functionality
+  const pullToRefreshState = usePullToRefresh({
+    onRefresh: async () => {
+      await refetch();
+    },
+    enabled: !isLoading && !isRefreshing,
   });
   
   // Sort offices client-side
@@ -88,7 +99,8 @@ export default function OfficesList() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      
+      {/* Pull-to-refresh indicator */}
+      <PullToRefreshIndicator {...pullToRefreshState} />
 
       <div className="container py-4 sm:py-6 md:py-8">
         {/* Breadcrumb */}

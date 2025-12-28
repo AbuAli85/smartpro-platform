@@ -21,7 +21,35 @@
 
 ---
 
-## 🚀 Current Sprint - Mobile Enhancement Phase 2 (PWA, Date Pickers, Haptic Feedback)
+## 🚀 Current Sprint - Mobile Enhancement Phase 3 (Biometric Auth, Offline Queue, Pull-to-Refresh)
+
+### Biometric Authentication (WebAuthn API)
+- [x] Create WebAuthn service for credential registration
+- [x] Implement biometric login flow
+- [x] Add passkey management UI in user profile
+- [x] Create fallback authentication for unsupported devices
+- [ ] Add biometric re-authentication for sensitive actions
+- [ ] Test biometric auth on iOS and Android devices
+
+### Offline Booking Queue
+- [x] Set up IndexedDB for offline data storage
+- [x] Create offline booking queue manager
+- [x] Implement automatic sync when connection restored
+- [x] Add UI indicators for pending offline bookings
+- [ ] Handle conflict resolution for offline bookings
+- [ ] Test offline booking flow end-to-end
+
+### Pull-to-Refresh Gesture
+- [x] Create usePullToRefresh hook
+- [x] Add pull-to-refresh to BookingsList page
+- [x] Add pull-to-refresh to OfficesList page
+- [x] Add pull-to-refresh to MyOffices page
+- [x] Implement custom refresh animations
+- [ ] Test pull-to-refresh on various mobile devices
+
+---
+
+## 🏁 Completed Sprint - Mobile Enhancement Phase 2 (PWA, Date Pickers, Haptic Feedback)
 
 ### Progressive Web App (PWA) Support
 - [x] Create web app manifest (manifest.json) with app metadata

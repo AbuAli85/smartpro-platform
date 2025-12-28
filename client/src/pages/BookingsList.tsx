@@ -27,6 +27,8 @@ import CancellationDialog from "@/components/CancellationDialog";
 import ReviewDialog from "@/components/ReviewDialog";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useLocation } from "wouter";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { PullToRefreshIndicator } from "@/components/PullToRefreshIndicator";
 
 export default function BookingsList() {
   const { t } = useLanguage();
@@ -35,6 +37,14 @@ export default function BookingsList() {
   const [reviewBooking, setReviewBooking] = useState<any | null>(null);
   
   const { data: bookings, isLoading, refetch } = trpc.booking.getMyBookings.useQuery();
+
+  // Pull-to-refresh functionality
+  const pullToRefreshState = usePullToRefresh({
+    onRefresh: async () => {
+      await refetch();
+    },
+    enabled: !isLoading,
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -71,6 +81,8 @@ export default function BookingsList() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      {/* Pull-to-refresh indicator */}
+      <PullToRefreshIndicator {...pullToRefreshState} />
       <div className="container py-8">
         <Breadcrumb items={[{ label: t("bookings.title") }]} className="mb-6" />
         <h1 className="text-4xl font-bold mb-8">{t("bookings.title")}</h1>

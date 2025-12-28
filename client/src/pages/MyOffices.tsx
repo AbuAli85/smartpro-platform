@@ -6,9 +6,19 @@ import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
 import { Building2, Plus, MapPin, Phone, Mail, Globe, CheckCircle2, Clock, XCircle, Settings, Eye } from "lucide-react";
 import { toast } from "sonner";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { PullToRefreshIndicator } from "@/components/PullToRefreshIndicator";
 
 export default function MyOffices() {
   const { data: offices, isLoading, refetch } = trpc.officeOwner.getMyOffices.useQuery();
+
+  // Pull-to-refresh functionality
+  const pullToRefreshState = usePullToRefresh({
+    onRefresh: async () => {
+      await refetch();
+    },
+    enabled: !isLoading,
+  });
   const toggleStatusMutation = trpc.officeOwner.toggleOfficeStatus.useMutation({
     onSuccess: () => {
       toast.success("Office status updated successfully");
@@ -89,10 +99,12 @@ export default function MyOffices() {
   const isVerified = (office: any) => office.verificationStatus === "verified";
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <div className="container py-8">
-        <div className="flex justify-between items-center mb-8">
-          <div>
+    <div className="container py-8">
+      {/* Pull-to-refresh indicator */}
+      <PullToRefreshIndicator {...pullToRefreshState} />
+      
+      <div className="flex justify-between items-center mb-8">
+        <div>
             <h1 className="text-4xl font-bold mb-2">My Offices</h1>
             <p className="text-muted-foreground">Manage your registered Sanad offices</p>
           </div>
@@ -101,11 +113,11 @@ export default function MyOffices() {
               <Plus className="w-4 h-4 mr-2" />
               Register New Office
             </Button>
-          </Link>
-        </div>
+        </Link>
+      </div>
 
-        {!offices || offices.length === 0 ? (
-          <Card>
+      {!offices || offices.length === 0 ? (
+        <Card>
             <CardContent className="py-12 text-center">
               <Building2 className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-xl font-semibold mb-2">No offices registered yet</h3>
@@ -119,9 +131,9 @@ export default function MyOffices() {
                 </Button>
               </Link>
             </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-6">
+        </Card>
+      ) : (
+        <div className="grid gap-6">
             {offices.map((office) => (
               <Card key={office.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
@@ -245,9 +257,8 @@ export default function MyOffices() {
                 </CardContent>
               </Card>
             ))}
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
