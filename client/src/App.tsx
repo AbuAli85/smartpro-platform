@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { Sidebar } from "@/components/Sidebar";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { OfflineBanner } from "@/components/OfflineBanner";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import Home from "./pages/Home";
 import OfficesList from "./pages/OfficesList";
 import OfficeProfile from "./pages/OfficeProfile";
@@ -289,6 +290,7 @@ function App() {
               </div>
             </main>
             <BottomNavigation />
+            <PWAInstallPrompt />
           </div>
             </TooltipProvider>
           </NotificationProvider>

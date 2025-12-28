@@ -15,6 +15,7 @@ import DocumentUpload from "@/components/DocumentUpload";
 import MultiDocumentUpload from "@/components/MultiDocumentUpload";
 import { OMAN_GOVERNORATES, OMAN_CITIES, getCitiesByGovernorate, getBilingualLabel } from "../../../shared/omanLocations";
 import { useAutoSave, loadDraft } from "@/hooks/useAutoSave";
+import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import { Save, Clock } from "lucide-react";
 
 const STEPS = [
@@ -30,6 +31,7 @@ export default function OfficeRegistration() {
   const [, setLocation] = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const [showDraftRestorePrompt, setShowDraftRestorePrompt] = useState(false);
+  const { vibrate } = useHapticFeedback();
   
   // Initialize form data with draft if available
   const [formData, setFormData] = useState(() => {
@@ -82,6 +84,7 @@ export default function OfficeRegistration() {
       // Clear draft after successful submission
       clearDraft();
       
+      vibrate('success'); // Haptic feedback on success
       toast.success("Office registered successfully!", {
         description: "Your application is under review. We'll notify you once approved.",
       });
@@ -92,6 +95,7 @@ export default function OfficeRegistration() {
       setLocation("/my-offices");
     },
     onError: (error: any) => {
+      vibrate('error'); // Haptic feedback on error
       toast.error("Registration failed", {
         description: error.message,
       });

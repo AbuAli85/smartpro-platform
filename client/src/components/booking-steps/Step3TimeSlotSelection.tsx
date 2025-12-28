@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Calendar } from "@/components/ui/calendar";
+import { useHapticFeedback } from "@/hooks/useHapticFeedback";
+import { DateTimePicker } from "@/components/DateTimePicker";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ export function Step3TimeSlotSelection({
   isLoadingSlots,
 }: Step3Props) {
   const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
+  const { vibrate } = useHapticFeedback();
 
   // Get workload indicator
   const getWorkloadInfo = (workload?: "low" | "medium" | "high") => {
@@ -135,17 +137,19 @@ export function Step3TimeSlotSelection({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={onDateSelect}
-              disabled={(date) => {
-                // Disable past dates
+            <DateTimePicker
+              selected={selectedDate || null}
+              onChange={(date) => onDateSelect(date || undefined)}
+              placeholderText="Select appointment date"
+              minDate={new Date()}
+              filterDate={(date) => {
+                // Only allow future dates
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-                return date < today;
+                return date >= today;
               }}
-              className="rounded-md border"
+              inline
+              isClearable={false}
             />
             {selectedDate && (
               <div className="mt-4 p-3 bg-muted rounded-lg">
@@ -219,7 +223,10 @@ export function Step3TimeSlotSelection({
                             key={slot.time}
                             variant={isSelected ? "default" : "outline"}
                             disabled={!slot.available}
-                            onClick={() => onTimeSelect(slot.time)}
+                            onClick={() => {
+                              vibrate('selection');
+                              onTimeSelect(slot.time);
+                            }}
                             className={cn(
                               "h-auto flex-col items-start p-3",
                               !slot.available && "opacity-50 cursor-not-allowed"
@@ -258,7 +265,10 @@ export function Step3TimeSlotSelection({
                             key={slot.time}
                             variant={isSelected ? "default" : "outline"}
                             disabled={!slot.available}
-                            onClick={() => onTimeSelect(slot.time)}
+                            onClick={() => {
+                              vibrate('selection');
+                              onTimeSelect(slot.time);
+                            }}
                             className={cn(
                               "h-auto flex-col items-start p-3",
                               !slot.available && "opacity-50 cursor-not-allowed"
@@ -297,7 +307,10 @@ export function Step3TimeSlotSelection({
                             key={slot.time}
                             variant={isSelected ? "default" : "outline"}
                             disabled={!slot.available}
-                            onClick={() => onTimeSelect(slot.time)}
+                            onClick={() => {
+                              vibrate('selection');
+                              onTimeSelect(slot.time);
+                            }}
                             className={cn(
                               "h-auto flex-col items-start p-3",
                               !slot.available && "opacity-50 cursor-not-allowed"

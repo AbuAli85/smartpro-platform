@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import ChatWidget from "@/components/ChatWidget";
 import { BookingWizard } from "@/components/BookingWizard";
 import { Step1ServiceSelection } from "@/components/booking-steps/Step1ServiceSelection";
@@ -18,6 +19,7 @@ import { getServiceConfig } from "@/../../shared/serviceRequirements";
 
 export default function BookOffice() {
   const { t } = useLanguage();
+  const { vibrate } = useHapticFeedback();
   
   // Wizard steps with translations
   const WIZARD_STEPS = [
@@ -147,12 +149,14 @@ export default function BookOffice() {
 
   const createBookingMutation = trpc.booking.create.useMutation({
     onSuccess: () => {
+      vibrate('success'); // Haptic feedback on success
       toast.success("Booking Created!", {
         description: "Your booking request has been submitted successfully.",
       });
       setLocation("/bookings");
     },
     onError: (error) => {
+      vibrate('error'); // Haptic feedback on error
       toast.error(t("booking.bookingFailed"), {
         description: error.message,
       });

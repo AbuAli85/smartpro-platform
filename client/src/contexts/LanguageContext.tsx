@@ -443,6 +443,15 @@ export const translations: Record<Language, Record<string, string>> = {
     "common.upload": "Upload",
     "common.select": "Select",
     "common.all": "All",
+    "common.notNow": "Not Now",
+
+    // PWA
+    "pwa.installTitle": "Install SmartPro",
+    "pwa.installDescription": "Get quick access and work offline with our mobile app",
+    "pwa.installButton": "Install App",
+    "pwa.benefit1": "Fast access from home screen",
+    "pwa.benefit2": "Work offline with cached data",
+    "pwa.benefit3": "Get instant push notifications",
     "common.none": "None",
     "common.apply": "Apply",
     "common.reset": "Reset",
@@ -1029,6 +1038,15 @@ export const translations: Record<Language, Record<string, string>> = {
     "common.upload": "رفع",
     "common.select": "اختيار",
     "common.all": "الكل",
+    "common.notNow": "ليس الآن",
+
+    // PWA
+    "pwa.installTitle": "تثبيت سمارت برو",
+    "pwa.installDescription": "احصل على وصول سريع واعمل دون اتصال بالإنترنت مع تطبيقنا",
+    "pwa.installButton": "تثبيت التطبيق",
+    "pwa.benefit1": "وصول سريع من الشاشة الرئيسية",
+    "pwa.benefit2": "العمل دون اتصال بالإنترنت",
+    "pwa.benefit3": "تلقي إشعارات فورية",
     "common.none": "لا شيء",
     "common.apply": "تطبيق",
     "common.reset": "إعادة تعيين",
