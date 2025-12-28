@@ -1116,3 +1116,31 @@ Note: This feature requires more extensive context system changes and will be im
   - getRequestBids
   - getOfficeBids
 - [x] Test /request-service page to verify errors are resolved
+
+
+## 🚀 Current Sprint - Advanced Mobile UX Enhancements
+
+### Swipe Gestures
+- [x] Install and configure swipe gesture library (react-swipeable or similar)
+- [x] Implement swipe-to-open for mobile menu (swipe from left edge)
+- [x] Implement swipe-to-close for mobile menu (swipe to left)
+- [ ] Add swipe-between-cards for office listings carousel on mobile
+- [ ] Add visual feedback for swipe gestures (drag indicators, animations)
+- [ ] Test swipe gestures on various mobile devices
+
+### Responsive Image Loading
+- [x] Implement responsive image component with srcset
+- [x] Add different image sizes for mobile, tablet, and desktop
+- [x] Implement lazy loading for images below the fold
+- [x] Add blur-up placeholder effect while images load
+- [x] Optimize office cover images for mobile (smaller file sizes)
+- [ ] Test image loading performance on slow mobile networks
+
+### Mobile-Specific Features
+- [x] Add click-to-call buttons for office phone numbers
+- [x] Implement tap-to-navigate for office addresses (open in maps app)
+- [ ] Add mobile-optimized date picker for booking forms
+- [x] Implement share functionality for offices (native share API)
+- [ ] Add haptic feedback for important actions on mobile
+- [ ] Test mobile-specific features on iOS and Android
+

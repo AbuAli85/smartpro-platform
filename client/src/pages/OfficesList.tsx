@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { Building2, MapPin, Star, Search, Plus, Filter } from "lucide-react";
+import { OfficeCoverImage } from "@/components/ResponsiveImage";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { AdvancedFilters, type FilterState } from "@/components/AdvancedFilters";
@@ -205,17 +206,11 @@ export default function OfficesList() {
               {sortedOffices.map((office) => (
                 <Card key={office.id} className="hover:shadow-elegant-lg transition-all duration-300 border-2 hover:border-primary/50">
                   <CardHeader>
-                    {office.coverImageUrl ? (
-                      <img
-                        src={office.coverImageUrl}
-                        alt={office.officeName}
-                        className="w-full h-40 object-cover rounded-md mb-4"
-                      />
-                    ) : (
-                      <div className="w-full h-40 bg-gradient-elegant rounded-md mb-4 flex items-center justify-center">
-                        <Building2 className="w-12 h-12 text-white" />
-                      </div>
-                    )}
+                    <OfficeCoverImage
+                      src={office.coverImageUrl}
+                      alt={office.officeName}
+                      className="mb-4"
+                    />
                     <CardTitle className="line-clamp-1">{office.officeName}</CardTitle>
                     <CardDescription className="line-clamp-2">
                       {office.description || t("offices.professionalServices")}

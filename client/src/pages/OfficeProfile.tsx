@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { Building2, MapPin, Phone, Mail, Globe, Star, Calendar, ArrowLeft, DollarSign, Clock } from "lucide-react";
+import { MobileActions, ClickToCall, TapToNavigate } from "@/components/MobileActions";
+import { ResponsiveImage } from "@/components/ResponsiveImage";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { CanonicalURL } from "@/components/CanonicalURL";
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -114,10 +116,11 @@ export default function OfficeProfile() {
         {/* Hero Section */}
         <div className="mb-8">
           {office.coverImageUrl ? (
-            <img
+            <ResponsiveImage
               src={office.coverImageUrl}
               alt={office.officeName}
-              className="w-full h-64 object-cover rounded-lg mb-6"
+              className="w-full h-64 rounded-lg mb-6"
+              priority
             />
           ) : (
             <div className="w-full h-64 bg-gradient-elegant rounded-lg mb-6 flex items-center justify-center">
@@ -134,15 +137,23 @@ export default function OfficeProfile() {
                 )}
               </div>
               <p className="text-muted-foreground text-lg mb-4">{office.description}</p>
+              
+              {/* Mobile Actions - Visible on mobile */}
+              <div className="lg:hidden mb-4">
+                <MobileActions
+                  phoneNumber={office.phone}
+                  address={`${office.governorate}, ${office.wilayat}`}
+                  officeName={office.officeName}
+                />
+              </div>
+
               <div className="flex flex-wrap gap-4 text-sm">
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-muted-foreground" />
-                  <span>{office.governorate}, {office.wilayat}</span>
+                  <TapToNavigate address={`${office.governorate}, ${office.wilayat}`} />
                 </div>
                 {office.phone && (
                   <div className="flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-muted-foreground" />
-                    <span>{office.phone}</span>
+                    <ClickToCall phoneNumber={office.phone} />
                   </div>
                 )}
                 {office.email && (
