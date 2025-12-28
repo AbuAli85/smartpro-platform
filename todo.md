@@ -1060,3 +1060,14 @@ Note: This feature requires more extensive context system changes and will be im
 - [x] Add region.all translation key for "All Oman" / "جميع عمان"
 - [x] Conduct comprehensive page-by-page translation audit
 - [x] Fix all remaining untranslated text across all pages
+
+## tRPC Serialization Errors (Dec 28, 2025)
+- [x] Investigate /request-service page tRPC queries causing serialization errors
+- [x] Identify procedures returning non-serializable data (Drizzle query results)
+- [x] Fix data transformation issues in affected procedures:
+  - listServiceRequests
+  - getUserServiceRequests
+  - getServiceRequest
+  - getRequestBids
+  - getOfficeBids
+- [x] Test /request-service page to verify errors are resolved

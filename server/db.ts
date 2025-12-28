@@ -4588,7 +4588,9 @@ export async function listServiceRequests(filters: {
     query = query.where(and(...conditions)) as any;
   }
 
-  return await query.orderBy(desc(serviceRequests.createdAt));
+  const results = await query.orderBy(desc(serviceRequests.createdAt));
+  // Return plain objects to ensure proper serialization
+  return results.map(r => ({ ...r }));
 }
 
 export async function getUserServiceRequests(userId: number) {
@@ -4628,12 +4630,13 @@ export async function getUserServiceRequests(userId: number) {
 
       return {
         ...request,
-        bids,
+        bids: bids.map(b => ({ ...b })),
       };
     })
   );
 
-  return requestsWithBids;
+  // Return plain objects to ensure proper serialization
+  return requestsWithBids.map(r => ({ ...r }));
 }
 
 export async function getServiceRequest(requestId: number) {
@@ -4646,7 +4649,8 @@ export async function getServiceRequest(requestId: number) {
     .where(eq(serviceRequests.id, requestId))
     .limit(1);
 
-  return results.length > 0 ? results[0] : null;
+  // Return plain object to ensure proper serialization
+  return results.length > 0 ? { ...results[0] } : null;
 }
 
 export async function updateServiceRequest(
@@ -4687,7 +4691,7 @@ export async function getRequestBids(requestId: number) {
   const db = await getDb();
   if (!db) return [];
 
-  return await db
+  const results = await db
     .select({
       id: serviceBids.id,
       requestId: serviceBids.requestId,
@@ -4710,6 +4714,9 @@ export async function getRequestBids(requestId: number) {
     .leftJoin(sanadOffices, eq(serviceBids.officeId, sanadOffices.id))
     .where(eq(serviceBids.requestId, requestId))
     .orderBy(desc(serviceBids.createdAt));
+  
+  // Return plain objects to ensure proper serialization
+  return results.map(r => ({ ...r }));
 }
 
 export async function updateServiceBid(bidId: number, updates: Partial<ServiceBid>) {
@@ -4723,7 +4730,7 @@ export async function getOfficeBids(officeId: number) {
   const db = await getDb();
   if (!db) return [];
 
-  return await db
+  const results = await db
     .select({
       id: serviceBids.id,
       requestId: serviceBids.requestId,
@@ -4744,6 +4751,9 @@ export async function getOfficeBids(officeId: number) {
     .leftJoin(serviceRequests, eq(serviceBids.requestId, serviceRequests.id))
     .where(eq(serviceBids.officeId, officeId))
     .orderBy(desc(serviceBids.createdAt));
+  
+  // Return plain objects to ensure proper serialization
+  return results.map(r => ({ ...r }));
 }
 
 
