@@ -1049,3 +1049,14 @@ Note: This feature requires more extensive context system changes and will be im
 - [x] Check Date serialization in responses (superjson properly configured)
 - [x] Verify superjson is properly handling all data types
 - [x] Fix function name mismatch (getSanadOfficesByOwnerId)
+
+
+## Translation Audit Issues (Dec 28, 2025)
+- [x] Add missing "nav.leaderboards" English translation key
+- [x] Add sidebar section header translations (MAIN, MY SERVICES, OFFICE MANAGEMENT)
+- [x] Update Sidebar.tsx to use translation keys for section headers
+- [x] Connection status translations (already implemented with status.connected/offline)
+- [x] "What You Can Do" feature discovery card (already has bilingual support)
+- [x] Add region.all translation key for "All Oman" / "جميع عمان"
+- [x] Conduct comprehensive page-by-page translation audit
+- [x] Fix all remaining untranslated text across all pages

@@ -103,7 +103,7 @@ export function Sidebar({ className }: SidebarProps) {
   // Organize navigation into logical groups
   const navigationGroups: NavGroup[] = [
     {
-      title: "Main",
+      title: t("sidebar.sectionMain"),
       items: [
         { name: t("nav.home"), href: "/", icon: Home },
         { name: t("nav.sanadOffices"), href: "/offices", icon: Building2 },
@@ -112,7 +112,7 @@ export function Sidebar({ className }: SidebarProps) {
       ],
     },
     {
-      title: "My Services",
+      title: t("sidebar.sectionMyServices"),
       requiresAuth: true,
       items: [
         { name: t("nav.myBookings"), href: "/bookings", icon: Calendar, requiresAuth: true, requirePermission: "canCreateBooking" as const },
@@ -121,7 +121,7 @@ export function Sidebar({ className }: SidebarProps) {
       ],
     },
     {
-      title: "Office Management",
+      title: t("sidebar.sectionOfficeManagement"),
       requiresAuth: true,
       requirePermission: "canManageOffice" as const,
       items: [
@@ -137,7 +137,7 @@ export function Sidebar({ className }: SidebarProps) {
       ],
     },
     {
-      title: "Admin Panel",
+      title: t("sidebar.sectionAdminPanel"),
       requiresAuth: true,
       requirePermission: "canAccessAdminPanel" as const,
       items: [
@@ -156,7 +156,7 @@ export function Sidebar({ className }: SidebarProps) {
       ],
     },
     {
-      title: "Rewards & Profile",
+      title: t("sidebar.sectionRewardsProfile"),
       requiresAuth: true,
       items: [
         { name: t("nav.loyaltyRewards"), href: "/loyalty", icon: Award, requiresAuth: true },

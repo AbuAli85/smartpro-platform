@@ -48,10 +48,18 @@ export const translations: Record<Language, Record<string, string>> = {
     "nav.translationRequests": "Translation Requests",
     "nav.translationAnalytics": "Translation Analytics",
     "nav.regionalStatistics": "Regional Statistics",
+    "nav.leaderboards": "Regional Leaderboards",
     "nav.translationQuality": "Translation Quality",
     "nav.reviewQueue": "Review Queue",
     "nav.batchProcessing": "Batch Processing",
     "nav.translatorTraining": "Translator Training",
+    
+    // Sidebar section headers
+    "sidebar.sectionMain": "MAIN",
+    "sidebar.sectionMyServices": "MY SERVICES",
+    "sidebar.sectionOfficeManagement": "OFFICE MANAGEMENT",
+    "sidebar.sectionAdminPanel": "ADMIN PANEL",
+    "sidebar.sectionRewardsProfile": "REWARDS & PROFILE",
     
     // Home page
     "home.hero.title": "Everything You Need for Business Services",
@@ -167,6 +175,7 @@ export const translations: Record<Language, Record<string, string>> = {
     "bookings.defaultCurrency": "OMR",
     
     // Regions
+    "region.all": "All Oman",
     "region.allOman": "All Oman",
     "region.muscat": "Muscat",
     "region.dhofar": "Dhofar",
@@ -628,6 +637,13 @@ export const translations: Record<Language, Record<string, string>> = {
     "nav.batchProcessing": "المعالجة الدفعية",
     "nav.translatorTraining": "تدريب المترجمين",
     
+    // Sidebar section headers
+    "sidebar.sectionMain": "الرئيسية",
+    "sidebar.sectionMyServices": "خدماتي",
+    "sidebar.sectionOfficeManagement": "إدارة المكتب",
+    "sidebar.sectionAdminPanel": "لوحة الإدارة",
+    "sidebar.sectionRewardsProfile": "المكافآت والملف الشخصي",
+    
     // Home page
     "home.hero.title": "كل ما تحتاجه لخدمات الأعمال",
     "home.hero.subtitle": "منصة موحدة تربط الشركات الصغيرة والمتوسطة بمكاتب سند المهنية. احصل على تراخيص عملك وتصاريحك وتسجيلاتك بشكل أسرع.",
@@ -742,6 +758,7 @@ export const translations: Record<Language, Record<string, string>> = {
     "bookings.defaultCurrency": "ر.ع.",
     
     // Regions
+    "region.all": "جميع عمان",
     "region.allOman": "جميع عمان",
     "region.muscat": "مسقط",
     "region.dhofar": "ظفار",
