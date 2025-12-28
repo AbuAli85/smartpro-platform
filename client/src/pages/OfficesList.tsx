@@ -89,14 +89,14 @@ export default function OfficesList() {
     <div className="min-h-screen flex flex-col bg-background">
       
 
-      <div className="container py-8">
+      <div className="container py-4 sm:py-6 md:py-8">
         {/* Breadcrumb */}
-        <Breadcrumb items={[{ label: t("offices.title") }]} className="mb-6" />
+        <Breadcrumb items={[{ label: t("offices.title") }]} className="mb-4 sm:mb-6" />
         
         {/* Header */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6 sm:mb-8">
           <div>
-            <h1 className="text-4xl font-bold tracking-tight">{t("offices.title")}</h1>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">{t("offices.title")}</h1>
             <p className="text-muted-foreground mt-2">
               {t("offices.subtitle")}
             </p>
@@ -112,7 +112,7 @@ export default function OfficesList() {
         </div>
 
         {/* Basic Filters */}
-        <div className="mb-4 flex flex-col gap-4 md:flex-row">
+        <div className="mb-4 flex flex-col gap-3 sm:gap-4 md:flex-row">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
@@ -130,7 +130,7 @@ export default function OfficesList() {
             setGovernorate(value === "all" ? undefined : value);
             setPage(1);
           }}>
-            <SelectTrigger className="w-full md:w-[200px]">
+            <SelectTrigger className="w-full md:w-[200px] h-11">
               <Filter className="w-4 h-4 mr-2" />
               <SelectValue placeholder={t("offices.allRegions")} />
             </SelectTrigger>
@@ -145,7 +145,7 @@ export default function OfficesList() {
           </Select>
           
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-full md:w-[180px]">
+            <SelectTrigger className="w-full md:w-[180px] h-11">
               <SelectValue placeholder={t("common.filter")} />
             </SelectTrigger>
             <SelectContent>
@@ -165,7 +165,7 @@ export default function OfficesList() {
 
         {/* Offices Grid */}
         {isLoading ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[...Array(6)].map((_, i) => (
               <Card key={i} className="animate-pulse">
                 <CardHeader>
@@ -201,7 +201,7 @@ export default function OfficesList() {
                 </Button>
               )}
             </div>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
               {sortedOffices.map((office) => (
                 <Card key={office.id} className="hover:shadow-elegant-lg transition-all duration-300 border-2 hover:border-primary/50">
                   <CardHeader>

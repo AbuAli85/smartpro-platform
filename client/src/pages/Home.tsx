@@ -29,7 +29,7 @@ export default function Home() {
       <div className="min-h-screen flex flex-col">
 
         {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-[#003366] via-[#004488] to-[#0055AA] py-20 lg:py-32">
+        <section className="relative overflow-hidden bg-gradient-to-br from-[#003366] via-[#004488] to-[#0055AA] py-12 sm:py-16 md:py-20 lg:py-32">
           <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:40px_40px]" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#003366]/50 to-transparent" />
           
@@ -43,15 +43,15 @@ export default function Home() {
                 🚀 {t("home.hero.badge")}
               </Badge>
               
-              <h1 className="text-5xl font-bold tracking-tight text-white sm:text-7xl mb-6">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-white mb-4 sm:mb-6 px-4">
                 {getRegionalContent("home.hero.title")}
               </h1>
               
-              <p className="mt-6 text-xl leading-8 text-blue-100 max-w-2xl mx-auto">
+              <p className="mt-4 sm:mt-6 text-base sm:text-lg md:text-xl leading-6 sm:leading-7 md:leading-8 text-blue-100 max-w-2xl mx-auto px-4">
                 {getRegionalContent("home.hero.subtitle")}
               </p>
               
-              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <div className="mt-6 sm:mt-8 md:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-4">
                 {!user ? (
                   <>
                     <Button asChild size="lg" className="bg-white text-[#003366] hover:bg-blue-50 w-full sm:w-auto">
@@ -90,18 +90,18 @@ export default function Home() {
               </div>
 
               {/* Stats */}
-              <div className="mt-16 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
+              <div className="mt-10 sm:mt-12 md:mt-16 grid grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-2xl mx-auto px-4">
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-white">500+</div>
-                  <div className="text-sm text-blue-200 mt-1">{t("home.stats.verifiedOffices")}</div>
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">500+</div>
+                  <div className="text-xs sm:text-sm text-blue-200 mt-1">{t("home.stats.verifiedOffices")}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-white">10K+</div>
-                  <div className="text-sm text-blue-200 mt-1">{t("home.stats.servicesCompleted")}</div>
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">10K+</div>
+                  <div className="text-xs sm:text-sm text-blue-200 mt-1">{t("home.stats.servicesCompleted")}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-white">4.9★</div>
-                  <div className="text-sm text-blue-200 mt-1">{t("home.stats.avgRating")}</div>
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">4.9★</div>
+                  <div className="text-xs sm:text-sm text-blue-200 mt-1">{t("home.stats.avgRating")}</div>
                 </div>
               </div>
             </div>
@@ -109,19 +109,19 @@ export default function Home() {
         </section>
 
         {/* Features Section */}
-        <section className="py-20 lg:py-32 bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-800">
+        <section className="py-12 sm:py-16 md:py-20 lg:py-32 bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-800">
           <div className="container">
-            <div className="mx-auto max-w-2xl text-center mb-16">
+            <div className="mx-auto max-w-2xl text-center mb-8 sm:mb-12 md:mb-16 px-4">
               <Badge className="mb-4">{t("home.featureCards.sectionBadge")}</Badge>
-              <h2 className="text-4xl font-bold tracking-tight">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
                 {t("home.featureCards.sectionTitle")}
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
+              <p className="mt-3 sm:mt-4 text-base sm:text-lg text-muted-foreground">
                 {t("home.featureCards.sectionSubtitle")}
               </p>
             </div>
 
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
               {/* Feature 1 */}
               <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-lg">
                 <CardHeader>

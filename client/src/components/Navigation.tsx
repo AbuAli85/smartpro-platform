@@ -29,29 +29,29 @@ export function Navigation() {
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
+      <div className="container flex h-14 sm:h-16 items-center px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2 mr-8">
-          <div className="w-8 h-8 rounded-lg bg-gradient-elegant flex items-center justify-center">
-            <Building2 className="w-5 h-5 text-white" />
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-elegant flex items-center justify-center">
+            <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
           </div>
-          <span className="font-bold text-xl hidden sm:inline-block">SmartPro</span>
+          <span className="font-bold text-lg sm:text-xl hidden sm:inline-block">SmartPro</span>
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex flex-1 items-center space-x-6">
-          <Link href="/offices" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+        <div className="hidden lg:flex flex-1 items-center space-x-4 xl:space-x-6">
+          <Link href="/offices" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">
             Sanad Offices
           </Link>
-          <Link href="/templates" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <Link href="/templates" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">
             Document Templates
           </Link>
           {isAuthenticated && (
             <>
-              <Link href="/bookings" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/bookings" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">
                 My Bookings
               </Link>
-              <Link href="/my-offices" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/my-offices" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap">
                 My Offices
               </Link>
             </>
@@ -59,7 +59,7 @@ export function Navigation() {
         </div>
 
         {/* Auth Section */}
-        <div className="flex items-center space-x-4 ml-auto">
+        <div className="flex items-center space-x-2 sm:space-x-4 ml-auto">
           {loading ? (
             <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
           ) : isAuthenticated && user ? (
@@ -118,7 +118,7 @@ export function Navigation() {
 
           {/* Mobile Menu */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild className="md:hidden">
+            <DropdownMenuTrigger asChild className="lg:hidden">
               <Button variant="ghost" size="icon">
                 <Menu className="h-5 w-5" />
               </Button>
