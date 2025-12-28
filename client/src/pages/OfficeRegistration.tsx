@@ -158,7 +158,7 @@ export default function OfficeRegistration() {
     setFormData(prev => ({
       ...prev,
       selectedServices: prev.selectedServices.includes(serviceId)
-        ? prev.selectedServices.filter(id => id !== serviceId)
+        ? prev.selectedServices.filter((id: string) => id !== serviceId)
         : [...prev.selectedServices, serviceId],
     }));
   };
@@ -194,7 +194,7 @@ export default function OfficeRegistration() {
       phone: formData.phone,
       email: formData.email,
       website: formData.website || undefined,
-      serviceIds: formData.selectedServices.map(id => parseInt(id)),
+      serviceIds: formData.selectedServices.map((id: string) => parseInt(id)),
     });
   };
 
@@ -558,7 +558,7 @@ export default function OfficeRegistration() {
                     onUploadComplete={(urls) => handleInputChange("certificateUrls", urls)}
                     currentUrls={formData.certificateUrls}
                     onRemove={(index) => {
-                      const newUrls = formData.certificateUrls.filter((_, i) => i !== index);
+                      const newUrls = formData.certificateUrls.filter((_: string, i: number) => i !== index);
                       handleInputChange("certificateUrls", newUrls);
                     }}
                   />
@@ -571,7 +571,7 @@ export default function OfficeRegistration() {
                     onUploadComplete={(urls) => handleInputChange("permitUrls", urls)}
                     currentUrls={formData.permitUrls}
                     onRemove={(index) => {
-                      const newUrls = formData.permitUrls.filter((_, i) => i !== index);
+                      const newUrls = formData.permitUrls.filter((_: string, i: number) => i !== index);
                       handleInputChange("permitUrls", newUrls);
                     }}
                   />
@@ -717,7 +717,7 @@ export default function OfficeRegistration() {
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-wrap gap-2">
-                      {formData.selectedServices.map((serviceId) => {
+                      {formData.selectedServices.map((serviceId: string) => {
                         const serviceName = [
                           { id: "1", name: "Commercial Registration" },
                           { id: "2", name: "Tax Registration" },
