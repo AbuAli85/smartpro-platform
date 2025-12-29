@@ -28,6 +28,13 @@ export const users = mysqlTable("users", {
   }>(),
   whatsappEnabled: boolean("whatsappEnabled").default(false),
   referralCode: varchar("referralCode", { length: 20 }).unique(),
+  
+  // Multi-Factor Authentication
+  mfaEnabled: boolean("mfaEnabled").default(false),
+  mfaSecret: varchar("mfaSecret", { length: 255 }),
+  mfaBackupCodes: json("mfaBackupCodes").$type<string[]>(),
+  mfaEnabledAt: timestamp("mfaEnabledAt"),
+  
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -1428,3 +1435,77 @@ export const regionalCampaigns = mysqlTable("regional_campaigns", {
 
 export type RegionalCampaign = typeof regionalCampaigns.$inferSelect;
 export type InsertRegionalCampaign = typeof regionalCampaigns.$inferInsert;
+
+// ============================================================================
+// AUTHENTICATION AUDIT LOGGING
+// ============================================================================
+
+export const authAuditLog = mysqlTable("auth_audit_log", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // User information
+  userId: int("userId"), // Nullable for failed login attempts
+  openId: varchar("openId", { length: 64 }), // For tracking attempts before user lookup
+  
+  // Event details
+  eventType: mysqlEnum("eventType", [
+    "login_success",
+    "login_failure", 
+    "logout",
+    "session_expired",
+    "role_changed",
+    "permission_denied",
+    "password_reset_requested",
+    "password_reset_completed",
+    "mfa_enabled",
+    "mfa_disabled",
+    "mfa_verified",
+    "mfa_failed",
+    "email_verified",
+    "account_locked",
+    "account_unlocked"
+  ]).notNull(),
+  
+  // Request metadata
+  ipAddress: varchar("ipAddress", { length: 45 }), // IPv6 compatible
+  userAgent: text("userAgent"),
+  deviceInfo: json("deviceInfo").$type<{
+    browser?: string;
+    os?: string;
+    device?: string;
+    isMobile?: boolean;
+  }>(),
+  
+  // Location data (optional, can be derived from IP)
+  country: varchar("country", { length: 100 }),
+  city: varchar("city", { length: 100 }),
+  
+  // Event-specific metadata
+  metadata: json("metadata").$type<{
+    attemptedEmail?: string; // For failed logins
+    previousRole?: string; // For role changes
+    newRole?: string; // For role changes
+    attemptedAction?: string; // For permission denied
+    reason?: string; // General reason field
+    sessionDuration?: number; // For logout events (in seconds)
+    [key: string]: any;
+  }>(),
+  
+  // Status and severity
+  success: boolean("success").notNull(),
+  severity: mysqlEnum("severity", ["info", "warning", "error", "critical"]).default("info").notNull(),
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index("user_id_idx").on(table.userId),
+  eventTypeIdx: index("event_type_idx").on(table.eventType),
+  ipAddressIdx: index("ip_address_idx").on(table.ipAddress),
+  createdAtIdx: index("created_at_idx").on(table.createdAt),
+  severityIdx: index("severity_idx").on(table.severity),
+  // Composite index for common queries
+  userEventIdx: index("user_event_idx").on(table.userId, table.eventType, table.createdAt),
+}));
+
+export type AuthAuditLog = typeof authAuditLog.$inferSelect;
+export type InsertAuthAuditLog = typeof authAuditLog.$inferInsert;

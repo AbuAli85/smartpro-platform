@@ -36,6 +36,9 @@ import {
   bundleServices,
   type ServiceBundle,
   type BundleService,
+  authAuditLog,
+  type AuthAuditLog,
+  type InsertAuthAuditLog,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -5370,4 +5373,358 @@ export async function getServiceDemandByGovernorate() {
     .limit(50);
   
   return result;
+}
+
+// ============================================================================
+// AUTHENTICATION AUDIT LOGGING
+// ============================================================================
+
+/**
+ * Log an authentication event to the audit log
+ */
+export async function logAuthEvent(event: {
+  userId?: number;
+  openId?: string;
+  eventType: AuthAuditLog["eventType"];
+  ipAddress?: string;
+  userAgent?: string;
+  deviceInfo?: AuthAuditLog["deviceInfo"];
+  country?: string;
+  city?: string;
+  metadata?: AuthAuditLog["metadata"];
+  success: boolean;
+  severity?: AuthAuditLog["severity"];
+}): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[AuthAudit] Cannot log event: database not available");
+    return;
+  }
+
+  try {
+    await db.insert(authAuditLog).values({
+      userId: event.userId,
+      openId: event.openId,
+      eventType: event.eventType,
+      ipAddress: event.ipAddress,
+      userAgent: event.userAgent,
+      deviceInfo: event.deviceInfo,
+      country: event.country,
+      city: event.city,
+      metadata: event.metadata,
+      success: event.success,
+      severity: event.severity || "info",
+    });
+  } catch (error) {
+    console.error("[AuthAudit] Failed to log event:", error);
+    // Don't throw - audit logging should not break the main flow
+  }
+}
+
+/**
+ * Get audit logs for a specific user
+ */
+export async function getUserAuditLogs(
+  userId: number,
+  options?: {
+    limit?: number;
+    offset?: number;
+    eventTypes?: AuthAuditLog["eventType"][];
+  }
+): Promise<AuthAuditLog[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const conditions = [eq(authAuditLog.userId, userId)];
+
+    if (options?.eventTypes && options.eventTypes.length > 0) {
+      conditions.push(
+        sql`${authAuditLog.eventType} IN (${sql.join(options.eventTypes.map(t => sql`${t}`), sql`, `)})`
+      );
+    }
+
+    const query = db
+      .select()
+      .from(authAuditLog)
+      .where(and(...conditions))
+      .orderBy(desc(authAuditLog.createdAt))
+      .limit(options?.limit || 50)
+      .offset(options?.offset || 0);
+
+    return await query;
+  } catch (error) {
+    console.error("[AuthAudit] Failed to get user audit logs:", error);
+    return [];
+  }
+}
+
+/**
+ * Get all audit logs (admin only)
+ */
+export async function getAllAuditLogs(options?: {
+  limit?: number;
+  offset?: number;
+  eventTypes?: AuthAuditLog["eventType"][];
+  severity?: AuthAuditLog["severity"][];
+  startDate?: Date;
+  endDate?: Date;
+}): Promise<AuthAuditLog[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const conditions = [];
+
+    if (options?.eventTypes && options.eventTypes.length > 0) {
+      conditions.push(
+        sql`${authAuditLog.eventType} IN (${sql.join(options.eventTypes.map(t => sql`${t}`), sql`, `)})`
+      );
+    }
+
+    if (options?.severity && options.severity.length > 0) {
+      conditions.push(
+        sql`${authAuditLog.severity} IN (${sql.join(options.severity.map(s => sql`${s}`), sql`, `)})`
+      );
+    }
+
+    if (options?.startDate) {
+      conditions.push(gte(authAuditLog.createdAt, options.startDate));
+    }
+
+    if (options?.endDate) {
+      conditions.push(lte(authAuditLog.createdAt, options.endDate));
+    }
+
+    const baseQuery = db
+      .select()
+      .from(authAuditLog)
+      .orderBy(desc(authAuditLog.createdAt));
+
+    const query = conditions.length > 0
+      ? baseQuery.where(and(...conditions))
+      : baseQuery;
+
+    return await query
+      .limit(options?.limit || 50)
+      .offset(options?.offset || 0);
+  } catch (error) {
+    console.error("[AuthAudit] Failed to get all audit logs:", error);
+    return [];
+  }
+}
+
+/**
+ * Get audit log statistics
+ */
+export async function getAuditLogStats(options?: {
+  startDate?: Date;
+  endDate?: Date;
+}): Promise<{
+  totalEvents: number;
+  successfulLogins: number;
+  failedLogins: number;
+  logouts: number;
+  criticalEvents: number;
+  uniqueUsers: number;
+}> {
+  const db = await getDb();
+  if (!db) {
+    return {
+      totalEvents: 0,
+      successfulLogins: 0,
+      failedLogins: 0,
+      logouts: 0,
+      criticalEvents: 0,
+      uniqueUsers: 0,
+    };
+  }
+
+  try {
+    const conditions = [];
+
+    if (options?.startDate) {
+      conditions.push(gte(authAuditLog.createdAt, options.startDate));
+    }
+
+    if (options?.endDate) {
+      conditions.push(lte(authAuditLog.createdAt, options.endDate));
+    }
+
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    const [stats] = await db
+      .select({
+        totalEvents: sql<number>`COUNT(*)`,
+        successfulLogins: sql<number>`SUM(CASE WHEN ${authAuditLog.eventType} = 'login_success' THEN 1 ELSE 0 END)`,
+        failedLogins: sql<number>`SUM(CASE WHEN ${authAuditLog.eventType} = 'login_failure' THEN 1 ELSE 0 END)`,
+        logouts: sql<number>`SUM(CASE WHEN ${authAuditLog.eventType} = 'logout' THEN 1 ELSE 0 END)`,
+        criticalEvents: sql<number>`SUM(CASE WHEN ${authAuditLog.severity} = 'critical' THEN 1 ELSE 0 END)`,
+        uniqueUsers: sql<number>`COUNT(DISTINCT ${authAuditLog.userId})`,
+      })
+      .from(authAuditLog)
+      .where(whereClause);
+
+    return {
+      totalEvents: Number(stats.totalEvents) || 0,
+      successfulLogins: Number(stats.successfulLogins) || 0,
+      failedLogins: Number(stats.failedLogins) || 0,
+      logouts: Number(stats.logouts) || 0,
+      criticalEvents: Number(stats.criticalEvents) || 0,
+      uniqueUsers: Number(stats.uniqueUsers) || 0,
+    };
+  } catch (error) {
+    console.error("[AuthAudit] Failed to get audit log stats:", error);
+    return {
+      totalEvents: 0,
+      successfulLogins: 0,
+      failedLogins: 0,
+      logouts: 0,
+      criticalEvents: 0,
+      uniqueUsers: 0,
+    };
+  }
+}
+
+// ============================================================================
+// MULTI-FACTOR AUTHENTICATION (MFA)
+// ============================================================================
+
+/**
+ * Enable MFA for a user
+ */
+export async function enableMFA(
+  userId: number,
+  secret: string,
+  backupCodes: string[]
+): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[MFA] Cannot enable MFA: database not available");
+    return;
+  }
+
+  try {
+    await db
+      .update(users)
+      .set({
+        mfaEnabled: true,
+        mfaSecret: secret,
+        mfaBackupCodes: backupCodes,
+        mfaEnabledAt: new Date(),
+      })
+      .where(eq(users.id, userId));
+  } catch (error) {
+    console.error("[MFA] Failed to enable MFA:", error);
+    throw error;
+  }
+}
+
+/**
+ * Disable MFA for a user
+ */
+export async function disableMFA(userId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[MFA] Cannot disable MFA: database not available");
+    return;
+  }
+
+  try {
+    await db
+      .update(users)
+      .set({
+        mfaEnabled: false,
+        mfaSecret: null,
+        mfaBackupCodes: null,
+        mfaEnabledAt: null,
+      })
+      .where(eq(users.id, userId));
+  } catch (error) {
+    console.error("[MFA] Failed to disable MFA:", error);
+    throw error;
+  }
+}
+
+/**
+ * Update backup codes for a user
+ */
+export async function updateBackupCodes(
+  userId: number,
+  backupCodes: string[]
+): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[MFA] Cannot update backup codes: database not available");
+    return;
+  }
+
+  try {
+    await db
+      .update(users)
+      .set({
+        mfaBackupCodes: backupCodes,
+      })
+      .where(eq(users.id, userId));
+  } catch (error) {
+    console.error("[MFA] Failed to update backup codes:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get MFA status for a user
+ */
+export async function getMFAStatus(userId: number): Promise<{
+  enabled: boolean;
+  secret: string | null;
+  backupCodes: string[] | null;
+  enabledAt: Date | null;
+}> {
+  const db = await getDb();
+  if (!db) {
+    return {
+      enabled: false,
+      secret: null,
+      backupCodes: null,
+      enabledAt: null,
+    };
+  }
+
+  try {
+    const [user] = await db
+      .select({
+        mfaEnabled: users.mfaEnabled,
+        mfaSecret: users.mfaSecret,
+        mfaBackupCodes: users.mfaBackupCodes,
+        mfaEnabledAt: users.mfaEnabledAt,
+      })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (!user) {
+      return {
+        enabled: false,
+        secret: null,
+        backupCodes: null,
+        enabledAt: null,
+      };
+    }
+
+    return {
+      enabled: user.mfaEnabled || false,
+      secret: user.mfaSecret,
+      backupCodes: user.mfaBackupCodes as string[] | null,
+      enabledAt: user.mfaEnabledAt,
+    };
+  } catch (error) {
+    console.error("[MFA] Failed to get MFA status:", error);
+    return {
+      enabled: false,
+      secret: null,
+      backupCodes: null,
+      enabledAt: null,
+    };
+  }
 }

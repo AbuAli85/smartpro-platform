@@ -36,6 +36,9 @@ export function registerOAuthRoutes(app: Express) {
         lastSignedIn: new Date(),
       });
 
+      // Get user ID for audit logging
+      const user = await db.getUserByOpenId(userInfo.openId);
+
       const sessionToken = await sdk.createSessionToken(userInfo.openId, {
         name: userInfo.name || "",
         expiresInMs: ONE_YEAR_MS,
@@ -44,9 +47,41 @@ export function registerOAuthRoutes(app: Express) {
       const cookieOptions = getSessionCookieOptions(req);
       res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
 
+      // Log successful login
+      await db.logAuthEvent({
+        userId: user?.id,
+        openId: userInfo.openId,
+        eventType: "login_success",
+        ipAddress: req.ip || req.socket.remoteAddress,
+        userAgent: req.headers["user-agent"],
+        deviceInfo: {
+          browser: req.headers["user-agent"]?.split("/")[0],
+          isMobile: /mobile/i.test(req.headers["user-agent"] || ""),
+        },
+        metadata: {
+          loginMethod: userInfo.loginMethod ?? userInfo.platform,
+        },
+        success: true,
+        severity: "info",
+      });
+
       res.redirect(302, "/");
     } catch (error) {
       console.error("[OAuth] Callback failed", error);
+      
+      // Log failed login attempt
+      await db.logAuthEvent({
+        openId: code, // Use code as identifier since we don't have openId yet
+        eventType: "login_failure",
+        ipAddress: req.ip || req.socket.remoteAddress,
+        userAgent: req.headers["user-agent"],
+        metadata: {
+          reason: error instanceof Error ? error.message : "Unknown error",
+        },
+        success: false,
+        severity: "warning",
+      });
+      
       res.status(500).json({ error: "OAuth callback failed" });
     }
   });

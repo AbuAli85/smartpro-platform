@@ -61,6 +61,8 @@ import UserManagement from "./pages/UserManagement";
 import OfficeVerification from "./pages/OfficeVerification";
 import OnboardingWizard from "./pages/OnboardingWizard";
 import OfficeAnalytics from "./pages/OfficeAnalytics";
+import AuditLogs from "./pages/AuditLogs";
+import MFASettings from "./pages/MFASettings";
 import { useNotifications } from "./hooks/useNotifications";
 import { useMarketplaceNotifications } from "./hooks/useMarketplaceNotifications";
 import { SocketProvider } from "./contexts/SocketContext";
@@ -112,6 +114,11 @@ function Router() {
       <Route path="/admin/office-verification">
         <ProtectedRoute requirePermission="canVerifyOffices">
           <OfficeVerification />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/audit-logs">
+        <ProtectedRoute requirePermission="canAccessAdminPanel">
+          <AuditLogs />
         </ProtectedRoute>
       </Route>
       <Route path="/admin/analytics">
@@ -201,6 +208,7 @@ function Router() {
       <Route path="/profile" component={Profile} />
       <Route path="/notifications" component={NotificationPreferences} />
       <Route path="/language-settings" component={LanguageSettings} />
+      <Route path="/security/mfa" component={MFASettings} />
       
       {/* Loyalty */}
       <Route path="/loyalty" component={LoyaltyDashboard} />

@@ -41,15 +41,32 @@ import { storageRouter } from "./routers/storage";
 import { reviewsRouter } from "./routers/reviews";
 import { recommendationsRouter } from "./routers/recommendations";
 import { campaignsRouter } from "./routers/campaigns";
+import { auditLogRouter } from "./routers/auditLog";
+import { mfaRouter } from "./routers/mfa";
 
 export const appRouter = router({
   system: systemRouter,
   
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
-    logout: publicProcedure.mutation(({ ctx }) => {
+    logout: publicProcedure.mutation(async ({ ctx }) => {
+      const user = ctx.user;
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+      
+      // Log logout event
+      if (user) {
+        await db.logAuthEvent({
+          userId: user.id,
+          openId: user.openId,
+          eventType: "logout",
+          ipAddress: ctx.req.ip || ctx.req.socket.remoteAddress,
+          userAgent: ctx.req.headers["user-agent"],
+          success: true,
+          severity: "info",
+        });
+      }
+      
       return {
         success: true,
       } as const;
@@ -141,6 +158,8 @@ export const appRouter = router({
   reviews: reviewsRouter,
   recommendations: recommendationsRouter,
   campaigns: campaignsRouter,
+  auditLog: auditLogRouter,
+  mfa: mfaRouter,
 });
 
 export type AppRouter = typeof appRouter;
