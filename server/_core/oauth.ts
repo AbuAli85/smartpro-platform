@@ -16,14 +16,25 @@ export function registerOAuthRoutes(app: Express) {
     const code = getQueryParam(req, "code");
     const state = getQueryParam(req, "state");
 
+    console.log("[OAuth] Callback received:", { 
+      hasCode: !!code, 
+      hasState: !!state,
+      query: req.query 
+    });
+
     if (!code || !state) {
+      console.error("[OAuth] Missing required parameters:", { code: !!code, state: !!state });
       res.status(400).json({ error: "code and state are required" });
       return;
     }
 
     try {
+      console.log("[OAuth] Exchanging code for token...");
       const tokenResponse = await sdk.exchangeCodeForToken(code, state);
+      console.log("[OAuth] Token exchange successful");
+      
       const userInfo = await sdk.getUserInfo(tokenResponse.accessToken);
+      console.log("[OAuth] User info retrieved:", { openId: userInfo.openId, email: userInfo.email });
 
       if (!userInfo.openId) {
         res.status(400).json({ error: "openId missing from user info" });
@@ -102,25 +113,44 @@ export function registerOAuthRoutes(app: Express) {
       res.redirect(302, "/");
     } catch (error) {
       console.error("[OAuth] Callback failed", error);
+      console.error("[OAuth] Error details:", {
+        message: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
+        code,
+        state,
+      });
       
       // Check for brute force attempts
       const ipAddress = req.ip || req.socket.remoteAddress || "Unknown";
-      await checkBruteForceAttempt(ipAddress, req.headers["user-agent"]);
+      try {
+        await checkBruteForceAttempt(ipAddress, req.headers["user-agent"]);
+      } catch (bruteForceError) {
+        console.error("[OAuth] Brute force check failed:", bruteForceError);
+      }
       
       // Log failed login attempt
-      await db.logAuthEvent({
-        openId: code, // Use code as identifier since we don't have openId yet
-        eventType: "login_failure",
-        ipAddress,
-        userAgent: req.headers["user-agent"],
-        metadata: {
-          reason: error instanceof Error ? error.message : "Unknown error",
-        },
-        success: false,
-        severity: "warning",
-      });
+      try {
+        await db.logAuthEvent({
+          openId: code, // Use code as identifier since we don't have openId yet
+          eventType: "login_failure",
+          ipAddress,
+          userAgent: req.headers["user-agent"],
+          metadata: {
+            reason: error instanceof Error ? error.message : "Unknown error",
+            errorStack: error instanceof Error ? error.stack : undefined,
+          },
+          success: false,
+          severity: "warning",
+        });
+      } catch (logError) {
+        console.error("[OAuth] Failed to log auth event:", logError);
+      }
       
-      res.status(500).json({ error: "OAuth callback failed" });
+      res.status(500).json({ 
+        error: "OAuth callback failed",
+        message: error instanceof Error ? error.message : "Unknown error",
+        details: process.env.NODE_ENV === "development" ? (error instanceof Error ? error.stack : undefined) : undefined
+      });
     }
   });
 }

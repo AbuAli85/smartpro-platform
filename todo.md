@@ -491,3 +491,23 @@ The platform is stable, fully functional, and ready for users. Minor console war
 ---
 
 *Last updated: December 29, 2025*
+
+
+### OAuth Callback Error Fix (Dec 29, 2025)
+
+#### Investigation & Fixes
+- [x] Review OAuth callback handler implementation
+- [x] Add detailed error logging for debugging
+- [x] Add console logs at each step of OAuth flow
+- [x] Improve error messages with stack traces
+- [x] Add try-catch blocks for security checks
+- [ ] Test OAuth login flow end-to-end
+- [ ] Verify error messages are helpful for debugging
+- [ ] Check environment variables are properly configured
+
+#### Diagnostic Results
+- [x] Environment variables properly configured
+- [x] SDK initialization successful
+- [x] OAuth server connectivity verified (https://api.manus.im)
+- [x] Enhanced error logging implemented
+- [x] Created diagnostic test script
