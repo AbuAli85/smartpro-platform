@@ -8,8 +8,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { trpc } from "@/lib/trpc";
 import { Plus, Edit, Trash2, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function CannedResponses() {
+  const { t } = useLanguage();
   const [selectedOfficeId, setSelectedOfficeId] = useState<number | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingResponse, setEditingResponse] = useState<any>(null);
@@ -113,9 +115,9 @@ export default function CannedResponses() {
     <div className="container mx-auto p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold">Canned Responses</h1>
+          <h1 className="text-3xl font-bold">{t("pages.cannedResponses")}</h1>
           <p className="text-muted-foreground mt-1">
-            Create quick-reply templates for common questions
+            {t("pages.cannedResponsesDesc")}
           </p>
         </div>
 

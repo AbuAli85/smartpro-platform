@@ -26,6 +26,7 @@ import { RatingModal } from "@/components/RatingModal";
 import { TransferDialog } from "@/components/TransferDialog";
 import { TransferHistory } from "@/components/TransferHistory";
 import { ExportDialog } from "@/components/ExportDialog";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Message {
   id: number;
@@ -117,6 +118,7 @@ function AssignmentDropdown({ conversationId }: { conversationId: number }) {
 }
 
 export default function ChatInbox() {
+  const { t } = useLanguage();
   const { user } = useAuth();
 
   // Request notification permission on mount
@@ -405,8 +407,8 @@ export default function ChatInbox() {
       <div className="container py-8">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Chat Inbox</h1>
-            <p className="text-muted-foreground">Manage conversations with customers</p>
+            <h1 className="text-3xl font-bold">{t("pages.chatInbox")}</h1>
+            <p className="text-muted-foreground">{t("pages.chatInboxDesc")}</p>
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -486,7 +488,7 @@ export default function ChatInbox() {
                 ) : (
                   <div className="p-8 text-center">
                     <MessageCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-                    <p className="text-muted-foreground">No conversations found</p>
+                    <p className="text-muted-foreground">{t("empty.noConversations")}</p>
                   </div>
                 )}
               </ScrollArea>
@@ -814,8 +816,8 @@ export default function ChatInbox() {
               <CardContent className="flex items-center justify-center h-[600px]">
                 <div className="text-center">
                   <MessageCircle className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-                  <p className="text-lg font-medium mb-2">Select a conversation</p>
-                  <p className="text-muted-foreground">Choose a conversation from the list to start chatting</p>
+                  <p className="text-lg font-medium mb-2">{t("empty.selectConversation")}</p>
+                  <p className="text-muted-foreground">{t("empty.selectConversationDesc")}</p>
                 </div>
               </CardContent>
             )}

@@ -177,3 +177,37 @@
 - [ ] Resolve marketplace cache issue (needs redeploy)
 - [ ] Add Arabic content to database (sample data)
 - [ ] Test with Arabic screen readers
+
+## 🔴 Translation Fixes from Screenshot Review (Dec 29, 2025)
+
+### Homepage Issues
+- [x] Fix affordability section showing translation keys (home.affordability.title, subtitle, description)
+- [x] Verify all homepage sections display Arabic text correctly
+
+### Empty State Translations
+- [x] Add "No Service Requests Yet" translation
+- [x] Add "No Service Requests Found" translation
+- [x] Add "No offices registered yet" translation
+- [x] Add "No Offices Found" translation
+- [x] Add "No conversations found" translation
+- [x] Add "No staff members yet" translation
+- [x] Add "No performance data available yet" translation
+
+### Page Title Translations
+- [x] Translate "Service Request Marketplace" page title
+- [x] Translate "My Offices" page title
+- [x] Translate "Analytics Dashboard" page title
+- [x] Translate "Chat Inbox" page title
+- [x] Translate "Canned Responses" page title
+- [x] Translate "Staff Management" page title
+- [x] Translate "Staff Performance Dashboard" page title
+
+### Component Updates Needed
+- [x] Update MyServiceRequests.tsx with translation keys
+- [x] Update MarketplaceBrowser.tsx with translation keys
+- [x] Update MyOffices.tsx with translation keys
+- [x] Update AnalyticsDashboard.tsx with translation keys
+- [x] Update ChatInbox.tsx with translation keys
+- [x] Update CannedResponses.tsx with translation keys
+- [x] Update StaffManagement.tsx with translation keys
+- [x] Update StaffPerformance.tsx with translation keys

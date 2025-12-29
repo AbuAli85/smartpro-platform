@@ -12,9 +12,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TrendingUp, Clock, CheckCircle, MessageSquare, Award } from "lucide-react";
-import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function StaffPerformance() {
+  const { t } = useLanguage();
   const [dateRange, setDateRange] = useState<7 | 30 | 90>(30);
   
   // Get user's office
@@ -94,9 +96,9 @@ export default function StaffPerformance() {
     <div className="container py-8">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Staff Performance Dashboard</h1>
+          <h1 className="text-3xl font-bold">{t("pages.staffPerformance")}</h1>
           <p className="text-muted-foreground">
-            Track team performance metrics and identify areas for improvement
+            {t("pages.staffPerformanceDesc")}
           </p>
         </div>
         <div className="flex gap-2">
@@ -417,9 +419,9 @@ export default function StaffPerformance() {
           ) : (
             <div className="text-center py-12">
               <Award className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-              <p className="text-muted-foreground">No performance data available yet</p>
+              <p className="text-muted-foreground">{t("empty.noPerformanceData")}</p>
               <p className="text-sm text-muted-foreground mt-2">
-                Metrics will appear once staff members start handling conversations
+                {t("empty.noPerformanceDataDesc")}
               </p>
             </div>
           )}

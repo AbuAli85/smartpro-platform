@@ -737,6 +737,50 @@ export const translations: Record<Language, Record<string, string>> = {
     "message.deleteSuccess": "Deleted successfully",
     "message.updateSuccess": "Updated successfully",
     "message.createSuccess": "Created successfully",
+    
+    // Affordability Section
+    "home.affordability.subtitle": "Smart Pricing",
+    "home.affordability.title": "Affordable Business Services for Every SME",
+    "home.affordability.description": "SmartPro's digital platform reduces overhead costs, allowing Sanad offices to offer competitive pricing. Save up to 73% compared to traditional service providers while maintaining the highest quality standards.",
+    
+    // Empty States
+    "empty.noServiceRequestsYet": "No Service Requests Yet",
+    "empty.noServiceRequestsYetDesc": "You haven't posted any service requests. Start by posting a request to receive competitive bids from offices.",
+    "empty.noServiceRequestsFound": "No Service Requests Found",
+    "empty.noServiceRequestsFoundDesc": "Try adjusting your filters or check back later for new requests",
+    "empty.noOfficesYet": "No offices registered yet",
+    "empty.noOfficesYetDesc": "Register your first Sanad office to start offering business services",
+    "empty.noOfficesFound": "No Offices Found",
+    "empty.noOfficesFoundDesc": "You don't have any registered offices yet. Register your office to start managing bookings",
+    "empty.noConversations": "No conversations found",
+    "empty.noConversationsDesc": "Start a conversation with a customer to see it here",
+    "empty.noStaffYet": "No staff members yet",
+    "empty.noStaffYetDesc": "Add your first staff member to start managing your team",
+    "empty.noPerformanceData": "No performance data available yet",
+    "empty.noPerformanceDataDesc": "Metrics will appear once staff members start handling conversations",
+    "empty.selectConversation": "Select a conversation",
+    "empty.selectConversationDesc": "Choose a conversation from the list to start chatting",
+    
+    // Page Titles
+    "pages.serviceRequestMarketplace": "Service Request Marketplace",
+    "pages.serviceRequestMarketplaceDesc": "Browse service requests from customers and submit competitive bids",
+    "pages.myOffices": "My Offices",
+    "pages.myOfficesDesc": "Manage your registered Sanad offices",
+    "pages.analyticsDashboard": "Analytics Dashboard",
+    "pages.analyticsDashboardDesc": "Track your office performance and growth",
+    "pages.chatInbox": "Chat Inbox",
+    "pages.chatInboxDesc": "Manage conversations with customers",
+    "pages.cannedResponses": "Canned Responses",
+    "pages.cannedResponsesDesc": "Create quick-reply templates for common questions",
+    "pages.staffManagement": "Staff Management",
+    "pages.staffManagementDesc": "Manage your office staff and their roles",
+    "pages.staffPerformance": "Staff Performance Dashboard",
+    "pages.staffPerformanceDesc": "Track team performance metrics and identify areas for improvement",
+    
+    // Action Buttons
+    "actions.postServiceRequest": "Post a Service Request",
+    "actions.registerYourFirstOffice": "Register Your First Office",
+    "actions.addYourFirstStaffMember": "Add Your First Staff Member",
   },
   ar: {
     // Navigation
@@ -1459,6 +1503,50 @@ export const translations: Record<Language, Record<string, string>> = {
     "message.deleteSuccess": "تم الحذف بنجاح",
     "message.updateSuccess": "تم التحديث بنجاح",
     "message.createSuccess": "تم الإنشاء بنجاح",
+    
+    // Affordability Section
+    "home.affordability.subtitle": "أسعار ذكية",
+    "home.affordability.title": "خدمات أعمال ميسورة لكل مؤسسة صغيرة ومتوسطة",
+    "home.affordability.description": "منصة SmartPro الرقمية تقلل التكاليف التشغيلية، مما يسمح لمكاتب سند بتقديم أسعار تنافسية. وفر حتى 73% مقارنة بمقدمي الخدمات التقليديين مع الحفاظ على أعلى معايير الجودة.",
+    
+    // Empty States
+    "empty.noServiceRequestsYet": "لا توجد طلبات خدمة بعد",
+    "empty.noServiceRequestsYetDesc": "لم تقم بنشر أي طلبات خدمة. ابدأ بنشر طلب لتلقي عروض تنافسية من المكاتب.",
+    "empty.noServiceRequestsFound": "لم يتم العثور على طلبات خدمة",
+    "empty.noServiceRequestsFoundDesc": "حاول تعديل الفلاتر أو تحقق مرة أخرى لاحقاً للحصول على طلبات جديدة",
+    "empty.noOfficesYet": "لا توجد مكاتب مسجلة بعد",
+    "empty.noOfficesYetDesc": "سجل مكتب سند الأول لبدء تقديم خدمات الأعمال",
+    "empty.noOfficesFound": "لم يتم العثور على مكاتب",
+    "empty.noOfficesFoundDesc": "ليس لديك أي مكاتب مسجلة بعد. سجل مكتبك لبدء إدارة الحجوزات",
+    "empty.noConversations": "لا توجد محادثات",
+    "empty.noConversationsDesc": "ابدأ محادثة مع عميل لرؤيتها هنا",
+    "empty.noStaffYet": "لا يوجد موظفون بعد",
+    "empty.noStaffYetDesc": "أضف أول موظف لبدء إدارة فريقك",
+    "empty.noPerformanceData": "لا توجد بيانات أداء متاحة بعد",
+    "empty.noPerformanceDataDesc": "ستظهر المقاييس بمجرد أن يبدأ الموظفون في التعامل مع المحادثات",
+    "empty.selectConversation": "اختر محادثة",
+    "empty.selectConversationDesc": "اختر محادثة من القائمة لبدء الدردشة",
+    
+    // Page Titles
+    "pages.serviceRequestMarketplace": "سوق طلبات الخدمة",
+    "pages.serviceRequestMarketplaceDesc": "تصفح طلبات الخدمة من العملاء وقدم عروضاً تنافسية",
+    "pages.myOffices": "مكاتبي",
+    "pages.myOfficesDesc": "إدارة مكاتب سند المسجلة",
+    "pages.analyticsDashboard": "لوحة التحليلات",
+    "pages.analyticsDashboardDesc": "تتبع أداء مكتبك ونموه",
+    "pages.chatInbox": "صندوق الدردشة",
+    "pages.chatInboxDesc": "إدارة المحادثات مع العملاء",
+    "pages.cannedResponses": "الردود الجاهزة",
+    "pages.cannedResponsesDesc": "إنشاء قوالب رد سريع للأسئلة الشائعة",
+    "pages.staffManagement": "إدارة الموظفين",
+    "pages.staffManagementDesc": "إدارة موظفي مكتبك وأدوارهم",
+    "pages.staffPerformance": "لوحة أداء الموظفين",
+    "pages.staffPerformanceDesc": "تتبع مقاييس أداء الفريق وتحديد مجالات التحسين",
+    
+    // Action Buttons
+    "actions.postServiceRequest": "نشر طلب خدمة",
+    "actions.registerYourFirstOffice": "سجل مكتبك الأول",
+    "actions.addYourFirstStaffMember": "أضف أول موظف",
   },
 };
 

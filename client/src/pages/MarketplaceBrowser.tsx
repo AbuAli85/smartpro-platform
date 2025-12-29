@@ -9,8 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Calendar, DollarSign, MapPin, Clock, Building2, Filter } from "lucide-react";
 import { BidSubmissionDialog } from "@/components/BidSubmissionDialog";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function MarketplaceBrowser() {
+  const { t } = useLanguage();
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [bidDialogOpen, setBidDialogOpen] = useState(false);
   
@@ -52,9 +54,9 @@ export default function MarketplaceBrowser() {
     <div className="min-h-screen bg-background">
       <div className="container py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Service Request Marketplace</h1>
+          <h1 className="text-3xl font-bold mb-2">{t("pages.serviceRequestMarketplace")}</h1>
           <p className="text-muted-foreground">
-            Browse service requests from customers and submit competitive bids
+            {t("pages.serviceRequestMarketplaceDesc")}
           </p>
         </div>
 
@@ -189,9 +191,9 @@ export default function MarketplaceBrowser() {
           <Card>
             <CardContent className="py-12 text-center">
               <Building2 className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-semibold mb-2">No Service Requests Found</h3>
+              <h3 className="text-lg font-semibold mb-2">{t("empty.noServiceRequestsFound")}</h3>
               <p className="text-muted-foreground">
-                Try adjusting your filters or check back later for new requests
+                {t("empty.noServiceRequestsFoundDesc")}
               </p>
             </CardContent>
           </Card>

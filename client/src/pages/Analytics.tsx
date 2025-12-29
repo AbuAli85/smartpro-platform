@@ -18,6 +18,7 @@ import {
   ArcElement,
 } from "chart.js";
 import { Line, Bar } from "react-chartjs-2";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Register Chart.js components
 ChartJS.register(
@@ -33,6 +34,7 @@ ChartJS.register(
 );
 
 export default function Analytics() {
+  const { t } = useLanguage();
   const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d">("30d");
   const [groupBy, setGroupBy] = useState<"day" | "week" | "month">("day");
 
@@ -172,9 +174,9 @@ export default function Analytics() {
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold tracking-tight">Analytics Dashboard</h1>
+            <h1 className="text-4xl font-bold tracking-tight">{t("pages.analyticsDashboard")}</h1>
             <p className="text-muted-foreground mt-2">
-              Track booking trends, popular services, and revenue metrics
+              {t("pages.analyticsDashboardDesc")}
             </p>
           </div>
 

@@ -65,12 +65,12 @@ export default function MyServiceRequests() {
       <div className="container mx-auto py-8">
         <div className="text-center py-12">
           <Package className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-          <h2 className="text-2xl font-semibold mb-2">No Service Requests Yet</h2>
+          <h2 className="text-2xl font-semibold mb-2">{t("empty.noServiceRequestsYet")}</h2>
           <p className="text-gray-600 mb-6">
-            You haven't posted any service requests. Start by posting a request to receive competitive bids from offices.
+            {t("empty.noServiceRequestsYetDesc")}
           </p>
           <Button asChild className="bg-[#003366] hover:bg-[#002244]">
-            <a href="/request-service">Post a Service Request</a>
+            <a href="/request-service">{t("actions.postServiceRequest")}</a>
           </Button>
         </div>
       </div>
@@ -80,8 +80,8 @@ export default function MyServiceRequests() {
   return (
     <div className="container mx-auto py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">My Service Requests</h1>
-        <p className="text-gray-600">View and manage your service requests and received bids</p>
+        <h1 className="text-3xl font-bold mb-2">{t("nav.myServiceRequests")}</h1>
+        <p className="text-gray-600">{t("marketplace.myRequests")}</p>
       </div>
 
       <div className="grid gap-6">

@@ -8,8 +8,10 @@ import { Building2, Plus, MapPin, Phone, Mail, Globe, CheckCircle2, Clock, XCirc
 import { toast } from "sonner";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { PullToRefreshIndicator } from "@/components/PullToRefreshIndicator";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function MyOffices() {
+  const { t } = useLanguage();
   const { data: offices, isLoading, refetch } = trpc.officeOwner.getMyOffices.useQuery();
 
   // Pull-to-refresh functionality
@@ -79,7 +81,7 @@ export default function MyOffices() {
       <div className="min-h-screen flex flex-col bg-background">
         <div className="container py-8">
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-4xl font-bold">My Offices</h1>
+            <h1 className="text-4xl font-bold">{t("pages.myOffices")}</h1>
           </div>
           <div className="grid gap-6">
             {[1, 2, 3].map((i) => (
@@ -120,14 +122,14 @@ export default function MyOffices() {
         <Card>
             <CardContent className="py-12 text-center">
               <Building2 className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No offices registered yet</h3>
+              <h3 className="text-xl font-semibold mb-2">{t("empty.noOfficesYet")}</h3>
               <p className="text-muted-foreground mb-6">
-                Register your first Sanad office to start offering business services
+                {t("empty.noOfficesYetDesc")}
               </p>
               <Link href="/office-registration">
                 <Button>
                   <Plus className="w-4 h-4 mr-2" />
-                  Register Your First Office
+                  {t("actions.registerYourFirstOffice")}
                 </Button>
               </Link>
             </CardContent>

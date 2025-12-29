@@ -31,8 +31,10 @@ import { UserPlus, Edit, Trash2, Users, Circle } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function StaffManagement() {
+  const { t } = useLanguage();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<any>(null);
@@ -153,8 +155,8 @@ export default function StaffManagement() {
         <div className="flex items-center gap-3">
           <Users className="h-8 w-8 text-primary" />
           <div>
-            <h1 className="text-3xl font-bold">Staff Management</h1>
-            <p className="text-muted-foreground">Manage your office staff and their roles</p>
+            <h1 className="text-3xl font-bold">{t("pages.staffManagement")}</h1>
+            <p className="text-muted-foreground">{t("pages.staffManagementDesc")}</p>
           </div>
         </div>
         <Button onClick={() => setIsAddDialogOpen(true)}>
@@ -232,10 +234,10 @@ export default function StaffManagement() {
           ) : (
             <div className="text-center py-12">
               <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-              <p className="text-muted-foreground">No staff members yet</p>
+              <p className="text-muted-foreground">{t("empty.noStaffYet")}</p>
               <Button onClick={() => setIsAddDialogOpen(true)} className="mt-4">
                 <UserPlus className="h-4 w-4 mr-2" />
-                Add Your First Staff Member
+                {t("actions.addYourFirstStaffMember")}
               </Button>
             </div>
           )}
