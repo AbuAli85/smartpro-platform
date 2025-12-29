@@ -1,4 +1,4 @@
-import { and, desc, eq, like, or, sql, gte, lte, not, isNull, ne, lt } from "drizzle-orm";
+import { and, desc, eq, like, or, sql, gte, lte, not, isNull, ne, lt, asc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser,
@@ -115,7 +115,8 @@ export async function upsertUser(user: InsertUser): Promise<void> {
   }
 
   try {
-    const values: InsertUser = {
+    // Build values object with only the fields we're setting
+    const values: Partial<InsertUser> = {
       openId: user.openId,
     };
     const updateSet: Record<string, unknown> = {};
@@ -153,7 +154,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       updateSet.lastSignedIn = new Date();
     }
 
-    await db.insert(users).values(values).onDuplicateKeyUpdate({
+    await db.insert(users).values(values as InsertUser).onDuplicateKeyUpdate({
       set: updateSet,
     });
   } catch (error) {
@@ -6223,4 +6224,359 @@ export async function getRecentAuthEvents(criteria: {
   }
 
   return results;
+}
+
+// ============================================================================
+// LOGIN ANALYTICS
+// ============================================================================
+
+/**
+ * Get login analytics summary for a time range
+ */
+export async function getLoginAnalyticsSummary(
+  startDate: Date,
+  endDate: Date
+): Promise<{
+  totalLogins: number;
+  successfulLogins: number;
+  failedLogins: number;
+  uniqueUsers: number;
+  successRate: number;
+}> {
+  const db = await getDb();
+  if (!db) {
+    return {
+      totalLogins: 0,
+      successfulLogins: 0,
+      failedLogins: 0,
+      uniqueUsers: 0,
+      successRate: 0,
+    };
+  }
+
+  try {
+    // Get all login events in time range
+    const events = await db
+      .select()
+      .from(authAuditLog)
+      .where(
+        and(
+          or(
+            eq(authAuditLog.eventType, "login_success"),
+            eq(authAuditLog.eventType, "login_failure")
+          ),
+          gte(authAuditLog.createdAt, startDate),
+          lte(authAuditLog.createdAt, endDate)
+        )
+      );
+
+    const successfulLogins = events.filter((e) => e.eventType === "login_success").length;
+    const failedLogins = events.filter((e) => e.eventType === "login_failure").length;
+    const totalLogins = successfulLogins + failedLogins;
+    
+    // Count unique users (by openId)
+    const uniqueOpenIds = new Set(
+      events
+        .filter((e) => e.eventType === "login_success" && e.openId)
+        .map((e) => e.openId)
+    );
+    const uniqueUsers = uniqueOpenIds.size;
+
+    const successRate = totalLogins > 0 ? (successfulLogins / totalLogins) * 100 : 0;
+
+    return {
+      totalLogins,
+      successfulLogins,
+      failedLogins,
+      uniqueUsers,
+      successRate,
+    };
+  } catch (error) {
+    console.error("[Database] Failed to get login analytics summary:", error);
+    return {
+      totalLogins: 0,
+      successfulLogins: 0,
+      failedLogins: 0,
+      uniqueUsers: 0,
+      successRate: 0,
+    };
+  }
+}
+
+/**
+ * Get login trends over time
+ */
+export async function getLoginTrends(
+  startDate: Date,
+  endDate: Date,
+  groupBy: "hour" | "day" | "week"
+): Promise<Array<{
+  period: string;
+  successful: number;
+  failed: number;
+  total: number;
+}>> {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const events = await db
+      .select()
+      .from(authAuditLog)
+      .where(
+        and(
+          or(
+            eq(authAuditLog.eventType, "login_success"),
+            eq(authAuditLog.eventType, "login_failure")
+          ),
+          gte(authAuditLog.createdAt, startDate),
+          lte(authAuditLog.createdAt, endDate)
+        )
+      )
+      .orderBy(asc(authAuditLog.createdAt));
+
+    // Group events by time period
+    const grouped = new Map<string, { successful: number; failed: number }>();
+
+    events.forEach((event) => {
+      const date = new Date(event.createdAt);
+      let period: string;
+
+      switch (groupBy) {
+        case "hour":
+          period = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")} ${String(date.getHours()).padStart(2, "0")}:00`;
+          break;
+        case "day":
+          period = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+          break;
+        case "week":
+          const weekStart = new Date(date);
+          weekStart.setDate(date.getDate() - date.getDay());
+          period = `${weekStart.getFullYear()}-${String(weekStart.getMonth() + 1).padStart(2, "0")}-${String(weekStart.getDate()).padStart(2, "0")}`;
+          break;
+        default:
+          period = date.toISOString().split("T")[0];
+      }
+
+      if (!grouped.has(period)) {
+        grouped.set(period, { successful: 0, failed: 0 });
+      }
+
+      const counts = grouped.get(period)!;
+      if (event.eventType === "login_success") {
+        counts.successful++;
+      } else {
+        counts.failed++;
+      }
+    });
+
+    // Convert to array and sort
+    return Array.from(grouped.entries())
+      .map(([period, counts]) => ({
+        period,
+        successful: counts.successful,
+        failed: counts.failed,
+        total: counts.successful + counts.failed,
+      }))
+      .sort((a, b) => a.period.localeCompare(b.period));
+  } catch (error) {
+    console.error("[Database] Failed to get login trends:", error);
+    return [];
+  }
+}
+
+/**
+ * Get authentication methods distribution
+ */
+export async function getAuthMethodsDistribution(
+  startDate: Date,
+  endDate: Date
+): Promise<Array<{
+  method: string;
+  count: number;
+  percentage: number;
+}>> {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const events = await db
+      .select()
+      .from(authAuditLog)
+      .where(
+        and(
+          eq(authAuditLog.eventType, "login_success"),
+          gte(authAuditLog.createdAt, startDate),
+          lte(authAuditLog.createdAt, endDate)
+        )
+      );
+
+    // Count by login method from metadata
+    const methodCounts = new Map<string, number>();
+    let total = 0;
+
+    events.forEach((event) => {
+      const metadata = event.metadata as any;
+      const method = metadata?.loginMethod || "Unknown";
+      methodCounts.set(method, (methodCounts.get(method) || 0) + 1);
+      total++;
+    });
+
+    // Convert to array with percentages
+    return Array.from(methodCounts.entries())
+      .map(([method, count]) => ({
+        method,
+        count,
+        percentage: total > 0 ? (count / total) * 100 : 0,
+      }))
+      .sort((a, b) => b.count - a.count);
+  } catch (error) {
+    console.error("[Database] Failed to get auth methods distribution:", error);
+    return [];
+  }
+}
+
+/**
+ * Get geographic distribution of logins
+ */
+export async function getGeographicDistribution(
+  startDate: Date,
+  endDate: Date
+): Promise<Array<{
+  country: string;
+  city: string;
+  count: number;
+}>> {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    // Get successful logins from active sessions (which have location data)
+    const sessions = await db
+      .select()
+      .from(activeSessions)
+      .where(
+        and(
+          gte(activeSessions.createdAt, startDate),
+          lte(activeSessions.createdAt, endDate)
+        )
+      );
+
+    // Count by location
+    const locationCounts = new Map<string, { country: string; city: string; count: number }>();
+
+    sessions.forEach((session) => {
+      const location = session.location as any;
+      if (location) {
+        const country = location.country || "Unknown";
+        const city = location.city || "Unknown";
+        const key = `${country}|${city}`;
+
+        if (!locationCounts.has(key)) {
+          locationCounts.set(key, { country, city, count: 0 });
+        }
+        locationCounts.get(key)!.count++;
+      }
+    });
+
+    // Convert to array and sort by count
+    return Array.from(locationCounts.values()).sort((a, b) => b.count - a.count);
+  } catch (error) {
+    console.error("[Database] Failed to get geographic distribution:", error);
+    return [];
+  }
+}
+
+/**
+ * Get recent login attempts
+ */
+export async function getRecentLoginAttempts(
+  limit: number,
+  eventType: "all" | "login_success" | "login_failure"
+): Promise<Array<AuthAuditLog>> {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    let query = db
+      .select()
+      .from(authAuditLog)
+      .orderBy(desc(authAuditLog.createdAt))
+      .limit(limit);
+
+    if (eventType !== "all") {
+      query = query.where(eq(authAuditLog.eventType, eventType as any)) as any;
+    } else {
+      query = query.where(
+        or(
+          eq(authAuditLog.eventType, "login_success"),
+          eq(authAuditLog.eventType, "login_failure")
+        )
+      ) as any;
+    }
+
+    return await query;
+  } catch (error) {
+    console.error("[Database] Failed to get recent login attempts:", error);
+    return [];
+  }
+}
+
+/**
+ * Get hourly login patterns
+ */
+export async function getHourlyLoginPatterns(
+  startDate: Date,
+  endDate: Date
+): Promise<Array<{
+  hour: number;
+  count: number;
+  successRate: number;
+}>> {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const events = await db
+      .select()
+      .from(authAuditLog)
+      .where(
+        and(
+          or(
+            eq(authAuditLog.eventType, "login_success"),
+            eq(authAuditLog.eventType, "login_failure")
+          ),
+          gte(authAuditLog.createdAt, startDate),
+          lte(authAuditLog.createdAt, endDate)
+        )
+      );
+
+    // Group by hour of day (0-23)
+    const hourlyStats = new Array(24).fill(null).map(() => ({
+      successful: 0,
+      failed: 0,
+    }));
+
+    events.forEach((event) => {
+      const hour = new Date(event.createdAt).getHours();
+      if (event.eventType === "login_success") {
+        hourlyStats[hour].successful++;
+      } else {
+        hourlyStats[hour].failed++;
+      }
+    });
+
+    // Convert to result format
+    return hourlyStats.map((stats, hour) => {
+      const total = stats.successful + stats.failed;
+      return {
+        hour,
+        count: total,
+        successRate: total > 0 ? (stats.successful / total) * 100 : 0,
+      };
+    });
+  } catch (error) {
+    console.error("[Database] Failed to get hourly login patterns:", error);
+    return [];
+  }
 }

@@ -47,6 +47,7 @@ import TranslatorTraining from "./pages/TranslatorTraining";
 import TranslationManagement from "./pages/TranslationManagement";
 import NotificationPreferences from "./pages/NotificationPreferences";
 import LanguageSettings from "./pages/LanguageSettings";
+import AuthError from "./pages/AuthError";
 import RequestServicePage from "./pages/RequestServicePage";
 import RequestServiceWizard from "./pages/RequestServiceWizard";
 import RequestSuccessPage from "./pages/RequestSuccessPage";
@@ -71,6 +72,7 @@ import { RequestPasswordReset } from "./pages/RequestPasswordReset";
 import { ResetPassword } from "./pages/ResetPassword";
 import { SessionManagement } from "./pages/SessionManagement";
 import SecurityDashboard from "./pages/admin/SecurityDashboard";
+import LoginAnalytics from "./pages/admin/LoginAnalytics";
 import { useNotifications } from "./hooks/useNotifications";
 import { useMarketplaceNotifications } from "./hooks/useMarketplaceNotifications";
 import { SocketProvider } from "./contexts/SocketContext";
@@ -182,6 +184,11 @@ function Router() {
           <SecurityDashboard />
         </ProtectedRoute>
       </Route>
+      <Route path="/admin/login-analytics">
+        <ProtectedRoute requirePermission="canAccessAdminPanel">
+          <LoginAnalytics />
+        </ProtectedRoute>
+      </Route>
       
       {/* Office Dashboard */}
       <Route path="/office-dashboard">
@@ -229,6 +236,7 @@ function Router() {
       <Route path="/profile" component={Profile} />
       <Route path="/notifications" component={NotificationPreferences} />
       <Route path="/language-settings" component={LanguageSettings} />
+      <Route path="/auth-error" component={AuthError} />
       <Route path="/security/mfa" component={MFASettings} />
       
       {/* Account Recovery */}

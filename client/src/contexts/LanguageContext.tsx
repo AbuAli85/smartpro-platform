@@ -54,6 +54,8 @@ export const translations: Record<Language, Record<string, string>> = {
     "nav.reviewQueue": "Review Queue",
     "nav.batchProcessing": "Batch Processing",
     "nav.translatorTraining": "Translator Training",
+    "nav.securityDashboard": "Security Dashboard",
+    "nav.loginAnalytics": "Login Analytics",
     
     // Sidebar section headers
     "sidebar.sectionMain": "MAIN",
@@ -961,6 +963,8 @@ export const translations: Record<Language, Record<string, string>> = {
     "nav.reviewQueue": "قائمة المراجعة",
     "nav.batchProcessing": "المعالجة الدفعية",
     "nav.translatorTraining": "تدريب المترجمين",
+    "nav.securityDashboard": "لوحة الأمان",
+    "nav.loginAnalytics": "تحليلات تسجيل الدخول",
     
     // Sidebar section headers
     "sidebar.sectionMain": "الرئيسية",

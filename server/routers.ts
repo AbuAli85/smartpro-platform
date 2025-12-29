@@ -48,6 +48,7 @@ import { sessionManagementRouter } from "./routers/sessionManagement";
 import { securityDashboardRouter } from "./routers/securityDashboard";
 import { documentUploadRouter } from "./routers/documentUpload";
 import { requestMessagingRouter } from "./routers/requestMessaging";
+import { loginAnalyticsRouter } from "./routers/loginAnalytics";
 
 export const appRouter = router({
   system: systemRouter,
@@ -170,6 +171,7 @@ export const appRouter = router({
   accountRecovery: accountRecoveryRouter,
   sessionManagement: sessionManagementRouter,
   securityDashboard: securityDashboardRouter,
+  loginAnalytics: loginAnalyticsRouter,
 });
 
 export type AppRouter = typeof appRouter;

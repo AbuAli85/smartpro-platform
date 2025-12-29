@@ -146,11 +146,20 @@ export function registerOAuthRoutes(app: Express) {
         console.error("[OAuth] Failed to log auth event:", logError);
       }
       
-      res.status(500).json({ 
-        error: "OAuth callback failed",
-        message: error instanceof Error ? error.message : "Unknown error",
-        details: process.env.NODE_ENV === "development" ? (error instanceof Error ? error.stack : undefined) : undefined
-      });
+      // Redirect to error page with error details
+      const errorType = error instanceof Error && error.message.includes("token") 
+        ? "token_exchange_failed" 
+        : error instanceof Error && error.message.includes("user") 
+        ? "user_info_failed" 
+        : error instanceof Error && error.message.includes("network") 
+        ? "network_error" 
+        : "oauth_failed";
+      
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      const redirectUrl = `/auth-error?type=${encodeURIComponent(errorType)}&message=${encodeURIComponent(errorMessage)}`;
+      
+      res.redirect(302, redirectUrl);
+      return;
     }
   });
 }

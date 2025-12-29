@@ -148,6 +148,7 @@ export function Sidebar({ className }: SidebarProps) {
         { name: t("nav.officeVerification"), href: "/admin/office-verification", icon: Building2, requiresAuth: true, requirePermission: "canVerifyOffices" as const },
         { name: t("nav.adminAnalytics"), href: "/admin/analytics", icon: BarChart3, requiresAuth: true, requirePermission: "canViewSystemAnalytics" as const },
         { name: t("nav.securityDashboard"), href: "/admin/security-dashboard", icon: Shield, requiresAuth: true, requirePermission: "canAccessAdminPanel" as const },
+        { name: t("nav.loginAnalytics"), href: "/admin/login-analytics", icon: Activity, requiresAuth: true, requirePermission: "canAccessAdminPanel" as const },
         { name: t("nav.regionalStatistics"), href: "/admin/regional-statistics", icon: MapPin, requiresAuth: true, requirePermission: "canViewSystemAnalytics" as const },
         { name: "Translation Management", href: "/admin/translation-management", icon: Languages, requiresAuth: true, requirePermission: "canManageTranslations" as const },
         { name: t("nav.translationRequests"), href: "/admin/translation-requests", icon: MessageSquareText, requiresAuth: true, requirePermission: "canManageTranslations" as const },
