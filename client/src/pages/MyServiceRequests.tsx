@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, Package, Calendar, DollarSign, Clock, Building2, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { Loader2, Package, Calendar, DollarSign, Clock, Building2, CheckCircle, XCircle, AlertCircle, FileText, TrendingUp, Users, Star } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -60,6 +60,14 @@ export default function MyServiceRequests() {
     );
   }
 
+  // Calculate statistics
+  const stats = {
+    total: requests?.length || 0,
+    active: requests?.filter((r: any) => ['open', 'bidding', 'awarded', 'in_progress'].includes(r.status)).length || 0,
+    completed: requests?.filter((r: any) => r.status === 'completed').length || 0,
+    totalBids: requests?.reduce((sum: number, r: any) => sum + (r.bids?.length || 0), 0) || 0,
+  };
+
   if (!requests || requests.length === 0) {
     return (
       <div className="container mx-auto py-8">
@@ -82,6 +90,53 @@ export default function MyServiceRequests() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">{t("nav.myServiceRequests")}</h1>
         <p className="text-gray-600">{t("marketplace.myRequests")}</p>
+      </div>
+
+      {/* Statistics Dashboard */}
+      <div className="grid gap-4 md:grid-cols-4 mb-8">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.total}</div>
+            <p className="text-xs text-muted-foreground mt-1">All time</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Requests</CardTitle>
+            <Clock className="h-4 w-4 text-blue-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">{stats.active}</div>
+            <p className="text-xs text-muted-foreground mt-1">In progress</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Completed</CardTitle>
+            <CheckCircle className="h-4 w-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
+            <p className="text-xs text-muted-foreground mt-1">Successfully finished</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Bids</CardTitle>
+            <Users className="h-4 w-4 text-purple-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-purple-600">{stats.totalBids}</div>
+            <p className="text-xs text-muted-foreground mt-1">From all offices</p>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-6">
