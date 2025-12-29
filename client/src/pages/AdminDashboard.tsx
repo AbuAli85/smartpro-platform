@@ -24,8 +24,10 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import { exportToCSV, exportToExcel, exportMultiSheetExcel } from "@/lib/exportUtils";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function AdminDashboard() {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const [, setLocation] = useLocation();
 
@@ -43,9 +45,9 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="bg-gradient-to-r from-[#003366] to-[#004488] text-white py-12">
         <div className="container">
-          <h1 className="text-4xl font-bold mb-2">MOCIP Admin Dashboard</h1>
+          <h1 className="text-4xl font-bold mb-2">{t("admin.mocipTitle")}</h1>
           <p className="text-xl text-blue-100">
-            Ministry oversight and platform management
+            {t("admin.mocipSubtitle")}
           </p>
         </div>
       </div>
@@ -56,7 +58,7 @@ export default function AdminDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">
-                Total Offices
+                {t("admin.totalOffices")}
               </CardTitle>
               <Building2 className="h-5 w-5 text-[#003366]" />
             </CardHeader>
@@ -71,14 +73,14 @@ export default function AdminDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">
-                Total Users
+                {t("admin.totalUsers")}
               </CardTitle>
               <Users className="h-5 w-5 text-[#003366]" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{stats?.totalUsers || 0}</div>
               <p className="text-xs text-gray-500 mt-1">
-                Registered users
+                {t("admin.registeredUsers")}
               </p>
             </CardContent>
           </Card>
@@ -86,7 +88,7 @@ export default function AdminDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">
-                Documents Generated
+                {t("admin.documentsGenerated")}
               </CardTitle>
               <FileText className="h-5 w-5 text-[#003366]" />
             </CardHeader>
@@ -101,14 +103,14 @@ export default function AdminDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">
-                Total Bookings
+                {t("admin.totalBookings")}
               </CardTitle>
               <Calendar className="h-5 w-5 text-[#003366]" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{stats?.totalBookings || 0}</div>
               <p className="text-xs text-gray-500 mt-1">
-                All time bookings
+                {t("admin.allTimeBookings")}
               </p>
             </CardContent>
           </Card>
@@ -117,19 +119,19 @@ export default function AdminDashboard() {
         {/* Main Content */}
         <Tabs defaultValue="verification" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="verification">Office Verification</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="compliance">Compliance</TabsTrigger>
-            <TabsTrigger value="users">User Management</TabsTrigger>
+            <TabsTrigger value="verification">{t("admin.tabs.officeVerification")}</TabsTrigger>
+            <TabsTrigger value="analytics">{t("admin.tabs.analytics")}</TabsTrigger>
+            <TabsTrigger value="compliance">{t("admin.tabs.compliance")}</TabsTrigger>
+            <TabsTrigger value="users">{t("admin.tabs.userManagement")}</TabsTrigger>
           </TabsList>
 
           {/* Office Verification Tab */}
           <TabsContent value="verification" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Pending Office Verifications</CardTitle>
+                <CardTitle>{t("admin.pendingOfficeVerifications")}</CardTitle>
                 <CardDescription>
-                  Review and approve new Sanad office registrations
+                  {t("admin.pendingOfficeVerificationsDesc")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -176,9 +178,9 @@ export default function AdminDashboard() {
                   <div className="text-center py-12">
                     <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                      All Caught Up!
+                      {t("admin.allCaughtUp")}
                     </h3>
-                    <p className="text-gray-500">No pending office verifications</p>
+                    <p className="text-gray-500">{t("admin.noPendingVerifications")}</p>
                   </div>
                 )}
               </CardContent>

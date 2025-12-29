@@ -28,8 +28,10 @@ import {
 } from "lucide-react";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import DocumentPreviewModal from "@/components/DocumentPreviewModal";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 function OfficeVerificationPage() {
+  const { t } = useLanguage();
   const [selectedOffice, setSelectedOffice] = useState<any>(null);
   const [isApproveDialogOpen, setIsApproveDialogOpen] = useState(false);
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
@@ -152,16 +154,16 @@ function OfficeVerificationPage() {
   return (
     <div className="container py-8 max-w-7xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Office Verification</h1>
+        <h1 className="text-3xl font-bold mb-2">{t("admin.officeVerification")}</h1>
         <p className="text-muted-foreground">
-          Review and verify pending office registrations
+          {t("admin.officeVerificationSubtitle")}
         </p>
       </div>
 
       {isLoading ? (
         <Card>
           <CardContent className="py-12 text-center text-muted-foreground">
-            Loading pending registrations...
+            {t("admin.loadingPendingRegistrations")}
           </CardContent>
         </Card>
       ) : !pendingOffices || pendingOffices.length === 0 ? (

@@ -31,6 +31,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Search, Shield, User, Building2, Briefcase, Users, Crown } from "lucide-react";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const ROLE_ICONS = {
   user: User,
@@ -63,6 +64,7 @@ const ROLE_LABELS = {
 };
 
 function UserManagementPage() {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [selectedUser, setSelectedUser] = useState<any>(null);
@@ -113,17 +115,17 @@ function UserManagementPage() {
   return (
     <div className="container py-8 max-w-7xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">User Management</h1>
+        <h1 className="text-3xl font-bold mb-2">{t("admin.userManagement")}</h1>
         <p className="text-muted-foreground">
-          Manage user roles and permissions across the platform
+          {t("admin.userManagementSubtitle")}
         </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>All Users</CardTitle>
+          <CardTitle>{t("admin.allUsers")}</CardTitle>
           <CardDescription>
-            Search and filter users, update roles and permissions
+            {t("admin.allUsersDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -132,7 +134,7 @@ function UserManagementPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search by name, email, or ID..."
+                placeholder={t("admin.searchUsers")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -143,7 +145,7 @@ function UserManagementPage() {
                 <SelectValue placeholder="Filter by role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Roles</SelectItem>
+                <SelectItem value="all">{t("admin.allRoles")}</SelectItem>
                 <SelectItem value="user">User</SelectItem>
                 <SelectItem value="admin">Admin</SelectItem>
                 <SelectItem value="sanad_owner">Sanad Owner</SelectItem>
@@ -158,7 +160,7 @@ function UserManagementPage() {
           {/* Users Table */}
           {isLoading ? (
             <div className="text-center py-8 text-muted-foreground">
-              Loading users...
+              {t("admin.loadingUsers")}
             </div>
           ) : filteredUsers && filteredUsers.length > 0 ? (
             <div className="border rounded-lg overflow-hidden">

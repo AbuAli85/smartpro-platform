@@ -211,3 +211,32 @@
 - [x] Update CannedResponses.tsx with translation keys
 - [x] Update StaffManagement.tsx with translation keys
 - [x] Update StaffPerformance.tsx with translation keys
+
+## 🔴 Admin Pages Translation Fixes (Dec 29, 2025)
+
+### Admin Dashboard (/admin)
+- [x] Translate "MOCIP Admin Dashboard" page title
+- [x] Translate "Ministry oversight and platform management" subtitle
+- [x] Translate stat card labels (Total Bookings, Documents Generated, Total Users, Total Offices)
+- [x] Translate stat descriptions (All time bookings, etc.)
+- [x] Translate tab labels (Office Verification, Analytics, Compliance, User Management)
+- [x] Translate "Pending Office Verifications" section
+- [x] Translate empty state "All Caught Up!" and "No pending office verifications"
+
+### User Management (/admin/users)
+- [x] Translate "User Management" page title
+- [x] Translate "Manage user roles and permissions" subtitle
+- [x] Translate "All Users" section title
+- [x] Translate search placeholder "Search by name, email, or ID..."
+- [x] Translate "All Roles" filter
+- [x] Translate "Loading users..." loading state
+
+### Office Verification (/admin/office-verification)
+- [x] Translate "Office Verification" page title
+- [x] Translate "Review and verify pending office registrations" subtitle
+- [x] Translate "Loading pending registrations..." loading state
+
+### Component Updates
+- [x] Update AdminDashboard.tsx with translation keys
+- [x] Update UserManagement.tsx with translation keys
+- [x] Update OfficeVerification.tsx with translation keys
