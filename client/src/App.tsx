@@ -63,6 +63,7 @@ import UserManagement from "./pages/UserManagement";
 import OfficeVerification from "./pages/OfficeVerification";
 import OnboardingWizard from "./pages/OnboardingWizard";
 import OfficeAnalytics from "./pages/OfficeAnalytics";
+import OfficeRequestMessages from "./pages/OfficeRequestMessages";
 import AuditLogs from "./pages/AuditLogs";
 import MFASettings from "./pages/MFASettings";
 import { VerifyEmail } from "./pages/VerifyEmail";
@@ -216,6 +217,11 @@ function Router() {
       <Route path="/bundle-recommendations">
         <ProtectedRoute requirePermission="canManageOffice">
           <BundleRecommendations />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/office-messages">
+        <ProtectedRoute requirePermission="canManageOffice">
+          <OfficeRequestMessages />
         </ProtectedRoute>
       </Route>
       

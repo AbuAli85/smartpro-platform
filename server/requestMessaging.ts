@@ -109,6 +109,42 @@ export async function getLatestMessage(requestId: number) {
 }
 
 /**
+ * Get unread message counts for all user's requests
+ * Returns a map of requestId -> unread count
+ */
+export async function getUnreadCountsForUserRequests(userId: number, requestIds: number[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  if (requestIds.length === 0) {
+    return {};
+  }
+  
+  // Get all unread messages for these requests
+  const messages = await db
+    .select()
+    .from(requestMessages)
+    .where(
+      and(
+        eq(requestMessages.isRead, false)
+      )
+    );
+  
+  // Filter to only messages in the user's requests and not sent by them
+  const relevantMessages = messages.filter((m: any) => 
+    requestIds.includes(m.requestId) && m.senderId !== userId
+  );
+  
+  // Count by requestId
+  const counts: Record<number, number> = {};
+  for (const message of relevantMessages) {
+    counts[message.requestId] = (counts[message.requestId] || 0) + 1;
+  }
+  
+  return counts;
+}
+
+/**
  * Delete a message (soft delete - just mark as deleted)
  */
 export async function deleteMessage(messageId: number) {

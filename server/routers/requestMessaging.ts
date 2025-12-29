@@ -11,6 +11,7 @@ import {
   markMessageAsRead,
   markAllMessagesAsRead,
   getUnreadMessageCount,
+  getUnreadCountsForUserRequests,
   getLatestMessage,
   deleteMessage,
 } from "../requestMessaging";
@@ -89,6 +90,17 @@ export const requestMessagingRouter = router({
     .query(async ({ ctx, input }) => {
       const count = await getUnreadMessageCount(input.requestId, ctx.user.id);
       return { count };
+    }),
+
+  /**
+   * Get unread message counts for all user's requests
+   * Returns a map of requestId -> unread count
+   */
+  getAllUnreadCounts: protectedProcedure
+    .input(z.object({ requestIds: z.array(z.number()) }))
+    .query(async ({ ctx, input }) => {
+      const counts = await getUnreadCountsForUserRequests(ctx.user.id, input.requestIds);
+      return counts;
     }),
 
   /**

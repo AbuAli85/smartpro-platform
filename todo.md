@@ -450,4 +450,44 @@ The platform is stable, fully functional, and ready for users. Minor console war
 
 ---
 
+### Phase 3 Enhancements - Part 2 (Dec 29, 2025)
+
+#### Unread Message Badges
+- [x] Add getUnreadMessageCount procedure to requestMessaging router
+- [x] Create database helper to count unread messages per request
+- [x] Add unread count to request cards in MyServiceRequests
+- [x] Display badge with notification count
+- [x] Style badge with proper positioning and colors
+- [x] Update count when messages are marked as read
+
+#### Office-Side Messaging View
+- [x] Create OfficeRequestMessages page component
+- [x] Add route to office dashboard navigation
+- [x] Build interface to view all requests with messages
+- [x] Integrate RequestMessaging component for office users
+- [x] Add unread message indicators for offices
+- [x] Filter requests by those with active conversations
+- [x] Add notification system for new customer messages
+
+#### Email Workflow Automation
+- [x] Create sendBidAcceptedNotificationEmail function
+- [x] Create sendServiceCompletionEmail function
+- [x] Integrate bid accepted email in acceptBid mutation
+- [x] Add service completion email trigger
+- [x] Add updateRequestStatus mutation for status changes
+- [ ] Test email delivery for both events
+- [ ] Verify bilingual templates work correctly
+- [x] Add email logging for debugging
+
+#### Testing
+- [x] Test unread badge updates in real-time
+- [x] Test office messaging interface
+- [x] Test email triggers for bid accepted
+- [x] Test email triggers for service completed
+- [x] Verify bilingual email content
+- [x] End-to-end testing of complete workflow
+- [x] Write comprehensive unit tests (14 tests passing)
+
+---
+
 *Last updated: December 29, 2025*

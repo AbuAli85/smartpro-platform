@@ -18,6 +18,7 @@ import {
   Gift,
   BarChart3,
   MessageCircle,
+  MessageSquare,
   TrendingUp,
   MessageSquareText,
   MapPin,
@@ -134,6 +135,7 @@ export function Sidebar({ className }: SidebarProps) {
         { name: t("nav.staffManagement"), href: "/owner/staff", icon: Users, requiresAuth: true, requirePermission: "canManageStaff" as const },
         { name: t("nav.staffPerformance"), href: "/owner/staff-performance", icon: Activity, requiresAuth: true, requirePermission: "canManageStaff" as const },
         { name: t("nav.followUpSettings"), href: "/owner/follow-up-settings", icon: Clock, requiresAuth: true, requirePermission: "canManageOffice" as const },
+        { name: t("nav.officeMessages") || "Request Messages", href: "/office-messages", icon: MessageSquare, requiresAuth: true, requirePermission: "canManageOffice" as const },
       ],
     },
     {

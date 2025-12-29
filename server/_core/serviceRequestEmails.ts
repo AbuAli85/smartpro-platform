@@ -565,3 +565,394 @@ export async function sendNewRequestNotificationToOffice(params: {
     return { success: false, error };
   }
 }
+
+/**
+ * Send bid accepted notification email to office (bilingual)
+ */
+export async function sendBidAcceptedNotificationEmail(params: {
+  to: string;
+  officeName: string;
+  trackingNumber: string;
+  serviceTitle: string;
+  customerName: string;
+  bidAmount: string;
+  language: 'en' | 'ar';
+}) {
+  const { to, officeName, trackingNumber, serviceTitle, customerName, bidAmount, language } = params;
+
+  const isArabic = language === 'ar';
+
+  const subject = isArabic
+    ? `🎉 تم قبول عرضك - ${trackingNumber}`
+    : `🎉 Your Bid Was Accepted - ${trackingNumber}`;
+
+  const html = isArabic ? `
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; direction: rtl;">
+  <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 30px; text-align: center;">
+      <h1 style="color: white; margin: 0; font-size: 28px;">🎉 تهانينا! تم قبول عرضك</h1>
+      <p style="color: #e0e0e0; margin: 10px 0 0 0; font-size: 16px;">رقم التتبع: <strong style="color: #FFD700;">${trackingNumber}</strong></p>
+    </div>
+
+    <!-- Content -->
+    <div style="padding: 30px;">
+      <p style="font-size: 16px; color: #333; margin: 0 0 20px 0;">عزيزي/عزيزتي <strong>${officeName}</strong>،</p>
+      
+      <p style="font-size: 15px; color: #555; line-height: 1.6; margin: 0 0 20px 0;">
+        نبشرك بأن العميل <strong>${customerName}</strong> قد قبل عرضك لتنفيذ الخدمة المطلوبة. يرجى التواصل مع العميل لبدء العمل.
+      </p>
+
+      <!-- Bid Details Card -->
+      <div style="background-color: #f0fdf4; border-right: 4px solid #10b981; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h2 style="color: #10b981; font-size: 18px; margin: 0 0 15px 0;">📋 تفاصيل العرض المقبول</h2>
+        
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 8px 0; color: #666; font-size: 14px; width: 40%;">عنوان الخدمة:</td>
+            <td style="padding: 8px 0; color: #333; font-size: 14px; font-weight: 600;">${serviceTitle}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; color: #666; font-size: 14px;">اسم العميل:</td>
+            <td style="padding: 8px 0; color: #333; font-size: 14px; font-weight: 600;">${customerName}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; color: #666; font-size: 14px;">قيمة العرض:</td>
+            <td style="padding: 8px 0; color: #10b981; font-size: 16px; font-weight: 700;">${bidAmount} ر.ع.</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Next Steps -->
+      <div style="background-color: #eff6ff; border-radius: 8px; padding: 20px; margin: 20px 0;">
+        <h3 style="color: #003366; font-size: 16px; margin: 0 0 15px 0;">📝 الخطوات التالية</h3>
+        <ul style="margin: 0; padding-right: 20px; color: #555; line-height: 1.8;">
+          <li>تواصل مع العميل لتأكيد تفاصيل الخدمة</li>
+          <li>ابدأ العمل على الخدمة وفقاً للمواصفات المتفق عليها</li>
+          <li>حافظ على تواصل منتظم مع العميل عبر منصة SmartPro</li>
+          <li>قم بتحديث حالة الطلب عند إكمال الخدمة</li>
+        </ul>
+      </div>
+
+      <!-- CTA Button -->
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="https://sanad.thesmartpro.io/office-messages" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; text-decoration: none; padding: 15px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 10px rgba(16,185,129,0.3);">
+          💬 تواصل مع العميل
+        </a>
+      </div>
+
+      <p style="font-size: 14px; color: #666; line-height: 1.6; margin: 20px 0 0 0;">
+        شكراً لكونك جزءاً من منصة SmartPro. نتمنى لك التوفيق في تنفيذ الخدمة!
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+      <p style="margin: 0; color: #666; font-size: 12px;">
+        SmartPro - البنية التحتية الرقمية الوطنية لخدمات الأعمال
+      </p>
+      <p style="margin: 10px 0 0 0; color: #999; font-size: 11px;">
+        هذا البريد الإلكتروني تم إرساله تلقائياً، يرجى عدم الرد عليه مباشرة.
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+  ` : `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px;">
+  <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 30px; text-align: center;">
+      <h1 style="color: white; margin: 0; font-size: 28px;">🎉 Congratulations! Your Bid Was Accepted</h1>
+      <p style="color: #e0e0e0; margin: 10px 0 0 0; font-size: 16px;">Tracking Number: <strong style="color: #FFD700;">${trackingNumber}</strong></p>
+    </div>
+
+    <!-- Content -->
+    <div style="padding: 30px;">
+      <p style="font-size: 16px; color: #333; margin: 0 0 20px 0;">Dear <strong>${officeName}</strong>,</p>
+      
+      <p style="font-size: 15px; color: #555; line-height: 1.6; margin: 0 0 20px 0;">
+        Great news! Customer <strong>${customerName}</strong> has accepted your bid for the requested service. Please contact the customer to begin work.
+      </p>
+
+      <!-- Bid Details Card -->
+      <div style="background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h2 style="color: #10b981; font-size: 18px; margin: 0 0 15px 0;">📋 Accepted Bid Details</h2>
+        
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 8px 0; color: #666; font-size: 14px; width: 40%;">Service Title:</td>
+            <td style="padding: 8px 0; color: #333; font-size: 14px; font-weight: 600;">${serviceTitle}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; color: #666; font-size: 14px;">Customer Name:</td>
+            <td style="padding: 8px 0; color: #333; font-size: 14px; font-weight: 600;">${customerName}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; color: #666; font-size: 14px;">Bid Amount:</td>
+            <td style="padding: 8px 0; color: #10b981; font-size: 16px; font-weight: 700;">${bidAmount} OMR</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Next Steps -->
+      <div style="background-color: #eff6ff; border-radius: 8px; padding: 20px; margin: 20px 0;">
+        <h3 style="color: #003366; font-size: 16px; margin: 0 0 15px 0;">📝 Next Steps</h3>
+        <ul style="margin: 0; padding-left: 20px; color: #555; line-height: 1.8;">
+          <li>Contact the customer to confirm service details</li>
+          <li>Begin work on the service according to agreed specifications</li>
+          <li>Maintain regular communication with the customer via SmartPro platform</li>
+          <li>Update the request status when the service is completed</li>
+        </ul>
+      </div>
+
+      <!-- CTA Button -->
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="https://sanad.thesmartpro.io/office-messages" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; text-decoration: none; padding: 15px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 10px rgba(16,185,129,0.3);">
+          💬 Contact Customer
+        </a>
+      </div>
+
+      <p style="font-size: 14px; color: #666; line-height: 1.6; margin: 20px 0 0 0;">
+        Thank you for being part of the SmartPro platform. We wish you success in delivering the service!
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+      <p style="margin: 0; color: #666; font-size: 12px;">
+        SmartPro - National Digital Infrastructure for Business Services
+      </p>
+      <p style="margin: 10px 0 0 0; color: #999; font-size: 11px;">
+        This email was sent automatically, please do not reply directly.
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+
+  try {
+    const result = await resend.emails.send({
+      from: FROM_EMAIL,
+      to,
+      subject,
+      html,
+    });
+
+    console.log(`✅ Bid accepted notification sent to office: ${officeName}`);
+    return { success: true, messageId: result.data?.id };
+  } catch (error) {
+    console.error('❌ Failed to send bid accepted notification to office:', error);
+    return { success: false, error };
+  }
+}
+
+/**
+ * Send service completion notification email to customer (bilingual)
+ */
+export async function sendServiceCompletionEmail(params: {
+  to: string;
+  customerName: string;
+  trackingNumber: string;
+  serviceTitle: string;
+  officeName: string;
+  language: 'en' | 'ar';
+}) {
+  const { to, customerName, trackingNumber, serviceTitle, officeName, language } = params;
+
+  const isArabic = language === 'ar';
+
+  const subject = isArabic
+    ? `✅ تم إكمال الخدمة - ${trackingNumber}`
+    : `✅ Service Completed - ${trackingNumber}`;
+
+  const html = isArabic ? `
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; direction: rtl;">
+  <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); padding: 30px; text-align: center;">
+      <h1 style="color: white; margin: 0; font-size: 28px;">✅ تم إكمال الخدمة بنجاح</h1>
+      <p style="color: #e0e0e0; margin: 10px 0 0 0; font-size: 16px;">رقم التتبع: <strong style="color: #FFD700;">${trackingNumber}</strong></p>
+    </div>
+
+    <!-- Content -->
+    <div style="padding: 30px;">
+      <p style="font-size: 16px; color: #333; margin: 0 0 20px 0;">عزيزي/عزيزتي <strong>${customerName}</strong>،</p>
+      
+      <p style="font-size: 15px; color: #555; line-height: 1.6; margin: 0 0 20px 0;">
+        نود إعلامك بأن مكتب <strong>${officeName}</strong> قد أكمل تنفيذ الخدمة المطلوبة. نأمل أن تكون راضياً عن الخدمة المقدمة.
+      </p>
+
+      <!-- Service Details Card -->
+      <div style="background-color: #faf5ff; border-right: 4px solid #8b5cf6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h2 style="color: #8b5cf6; font-size: 18px; margin: 0 0 15px 0;">📋 تفاصيل الخدمة</h2>
+        
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 8px 0; color: #666; font-size: 14px; width: 40%;">عنوان الخدمة:</td>
+            <td style="padding: 8px 0; color: #333; font-size: 14px; font-weight: 600;">${serviceTitle}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; color: #666; font-size: 14px;">مقدم الخدمة:</td>
+            <td style="padding: 8px 0; color: #333; font-size: 14px; font-weight: 600;">${officeName}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; color: #666; font-size: 14px;">الحالة:</td>
+            <td style="padding: 8px 0; color: #10b981; font-size: 14px; font-weight: 600;">✅ مكتملة</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Review Request -->
+      <div style="background-color: #fef3c7; border-radius: 8px; padding: 20px; margin: 20px 0;">
+        <h3 style="color: #d97706; font-size: 16px; margin: 0 0 15px 0;">⭐ شارك تجربتك</h3>
+        <p style="margin: 0; color: #555; line-height: 1.6; font-size: 14px;">
+          رأيك يهمنا! يرجى تقييم الخدمة المقدمة لمساعدة الآخرين في اتخاذ قرارات مستنيرة وتحسين جودة الخدمات على المنصة.
+        </p>
+      </div>
+
+      <!-- CTA Buttons -->
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="https://sanad.thesmartpro.io/my-service-requests" style="display: inline-block; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; text-decoration: none; padding: 15px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 10px rgba(139,92,246,0.3); margin: 5px;">
+          ⭐ تقييم الخدمة
+        </a>
+        <a href="https://sanad.thesmartpro.io/my-service-requests" style="display: inline-block; background: linear-gradient(135deg, #003366 0%, #0055aa 100%); color: white; text-decoration: none; padding: 15px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 10px rgba(0,51,102,0.3); margin: 5px;">
+          📊 عرض التفاصيل
+        </a>
+      </div>
+
+      <p style="font-size: 14px; color: #666; line-height: 1.6; margin: 20px 0 0 0;">
+        شكراً لاستخدامك منصة SmartPro. نتطلع لخدمتك مجدداً!
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+      <p style="margin: 0; color: #666; font-size: 12px;">
+        SmartPro - البنية التحتية الرقمية الوطنية لخدمات الأعمال
+      </p>
+      <p style="margin: 10px 0 0 0; color: #999; font-size: 11px;">
+        هذا البريد الإلكتروني تم إرساله تلقائياً، يرجى عدم الرد عليه مباشرة.
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+  ` : `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px;">
+  <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); padding: 30px; text-align: center;">
+      <h1 style="color: white; margin: 0; font-size: 28px;">✅ Service Completed Successfully</h1>
+      <p style="color: #e0e0e0; margin: 10px 0 0 0; font-size: 16px;">Tracking Number: <strong style="color: #FFD700;">${trackingNumber}</strong></p>
+    </div>
+
+    <!-- Content -->
+    <div style="padding: 30px;">
+      <p style="font-size: 16px; color: #333; margin: 0 0 20px 0;">Dear <strong>${customerName}</strong>,</p>
+      
+      <p style="font-size: 15px; color: #555; line-height: 1.6; margin: 0 0 20px 0;">
+        We're pleased to inform you that <strong>${officeName}</strong> has completed your requested service. We hope you're satisfied with the service provided.
+      </p>
+
+      <!-- Service Details Card -->
+      <div style="background-color: #faf5ff; border-left: 4px solid #8b5cf6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h2 style="color: #8b5cf6; font-size: 18px; margin: 0 0 15px 0;">📋 Service Details</h2>
+        
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 8px 0; color: #666; font-size: 14px; width: 40%;">Service Title:</td>
+            <td style="padding: 8px 0; color: #333; font-size: 14px; font-weight: 600;">${serviceTitle}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; color: #666; font-size: 14px;">Service Provider:</td>
+            <td style="padding: 8px 0; color: #333; font-size: 14px; font-weight: 600;">${officeName}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; color: #666; font-size: 14px;">Status:</td>
+            <td style="padding: 8px 0; color: #10b981; font-size: 14px; font-weight: 600;">✅ Completed</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Review Request -->
+      <div style="background-color: #fef3c7; border-radius: 8px; padding: 20px; margin: 20px 0;">
+        <h3 style="color: #d97706; font-size: 16px; margin: 0 0 15px 0;">⭐ Share Your Experience</h3>
+        <p style="margin: 0; color: #555; line-height: 1.6; font-size: 14px;">
+          Your feedback matters! Please rate the service provided to help others make informed decisions and improve service quality on the platform.
+        </p>
+      </div>
+
+      <!-- CTA Buttons -->
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="https://sanad.thesmartpro.io/my-service-requests" style="display: inline-block; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; text-decoration: none; padding: 15px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 10px rgba(139,92,246,0.3); margin: 5px;">
+          ⭐ Rate Service
+        </a>
+        <a href="https://sanad.thesmartpro.io/my-service-requests" style="display: inline-block; background: linear-gradient(135deg, #003366 0%, #0055aa 100%); color: white; text-decoration: none; padding: 15px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 10px rgba(0,51,102,0.3); margin: 5px;">
+          📊 View Details
+        </a>
+      </div>
+
+      <p style="font-size: 14px; color: #666; line-height: 1.6; margin: 20px 0 0 0;">
+        Thank you for using SmartPro platform. We look forward to serving you again!
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+      <p style="margin: 0; color: #666; font-size: 12px;">
+        SmartPro - National Digital Infrastructure for Business Services
+      </p>
+      <p style="margin: 10px 0 0 0; color: #999; font-size: 11px;">
+        This email was sent automatically, please do not reply directly.
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+
+  try {
+    const result = await resend.emails.send({
+      from: FROM_EMAIL,
+      to,
+      subject,
+      html,
+    });
+
+    console.log(`✅ Service completion notification sent to customer: ${customerName}`);
+    return { success: true, messageId: result.data?.id };
+  } catch (error) {
+    console.error('❌ Failed to send service completion notification:', error);
+    return { success: false, error };
+  }
+}

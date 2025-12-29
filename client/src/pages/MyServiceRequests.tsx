@@ -44,6 +44,13 @@ export default function MyServiceRequests() {
   };
 
   const { data: requests, isLoading, refetch } = trpc.serviceMarketplace.getMyRequests.useQuery();
+  
+  // Get unread message counts for all requests
+  const requestIds = requests?.map((r: any) => r.id) || [];
+  const { data: unreadCounts } = trpc.requestMessaging.getAllUnreadCounts.useQuery(
+    { requestIds },
+    { enabled: requestIds.length > 0, refetchInterval: 5000 } // Poll every 5 seconds
+  );
   const acceptBidMutation = trpc.serviceMarketplace.acceptBid.useMutation({
     onSuccess: () => {
       toast.success("Bid accepted successfully! Booking has been created.");
@@ -324,6 +331,11 @@ export default function MyServiceRequests() {
                   <span className="flex items-center gap-2">
                     <MessageSquare className="h-4 w-4" />
                     {t("serviceRequest.viewMessages") || "View Messages"}
+                    {unreadCounts && unreadCounts[request.id] > 0 && (
+                      <Badge variant="destructive" className="ml-2 h-5 min-w-5 rounded-full px-1.5 text-xs">
+                        {unreadCounts[request.id]}
+                      </Badge>
+                    )}
                   </span>
                   {expandedMessaging.has(request.id) ? (
                     <ChevronUp className="h-4 w-4" />

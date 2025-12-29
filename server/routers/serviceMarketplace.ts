@@ -3,7 +3,7 @@ import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import * as db from "../db";
 import { TRPCError } from "@trpc/server";
 import { notifyNewBid, notifyBidAccepted } from "../_core/socket";
-import { generateTrackingNumber, sendRequestConfirmationEmail, sendNewRequestNotificationToOffice, sendNewBidNotificationEmail } from "../_core/serviceRequestEmails";
+import { generateTrackingNumber, sendRequestConfirmationEmail, sendNewRequestNotificationToOffice, sendNewBidNotificationEmail, sendBidAcceptedNotificationEmail, sendServiceCompletionEmail } from "../_core/serviceRequestEmails";
 import { analyzeServiceRequest, matchOffices } from "../_core/intelligentRequestService";
 
 export const serviceMarketplaceRouter = router({
@@ -333,8 +333,21 @@ export const serviceMarketplaceRouter = router({
           price: bid.proposedPrice,
         });
 
-        // TODO: Send bid accepted email notification to office
-        // Will be implemented in Phase 3
+        // Send bid accepted email notification to office
+        const officeOwner = await db.getUserById(office.createdBy);
+        if (officeOwner && officeOwner.email) {
+          // Generate tracking number from request ID
+          const trackingNumber = `SR-${request.id.toString().padStart(6, '0')}`;
+          await sendBidAcceptedNotificationEmail({
+            to: officeOwner.email,
+            officeName: office.officeName || "Your Office",
+            trackingNumber,
+            serviceTitle: request.title,
+            customerName: user.name || "Customer",
+            bidAmount: bid.proposedPrice,
+            language: officeOwner.preferredLanguage === 'ar' ? 'ar' : 'en',
+          });
+        }
       }
 
       return { bookingId };
@@ -356,5 +369,74 @@ export const serviceMarketplaceRouter = router({
       }
 
       return await db.getOfficeBids(input.officeId);
+    }),
+
+  // Update request status (office can mark as completed)
+  updateRequestStatus: protectedProcedure
+    .input(
+      z.object({
+        requestId: z.number(),
+        status: z.enum(["open", "bidding", "awarded", "in_progress", "completed", "cancelled"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = ctx.user!;
+
+      const request = await db.getServiceRequest(input.requestId);
+      if (!request) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Service request not found",
+        });
+      }
+
+      // Verify permission: either customer or office with accepted bid
+      const isCustomer = request.userId === user.id;
+      let isOffice = false;
+      
+      if (request.acceptedBidId) {
+        const acceptedBid = await db.getServiceBid(request.acceptedBidId);
+        if (acceptedBid) {
+          const office = await db.getSanadOfficeById(acceptedBid.officeId);
+          if (office && office.createdBy === user.id) {
+            isOffice = true;
+          }
+        }
+      }
+
+      if (!isCustomer && !isOffice) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You do not have permission to update this request",
+        });
+      }
+
+      // Update request status
+      await db.updateServiceRequest(input.requestId, {
+        status: input.status,
+      });
+
+      // Send service completion email if status is completed
+      if (input.status === "completed" && request.acceptedBidId) {
+        const acceptedBid = await db.getServiceBid(request.acceptedBidId);
+        if (acceptedBid) {
+          const office = await db.getSanadOfficeById(acceptedBid.officeId);
+          const customer = await db.getUserById(request.userId);
+          
+          if (customer && customer.email && office) {
+            const trackingNumber = `SR-${request.id.toString().padStart(6, '0')}`;
+            await sendServiceCompletionEmail({
+              to: customer.email,
+              customerName: customer.name || "Customer",
+              trackingNumber,
+              serviceTitle: request.title,
+              officeName: office.officeName || "Office",
+              language: customer.preferredLanguage === 'ar' ? 'ar' : 'en',
+            });
+          }
+        }
+      }
+
+      return { success: true };
     }),
 });
