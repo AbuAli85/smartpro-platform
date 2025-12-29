@@ -2,6 +2,11 @@ import { z } from "zod";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import * as db from "../db";
 import { TRPCError } from "@trpc/server";
+import {
+  sendPasswordResetEmail,
+  sendEmailVerificationEmail,
+  sendRecoveryEmailVerification,
+} from "../_core/accountRecoveryEmails";
 
 /**
  * Account Recovery Router
@@ -18,8 +23,18 @@ export const accountRecoveryRouter = router({
     try {
       const token = await db.generateEmailVerificationToken(ctx.user.id);
       
-      // TODO: Send verification email with token
-      // await sendVerificationEmail(ctx.user.email, token);
+      // Send verification email
+      const emailResult = await sendEmailVerificationEmail(
+        ctx.user.email || "",
+        ctx.user.name || "User",
+        token,
+        ctx.user.preferredLanguage || undefined
+      );
+      
+      if (!emailResult.success) {
+        console.error("[Account Recovery] Failed to send verification email:", emailResult.error);
+        // Continue anyway - token is generated, user can retry
+      }
       
       // Log the event
       await db.logAuthEvent({
@@ -83,8 +98,18 @@ export const accountRecoveryRouter = router({
         return { success: true, message: "If the email exists, a reset link has been sent" };
       }
       
-      // TODO: Send password reset email with token
-      // await sendPasswordResetEmail(input.email, result.token);
+      // Send password reset email
+      const emailResult = await sendPasswordResetEmail(
+        input.email,
+        result.userName || "User",
+        result.token,
+        result.preferredLanguage
+      );
+      
+      if (!emailResult.success) {
+        console.error("[Account Recovery] Failed to send password reset email:", emailResult.error);
+        // Continue anyway - token is generated, user can retry
+      }
       
       // Log the event
       await db.logAuthEvent({
@@ -164,9 +189,22 @@ export const accountRecoveryRouter = router({
   setRecoveryEmail: protectedProcedure
     .input(z.object({ recoveryEmail: z.string().email() }))
     .mutation(async ({ input, ctx }) => {
-      await db.setRecoveryEmail(ctx.user.id, input.recoveryEmail);
+      const token = await db.setRecoveryEmail(ctx.user.id, input.recoveryEmail);
       
-      return { success: true, message: "Recovery email updated" };
+      // Send recovery email verification
+      const emailResult = await sendRecoveryEmailVerification(
+        ctx.user.email || "",
+        ctx.user.name || "User",
+        token,
+        input.recoveryEmail,
+        ctx.user.preferredLanguage || undefined
+      );
+      
+      if (!emailResult.success) {
+        console.error("[Account Recovery] Failed to send recovery email verification:", emailResult.error);
+      }
+      
+      return { success: true, message: "Recovery email updated. Please check your email to verify." };
     }),
 
   /**

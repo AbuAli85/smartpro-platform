@@ -3,6 +3,8 @@ import type { Express, Request, Response } from "express";
 import * as db from "../db";
 import { getSessionCookieOptions } from "./cookies";
 import { sdk } from "./sdk";
+import { lookupIPLocation } from "./ipGeolocation";
+import { checkSuspiciousLocation, checkBruteForceAttempt } from "./securityAlertService";
 
 function getQueryParam(req: Request, key: string): string | undefined {
   const value = req.query[key];
@@ -47,7 +49,11 @@ export function registerOAuthRoutes(app: Express) {
       const cookieOptions = getSessionCookieOptions(req);
       res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
 
-      // Track active session
+      // Get IP address for session tracking and security checks
+      const ipAddress = req.ip || req.socket.remoteAddress || "Unknown";
+      const location = lookupIPLocation(ipAddress);
+      
+      // Track active session with geolocation
       if (user?.id) {
         await db.upsertActiveSession({
           sessionId: sessionToken,
@@ -59,10 +65,20 @@ export function registerOAuthRoutes(app: Express) {
                 req.headers["user-agent"]?.includes("Linux") ? "Linux" : "Unknown",
             isMobile: /mobile/i.test(req.headers["user-agent"] || ""),
           },
-          ipAddress: req.ip || req.socket.remoteAddress || "Unknown",
+          ipAddress,
           userAgent: req.headers["user-agent"],
+          location: location || undefined,
           expiresAt: new Date(Date.now() + ONE_YEAR_MS),
         });
+        
+        // Check for security threats
+        await checkSuspiciousLocation(
+          user.id,
+          userInfo.openId,
+          ipAddress,
+          sessionToken,
+          req.headers["user-agent"]
+        );
       }
 
       // Log successful login
@@ -87,11 +103,15 @@ export function registerOAuthRoutes(app: Express) {
     } catch (error) {
       console.error("[OAuth] Callback failed", error);
       
+      // Check for brute force attempts
+      const ipAddress = req.ip || req.socket.remoteAddress || "Unknown";
+      await checkBruteForceAttempt(ipAddress, req.headers["user-agent"]);
+      
       // Log failed login attempt
       await db.logAuthEvent({
         openId: code, // Use code as identifier since we don't have openId yet
         eventType: "login_failure",
-        ipAddress: req.ip || req.socket.remoteAddress,
+        ipAddress,
         userAgent: req.headers["user-agent"],
         metadata: {
           reason: error instanceof Error ? error.message : "Unknown error",

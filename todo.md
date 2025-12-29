@@ -238,6 +238,52 @@
 
 ---
 
+## 🔐 PHASE 2: ADVANCED SECURITY ENHANCEMENTS (Dec 29, 2025)
+
+### 1. Email Integration for Account Recovery
+- [x] Create email templates for password reset
+- [x] Create email templates for email verification
+- [x] Integrate Resend API with account recovery router
+- [x] Add email sending to requestPasswordReset procedure
+- [x] Add email sending to requestEmailVerification procedure
+- [ ] Test password reset email flow end-to-end
+- [ ] Test email verification flow end-to-end
+- [x] Add error handling for email delivery failures
+- [x] Add retry logic for failed email sends
+
+### 2. Geographic IP Lookup Integration
+- [x] Research and select IP geolocation service (MaxMind GeoIP2)
+- [x] Install geolocation library (geoip-lite)
+- [x] Create IP lookup utility function
+- [x] Integrate geolocation into OAuth callback
+- [x] Store location data in active_sessions table
+- [ ] Update Session Management UI to display locations
+- [ ] Add location map visualization to Security Dashboard
+- [x] Add location-based suspicious activity detection
+- [ ] Test with various IP addresses
+
+### 3. Automated Security Alerts System
+- [x] Define alert rules and thresholds
+- [x] Create security alert database table
+- [x] Create alert detection service
+- [x] Implement email notifications for alerts (via notifyOwner)
+- [ ] Implement SMS notifications for alerts (optional)
+- [ ] Create admin alert management UI
+- [ ] Add alert configuration settings
+- [ ] Test alert triggers for various scenarios
+- [x] Add alert history and audit trail
+
+### 4. Testing and Documentation
+- [ ] Test email integration with real email addresses
+- [ ] Test geolocation with VPN/different locations
+- [ ] Test security alerts with simulated attacks
+- [x] Update SECURITY_ENHANCEMENTS_DEC29.md
+- [x] Create user guide for account recovery (included in Phase 2 doc)
+- [x] Create admin guide for security alerts (included in Phase 2 doc)
+- [x] Update todo.md with completion status
+
+---
+
 ## 🎯 PRODUCTION DEPLOYMENT CHECKLIST
 
 - [x] All pages translated

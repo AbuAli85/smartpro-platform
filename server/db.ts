@@ -42,6 +42,9 @@ import {
   activeSessions,
   type ActiveSession,
   type InsertActiveSession,
+  securityAlerts,
+  type SecurityAlert,
+  type InsertSecurityAlert,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -5804,7 +5807,7 @@ export async function verifyEmailWithToken(token: string): Promise<boolean> {
 /**
  * Generate password reset token
  */
-export async function generatePasswordResetToken(email: string): Promise<{ token: string; userId: number } | null> {
+export async function generatePasswordResetToken(email: string): Promise<{ token: string; userId: number; userName: string; preferredLanguage?: string } | null> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
@@ -5828,7 +5831,12 @@ export async function generatePasswordResetToken(email: string): Promise<{ token
     })
     .where(eq(users.id, user.id));
 
-  return { token, userId: user.id };
+  return { 
+    token, 
+    userId: user.id,
+    userName: user.name || "User",
+    preferredLanguage: user.preferredLanguage || undefined,
+  };
 }
 
 /**
@@ -5873,19 +5881,26 @@ export async function completePasswordReset(userId: number): Promise<void> {
 }
 
 /**
- * Set recovery email for user
+ * Set recovery email for user and generate verification token
  */
-export async function setRecoveryEmail(userId: number, recoveryEmail: string): Promise<void> {
+export async function setRecoveryEmail(userId: number, recoveryEmail: string): Promise<string> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+
+  const token = generateSecureToken();
+  const expiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
   await db
     .update(users)
     .set({
       recoveryEmail,
       recoveryEmailVerified: false,
+      emailVerificationToken: token,
+      emailVerificationExpiry: expiry,
     })
     .where(eq(users.id, userId));
+
+  return token;
 }
 
 /**
@@ -5916,6 +5931,15 @@ export async function upsertActiveSession(session: {
   deviceInfo?: any;
   ipAddress?: string;
   userAgent?: string;
+  location?: {
+    country?: string;
+    region?: string;
+    city?: string;
+    latitude?: number;
+    longitude?: number;
+    timezone?: string;
+    formatted?: string;
+  };
   expiresAt?: Date;
 }): Promise<void> {
   const db = await getDb();
@@ -5929,6 +5953,7 @@ export async function upsertActiveSession(session: {
       deviceInfo: session.deviceInfo,
       ipAddress: session.ipAddress,
       userAgent: session.userAgent,
+      location: session.location,
       expiresAt: session.expiresAt,
       lastActive: new Date(),
       isActive: true,
@@ -5937,6 +5962,7 @@ export async function upsertActiveSession(session: {
       set: {
         lastActive: new Date(),
         isActive: true,
+        location: session.location,
       },
     });
 }
@@ -6017,4 +6043,184 @@ export async function cleanupExpiredSessions(): Promise<void> {
     .update(activeSessions)
     .set({ isActive: false })
     .where(and(lt(activeSessions.expiresAt, new Date()), eq(activeSessions.isActive, true)));
+}
+
+// ============================================================================
+// SECURITY ALERTS
+// ============================================================================
+
+/**
+ * Create a security alert
+ */
+export async function createSecurityAlert(alert: InsertSecurityAlert): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(securityAlerts).values(alert);
+  return result[0].insertId;
+}
+
+/**
+ * Get recent security alerts
+ */
+export async function getRecentSecurityAlerts(limit: number = 50): Promise<SecurityAlert[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(securityAlerts)
+    .orderBy(desc(securityAlerts.createdAt))
+    .limit(limit);
+}
+
+/**
+ * Get security alerts by status
+ */
+export async function getSecurityAlertsByStatus(status: "new" | "investigating" | "resolved" | "false_positive"): Promise<SecurityAlert[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(securityAlerts)
+    .where(eq(securityAlerts.status, status))
+    .orderBy(desc(securityAlerts.createdAt));
+}
+
+/**
+ * Get security alerts for a specific user
+ */
+export async function getUserSecurityAlerts(userId: number): Promise<SecurityAlert[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(securityAlerts)
+    .where(eq(securityAlerts.userId, userId))
+    .orderBy(desc(securityAlerts.createdAt));
+}
+
+/**
+ * Update security alert status
+ */
+export async function updateSecurityAlertStatus(
+  alertId: number,
+  status: "new" | "investigating" | "resolved" | "false_positive",
+  resolvedBy?: number,
+  resolutionNotes?: string
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(securityAlerts)
+    .set({
+      status,
+      resolvedBy,
+      resolvedAt: status === "resolved" || status === "false_positive" ? new Date() : undefined,
+      resolutionNotes,
+    })
+    .where(eq(securityAlerts.id, alertId));
+}
+
+/**
+ * Mark security alert notification as sent
+ */
+export async function markSecurityAlertNotificationSent(alertId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(securityAlerts)
+    .set({
+      notificationSent: true,
+      notificationSentAt: new Date(),
+    })
+    .where(eq(securityAlerts.id, alertId));
+}
+
+/**
+ * Get security alert statistics
+ */
+export async function getSecurityAlertStats(): Promise<{
+  total: number;
+  new: number;
+  investigating: number;
+  resolved: number;
+  critical: number;
+  high: number;
+  medium: number;
+  low: number;
+}> {
+  const db = await getDb();
+  if (!db) {
+    return {
+      total: 0,
+      new: 0,
+      investigating: 0,
+      resolved: 0,
+      critical: 0,
+      high: 0,
+      medium: 0,
+      low: 0,
+    };
+  }
+
+  const alerts = await db.select().from(securityAlerts);
+
+  return {
+    total: alerts.length,
+    new: alerts.filter((a) => a.status === "new").length,
+    investigating: alerts.filter((a) => a.status === "investigating").length,
+    resolved: alerts.filter((a) => a.status === "resolved").length,
+    critical: alerts.filter((a) => a.severity === "critical").length,
+    high: alerts.filter((a) => a.severity === "high").length,
+    medium: alerts.filter((a) => a.severity === "medium").length,
+    low: alerts.filter((a) => a.severity === "low").length,
+  };
+}
+
+/**
+ * Get recent authentication events matching criteria
+ */
+export async function getRecentAuthEvents(criteria: {
+  userId?: number;
+  openId?: string;
+  eventType?: string;
+  ipAddress?: string;
+  since?: Date;
+  metadata?: Record<string, any>;
+}): Promise<AuthAuditLog[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  let query = db.select().from(authAuditLog);
+
+  // Apply filters
+  const conditions = [];
+  if (criteria.userId) conditions.push(eq(authAuditLog.userId, criteria.userId));
+  if (criteria.openId) conditions.push(eq(authAuditLog.openId, criteria.openId));
+  if (criteria.eventType) conditions.push(eq(authAuditLog.eventType, criteria.eventType as any));
+  if (criteria.ipAddress) conditions.push(eq(authAuditLog.ipAddress, criteria.ipAddress));
+  if (criteria.since) conditions.push(gte(authAuditLog.createdAt, criteria.since));
+
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
+  }
+
+  const results = await query.orderBy(desc(authAuditLog.createdAt));
+
+  // Filter by metadata if specified (JSON filtering not supported in query)
+  if (criteria.metadata) {
+    return results.filter((event) => {
+      if (!event.metadata) return false;
+      return Object.entries(criteria.metadata!).every(
+        ([key, value]) => (event.metadata as any)?.[key] === value
+      );
+    });
+  }
+
+  return results;
 }
