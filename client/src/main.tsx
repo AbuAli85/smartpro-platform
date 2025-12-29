@@ -47,7 +47,7 @@ const trpcClient = trpc.createClient({
       transformer: superjson,
       fetch(input, init) {
         // Get current language from localStorage
-        const language = localStorage.getItem("language") || "en";
+        const language = localStorage.getItem("smartpro-language") || "en";
         
         return globalThis.fetch(input, {
           ...(init ?? {}),
