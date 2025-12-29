@@ -1756,12 +1756,15 @@ export async function getUnreadNotifications(userId: number) {
   const db = await getDb();
   if (!db) return [];
   
-  return await db
+  const results = await db
     .select()
     .from(notifications)
     .where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)))
     .orderBy(desc(notifications.createdAt))
     .limit(50);
+  
+  // Ensure plain objects for serialization
+  return results.map(r => ({ ...r }));
 }
 
 /**
@@ -1771,12 +1774,15 @@ export async function getUserNotifications(userId: number, limit: number = 50) {
   const db = await getDb();
   if (!db) return [];
   
-  return await db
+  const results = await db
     .select()
     .from(notifications)
     .where(eq(notifications.userId, userId))
     .orderBy(desc(notifications.createdAt))
     .limit(limit);
+  
+  // Ensure plain objects for serialization
+  return results.map(r => ({ ...r }));
 }
 
 /**
@@ -1827,7 +1833,8 @@ export async function getUnreadNotificationCount(userId: number): Promise<number
     .from(notifications)
     .where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)));
   
-  return result[0]?.count || 0;
+  // Ensure we return a plain number for serialization
+  return Number(result[0]?.count) || 0;
 }
 
 

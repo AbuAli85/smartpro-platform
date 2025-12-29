@@ -20,10 +20,19 @@ export default function RegionalLeaderboards() {
     { name: "Ad Dakhiliyah", nameAr: "الداخلية" },
   ];
 
-  const { data, isLoading } = trpc.recommendations.getTopByRegion.useQuery({
-    region: selectedRegion,
-    limit: 10,
-  });
+  const { data, isLoading } = trpc.recommendations.getTopByRegion.useQuery(
+    {
+      region: selectedRegion,
+      limit: 10,
+    },
+    {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 1,
+      retryDelay: 1000,
+    }
+  );
 
   const getRankIcon = (rank: number) => {
     if (rank === 1) return <Trophy className="h-6 w-6 text-yellow-500" />;

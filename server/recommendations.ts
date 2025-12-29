@@ -149,6 +149,7 @@ export async function getRecommendedOffices(
     }
 
     // Calculate scores for each office
+    // Convert to plain objects to ensure proper serialization
     const scoredOffices: RecommendedOffice[] = officesData.map(office => {
       const factors: ScoringFactors = {
         rating: Number(office.averageRating) || 0,
@@ -161,6 +162,11 @@ export async function getRecommendedOffices(
       const score = calculateScore(factors);
       const reasons = generateReason(factors, office.governorate);
 
+      // Convert to plain object with explicit type conversions
+      const rating = typeof office.averageRating === 'string' 
+        ? parseFloat(office.averageRating) 
+        : Number(office.averageRating) || 0;
+      
       return {
         id: office.id,
         officeName: office.officeName,
@@ -169,7 +175,7 @@ export async function getRecommendedOffices(
         descriptionAr: office.descriptionAr || office.description || "",
         governorate: office.governorate,
         logoUrl: office.logoUrl,
-        rating: Number(office.averageRating) || 0,
+        rating,
         reviewCount: Number(office.reviewCount) || 0,
         completedBookings: Number(office.completedBookings) || 0,
         score,
@@ -232,6 +238,7 @@ export async function getTopOfficesByRegion(
       );
 
     // Calculate scores for ranking
+    // Convert to plain objects to ensure proper serialization
     const scoredOffices: RecommendedOffice[] = officesData.map(office => {
       const factors: ScoringFactors = {
         rating: Number(office.averageRating) || 0,
@@ -244,6 +251,11 @@ export async function getTopOfficesByRegion(
       const score = calculateScore(factors);
       const reasons = generateReason(factors, office.governorate);
 
+      // Convert to plain object with explicit type conversions
+      const rating = typeof office.averageRating === 'string' 
+        ? parseFloat(office.averageRating) 
+        : Number(office.averageRating) || 0;
+      
       return {
         id: office.id,
         officeName: office.officeName,
@@ -252,7 +264,7 @@ export async function getTopOfficesByRegion(
         descriptionAr: office.descriptionAr || office.description || "",
         governorate: office.governorate,
         logoUrl: office.logoUrl,
-        rating: Number(office.averageRating) || 0,
+        rating,
         reviewCount: Number(office.reviewCount) || 0,
         completedBookings: Number(office.completedBookings) || 0,
         score,
