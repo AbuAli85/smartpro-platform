@@ -10,7 +10,11 @@
     "check": "tsc --noEmit",
     "format": "prettier --write .",
     "test": "vitest run",
-    "db:push": "drizzle-kit generate && drizzle-kit migrate"
+    "test:load": "artillery run load-tests/artillery-config.yml",
+    "test:load:report": "artillery run --output load-tests/report.json load-tests/artillery-config.yml && artillery report load-tests/report.json",
+    "test:load:smoke": "artillery run load-tests/smoke-test.yml",
+    "db:push": "drizzle-kit generate && drizzle-kit migrate",
+    "seed:demo": "tsx scripts/seed-demo-simple.ts && tsx scripts/seed-enhanced-data.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.693.0",
@@ -119,6 +123,7 @@
     "@types/react-dom": "^19.2.1",
     "@vitejs/plugin-react": "^5.0.4",
     "add": "^2.0.6",
+    "artillery": "^2.0.27",
     "autoprefixer": "^10.4.20",
     "drizzle-kit": "^0.31.4",
     "esbuild": "^0.25.0",
