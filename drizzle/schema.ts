@@ -1,1685 +1,970 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, json, index, uniqueIndex } from "drizzle-orm/mysql-core";
+import { mysqlTable, mysqlSchema, AnyMySqlColumn, index, int, varchar, json, text, timestamp, mysqlEnum, decimal, foreignKey, tinyint } from "drizzle-orm/mysql-core"
+import { sql } from "drizzle-orm"
 
-/**
- * SmartPro Platform - Complete Database Schema
- * A unified platform connecting SMEs with Sanad offices for business services
- */
-
-// ============================================================================
-// USERS & AUTHENTICATION
-// ============================================================================
-
-export const users = mysqlTable("users", {
-  id: int("id").autoincrement().primaryKey(),
-  openId: varchar("openId", { length: 64 }).notNull().unique(),
-  name: text("name"),
-  email: varchar("email", { length: 320 }),
-  phone: varchar("phone", { length: 20 }),
-  loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "admin", "sanad_owner", "sanad_staff", "sme_owner", "gig_worker", "government_official"]).default("user").notNull(),
-  avatarUrl: text("avatarUrl"),
-  preferredLanguage: varchar("preferredLanguage", { length: 10 }).default("en"),
-  notificationPreferences: json("notificationPreferences").$type<{
-    email: boolean;
-    sms: boolean;
-    confirmations: boolean;
-    reminders: boolean;
-    marketing: boolean;
-  }>(),
-  whatsappEnabled: boolean("whatsappEnabled").default(false),
-  referralCode: varchar("referralCode", { length: 20 }).unique(),
-  
-  // Multi-Factor Authentication
-  mfaEnabled: boolean("mfaEnabled").default(false),
-  mfaSecret: varchar("mfaSecret", { length: 255 }),
-  mfaBackupCodes: json("mfaBackupCodes").$type<string[]>(),
-  mfaEnabledAt: timestamp("mfaEnabledAt"),
-  
-  // Account Recovery
-  emailVerified: boolean("emailVerified").default(false),
-  emailVerificationToken: varchar("emailVerificationToken", { length: 255 }),
-  emailVerificationExpiry: timestamp("emailVerificationExpiry"),
-  recoveryEmail: varchar("recoveryEmail", { length: 320 }),
-  recoveryEmailVerified: boolean("recoveryEmailVerified").default(false),
-  passwordResetToken: varchar("passwordResetToken", { length: 255 }),
-  passwordResetExpiry: timestamp("passwordResetExpiry"),
-  
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-  lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
-}, (table) => ({
-  emailIdx: index("email_idx").on(table.email),
-  roleIdx: index("role_idx").on(table.role),
-}));
-
-export type User = typeof users.$inferSelect;
-export type InsertUser = typeof users.$inferInsert;
-
-// ============================================================================
-// SANAD OFFICES
-// ============================================================================
-
-export const sanadOffices = mysqlTable("sanad_offices", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // Basic information
-  officeName: varchar("officeName", { length: 255 }).notNull(),
-  officeNameAr: varchar("officeNameAr", { length: 255 }),
-  slug: varchar("slug", { length: 255 }).notNull().unique(),
-  
-  // Registration details
-  commercialRegistration: varchar("commercialRegistration", { length: 100 }).notNull().unique(),
-  tradeLicense: varchar("tradeLicense", { length: 100 }),
-  taxRegistration: varchar("taxRegistration", { length: 100 }),
-  
-  // Contact information
-  email: varchar("email", { length: 320 }).notNull(),
-  phone: varchar("phone", { length: 20 }).notNull(),
-  whatsapp: varchar("whatsapp", { length: 20 }),
-  website: text("website"),
-  
-  // Location
-  governorate: varchar("governorate", { length: 100 }).notNull(),
-  wilayat: varchar("wilayat", { length: 100 }).notNull(),
-  addressLine1: text("addressLine1").notNull(),
-  addressLine2: text("addressLine2"),
-  postalCode: varchar("postalCode", { length: 20 }),
-  locationLat: decimal("locationLat", { precision: 10, scale: 7 }),
-  locationLng: decimal("locationLng", { precision: 10, scale: 7 }),
-  
-  // Business details
-  description: text("description"),
-  descriptionAr: text("descriptionAr"),
-  yearEstablished: int("yearEstablished"),
-  employeeCount: int("employeeCount").default(1).notNull(),
-  
-  // Status and verification
-  status: mysqlEnum("status", ["pending", "active", "suspended", "inactive"]).default("pending").notNull(),
-  verificationStatus: mysqlEnum("verificationStatus", ["unverified", "pending_verification", "verified", "rejected"]).default("unverified").notNull(),
-  verifiedAt: timestamp("verifiedAt"),
-  verifiedBy: int("verifiedBy"),
-  
-  // Owner
-  ownerId: int("ownerId").notNull(),
-  
-  // Settings
-  acceptsOnlineBookings: boolean("acceptsOnlineBookings").default(true).notNull(),
-  autoAcceptBookings: boolean("autoAcceptBookings").default(false).notNull(),
-  workingHours: json("workingHours"),
-  
-  // Cancellation Policy
-  cancellationWindowHours: int("cancellationWindowHours").default(24).notNull(),
-  cancellationPenaltyPercent: int("cancellationPenaltyPercent").default(0).notNull(),
-  
-  // Media
-  logoUrl: text("logoUrl"),
-  coverImageUrl: text("coverImageUrl"),
-  images: json("images").$type<string[]>(),
-  
-  // Verification Documents
-  licenseDocumentUrl: text("licenseDocumentUrl"),
-  certificateUrls: json("certificateUrls").$type<string[]>(),
-  permitUrls: json("permitUrls").$type<string[]>(),
-  
-  // Document Expiry Tracking
-  licenseExpiryDate: timestamp("licenseExpiryDate"),
-  tradeLicenseExpiryDate: timestamp("tradeLicenseExpiryDate"),
-  taxRegistrationExpiryDate: timestamp("taxRegistrationExpiryDate"),
-  
-  // Analytics
-  totalOrders: int("totalOrders").default(0).notNull(),
-  completedOrders: int("completedOrders").default(0).notNull(),
-  averageRating: decimal("averageRating", { precision: 3, scale: 2 }).default("0.00").notNull(),
-  totalReviews: int("totalReviews").default(0).notNull(),
-  
-  // Performance Ranking
-  performanceScore: decimal("performanceScore", { precision: 5, scale: 2 }).default("0"),
-  performanceRank: int("performanceRank").default(0),
-  
-  // Audit
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-  createdBy: int("createdBy"),
-  updatedBy: int("updatedBy"),
-}, (table) => ({
-  ownerIdx: index("owner_idx").on(table.ownerId),
-  statusIdx: index("status_idx").on(table.status),
-  governorateIdx: index("governorate_idx").on(table.governorate),
-  verificationIdx: index("verification_idx").on(table.verificationStatus),
-  // Composite index for leaderboard queries (verification + region)
-  leaderboardIdx: index("leaderboard_idx").on(table.verificationStatus, table.governorate),
-}));
-
-export type SanadOffice = typeof sanadOffices.$inferSelect;
-export type InsertSanadOffice = typeof sanadOffices.$inferInsert;
-
-// ============================================================================
-// SANAD OFFICE STAFF
-// ============================================================================
-
-export const sanadOfficeStaff = mysqlTable("sanad_office_staff", {
-  id: int("id").autoincrement().primaryKey(),
-  officeId: int("officeId").notNull(),
-  userId: int("userId").notNull(),
-  role: mysqlEnum("role", ["owner", "manager", "staff", "viewer"]).default("staff").notNull(),
-  permissions: json("permissions").$type<string[]>(),
-  status: mysqlEnum("status", ["active", "inactive", "invited"]).default("invited").notNull(),
-  invitedAt: timestamp("invitedAt"),
-  joinedAt: timestamp("joinedAt"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, (table) => ({
-  officeIdx: index("office_idx").on(table.officeId),
-  userIdx: index("user_idx").on(table.userId),
-  uniqueOfficeUser: uniqueIndex("unique_office_user").on(table.officeId, table.userId),
-}));
-
-export type SanadOfficeStaff = typeof sanadOfficeStaff.$inferSelect;
-export type InsertSanadOfficeStaff = typeof sanadOfficeStaff.$inferInsert;
-
-// ============================================================================
-// SANAD OFFICE SERVICES
-// ============================================================================
-
-export const sanadOfficeServices = mysqlTable("sanad_office_services", {
-  id: int("id").autoincrement().primaryKey(),
-  officeId: int("officeId").notNull(),
-  
-  // Service details
-  serviceName: varchar("serviceName", { length: 255 }).notNull(),
-  serviceNameAr: varchar("serviceNameAr", { length: 255 }),
-  category: varchar("category", { length: 100 }).notNull(),
-  description: text("description"),
-  descriptionAr: text("descriptionAr"),
-  
-  // Pricing
-  price: decimal("price", { precision: 10, scale: 3 }),
-  currency: varchar("currency", { length: 3 }).default("OMR").notNull(),
-  priceType: mysqlEnum("priceType", ["fixed", "hourly", "custom"]).default("fixed").notNull(),
-  
-  // Delivery
-  estimatedDeliveryDays: int("estimatedDeliveryDays"),
-  
-  // Status
-  isActive: boolean("isActive").default(true).notNull(),
-  
-  // Metadata
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, (table) => ({
-  officeIdx: index("office_idx").on(table.officeId),
-  categoryIdx: index("category_idx").on(table.category),
-  activeIdx: index("active_idx").on(table.isActive),
-}));
-
-export type SanadOfficeService = typeof sanadOfficeServices.$inferSelect;
-export type InsertSanadOfficeService = typeof sanadOfficeServices.$inferInsert;
-
-// ============================================================================
-// DOCUMENT TEMPLATES
-// ============================================================================
-
-export const documentTemplates = mysqlTable("document_templates", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // Template details
-  templateName: varchar("templateName", { length: 255 }).notNull(),
-  templateNameAr: varchar("templateNameAr", { length: 255 }),
-  category: varchar("category", { length: 100 }).notNull(),
-  description: text("description"),
-  descriptionAr: text("descriptionAr"),
-  
-  // DOCX Template File (replaces Google Docs approach)
-  templateFileUrl: text("templateFileUrl"), // S3 URL to .docx template file
-  templateFileKey: varchar("templateFileKey", { length: 500 }), // S3 file key
-  googleDocId: varchar("googleDocId", { length: 255 }), // Legacy: Google Doc template ID
-  useGoogleDocs: boolean("useGoogleDocs").default(false).notNull(), // Legacy: Use Google Docs
-  
-  // Template content (legacy jsPDF system)
-  templateContent: text("templateContent").notNull(), // HTML or JSON template
-  variables: json("variables").$type<Array<{
-    name: string;
-    label: string;
-    labelAr?: string;
-    type: 'text' | 'number' | 'date' | 'email' | 'phone' | 'textarea' | 'dropdown' | 'checkbox' | 'radio';
-    required: boolean;
-    placeholder?: string;
-    placeholderAr?: string;
-    options?: string[]; // For dropdown/radio
-    validation?: string; // Regex pattern
-    defaultValue?: string;
-  }>>().notNull(),
-  tags: json("tags").$type<string[]>(), // For search and filtering
-  
-  // Metadata
-  language: varchar("language", { length: 10 }).default("en").notNull(),
-  isOfficial: boolean("isOfficial").default(false).notNull(), // Government-approved template
-  isPremium: boolean("isPremium").default(false).notNull(),
-  
-  // Pricing
-  price: decimal("price", { precision: 10, scale: 3 }),
-  
-  // File storage
-  fileUrl: text("fileUrl"),
-  fileKey: varchar("fileKey", { length: 500 }),
-  fileSize: int("fileSize"),
-  mimeType: varchar("mimeType", { length: 100 }),
-  
-  // Usage stats
-  usageCount: int("usageCount").default(0).notNull(),
-  
-  // Status
-  isActive: boolean("isActive").default(true).notNull(),
-  
-  // Audit
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-  createdBy: int("createdBy"),
-}, (table) => ({
-  categoryIdx: index("category_idx").on(table.category),
-  languageIdx: index("language_idx").on(table.language),
-  activeIdx: index("active_idx").on(table.isActive),
-}));
-
-export type DocumentTemplate = typeof documentTemplates.$inferSelect;
-export type InsertDocumentTemplate = typeof documentTemplates.$inferInsert;
-
-// ============================================================================
-// GENERATED DOCUMENTS
-// ============================================================================
-
-export const generatedDocuments = mysqlTable("generated_documents", {
-  id: int("id").autoincrement().primaryKey(),
-  templateId: int("templateId").notNull(),
-  userId: int("userId").notNull(),
-  officeId: int("officeId"),
-  bookingId: int("bookingId"),
-  
-  // Document details
-  documentName: varchar("documentName", { length: 255 }).notNull(),
-  filledData: json("filledData").notNull(), // User-provided values for variables
-  fileUrl: text("fileUrl").notNull(), // S3 URL to generated PDF
-  fileKey: varchar("fileKey", { length: 255 }).notNull(),
-  
-  // Status
-  status: mysqlEnum("status", ["draft", "generated", "delivered"]).default("generated").notNull(),
-  
-  // Audit
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, (table) => ({
-  templateIdx: index("template_idx").on(table.templateId),
-  userIdx: index("user_idx").on(table.userId),
-  officeIdx: index("office_idx").on(table.officeId),
-  bookingIdx: index("booking_idx").on(table.bookingId),
-}));
-
-export type GeneratedDocument = typeof generatedDocuments.$inferSelect;
-export type InsertGeneratedDocument = typeof generatedDocuments.$inferInsert;
-
-// ============================================================================
-// BOOKINGS
-// ============================================================================
-
-export const bookings = mysqlTable("bookings", {
-  id: int("id").autoincrement().primaryKey(),
-  officeId: int("officeId").notNull(),
-  serviceId: int("serviceId"),
-  userId: int("userId").notNull(), // SME owner
-  
-  // Booking details
-  bookingType: varchar("bookingType", { length: 50 }).default("service").notNull(),
-  serviceDescription: text("serviceDescription"),
-  requirements: text("requirements"),
-  
-  // Scheduling
-  preferredDate: timestamp("preferredDate"),
-  scheduledDate: timestamp("scheduledDate"),
-  scheduledTime: varchar("scheduledTime", { length: 10 }), // e.g., "09:00"
-  duration: int("duration").default(60), // Duration in minutes
-  completedDate: timestamp("completedDate"),
-  
-  // Status
-  status: mysqlEnum("status", ["pending", "confirmed", "in_progress", "completed", "cancelled"]).default("pending").notNull(),
-  
-  // Cancellation
-  cancellationReason: text("cancellationReason"),
-  cancelledBy: int("cancelledBy"), // User ID who cancelled
-  cancelledAt: timestamp("cancelledAt"),
-  cancellationPenalty: decimal("cancellationPenalty", { precision: 10, scale: 3 }),
-  refundAmount: decimal("refundAmount", { precision: 10, scale: 3 }),
-  
-  // Pricing
-  price: decimal("price", { precision: 10, scale: 3 }),
-  currency: varchar("currency", { length: 3 }).default("OMR").notNull(),
-  paymentStatus: mysqlEnum("paymentStatus", ["unpaid", "paid", "refunded"]).default("unpaid").notNull(),
-  
-  // Communication
-  notes: text("notes"),
-  
-  // Reminders
-  reminder24hSent: boolean("reminder24hSent").default(false).notNull(),
-  reminder1hSent: boolean("reminder1hSent").default(false).notNull(),
-  
-  // Audit
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, (table) => ({
-  officeIdx: index("office_idx").on(table.officeId),
-  userIdx: index("user_idx").on(table.userId),
-  statusIdx: index("status_idx").on(table.status),
-  dateIdx: index("date_idx").on(table.scheduledDate),
-}));
-
-export type Booking = typeof bookings.$inferSelect;
-export type InsertBooking = typeof bookings.$inferInsert;
-
-// ============================================================================
-// REVIEWS
-// ============================================================================
-
-export const reviews = mysqlTable("reviews", {
-  id: int("id").autoincrement().primaryKey(),
-  officeId: int("officeId").notNull(),
-  bookingId: int("bookingId"),
-  userId: int("userId").notNull(),
-  
-  // Review content
-  rating: int("rating").notNull(), // 1-5
-  reviewText: text("reviewText"),
-  
-  // Response
-  responseText: text("responseText"),
-  respondedAt: timestamp("respondedAt"),
-  respondedBy: int("respondedBy"),
-  
-  // Status
-  isVisible: boolean("isVisible").default(true).notNull(),
-  
-  // Audit
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, (table) => ({
-  officeIdx: index("office_idx").on(table.officeId),
-  userIdx: index("user_idx").on(table.userId),
-  bookingIdx: index("booking_idx").on(table.bookingId),
-  visibleIdx: index("visible_idx").on(table.isVisible),
-}));
-
-export type Review = typeof reviews.$inferSelect;
-export type InsertReview = typeof reviews.$inferInsert;
-
-// Review Photos
-export const reviewPhotos = mysqlTable("review_photos", {
-  id: int("id").autoincrement().primaryKey(),
-  reviewId: int("reviewId").notNull(),
-  photoUrl: text("photoUrl").notNull(),
-  photoKey: text("photoKey").notNull(), // S3 key for deletion
-  uploadedAt: timestamp("uploadedAt").defaultNow().notNull(),
-}, (table) => ({
-  reviewIdx: index("review_idx").on(table.reviewId),
-}));
-
-export type ReviewPhoto = typeof reviewPhotos.$inferSelect;
-export type InsertReviewPhoto = typeof reviewPhotos.$inferInsert;
-
-// Review Votes (Helpful/Not Helpful)
-export const reviewVotes = mysqlTable("review_votes", {
-  id: int("id").autoincrement().primaryKey(),
-  reviewId: int("reviewId").notNull(),
-  userId: int("userId").notNull(),
-  voteType: mysqlEnum("voteType", ["helpful", "not_helpful"]).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, (table) => ({
-  reviewUserIdx: index("review_user_idx").on(table.reviewId, table.userId),
-  reviewIdx: index("review_idx").on(table.reviewId),
-}));
-
-export type ReviewVote = typeof reviewVotes.$inferSelect;
-export type InsertReviewVote = typeof reviewVotes.$inferInsert;
-
-// ============================================================================
-// ACTIVITY LOG
-// ============================================================================
+export const activeSessions = mysqlTable("active_sessions", {
+	id: int().autoincrement().notNull(),
+	sessionId: varchar({ length: 255 }).notNull(),
+	userId: int().notNull(),
+	deviceInfo: json(),
+	ipAddress: varchar({ length: 45 }),
+	userAgent: text(),
+	lastActive: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	expiresAt: timestamp({ mode: 'string' }),
+	isActive: tinyint().default(1).notNull(),
+	location: json(),
+},
+(table) => [
+	index("active_sessions_sessionId_unique").on(table.sessionId),
+	index("user_id_idx").on(table.userId),
+	index("session_id_idx").on(table.sessionId),
+	index("last_active_idx").on(table.lastActive),
+	index("is_active_idx").on(table.isActive),
+]);
 
 export const activityLog = mysqlTable("activity_log", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId"),
-  action: varchar("action", { length: 100 }).notNull(),
-  entityType: varchar("entityType", { length: 50 }),
-  entityId: int("entityId"),
-  description: text("description"),
-  metadata: json("metadata"),
-  ipAddress: varchar("ipAddress", { length: 45 }),
-  userAgent: text("userAgent"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, (table) => ({
-  userIdx: index("user_idx").on(table.userId),
-  entityIdx: index("entity_idx").on(table.entityType, table.entityId),
-  actionIdx: index("action_idx").on(table.action),
-  dateIdx: index("date_idx").on(table.createdAt),
-}));
+	id: int().autoincrement().notNull(),
+	userId: int(),
+	action: varchar({ length: 100 }).notNull(),
+	entityType: varchar({ length: 50 }),
+	entityId: int(),
+	description: text(),
+	metadata: json(),
+	ipAddress: varchar({ length: 45 }),
+	userAgent: text(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("user_idx").on(table.userId),
+	index("entity_idx").on(table.entityType, table.entityId),
+	index("action_idx").on(table.action),
+	index("date_idx").on(table.createdAt),
+]);
 
-export type ActivityLog = typeof activityLog.$inferSelect;
-export type InsertActivityLog = typeof activityLog.$inferInsert;
-
-// ============================================================================
-// OFFICE AVAILABILITY
-// ============================================================================
-
-export const officeAvailability = mysqlTable("office_availability", {
-  id: int("id").autoincrement().primaryKey(),
-  officeId: int("officeId").notNull(),
-  
-  // Day of week (0 = Sunday, 6 = Saturday)
-  dayOfWeek: int("dayOfWeek").notNull(), // 0-6
-  
-  // Time slots
-  startTime: varchar("startTime", { length: 10 }).notNull(), // e.g., "09:00"
-  endTime: varchar("endTime", { length: 10 }).notNull(), // e.g., "17:00"
-  
-  // Slot configuration
-  slotDuration: int("slotDuration").default(60).notNull(), // Minutes per slot
-  
-  // Status
-  isActive: boolean("isActive").default(true).notNull(),
-  
-  // Audit
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, (table) => ({
-  officeIdx: index("office_idx").on(table.officeId),
-  dayIdx: index("day_idx").on(table.dayOfWeek),
-}));
-
-export type OfficeAvailability = typeof officeAvailability.$inferSelect;
-export type InsertOfficeAvailability = typeof officeAvailability.$inferInsert;
-
-// ============================================================================
-// LOYALTY PROGRAM
-// ============================================================================
-
-export const loyaltyPoints = mysqlTable("loyalty_points", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // User reference
-  userId: int("userId").notNull(),
-  
-  // Points tracking
-  totalPoints: int("totalPoints").default(0).notNull(),
-  availablePoints: int("availablePoints").default(0).notNull(),
-  redeemedPoints: int("redeemedPoints").default(0).notNull(),
-  
-  // Audit
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, (table) => ({
-  userIdx: index("user_idx").on(table.userId),
-}));
-
-export type LoyaltyPoints = typeof loyaltyPoints.$inferSelect;
-export type InsertLoyaltyPoints = typeof loyaltyPoints.$inferInsert;
-
-export const loyaltyTransactions = mysqlTable("loyalty_transactions", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // User reference
-  userId: int("userId").notNull(),
-  
-  // Transaction details
-  type: mysqlEnum("type", ["earn", "redeem"]).notNull(),
-  points: int("points").notNull(),
-  reason: varchar("reason", { length: 255 }).notNull(),
-  
-  // Related entities
-  bookingId: int("bookingId"),
-  reviewId: int("reviewId"),
-  referralId: int("referralId"),
-  
-  // Audit
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, (table) => ({
-  userIdx: index("user_idx").on(table.userId),
-  typeIdx: index("type_idx").on(table.type),
-}));
-
-export type LoyaltyTransaction = typeof loyaltyTransactions.$inferSelect;
-export type InsertLoyaltyTransaction = typeof loyaltyTransactions.$inferInsert;
-
-// ============================================================================
-// REFERRAL SYSTEM
-// ============================================================================
-
-export const referrals = mysqlTable("referrals", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // Referrer (user who shares the code)
-  referrerId: int("referrerId").notNull(),
-  referralCode: varchar("referralCode", { length: 20 }).notNull().unique(),
-  
-  // Referred user (new user who signs up with code)
-  referredId: int("referredId"),
-  
-  // Status tracking
-  status: mysqlEnum("status", ["pending", "completed", "expired"]).default("pending").notNull(),
-  pointsAwarded: boolean("pointsAwarded").default(false).notNull(),
-  
-  // Completion tracking
-  firstBookingId: int("firstBookingId"), // Track when referred user completes first booking
-  completedAt: timestamp("completedAt"),
-  
-  // Audit
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, (table) => ({
-  referrerIdx: index("referrer_idx").on(table.referrerId),
-  referredIdx: index("referred_idx").on(table.referredId),
-  codeIdx: index("code_idx").on(table.referralCode),
-  statusIdx: index("status_idx").on(table.status),
-}));
-
-export type Referral = typeof referrals.$inferSelect;
-export type InsertReferral = typeof referrals.$inferInsert;
-
-// ============================================================================
-// NOTIFICATION SYSTEM
-// ============================================================================
-
-export const notifications = mysqlTable("notifications", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // User reference
-  userId: int("userId").notNull(),
-  
-  // Notification content
-  type: mysqlEnum("type", ["booking", "points", "system", "review", "referral"]).notNull(),
-  title: varchar("title", { length: 255 }).notNull(),
-  message: text("message").notNull(),
-  
-  // Related entities
-  bookingId: int("bookingId"),
-  reviewId: int("reviewId"),
-  referralId: int("referralId"),
-  
-  // Status
-  isRead: boolean("isRead").default(false).notNull(),
-  readAt: timestamp("readAt"),
-  
-  // Action link (optional)
-  actionUrl: varchar("actionUrl", { length: 500 }),
-  
-  // Audit
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, (table) => ({
-  userIdx: index("user_idx").on(table.userId),
-  typeIdx: index("type_idx").on(table.type),
-  readIdx: index("read_idx").on(table.isRead),
-  dateIdx: index("date_idx").on(table.createdAt),
-}));
-
-export type Notification = typeof notifications.$inferSelect;
-export type InsertNotification = typeof notifications.$inferInsert;
-
-// ============================================================================
-// TEMPLATE DOWNLOADS TRACKING
-// ============================================================================
-
-export const templateDownloads = mysqlTable("template_downloads", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // References
-  templateId: int("templateId").notNull(),
-  userId: int("userId").notNull(),
-  
-  // Download metadata
-  downloadedAt: timestamp("downloadedAt").defaultNow().notNull(),
-  ipAddress: varchar("ipAddress", { length: 45 }),
-  userAgent: text("userAgent"),
-}, (table) => ({
-  templateIdx: index("template_idx").on(table.templateId),
-  userIdx: index("user_idx").on(table.userId),
-  dateIdx: index("date_idx").on(table.downloadedAt),
-}));
-
-export type TemplateDownload = typeof templateDownloads.$inferSelect;
-export type InsertTemplateDownload = typeof templateDownloads.$inferInsert;
-
-// ============================================================================
-// REAL-TIME CHAT SYSTEM
-// ============================================================================
-
-export const chatConversations = mysqlTable("chat_conversations", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // Participants
-  userId: int("userId").notNull(),
-  officeId: int("officeId").notNull(),
-  
-  // Related booking (optional)
-  bookingId: int("bookingId"),
-  
-  // Status
-  status: mysqlEnum("status", ["active", "closed", "archived"]).default("active").notNull(),
-  
-  // Tags for categorization
-  tags: json("tags").$type<string[]>(),
-  
-  // Last message info for sorting
-  lastMessageAt: timestamp("lastMessageAt").defaultNow().notNull(),
-  lastMessagePreview: varchar("lastMessagePreview", { length: 255 }),
-  
-  // Unread counts
-  unreadByUser: int("unreadByUser").default(0).notNull(),
-  unreadByOffice: int("unreadByOffice").default(0).notNull(),
-  
-  // Audit
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, (table) => ({
-  userIdx: index("user_idx").on(table.userId),
-  officeIdx: index("office_idx").on(table.officeId),
-  bookingIdx: index("booking_idx").on(table.bookingId),
-  statusIdx: index("status_idx").on(table.status),
-  lastMessageIdx: index("last_message_idx").on(table.lastMessageAt),
-}));
-
-export type ChatConversation = typeof chatConversations.$inferSelect;
-export type InsertChatConversation = typeof chatConversations.$inferInsert;
-
-export const chatMessages = mysqlTable("chat_messages", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // Conversation reference
-  conversationId: int("conversationId").notNull(),
-  
-  // Sender info
-  senderId: int("senderId").notNull(),
-  senderType: mysqlEnum("senderType", ["user", "office"]).notNull(),
-  
-  // Message content
-  message: text("message").notNull(),
-  
-  // Message type
-  messageType: mysqlEnum("messageType", ["text", "file", "system"]).default("text").notNull(),
-  fileUrl: text("fileUrl"),
-  fileName: varchar("fileName", { length: 255 }),
-  
-  // Read status
-  isRead: boolean("isRead").default(false).notNull(),
-  readAt: timestamp("readAt"),
-  
-  // Audit
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, (table) => ({
-  conversationIdx: index("conversation_idx").on(table.conversationId),
-  senderIdx: index("sender_idx").on(table.senderId),
-  dateIdx: index("date_idx").on(table.createdAt),
-}));
-
-export type ChatMessage = typeof chatMessages.$inferSelect;
-export type InsertChatMessage = typeof chatMessages.$inferInsert;
-
-// ===== Canned Responses =====
-export const cannedResponses = mysqlTable("canned_responses", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // Office reference
-  officeId: int("officeId").notNull(),
-  
-  // Response content
-  title: varchar("title", { length: 255 }).notNull(),
-  content: text("content").notNull(),
-  shortcut: varchar("shortcut", { length: 50 }),
-  category: mysqlEnum("category", ["greeting", "faq", "closing", "pricing", "hours", "services", "general"]).default("general").notNull(),
-  
-  // Audit
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, (table) => ({
-  officeIdx: index("office_idx").on(table.officeId),
-  categoryIdx: index("category_idx").on(table.category),
-}));
-
-export type CannedResponse = typeof cannedResponses.$inferSelect;
-export type InsertCannedResponse = typeof cannedResponses.$inferInsert;
-
-// ===== Chat Assignments =====
-export const chatAssignments = mysqlTable("chat_assignments", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // Conversation reference
-  conversationId: int("conversationId").notNull(),
-  
-  // Assignment info
-  assignedToUserId: int("assignedToUserId").notNull(),
-  assignedByUserId: int("assignedByUserId").notNull(),
-  
-  // Audit
-  assignedAt: timestamp("assignedAt").defaultNow().notNull(),
-}, (table) => ({
-  conversationIdx: index("conversation_idx").on(table.conversationId),
-  assignedToIdx: index("assigned_to_idx").on(table.assignedToUserId),
-}));
-
-export type ChatAssignment = typeof chatAssignments.$inferSelect;
-export type InsertChatAssignment = typeof chatAssignments.$inferInsert;
-
-// ===== Chat Ratings =====
-export const chatRatings = mysqlTable("chat_ratings", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // Conversation reference
-  conversationId: int("conversationId").notNull(),
-  
-  // Rating info
-  rating: int("rating").notNull(), // 1-5 stars
-  feedback: text("feedback"),
-  
-  // Staff reference (who was rated)
-  staffUserId: int("staffUserId"),
-  
-  // Customer reference
-  userId: int("userId").notNull(),
-  
-  // Audit
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, (table) => ({
-  conversationIdx: index("conversation_idx").on(table.conversationId),
-  staffIdx: index("staff_idx").on(table.staffUserId),
-  ratingIdx: index("rating_idx").on(table.rating),
-}));
-
-export type ChatRating = typeof chatRatings.$inferSelect;
-export type InsertChatRating = typeof chatRatings.$inferInsert;
-
-// ===== Chat Transfer History =====
-export const chatTransferHistory = mysqlTable("chat_transfer_history", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // Conversation reference
-  conversationId: int("conversationId").notNull(),
-  
-  // Transfer details
-  fromUserId: int("fromUserId").notNull(),
-  toUserId: int("toUserId").notNull(),
-  
-  // Context and reason
-  contextNotes: text("contextNotes"),
-  isEscalation: boolean("isEscalation").default(false).notNull(),
-  
-  // Audit
-  transferredAt: timestamp("transferredAt").defaultNow().notNull(),
-}, (table) => ({
-  conversationIdx: index("conversation_idx").on(table.conversationId),
-  fromUserIdx: index("from_user_idx").on(table.fromUserId),
-  toUserIdx: index("to_user_idx").on(table.toUserId),
-}));
-
-export type ChatTransferHistory = typeof chatTransferHistory.$inferSelect;
-export type InsertChatTransferHistory = typeof chatTransferHistory.$inferInsert;
-
-// ===== Scheduled Follow-ups =====
-export const scheduledFollowups = mysqlTable("scheduled_followups", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // Conversation reference
-  conversationId: int("conversationId").notNull(),
-  officeId: int("officeId").notNull(),
-  
-  // Scheduling
-  scheduledFor: timestamp("scheduledFor").notNull(),
-  triggerType: mysqlEnum("triggerType", ["24h", "48h", "manual"]).notNull().default("24h"),
-  
-  // Message
-  messageTemplate: text("messageTemplate").notNull(),
-  
-  // Status
-  status: mysqlEnum("status", ["pending", "sent", "cancelled"]).notNull().default("pending"),
-  sentAt: timestamp("sentAt"),
-
-  // Timestamps
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type ScheduledFollowup = typeof scheduledFollowups.$inferSelect;
-export type InsertScheduledFollowup = typeof scheduledFollowups.$inferInsert;
-
-// ===== Office Staff =====
-export const officeStaff = mysqlTable("office_staff", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // References
-  officeId: int("officeId").notNull(),
-  userId: int("userId").notNull(),
-  
-  // Role
-  role: mysqlEnum("role", ["owner", "manager", "agent"]).default("agent").notNull(),
-  
-  // Status
-  isActive: boolean("isActive").default(true).notNull(),
-  availabilityStatus: mysqlEnum("availabilityStatus", ["online", "offline", "busy"]).default("offline").notNull(),
-  
-  // Expertise tags for routing
-  expertiseTags: json("expertiseTags").$type<string[]>(),
-  
-  // Audit
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  lastActiveAt: timestamp("lastActiveAt"),
-}, (table) => ({
-  officeIdx: index("office_idx").on(table.officeId),
-  userIdx: index("user_idx").on(table.userId),
-}));
-
-export type OfficeStaff = typeof officeStaff.$inferSelect;
-export type InsertOfficeStaff = typeof officeStaff.$inferInsert;
-
-// ============================================================================
-// TRANSLATION MANAGEMENT
-// ============================================================================
-
-export const translationRequests = mysqlTable("translation_requests", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // Request details
-  entityType: mysqlEnum("entityType", ["office", "template"]).notNull(),
-  entityId: int("entityId").notNull(),
-  
-  // Requester info
-  requesterId: int("requesterId").notNull(),
-  requesterName: varchar("requesterName", { length: 255 }).notNull(),
-  requesterEmail: varchar("requesterEmail", { length: 320 }),
-  
-  // Translation content
-  currentNameEn: varchar("currentNameEn", { length: 255 }).notNull(),
-  currentDescriptionEn: text("currentDescriptionEn"),
-  proposedNameAr: varchar("proposedNameAr", { length: 255 }),
-  proposedDescriptionAr: text("proposedDescriptionAr"),
-  
-  // Request notes
-  notes: text("notes"),
-  
-  // Status and workflow
-  status: mysqlEnum("status", ["pending", "approved", "rejected", "completed"]).default("pending").notNull(),
-  priority: mysqlEnum("priority", ["low", "medium", "high"]).default("medium").notNull(),
-  
-  // Admin actions
-  reviewedBy: int("reviewedBy"),
-  reviewedAt: timestamp("reviewedAt"),
-  reviewNotes: text("reviewNotes"),
-  
-  // Completion tracking
-  completedBy: int("completedBy"),
-  completedAt: timestamp("completedAt"),
-  
-  // Audit
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, (table) => ({
-  entityIdx: index("entity_idx").on(table.entityType, table.entityId),
-  requesterIdx: index("requester_idx").on(table.requesterId),
-  statusIdx: index("status_idx").on(table.status),
-  priorityIdx: index("priority_idx").on(table.priority),
-  createdAtIdx: index("created_at_idx").on(table.createdAt),
-}));
-
-export type TranslationRequest = typeof translationRequests.$inferSelect;
-export type InsertTranslationRequest = typeof translationRequests.$inferInsert;
-
-export const translationActivityLog = mysqlTable("translation_activity_log", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // What was translated
-  entityType: mysqlEnum("entityType", ["office", "template"]).notNull(),
-  entityId: int("entityId").notNull(),
-  entityName: varchar("entityName", { length: 255 }).notNull(),
-  
-  // Who translated
-  translatorId: int("translatorId").notNull(),
-  translatorName: varchar("translatorName", { length: 255 }).notNull(),
-  
-  // What changed
-  actionType: mysqlEnum("actionType", ["created", "updated", "bulk_import"]).notNull(),
-  fieldChanged: varchar("fieldChanged", { length: 50 }), // "nameAr", "descriptionAr", "both"
-  
-  // Previous and new values (for audit)
-  previousValue: text("previousValue"),
-  newValue: text("newValue"),
-  
-  // Metadata
-  source: mysqlEnum("source", ["manual", "bulk_import", "request_approval"]).default("manual").notNull(),
-  requestId: int("requestId"), // Link to translation request if applicable
-  
-  // Audit
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, (table) => ({
-  entityIdx: index("entity_idx").on(table.entityType, table.entityId),
-  translatorIdx: index("translator_idx").on(table.translatorId),
-  actionIdx: index("action_idx").on(table.actionType),
-  sourceIdx: index("source_idx").on(table.source),
-  dateIdx: index("date_idx").on(table.createdAt),
-}));
-
-export type TranslationActivityLog = typeof translationActivityLog.$inferSelect;
-export type InsertTranslationActivityLog = typeof translationActivityLog.$inferInsert;
-
-// ============================================================================
-// TRANSLATION MEMORY
-// ============================================================================
-
-export const translationMemory = mysqlTable("translation_memory", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // Source and translation
-  sourceText: text("sourceText").notNull(),
-  translatedText: text("translatedText").notNull(),
-  sourceLanguage: varchar("sourceLanguage", { length: 10 }).notNull().default("en"),
-  targetLanguage: varchar("targetLanguage", { length: 10 }).notNull().default("ar"),
-  
-  // Context for better matching
-  context: varchar("context", { length: 100 }), // office_name, office_description, template_name, etc.
-  
-  // Usage tracking
-  usageCount: int("usageCount").notNull().default(0),
-  lastUsedAt: timestamp("lastUsedAt"),
-  
-  // Audit
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  createdBy: int("createdBy").notNull(),
-}, (table) => ({
-  contextIdx: index("context_idx").on(table.context),
-  usageIdx: index("usage_idx").on(table.usageCount),
-}));
-
-export type TranslationMemory = typeof translationMemory.$inferSelect;
-export type InsertTranslationMemory = typeof translationMemory.$inferInsert;
-
-// ============================================================================
-// TRANSLATION VERSION HISTORY
-// ============================================================================
-
-export const translationVersions = mysqlTable("translation_versions", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // What was changed
-  entityType: mysqlEnum("entityType", ["office", "template"]).notNull(),
-  entityId: int("entityId").notNull(),
-  fieldName: varchar("fieldName", { length: 50 }).notNull(), // nameAr, descriptionAr
-  
-  // Version data
-  oldValue: text("oldValue"),
-  newValue: text("newValue"),
-  
-  // Who changed it
-  changedBy: int("changedBy").notNull(),
-  changedByName: varchar("changedByName", { length: 255 }).notNull(),
-  changeReason: text("changeReason"),
-  
-  // Metadata
-  source: mysqlEnum("source", ["manual", "bulk_import", "request_approval", "auto_translate"]).default("manual").notNull(),
-  
-  // Audit
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, (table) => ({
-  entityIdx: index("entity_idx").on(table.entityType, table.entityId),
-  changedByIdx: index("changed_by_idx").on(table.changedBy),
-  dateIdx: index("date_idx").on(table.createdAt),
-}));
-
-export type TranslationVersion = typeof translationVersions.$inferSelect;
-export type InsertTranslationVersion = typeof translationVersions.$inferInsert;
-
-
-// ============================================================================
-// TRANSLATION REVIEWS (Collaborative Workflow)
-// ============================================================================
-
-export const translationReviews = mysqlTable("translation_reviews", {
-  id: int("id").primaryKey().autoincrement(),
-  entityType: mysqlEnum("entity_type", ["office", "template"]).notNull(),
-  entityId: int("entity_id").notNull(),
-  fieldName: varchar("field_name", { length: 50 }).notNull(), // nameAr, descriptionAr
-  translatedText: text("translated_text").notNull(),
-  status: mysqlEnum("status", ["pending", "approved", "rejected", "needs_revision"]).notNull().default("pending"),
-  submittedBy: int("submitted_by").notNull(),
-  submittedByName: varchar("submitted_by_name", { length: 255 }).notNull(),
-  reviewedBy: int("reviewed_by"),
-  reviewedByName: varchar("reviewed_by_name", { length: 255 }),
-  reviewNotes: text("review_notes"),
-  submittedAt: timestamp("submitted_at").defaultNow().notNull(),
-  reviewedAt: timestamp("reviewed_at"),
-}, (table) => ({
-  entityIdx: index("entity_idx").on(table.entityType, table.entityId),
-  statusIdx: index("status_idx").on(table.status),
-  submittedByIdx: index("submitted_by_idx").on(table.submittedBy),
-}));
-
-export type TranslationReview = typeof translationReviews.$inferSelect;
-export type InsertTranslationReview = typeof translationReviews.$inferInsert;
-
-export const translationReviewComments = mysqlTable("translation_review_comments", {
-  id: int("id").primaryKey().autoincrement(),
-  reviewId: int("review_id").notNull(),
-  userId: int("user_id").notNull(),
-  userName: varchar("user_name", { length: 255 }).notNull(),
-  comment: text("comment").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-}, (table) => ({
-  reviewIdIdx: index("review_id_idx").on(table.reviewId),
-}));
-
-export type TranslationReviewComment = typeof translationReviewComments.$inferSelect;
-export type InsertTranslationReviewComment = typeof translationReviewComments.$inferInsert;
-
-
-// ============================================================================
-// SMART BATCH TRANSLATION
-// ============================================================================
+export const authAuditLog = mysqlTable("auth_audit_log", {
+	id: int().autoincrement().notNull(),
+	userId: int(),
+	openId: varchar({ length: 64 }),
+	eventType: mysqlEnum(['login_success','login_failure','logout','session_expired','role_changed','permission_denied','password_reset_requested','password_reset_completed','mfa_enabled','mfa_disabled','mfa_verified','mfa_failed','email_verified','email_verification_sent','recovery_email_added','recovery_email_verified','session_revoked','all_sessions_revoked','account_locked','account_unlocked']).notNull(),
+	ipAddress: varchar({ length: 45 }),
+	userAgent: text(),
+	deviceInfo: json(),
+	country: varchar({ length: 100 }),
+	city: varchar({ length: 100 }),
+	metadata: json(),
+	success: tinyint().notNull(),
+	severity: mysqlEnum(['info','warning','error','critical']).default('info').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("user_id_idx").on(table.userId),
+	index("event_type_idx").on(table.eventType),
+	index("ip_address_idx").on(table.ipAddress),
+	index("created_at_idx").on(table.createdAt),
+	index("severity_idx").on(table.severity),
+	index("user_event_idx").on(table.userId, table.eventType, table.createdAt),
+]);
 
 export const batchTranslationJobs = mysqlTable("batch_translation_jobs", {
-  id: int("id").primaryKey().autoincrement(),
-  
-  // Job details
-  jobName: varchar("job_name", { length: 255 }).notNull(),
-  entityType: mysqlEnum("entity_type", ["office", "template", "both"]).notNull(),
-  
-  // Scope
-  targetEntityIds: json("target_entity_ids").$type<number[]>(), // null = all entities
-  
-  // Progress tracking
-  status: mysqlEnum("status", ["pending", "processing", "completed", "failed"]).notNull().default("pending"),
-  totalItems: int("total_items").notNull().default(0),
-  processedItems: int("processed_items").notNull().default(0),
-  autoApprovedCount: int("auto_approved_count").notNull().default(0),
-  queuedForReviewCount: int("queued_for_review_count").notNull().default(0),
-  failedCount: int("failed_count").notNull().default(0),
-  
-  // Settings
-  confidenceThreshold: int("confidence_threshold").notNull().default(80), // Auto-approve if >= threshold
-  useMemorySuggestions: boolean("use_memory_suggestions").notNull().default(true),
-  
-  // Results
-  results: json("results").$type<Array<{
-    entityType: string;
-    entityId: number;
-    fieldName: string;
-    status: "success" | "queued" | "failed";
-    confidence?: number;
-    error?: string;
-  }>>(),
-  
-  // Audit
-  createdBy: int("created_by").notNull(),
-  createdByName: varchar("created_by_name", { length: 255 }).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  startedAt: timestamp("started_at"),
-  completedAt: timestamp("completed_at"),
-}, (table) => ({
-  statusIdx: index("status_idx").on(table.status),
-  createdByIdx: index("created_by_idx").on(table.createdBy),
-  createdAtIdx: index("created_at_idx").on(table.createdAt),
-}));
+	id: int().autoincrement().notNull(),
+	jobName: varchar("job_name", { length: 255 }).notNull(),
+	entityType: mysqlEnum("entity_type", ['office','template','both']).notNull(),
+	targetEntityIds: json("target_entity_ids"),
+	status: mysqlEnum(['pending','processing','completed','failed']).default('pending').notNull(),
+	totalItems: int("total_items").default(0).notNull(),
+	processedItems: int("processed_items").default(0).notNull(),
+	autoApprovedCount: int("auto_approved_count").default(0).notNull(),
+	queuedForReviewCount: int("queued_for_review_count").default(0).notNull(),
+	failedCount: int("failed_count").default(0).notNull(),
+	confidenceThreshold: int("confidence_threshold").default(80).notNull(),
+	useMemorySuggestions: tinyint("use_memory_suggestions").default(1).notNull(),
+	results: json(),
+	createdBy: int("created_by").notNull(),
+	createdByName: varchar("created_by_name", { length: 255 }).notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	startedAt: timestamp("started_at", { mode: 'string' }),
+	completedAt: timestamp("completed_at", { mode: 'string' }),
+},
+(table) => [
+	index("status_idx").on(table.status),
+	index("created_by_idx").on(table.createdBy),
+	index("created_at_idx").on(table.createdAt),
+]);
 
-export type BatchTranslationJob = typeof batchTranslationJobs.$inferSelect;
-export type InsertBatchTranslationJob = typeof batchTranslationJobs.$inferInsert;
+export const bookings = mysqlTable("bookings", {
+	id: int().autoincrement().notNull(),
+	officeId: int().notNull(),
+	serviceId: int(),
+	userId: int().notNull(),
+	bookingType: varchar({ length: 50 }).default('service').notNull(),
+	serviceDescription: text(),
+	requirements: text(),
+	preferredDate: timestamp({ mode: 'string' }),
+	scheduledDate: timestamp({ mode: 'string' }),
+	completedDate: timestamp({ mode: 'string' }),
+	status: mysqlEnum(['pending','confirmed','in_progress','completed','cancelled']).default('pending').notNull(),
+	price: decimal({ precision: 10, scale: 3 }),
+	currency: varchar({ length: 3 }).default('OMR').notNull(),
+	paymentStatus: mysqlEnum(['unpaid','paid','refunded']).default('unpaid').notNull(),
+	notes: text(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+	scheduledTime: varchar({ length: 10 }),
+	duration: int().default(60),
+	cancellationReason: text(),
+	cancelledBy: int(),
+	cancelledAt: timestamp({ mode: 'string' }),
+	cancellationPenalty: decimal({ precision: 10, scale: 3 }),
+	refundAmount: decimal({ precision: 10, scale: 3 }),
+	reminder24HSent: tinyint().default(0).notNull(),
+	reminder1HSent: tinyint().default(0).notNull(),
+},
+(table) => [
+	index("office_idx").on(table.officeId),
+	index("user_idx").on(table.userId),
+	index("status_idx").on(table.status),
+	index("date_idx").on(table.scheduledDate),
+]);
 
+export const bundleServices = mysqlTable("bundle_services", {
+	id: int().autoincrement().notNull(),
+	bundleId: int("bundle_id").notNull(),
+	serviceId: int("service_id").notNull(),
+	serviceName: varchar("service_name", { length: 200 }).notNull(),
+	servicePrice: decimal("service_price", { precision: 10, scale: 2 }).notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP'),
+},
+(table) => [
+	index("bundle_idx").on(table.bundleId),
+	index("service_idx").on(table.serviceId),
+]);
 
-// ============================================================================
-// QUALITY ALERTS
-// ============================================================================
+export const cannedResponses = mysqlTable("canned_responses", {
+	id: int().autoincrement().notNull(),
+	officeId: int().notNull(),
+	title: varchar({ length: 255 }).notNull(),
+	content: text().notNull(),
+	category: mysqlEnum(['greeting','faq','closing','pricing','hours','services','general']).default('general').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+	shortcut: varchar({ length: 50 }),
+},
+(table) => [
+	index("office_idx").on(table.officeId),
+	index("category_idx").on(table.category),
+]);
+
+export const chatAssignments = mysqlTable("chat_assignments", {
+	id: int().autoincrement().notNull(),
+	conversationId: int().notNull(),
+	assignedToUserId: int().notNull(),
+	assignedByUserId: int().notNull(),
+	assignedAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("conversation_idx").on(table.conversationId),
+	index("assigned_to_idx").on(table.assignedToUserId),
+]);
+
+export const chatConversations = mysqlTable("chat_conversations", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	officeId: int().notNull(),
+	bookingId: int(),
+	status: mysqlEnum(['active','closed','archived']).default('active').notNull(),
+	lastMessageAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	lastMessagePreview: varchar({ length: 255 }),
+	unreadByUser: int().default(0).notNull(),
+	unreadByOffice: int().default(0).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+	tags: json(),
+},
+(table) => [
+	index("user_idx").on(table.userId),
+	index("office_idx").on(table.officeId),
+	index("booking_idx").on(table.bookingId),
+	index("status_idx").on(table.status),
+	index("last_message_idx").on(table.lastMessageAt),
+]);
+
+export const chatMessages = mysqlTable("chat_messages", {
+	id: int().autoincrement().notNull(),
+	conversationId: int().notNull(),
+	senderId: int().notNull(),
+	senderType: mysqlEnum(['user','office']).notNull(),
+	message: text().notNull(),
+	messageType: mysqlEnum(['text','file','system']).default('text').notNull(),
+	fileUrl: text(),
+	fileName: varchar({ length: 255 }),
+	isRead: tinyint().default(0).notNull(),
+	readAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("conversation_idx").on(table.conversationId),
+	index("sender_idx").on(table.senderId),
+	index("date_idx").on(table.createdAt),
+]);
+
+export const chatRatings = mysqlTable("chat_ratings", {
+	id: int().autoincrement().notNull(),
+	conversationId: int().notNull(),
+	rating: int().notNull(),
+	feedback: text(),
+	staffUserId: int(),
+	userId: int().notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("conversation_idx").on(table.conversationId),
+	index("staff_idx").on(table.staffUserId),
+	index("rating_idx").on(table.rating),
+]);
+
+export const chatTransferHistory = mysqlTable("chat_transfer_history", {
+	id: int().autoincrement().notNull(),
+	conversationId: int().notNull(),
+	fromUserId: int().notNull(),
+	toUserId: int().notNull(),
+	contextNotes: text(),
+	isEscalation: tinyint().default(0).notNull(),
+	transferredAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("conversation_idx").on(table.conversationId),
+	index("from_user_idx").on(table.fromUserId),
+	index("to_user_idx").on(table.toUserId),
+]);
+
+export const documentTemplates = mysqlTable("document_templates", {
+	id: int().autoincrement().notNull(),
+	templateName: varchar({ length: 255 }).notNull(),
+	templateNameAr: varchar({ length: 255 }),
+	category: varchar({ length: 100 }).notNull(),
+	description: text(),
+	descriptionAr: text(),
+	templateContent: text().notNull(),
+	variables: json().notNull(),
+	language: varchar({ length: 10 }).default('en').notNull(),
+	isOfficial: tinyint().default(0).notNull(),
+	isPremium: tinyint().default(0).notNull(),
+	usageCount: int().default(0).notNull(),
+	isActive: tinyint().default(1).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+	createdBy: int(),
+	tags: json(),
+	price: decimal({ precision: 10, scale: 3 }),
+	fileUrl: text(),
+	fileKey: varchar({ length: 500 }),
+	fileSize: int(),
+	mimeType: varchar({ length: 100 }),
+	googleDocId: varchar({ length: 255 }),
+	useGoogleDocs: tinyint().default(0).notNull(),
+	templateFileUrl: text(),
+	templateFileKey: varchar({ length: 500 }),
+},
+(table) => [
+	index("category_idx").on(table.category),
+	index("language_idx").on(table.language),
+	index("active_idx").on(table.isActive),
+]);
+
+export const generatedDocuments = mysqlTable("generated_documents", {
+	id: int().autoincrement().notNull(),
+	templateId: int().notNull(),
+	userId: int().notNull(),
+	officeId: int(),
+	bookingId: int(),
+	documentName: varchar({ length: 255 }).notNull(),
+	filledData: json().notNull(),
+	fileUrl: text().notNull(),
+	fileKey: varchar({ length: 255 }).notNull(),
+	status: mysqlEnum(['draft','generated','delivered']).default('generated').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("template_idx").on(table.templateId),
+	index("user_idx").on(table.userId),
+	index("office_idx").on(table.officeId),
+	index("booking_idx").on(table.bookingId),
+]);
+
+export const loyaltyPoints = mysqlTable("loyalty_points", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	totalPoints: int().default(0).notNull(),
+	availablePoints: int().default(0).notNull(),
+	redeemedPoints: int().default(0).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("user_idx").on(table.userId),
+]);
+
+export const loyaltyTransactions = mysqlTable("loyalty_transactions", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	type: mysqlEnum(['earn','redeem']).notNull(),
+	points: int().notNull(),
+	reason: varchar({ length: 255 }).notNull(),
+	bookingId: int(),
+	reviewId: int(),
+	referralId: int(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("user_idx").on(table.userId),
+	index("type_idx").on(table.type),
+]);
+
+export const notifications = mysqlTable("notifications", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	type: mysqlEnum(['booking','points','system','review','referral']).notNull(),
+	title: varchar({ length: 255 }).notNull(),
+	message: text().notNull(),
+	bookingId: int(),
+	reviewId: int(),
+	referralId: int(),
+	isRead: tinyint().default(0).notNull(),
+	readAt: timestamp({ mode: 'string' }),
+	actionUrl: varchar({ length: 500 }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("user_idx").on(table.userId),
+	index("type_idx").on(table.type),
+	index("read_idx").on(table.isRead),
+	index("date_idx").on(table.createdAt),
+]);
+
+export const officeAvailability = mysqlTable("office_availability", {
+	id: int().autoincrement().notNull(),
+	officeId: int().notNull(),
+	dayOfWeek: int().notNull(),
+	startTime: varchar({ length: 10 }).notNull(),
+	endTime: varchar({ length: 10 }).notNull(),
+	slotDuration: int().default(60).notNull(),
+	isActive: tinyint().default(1).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("office_idx").on(table.officeId),
+	index("day_idx").on(table.dayOfWeek),
+]);
+
+export const officeStaff = mysqlTable("office_staff", {
+	id: int().autoincrement().notNull(),
+	officeId: int().notNull(),
+	userId: int().notNull(),
+	role: mysqlEnum(['owner','manager','agent']).default('agent').notNull(),
+	isActive: tinyint().default(1).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	availabilityStatus: mysqlEnum(['online','offline','busy']).default('offline').notNull(),
+	expertiseTags: json(),
+	lastActiveAt: timestamp({ mode: 'string' }),
+},
+(table) => [
+	index("office_idx").on(table.officeId),
+	index("user_idx").on(table.userId),
+]);
 
 export const qualityAlerts = mysqlTable("quality_alerts", {
-  id: int("id").primaryKey().autoincrement(),
-  
-  // Alert details
-  alertType: mysqlEnum("alert_type", ["low_accuracy", "high_revision_rate", "memory_usage_drop"]).notNull(),
-  severity: mysqlEnum("severity", ["warning", "critical"]).notNull(),
-  
-  // Metrics
-  currentValue: decimal("current_value", { precision: 5, scale: 2 }).notNull(),
-  thresholdValue: decimal("threshold_value", { precision: 5, scale: 2 }).notNull(),
-  
-  // Message
-  message: text("message").notNull(),
-  
-  // Status
-  status: mysqlEnum("status", ["active", "resolved", "acknowledged"]).notNull().default("active"),
-  
-  // Timestamps
-  detectedAt: timestamp("detected_at").defaultNow().notNull(),
-  resolvedAt: timestamp("resolved_at"),
-  acknowledgedAt: timestamp("acknowledged_at"),
-  
-  // Notification
-  emailSent: boolean("email_sent").notNull().default(false),
-  emailSentAt: timestamp("email_sent_at"),
-}, (table) => ({
-  statusIdx: index("status_idx").on(table.status),
-  detectedAtIdx: index("detected_at_idx").on(table.detectedAt),
-}));
+	id: int().autoincrement().notNull(),
+	alertType: mysqlEnum("alert_type", ['low_accuracy','high_revision_rate','memory_usage_drop']).notNull(),
+	severity: mysqlEnum(['warning','critical']).notNull(),
+	currentValue: decimal("current_value", { precision: 5, scale: 2 }).notNull(),
+	thresholdValue: decimal("threshold_value", { precision: 5, scale: 2 }).notNull(),
+	message: text().notNull(),
+	status: mysqlEnum(['active','resolved','acknowledged']).default('active').notNull(),
+	detectedAt: timestamp("detected_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	resolvedAt: timestamp("resolved_at", { mode: 'string' }),
+	acknowledgedAt: timestamp("acknowledged_at", { mode: 'string' }),
+	emailSent: tinyint("email_sent").default(0).notNull(),
+	emailSentAt: timestamp("email_sent_at", { mode: 'string' }),
+},
+(table) => [
+	index("status_idx").on(table.status),
+	index("detected_at_idx").on(table.detectedAt),
+]);
 
-export type QualityAlert = typeof qualityAlerts.$inferSelect;
-export type InsertQualityAlert = typeof qualityAlerts.$inferInsert;
-
-
-// ============================================================================
-// TRANSLATOR TRAINING MODULE
-// ============================================================================
-
-export const trainingMaterials = mysqlTable("training_materials", {
-  id: int("id").primaryKey().autoincrement(),
-  title: varchar("title", { length: 255 }).notNull(),
-  titleAr: varchar("title_ar", { length: 255 }),
-  content: text("content").notNull(),
-  contentAr: text("content_ar"),
-  category: mysqlEnum("category", ["guidelines", "common_mistakes", "best_practices", "examples"]).notNull(),
-  orderIndex: int("order_index").default(0),
-  isActive: boolean("is_active").default(true),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
-});
-
-export const trainingQuizzes = mysqlTable("training_quizzes", {
-  id: int("id").primaryKey().autoincrement(),
-  title: varchar("title", { length: 255 }).notNull(),
-  titleAr: varchar("title_ar", { length: 255 }),
-  description: text("description"),
-  descriptionAr: text("description_ar"),
-  passingScore: int("passing_score").default(70),
-  isActive: boolean("is_active").default(true),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const quizQuestions = mysqlTable("quiz_questions", {
-  id: int("id").primaryKey().autoincrement(),
-  quizId: int("quiz_id").notNull().references(() => trainingQuizzes.id, { onDelete: "cascade" }),
-  question: text("question").notNull(),
-  questionAr: text("question_ar"),
-  correctAnswer: text("correct_answer").notNull(),
-  explanation: text("explanation"),
-  explanationAr: text("explanation_ar"),
-  orderIndex: int("order_index").default(0),
+export const quizAttempts = mysqlTable("quiz_attempts", {
+	id: int().autoincrement().notNull(),
+	quizId: int("quiz_id").notNull().references(() => trainingQuizzes.id, { onDelete: "cascade" } ),
+	userId: int("user_id").notNull().references(() => users.id),
+	score: int().notNull(),
+	totalQuestions: int("total_questions").notNull(),
+	passed: tinyint().default(0),
+	completedAt: timestamp("completed_at", { mode: 'string' }).default('CURRENT_TIMESTAMP'),
 });
 
 export const quizOptions = mysqlTable("quiz_options", {
-  id: int("id").primaryKey().autoincrement(),
-  questionId: int("question_id").notNull().references(() => quizQuestions.id, { onDelete: "cascade" }),
-  optionText: text("option_text").notNull(),
-  optionTextAr: text("option_text_ar"),
-  isCorrect: boolean("is_correct").default(false),
-  orderIndex: int("order_index").default(0),
+	id: int().autoincrement().notNull(),
+	questionId: int("question_id").notNull().references(() => quizQuestions.id, { onDelete: "cascade" } ),
+	optionText: text("option_text").notNull(),
+	optionTextAr: text("option_text_ar"),
+	isCorrect: tinyint("is_correct").default(0),
+	orderIndex: int("order_index").default(0),
 });
 
-export const quizAttempts = mysqlTable("quiz_attempts", {
-  id: int("id").primaryKey().autoincrement(),
-  quizId: int("quiz_id").notNull().references(() => trainingQuizzes.id),
-  userId: int("user_id").notNull().references(() => users.id),
-  score: int("score").notNull(),
-  totalQuestions: int("total_questions").notNull(),
-  passed: boolean("passed").default(false),
-  completedAt: timestamp("completed_at").defaultNow(),
+export const quizQuestions = mysqlTable("quiz_questions", {
+	id: int().autoincrement().notNull(),
+	quizId: int("quiz_id").notNull().references(() => trainingQuizzes.id, { onDelete: "cascade" } ),
+	question: text().notNull(),
+	questionAr: text("question_ar"),
+	correctAnswer: text("correct_answer").notNull(),
+	explanation: text(),
+	explanationAr: text("explanation_ar"),
+	orderIndex: int("order_index").default(0),
 });
 
-export type TrainingMaterial = typeof trainingMaterials.$inferSelect;
-export type InsertTrainingMaterial = typeof trainingMaterials.$inferInsert;
-export type TrainingQuiz = typeof trainingQuizzes.$inferSelect;
-export type InsertTrainingQuiz = typeof trainingQuizzes.$inferInsert;
-export type QuizQuestion = typeof quizQuestions.$inferSelect;
-export type InsertQuizQuestion = typeof quizQuestions.$inferInsert;
-export type QuizOption = typeof quizOptions.$inferSelect;
-export type InsertQuizOption = typeof quizOptions.$inferInsert;
-export type QuizAttempt = typeof quizAttempts.$inferSelect;
-export type InsertQuizAttempt = typeof quizAttempts.$inferInsert;
-
-// ============================================================================
-// TRANSLATION WORKFLOW AUTOMATION
-// ============================================================================
-
-export const untranslatedContentAlerts = mysqlTable("untranslated_content_alerts", {
-  id: int("id").primaryKey().autoincrement(),
-  contentType: mysqlEnum("content_type", ["office", "template"]).notNull(),
-  contentId: int("content_id").notNull(),
-  priority: mysqlEnum("priority", ["low", "medium", "high", "critical"]).default("medium"),
-  status: mysqlEnum("status", ["pending", "in_progress", "resolved"]).default("pending"),
-  notificationSent: boolean("notification_sent").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
-  resolvedAt: timestamp("resolved_at"),
-}, (table) => ({
-  contentIdx: index("content_idx").on(table.contentType, table.contentId),
-  statusIdx: index("status_idx").on(table.status),
-  priorityIdx: index("priority_idx").on(table.priority),
-}));
-
-export type UntranslatedContentAlert = typeof untranslatedContentAlerts.$inferSelect;
-export type InsertUntranslatedContentAlert = typeof untranslatedContentAlerts.$inferInsert;
-
-
-// ============================================================================
-// SERVICE REQUEST MARKETPLACE
-// ============================================================================
-
-export const serviceRequests = mysqlTable("service_requests", {
-  id: int("id").primaryKey().autoincrement(),
-  userId: int("user_id").notNull(),
-  
-  // Request details
-  title: varchar("title", { length: 255 }).notNull(),
-  description: text("description").notNull(),
-  serviceType: varchar("service_type", { length: 100 }).notNull(),
-  category: varchar("category", { length: 100 }),
-  
-  // Requirements
-  requirements: text("requirements"),
-  documents: json("documents"), // Array of uploaded document URLs
-  
-  // Budget and timeline
-  budgetMin: decimal("budget_min", { precision: 10, scale: 2 }),
-  budgetMax: decimal("budget_max", { precision: 10, scale: 2 }),
-  currency: varchar("currency", { length: 3 }).default("OMR").notNull(),
-  deadline: timestamp("deadline"),
-  urgency: mysqlEnum("urgency", ["low", "medium", "high", "urgent"]).default("medium"),
-  
-  // Location preferences
-  governorate: varchar("governorate", { length: 100 }),
-  wilayat: varchar("wilayat", { length: 100 }),
-  remoteAccepted: boolean("remote_accepted").default(true),
-  
-  // Status
-  status: mysqlEnum("status", ["open", "bidding", "awarded", "in_progress", "completed", "cancelled"]).default("open").notNull(),
-  acceptedBidId: int("accepted_bid_id"),
-  
-  // Metadata
-  viewCount: int("view_count").default(0),
-  bidCount: int("bid_count").default(0),
-  expiresAt: timestamp("expires_at"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
-}, (table) => ({
-  userIdx: index("user_idx").on(table.userId),
-  statusIdx: index("status_idx").on(table.status),
-  categoryIdx: index("category_idx").on(table.category),
-  urgencyIdx: index("urgency_idx").on(table.urgency),
-  locationIdx: index("location_idx").on(table.governorate, table.wilayat),
-}));
-
-export const requestMessages = mysqlTable("request_messages", {
-  id: int("id").primaryKey().autoincrement(),
-  requestId: int("request_id").notNull(),
-  senderId: int("sender_id").notNull(),
-  senderType: mysqlEnum("sender_type", ["customer", "office"]).notNull(),
-  
-  // Message content
-  message: text("message").notNull(),
-  attachments: json("attachments").$type<Array<{
-    url: string;
-    filename: string;
-    fileType: string;
-    fileSize: number;
-  }>>(),
-  
-  // Status
-  isRead: boolean("is_read").default(false),
-  readAt: timestamp("read_at"),
-  
-  // Metadata
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
-}, (table) => ({
-  requestIdx: index("request_idx").on(table.requestId),
-  senderIdx: index("sender_idx").on(table.senderId),
-  createdAtIdx: index("created_at_idx").on(table.createdAt),
-}));
-
-export type RequestMessage = typeof requestMessages.$inferSelect;
-export type InsertRequestMessage = typeof requestMessages.$inferInsert;
-
-export const serviceBids = mysqlTable("service_bids", {
-  id: int("id").primaryKey().autoincrement(),
-  requestId: int("request_id").notNull(),
-  officeId: int("office_id").notNull(),
-  
-  // Bid details
-  proposedPrice: decimal("proposed_price", { precision: 10, scale: 2 }).notNull(),
-  currency: varchar("currency", { length: 3 }).default("OMR").notNull(),
-  estimatedDuration: varchar("estimated_duration", { length: 100 }), // e.g., "3-5 days"
-  
-  // Proposal
-  coverLetter: text("cover_letter").notNull(),
-  methodology: text("methodology"),
-  portfolio: json("portfolio"), // Array of past work examples
-  
-  // Status
-  status: mysqlEnum("status", ["pending", "accepted", "rejected", "withdrawn"]).default("pending").notNull(),
-  
-  // Metadata
-  viewedByCustomer: boolean("viewed_by_customer").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
-}, (table) => ({
-  requestIdx: index("request_idx").on(table.requestId),
-  officeIdx: index("office_idx").on(table.officeId),
-  statusIdx: index("status_idx").on(table.status),
-}));
-
-export type ServiceRequest = typeof serviceRequests.$inferSelect;
-export type InsertServiceRequest = typeof serviceRequests.$inferInsert;
-export type ServiceBid = typeof serviceBids.$inferSelect;
-export type InsertServiceBid = typeof serviceBids.$inferInsert;
-
-// ============================================
-// SERVICE BUNDLES
-// ============================================
-
-export const serviceBundles = mysqlTable("service_bundles", {
-  id: int("id").primaryKey().autoincrement(),
-  officeId: int("office_id").notNull(),
-  
-  // Bundle details
-  name: varchar("name", { length: 200 }).notNull(),
-  description: text("description"),
-  
-  // Pricing
-  discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }).notNull(), // e.g., 15.00 for 15% off
-  validFrom: timestamp("valid_from"),
-  validUntil: timestamp("valid_until"),
-  
-  // Status
-  isActive: boolean("is_active").default(true).notNull(),
-  
-  // Metadata
-  createdBy: int("created_by"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
-}, (table) => ({
-  officeIdx: index("office_idx").on(table.officeId),
-  activeIdx: index("active_idx").on(table.isActive),
-}));
-
-export const bundleServices = mysqlTable("bundle_services", {
-  id: int("id").primaryKey().autoincrement(),
-  bundleId: int("bundle_id").notNull(),
-  serviceId: int("service_id").notNull(),
-  
-  // Service details (denormalized for display)
-  serviceName: varchar("service_name", { length: 200 }).notNull(),
-  servicePrice: decimal("service_price", { precision: 10, scale: 2 }).notNull(),
-  
-  createdAt: timestamp("created_at").defaultNow(),
-}, (table) => ({
-  bundleIdx: index("bundle_idx").on(table.bundleId),
-  serviceIdx: index("service_idx").on(table.serviceId),
-}));
-
-export type ServiceBundle = typeof serviceBundles.$inferSelect;
-export type InsertServiceBundle = typeof serviceBundles.$inferInsert;
-export type BundleService = typeof bundleServices.$inferSelect;
-export type InsertBundleService = typeof bundleServices.$inferInsert;
-
-// ============================================================================
-// REGIONAL CAMPAIGNS
-// ============================================================================
+export const referrals = mysqlTable("referrals", {
+	id: int().autoincrement().notNull(),
+	referrerId: int().notNull(),
+	referralCode: varchar({ length: 20 }).notNull(),
+	referredId: int(),
+	status: mysqlEnum(['pending','completed','expired']).default('pending').notNull(),
+	pointsAwarded: tinyint().default(0).notNull(),
+	firstBookingId: int(),
+	completedAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("referrals_referralCode_unique").on(table.referralCode),
+	index("referrer_idx").on(table.referrerId),
+	index("referred_idx").on(table.referredId),
+	index("code_idx").on(table.referralCode),
+	index("status_idx").on(table.status),
+]);
 
 export const regionalCampaigns = mysqlTable("regional_campaigns", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // Campaign Details
-  title: varchar("title", { length: 255 }).notNull(),
-  titleAr: varchar("titleAr", { length: 255 }),
-  description: text("description").notNull(),
-  descriptionAr: text("descriptionAr"),
-  
-  // Targeting
-  targetRegion: varchar("targetRegion", { length: 100 }).notNull(), // "Muscat", "Dhofar", "all", etc.
-  targetUserSegment: mysqlEnum("targetUserSegment", ["all", "new_users", "returning_users", "high_value"]).default("all").notNull(),
-  
-  // Campaign Type
-  campaignType: mysqlEnum("campaignType", ["seasonal", "promotional", "awareness", "special_event"]).default("promotional").notNull(),
-  
-  // Visual Elements
-  bannerImageUrl: text("bannerImageUrl"),
-  backgroundColor: varchar("backgroundColor", { length: 20 }).default("#003366"),
-  textColor: varchar("textColor", { length: 20 }).default("#FFFFFF"),
-  
-  // Call to Action
-  ctaText: varchar("ctaText", { length: 100 }),
-  ctaTextAr: varchar("ctaTextAr", { length: 100 }),
-  ctaLink: varchar("ctaLink", { length: 500 }),
-  
-  // Discount/Offer
-  discountPercentage: int("discountPercentage"), // e.g., 20 for 20% off
-  discountCode: varchar("discountCode", { length: 50 }),
-  
-  // Scheduling
-  startDate: timestamp("startDate").notNull(),
-  endDate: timestamp("endDate").notNull(),
-  
-  // Status
-  isActive: boolean("isActive").default(true).notNull(),
-  priority: int("priority").default(0).notNull(), // Higher priority shows first
-  
-  // Analytics
-  impressions: int("impressions").default(0).notNull(),
-  clicks: int("clicks").default(0).notNull(),
-  conversions: int("conversions").default(0).notNull(),
-  
-  // Metadata
-  createdBy: int("createdBy").notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, (table) => ({
-  regionIdx: index("region_idx").on(table.targetRegion),
-  activeIdx: index("active_idx").on(table.isActive),
-  dateIdx: index("date_idx").on(table.startDate, table.endDate),
-  priorityIdx: index("priority_idx").on(table.priority),
-}));
+	id: int().autoincrement().notNull(),
+	title: varchar({ length: 255 }).notNull(),
+	titleAr: varchar({ length: 255 }),
+	description: text().notNull(),
+	descriptionAr: text(),
+	targetRegion: varchar({ length: 100 }).notNull(),
+	targetUserSegment: mysqlEnum(['all','new_users','returning_users','high_value']).default('all').notNull(),
+	campaignType: mysqlEnum(['seasonal','promotional','awareness','special_event']).default('promotional').notNull(),
+	bannerImageUrl: text(),
+	backgroundColor: varchar({ length: 20 }).default('#003366'),
+	textColor: varchar({ length: 20 }).default('#FFFFFF'),
+	ctaText: varchar({ length: 100 }),
+	ctaTextAr: varchar({ length: 100 }),
+	ctaLink: varchar({ length: 500 }),
+	discountPercentage: int(),
+	discountCode: varchar({ length: 50 }),
+	startDate: timestamp({ mode: 'string' }).notNull(),
+	endDate: timestamp({ mode: 'string' }).notNull(),
+	isActive: tinyint().default(1).notNull(),
+	priority: int().default(0).notNull(),
+	impressions: int().default(0).notNull(),
+	clicks: int().default(0).notNull(),
+	conversions: int().default(0).notNull(),
+	createdBy: int().notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("region_idx").on(table.targetRegion),
+	index("active_idx").on(table.isActive),
+	index("date_idx").on(table.startDate, table.endDate),
+	index("priority_idx").on(table.priority),
+]);
 
-export type RegionalCampaign = typeof regionalCampaigns.$inferSelect;
-export type InsertRegionalCampaign = typeof regionalCampaigns.$inferInsert;
+export const requestMessages = mysqlTable("request_messages", {
+	id: int().autoincrement().notNull(),
+	requestId: int("request_id").notNull(),
+	senderId: int("sender_id").notNull(),
+	senderType: mysqlEnum("sender_type", ['customer','office']).notNull(),
+	message: text().notNull(),
+	attachments: json(),
+	isRead: tinyint("is_read").default(0),
+	readAt: timestamp("read_at", { mode: 'string' }),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP'),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow(),
+},
+(table) => [
+	index("request_idx").on(table.requestId),
+	index("sender_idx").on(table.senderId),
+	index("created_at_idx").on(table.createdAt),
+]);
 
-// ============================================================================
-// AUTHENTICATION AUDIT LOGGING
-// ============================================================================
+export const reviewPhotos = mysqlTable("review_photos", {
+	id: int().autoincrement().notNull(),
+	reviewId: int().notNull(),
+	photoUrl: text().notNull(),
+	photoKey: text().notNull(),
+	uploadedAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("review_idx").on(table.reviewId),
+]);
 
-export const authAuditLog = mysqlTable("auth_audit_log", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // User information
-  userId: int("userId"), // Nullable for failed login attempts
-  openId: varchar("openId", { length: 64 }), // For tracking attempts before user lookup
-  
-  // Event details
-  eventType: mysqlEnum("eventType", [
-    "login_success",
-    "login_failure", 
-    "logout",
-    "session_expired",
-    "role_changed",
-    "permission_denied",
-    "password_reset_requested",
-    "password_reset_completed",
-    "mfa_enabled",
-    "mfa_disabled",
-    "mfa_verified",
-    "mfa_failed",
-    "email_verified",
-    "email_verification_sent",
-    "recovery_email_added",
-    "recovery_email_verified",
-    "session_revoked",
-    "all_sessions_revoked",
-    "account_locked",
-    "account_unlocked"
-  ]).notNull(),
-  
-  // Request metadata
-  ipAddress: varchar("ipAddress", { length: 45 }), // IPv6 compatible
-  userAgent: text("userAgent"),
-  deviceInfo: json("deviceInfo").$type<{
-    browser?: string;
-    os?: string;
-    device?: string;
-    isMobile?: boolean;
-  }>(),
-  
-  // Location data (optional, can be derived from IP)
-  country: varchar("country", { length: 100 }),
-  city: varchar("city", { length: 100 }),
-  
-  // Event-specific metadata
-  metadata: json("metadata").$type<{
-    attemptedEmail?: string; // For failed logins
-    previousRole?: string; // For role changes
-    newRole?: string; // For role changes
-    attemptedAction?: string; // For permission denied
-    reason?: string; // General reason field
-    sessionDuration?: number; // For logout events (in seconds)
-    [key: string]: any;
-  }>(),
-  
-  // Status and severity
-  success: boolean("success").notNull(),
-  severity: mysqlEnum("severity", ["info", "warning", "error", "critical"]).default("info").notNull(),
-  
-  // Timestamps
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, (table) => ({
-  userIdIdx: index("user_id_idx").on(table.userId),
-  eventTypeIdx: index("event_type_idx").on(table.eventType),
-  ipAddressIdx: index("ip_address_idx").on(table.ipAddress),
-  createdAtIdx: index("created_at_idx").on(table.createdAt),
-  severityIdx: index("severity_idx").on(table.severity),
-  // Composite index for common queries
-  userEventIdx: index("user_event_idx").on(table.userId, table.eventType, table.createdAt),
-}));
+export const reviewVotes = mysqlTable("review_votes", {
+	id: int().autoincrement().notNull(),
+	reviewId: int().notNull(),
+	userId: int().notNull(),
+	voteType: mysqlEnum(['helpful','not_helpful']).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("review_user_idx").on(table.reviewId, table.userId),
+	index("review_idx").on(table.reviewId),
+]);
 
-export type AuthAuditLog = typeof authAuditLog.$inferSelect;
-export type InsertAuthAuditLog = typeof authAuditLog.$inferInsert;
+export const reviews = mysqlTable("reviews", {
+	id: int().autoincrement().notNull(),
+	officeId: int().notNull(),
+	bookingId: int(),
+	userId: int().notNull(),
+	rating: int().notNull(),
+	reviewText: text(),
+	responseText: text(),
+	respondedAt: timestamp({ mode: 'string' }),
+	respondedBy: int(),
+	isVisible: tinyint().default(1).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("office_idx").on(table.officeId),
+	index("user_idx").on(table.userId),
+	index("booking_idx").on(table.bookingId),
+	index("visible_idx").on(table.isVisible),
+]);
 
-// ============================================================================
-// SESSION MANAGEMENT
-// ============================================================================
+export const sanadOfficeServices = mysqlTable("sanad_office_services", {
+	id: int().autoincrement().notNull(),
+	officeId: int().notNull(),
+	serviceName: varchar({ length: 255 }).notNull(),
+	serviceNameAr: varchar({ length: 255 }),
+	category: varchar({ length: 100 }).notNull(),
+	description: text(),
+	descriptionAr: text(),
+	price: decimal({ precision: 10, scale: 3 }),
+	currency: varchar({ length: 3 }).default('OMR').notNull(),
+	priceType: mysqlEnum(['fixed','hourly','custom']).default('fixed').notNull(),
+	estimatedDeliveryDays: int(),
+	isActive: tinyint().default(1).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("office_idx").on(table.officeId),
+	index("category_idx").on(table.category),
+	index("active_idx").on(table.isActive),
+]);
 
-export const activeSessions = mysqlTable("active_sessions", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // Session identification
-  sessionId: varchar("sessionId", { length: 255 }).notNull().unique(),
-  userId: int("userId").notNull(),
-  
-  // Device and location information
-  deviceInfo: json("deviceInfo").$type<{
-    browser?: string;
-    os?: string;
-    device?: string;
-    isMobile?: boolean;
-  }>(),
-  ipAddress: varchar("ipAddress", { length: 45 }), // IPv6 compatible
-  userAgent: text("userAgent"),
-  
-  // Geographic location
-  location: json("location").$type<{
-    country?: string;
-    region?: string;
-    city?: string;
-    latitude?: number;
-    longitude?: number;
-    timezone?: string;
-    formatted?: string;
-  }>(),
-  
-  // Session metadata
-  lastActive: timestamp("lastActive").defaultNow().notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  expiresAt: timestamp("expiresAt"),
-  
-  // Status
-  isActive: boolean("isActive").default(true).notNull(),
-}, (table) => ({
-  userIdIdx: index("user_id_idx").on(table.userId),
-  sessionIdIdx: index("session_id_idx").on(table.sessionId),
-  lastActiveIdx: index("last_active_idx").on(table.lastActive),
-  isActiveIdx: index("is_active_idx").on(table.isActive),
-}));
+export const sanadOfficeStaff = mysqlTable("sanad_office_staff", {
+	id: int().autoincrement().notNull(),
+	officeId: int().notNull(),
+	userId: int().notNull(),
+	role: mysqlEnum(['owner','manager','staff','viewer']).default('staff').notNull(),
+	permissions: json(),
+	status: mysqlEnum(['active','inactive','invited']).default('invited').notNull(),
+	invitedAt: timestamp({ mode: 'string' }),
+	joinedAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("unique_office_user").on(table.officeId, table.userId),
+	index("office_idx").on(table.officeId),
+	index("user_idx").on(table.userId),
+]);
 
-export type ActiveSession = typeof activeSessions.$inferSelect;
-export type InsertActiveSession = typeof activeSessions.$inferInsert;
+export const sanadOffices = mysqlTable("sanad_offices", {
+	id: int().autoincrement().notNull(),
+	officeName: varchar({ length: 255 }).notNull(),
+	officeNameAr: varchar({ length: 255 }),
+	slug: varchar({ length: 255 }).notNull(),
+	commercialRegistration: varchar({ length: 100 }).notNull(),
+	tradeLicense: varchar({ length: 100 }),
+	taxRegistration: varchar({ length: 100 }),
+	email: varchar({ length: 320 }).notNull(),
+	phone: varchar({ length: 20 }).notNull(),
+	whatsapp: varchar({ length: 20 }),
+	website: text(),
+	governorate: varchar({ length: 100 }).notNull(),
+	wilayat: varchar({ length: 100 }).notNull(),
+	addressLine1: text().notNull(),
+	addressLine2: text(),
+	postalCode: varchar({ length: 20 }),
+	locationLat: decimal({ precision: 10, scale: 7 }),
+	locationLng: decimal({ precision: 10, scale: 7 }),
+	description: text(),
+	descriptionAr: text(),
+	yearEstablished: int(),
+	employeeCount: int().default(1).notNull(),
+	status: mysqlEnum(['pending','active','suspended','inactive']).default('pending').notNull(),
+	verificationStatus: mysqlEnum(['unverified','pending_verification','verified','rejected']).default('unverified').notNull(),
+	verifiedAt: timestamp({ mode: 'string' }),
+	verifiedBy: int(),
+	ownerId: int().notNull(),
+	acceptsOnlineBookings: tinyint().default(1).notNull(),
+	autoAcceptBookings: tinyint().default(0).notNull(),
+	workingHours: json(),
+	logoUrl: text(),
+	coverImageUrl: text(),
+	images: json(),
+	totalOrders: int().default(0).notNull(),
+	completedOrders: int().default(0).notNull(),
+	averageRating: decimal({ precision: 3, scale: 2 }).default('0.00').notNull(),
+	totalReviews: int().default(0).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+	createdBy: int(),
+	updatedBy: int(),
+	cancellationWindowHours: int().default(24).notNull(),
+	cancellationPenaltyPercent: int().default(0).notNull(),
+	licenseDocumentUrl: text(),
+	certificateUrls: json(),
+	permitUrls: json(),
+	licenseExpiryDate: timestamp({ mode: 'string' }),
+	tradeLicenseExpiryDate: timestamp({ mode: 'string' }),
+	taxRegistrationExpiryDate: timestamp({ mode: 'string' }),
+	performanceScore: decimal({ precision: 5, scale: 2 }).default('0'),
+	performanceRank: int().default(0),
+},
+(table) => [
+	index("sanad_offices_slug_unique").on(table.slug),
+	index("sanad_offices_commercialRegistration_unique").on(table.commercialRegistration),
+	index("owner_idx").on(table.ownerId),
+	index("status_idx").on(table.status),
+	index("governorate_idx").on(table.governorate),
+	index("verification_idx").on(table.verificationStatus),
+]);
 
-// ============================================================================
-// SECURITY ALERTS
-// ============================================================================
+export const scheduledFollowups = mysqlTable("scheduled_followups", {
+	id: int().autoincrement().notNull(),
+	conversationId: int().notNull(),
+	officeId: int().notNull(),
+	scheduledFor: timestamp({ mode: 'string' }).notNull(),
+	triggerType: mysqlEnum(['24h','48h','manual']).default('24h').notNull(),
+	messageTemplate: text().notNull(),
+	status: mysqlEnum(['pending','sent','cancelled']).default('pending').notNull(),
+	sentAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+});
 
 export const securityAlerts = mysqlTable("security_alerts", {
-  id: int("id").autoincrement().primaryKey(),
-  
-  // Alert identification
-  alertType: mysqlEnum("alertType", [
-    "multiple_failed_logins",
-    "impossible_travel",
-    "fast_travel",
-    "country_change",
-    "mfa_failure",
-    "suspicious_ip",
-    "password_reset_abuse",
-    "session_hijacking",
-    "brute_force_attempt",
-    "account_lockout",
-  ]).notNull(),
-  
-  severity: mysqlEnum("severity", ["low", "medium", "high", "critical"]).notNull(),
-  status: mysqlEnum("status", ["new", "investigating", "resolved", "false_positive"]).default("new").notNull(),
-  
-  // User and session information
-  userId: int("userId"),
-  openId: varchar("openId", { length: 64 }),
-  sessionId: varchar("sessionId", { length: 255 }),
-  
-  // Alert details
-  title: varchar("title", { length: 255 }).notNull(),
-  description: text("description").notNull(),
-  
-  // Context information
-  ipAddress: varchar("ipAddress", { length: 45 }),
-  userAgent: text("userAgent"),
-  location: json("location").$type<{
-    country?: string;
-    region?: string;
-    city?: string;
-    latitude?: number;
-    longitude?: number;
-    timezone?: string;
-    formatted?: string;
-  }>(),
-  
-  // Additional metadata
-  metadata: json("metadata").$type<{
-    failedAttempts?: number;
-    distance?: number;
-    timeDifference?: number;
-    previousLocation?: any;
-    currentLocation?: any;
-    reason?: string;
-    [key: string]: any;
-  }>(),
-  
-  // Resolution tracking
-  resolvedBy: int("resolvedBy"), // Admin user ID who resolved the alert
-  resolvedAt: timestamp("resolvedAt"),
-  resolutionNotes: text("resolutionNotes"),
-  
-  // Notification tracking
-  notificationSent: boolean("notificationSent").default(false),
-  notificationSentAt: timestamp("notificationSentAt"),
-  
-  // Timestamps
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, (table) => ({
-  userIdIdx: index("user_id_idx").on(table.userId),
-  alertTypeIdx: index("alert_type_idx").on(table.alertType),
-  severityIdx: index("severity_idx").on(table.severity),
-  statusIdx: index("status_idx").on(table.status),
-  createdAtIdx: index("created_at_idx").on(table.createdAt),
-}));
+	id: int().autoincrement().notNull(),
+	alertType: mysqlEnum(['multiple_failed_logins','impossible_travel','fast_travel','country_change','mfa_failure','suspicious_ip','password_reset_abuse','session_hijacking','brute_force_attempt','account_lockout']).notNull(),
+	severity: mysqlEnum(['low','medium','high','critical']).notNull(),
+	status: mysqlEnum(['new','investigating','resolved','false_positive']).default('new').notNull(),
+	userId: int(),
+	openId: varchar({ length: 64 }),
+	sessionId: varchar({ length: 255 }),
+	title: varchar({ length: 255 }).notNull(),
+	description: text().notNull(),
+	ipAddress: varchar({ length: 45 }),
+	userAgent: text(),
+	location: json(),
+	metadata: json(),
+	resolvedBy: int(),
+	resolvedAt: timestamp({ mode: 'string' }),
+	resolutionNotes: text(),
+	notificationSent: tinyint().default(0),
+	notificationSentAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("user_id_idx").on(table.userId),
+	index("alert_type_idx").on(table.alertType),
+	index("severity_idx").on(table.severity),
+	index("status_idx").on(table.status),
+	index("created_at_idx").on(table.createdAt),
+]);
 
-export type SecurityAlert = typeof securityAlerts.$inferSelect;
-export type InsertSecurityAlert = typeof securityAlerts.$inferInsert;
+export const serviceBids = mysqlTable("service_bids", {
+	id: int().autoincrement().notNull(),
+	requestId: int("request_id").notNull(),
+	officeId: int("office_id").notNull(),
+	proposedPrice: decimal("proposed_price", { precision: 10, scale: 2 }).notNull(),
+	currency: varchar({ length: 3 }).default('OMR').notNull(),
+	estimatedDuration: varchar("estimated_duration", { length: 100 }),
+	coverLetter: text("cover_letter").notNull(),
+	methodology: text(),
+	portfolio: json(),
+	status: mysqlEnum(['pending','accepted','rejected','withdrawn']).default('pending').notNull(),
+	viewedByCustomer: tinyint("viewed_by_customer").default(0),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP'),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow(),
+},
+(table) => [
+	index("request_idx").on(table.requestId),
+	index("office_idx").on(table.officeId),
+	index("status_idx").on(table.status),
+]);
+
+export const serviceBundles = mysqlTable("service_bundles", {
+	id: int().autoincrement().notNull(),
+	officeId: int("office_id").notNull(),
+	name: varchar({ length: 200 }).notNull(),
+	description: text(),
+	discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }).notNull(),
+	validFrom: timestamp("valid_from", { mode: 'string' }),
+	validUntil: timestamp("valid_until", { mode: 'string' }),
+	isActive: tinyint("is_active").default(1).notNull(),
+	createdBy: int("created_by"),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP'),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow(),
+},
+(table) => [
+	index("office_idx").on(table.officeId),
+	index("active_idx").on(table.isActive),
+]);
+
+export const serviceRequests = mysqlTable("service_requests", {
+	id: int().autoincrement().notNull(),
+	userId: int("user_id").notNull(),
+	title: varchar({ length: 255 }).notNull(),
+	description: text().notNull(),
+	serviceType: varchar("service_type", { length: 100 }).notNull(),
+	category: varchar({ length: 100 }),
+	requirements: text(),
+	documents: json(),
+	budgetMin: decimal("budget_min", { precision: 10, scale: 2 }),
+	budgetMax: decimal("budget_max", { precision: 10, scale: 2 }),
+	currency: varchar({ length: 3 }).default('OMR').notNull(),
+	deadline: timestamp({ mode: 'string' }),
+	urgency: mysqlEnum(['low','medium','high','urgent']).default('medium'),
+	governorate: varchar({ length: 100 }),
+	wilayat: varchar({ length: 100 }),
+	remoteAccepted: tinyint("remote_accepted").default(1),
+	status: mysqlEnum(['open','bidding','awarded','in_progress','completed','cancelled']).default('open').notNull(),
+	acceptedBidId: int("accepted_bid_id"),
+	viewCount: int("view_count").default(0),
+	bidCount: int("bid_count").default(0),
+	expiresAt: timestamp("expires_at", { mode: 'string' }),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP'),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow(),
+},
+(table) => [
+	index("user_idx").on(table.userId),
+	index("status_idx").on(table.status),
+	index("category_idx").on(table.category),
+	index("urgency_idx").on(table.urgency),
+	index("location_idx").on(table.governorate, table.wilayat),
+]);
+
+export const templateDownloads = mysqlTable("template_downloads", {
+	id: int().autoincrement().notNull(),
+	templateId: int().notNull(),
+	userId: int().notNull(),
+	downloadedAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	ipAddress: varchar({ length: 45 }),
+	userAgent: text(),
+},
+(table) => [
+	index("template_idx").on(table.templateId),
+	index("user_idx").on(table.userId),
+	index("date_idx").on(table.downloadedAt),
+]);
+
+export const trainingMaterials = mysqlTable("training_materials", {
+	id: int().autoincrement().notNull(),
+	title: varchar({ length: 255 }).notNull(),
+	titleAr: varchar("title_ar", { length: 255 }),
+	content: text().notNull(),
+	contentAr: text("content_ar"),
+	category: mysqlEnum(['guidelines','common_mistakes','best_practices','examples']).notNull(),
+	orderIndex: int("order_index").default(0),
+	isActive: tinyint("is_active").default(1),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP'),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow(),
+});
+
+export const trainingQuizzes = mysqlTable("training_quizzes", {
+	id: int().autoincrement().notNull(),
+	title: varchar({ length: 255 }).notNull(),
+	titleAr: varchar("title_ar", { length: 255 }),
+	description: text(),
+	descriptionAr: text("description_ar"),
+	passingScore: int("passing_score").default(70),
+	isActive: tinyint("is_active").default(1),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP'),
+});
+
+export const translationActivityLog = mysqlTable("translation_activity_log", {
+	id: int().autoincrement().notNull(),
+	entityType: mysqlEnum(['office','template']).notNull(),
+	entityId: int().notNull(),
+	entityName: varchar({ length: 255 }).notNull(),
+	translatorId: int().notNull(),
+	translatorName: varchar({ length: 255 }).notNull(),
+	actionType: mysqlEnum(['created','updated','bulk_import']).notNull(),
+	fieldChanged: varchar({ length: 50 }),
+	previousValue: text(),
+	newValue: text(),
+	source: mysqlEnum(['manual','bulk_import','request_approval']).default('manual').notNull(),
+	requestId: int(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("entity_idx").on(table.entityType, table.entityId),
+	index("translator_idx").on(table.translatorId),
+	index("action_idx").on(table.actionType),
+	index("source_idx").on(table.source),
+	index("date_idx").on(table.createdAt),
+]);
+
+export const translationMemory = mysqlTable("translation_memory", {
+	id: int().autoincrement().notNull(),
+	sourceText: text().notNull(),
+	translatedText: text().notNull(),
+	sourceLanguage: varchar({ length: 10 }).default('en').notNull(),
+	targetLanguage: varchar({ length: 10 }).default('ar').notNull(),
+	context: varchar({ length: 100 }),
+	usageCount: int().default(0).notNull(),
+	lastUsedAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	createdBy: int().notNull(),
+},
+(table) => [
+	index("source_idx").on(table.sourceText),
+	index("context_idx").on(table.context),
+	index("usage_idx").on(table.usageCount),
+]);
+
+export const translationRequests = mysqlTable("translation_requests", {
+	id: int().autoincrement().notNull(),
+	entityType: mysqlEnum(['office','template']).notNull(),
+	entityId: int().notNull(),
+	requesterId: int().notNull(),
+	requesterName: varchar({ length: 255 }).notNull(),
+	requesterEmail: varchar({ length: 320 }),
+	currentNameEn: varchar({ length: 255 }).notNull(),
+	currentDescriptionEn: text(),
+	proposedNameAr: varchar({ length: 255 }),
+	proposedDescriptionAr: text(),
+	notes: text(),
+	status: mysqlEnum(['pending','approved','rejected','completed']).default('pending').notNull(),
+	priority: mysqlEnum(['low','medium','high']).default('medium').notNull(),
+	reviewedBy: int(),
+	reviewedAt: timestamp({ mode: 'string' }),
+	reviewNotes: text(),
+	completedBy: int(),
+	completedAt: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("entity_idx_req").on(table.entityType, table.entityId),
+	index("requester_idx").on(table.requesterId),
+	index("status_idx").on(table.status),
+	index("priority_idx").on(table.priority),
+	index("created_at_idx").on(table.createdAt),
+]);
+
+export const translationReviewComments = mysqlTable("translation_review_comments", {
+	id: int().autoincrement().notNull(),
+	reviewId: int("review_id").notNull(),
+	userId: int("user_id").notNull(),
+	userName: varchar("user_name", { length: 255 }).notNull(),
+	comment: text().notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("review_id_idx").on(table.reviewId),
+]);
+
+export const translationReviews = mysqlTable("translation_reviews", {
+	id: int().autoincrement().notNull(),
+	entityType: mysqlEnum("entity_type", ['office','template']).notNull(),
+	entityId: int("entity_id").notNull(),
+	fieldName: varchar("field_name", { length: 50 }).notNull(),
+	translatedText: text("translated_text").notNull(),
+	status: mysqlEnum(['pending','approved','rejected','needs_revision']).default('pending').notNull(),
+	submittedBy: int("submitted_by").notNull(),
+	submittedByName: varchar("submitted_by_name", { length: 255 }).notNull(),
+	reviewedBy: int("reviewed_by"),
+	reviewedByName: varchar("reviewed_by_name", { length: 255 }),
+	reviewNotes: text("review_notes"),
+	submittedAt: timestamp("submitted_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	reviewedAt: timestamp("reviewed_at", { mode: 'string' }),
+},
+(table) => [
+	index("entity_idx").on(table.entityType, table.entityId),
+	index("status_idx").on(table.status),
+	index("submitted_by_idx").on(table.submittedBy),
+]);
+
+export const translationVersions = mysqlTable("translation_versions", {
+	id: int().autoincrement().notNull(),
+	entityType: mysqlEnum(['office','template']).notNull(),
+	entityId: int().notNull(),
+	fieldName: varchar({ length: 50 }).notNull(),
+	oldValue: text(),
+	newValue: text(),
+	changedBy: int().notNull(),
+	changedByName: varchar({ length: 255 }).notNull(),
+	changeReason: text(),
+	source: mysqlEnum(['manual','bulk_import','request_approval','auto_translate']).default('manual').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("entity_idx").on(table.entityType, table.entityId),
+	index("changed_by_idx").on(table.changedBy),
+	index("date_idx").on(table.createdAt),
+]);
+
+export const untranslatedContentAlerts = mysqlTable("untranslated_content_alerts", {
+	id: int().autoincrement().notNull(),
+	contentType: mysqlEnum("content_type", ['office','template']).notNull(),
+	contentId: int("content_id").notNull(),
+	priority: mysqlEnum(['low','medium','high','critical']).default('medium'),
+	status: mysqlEnum(['pending','in_progress','resolved']).default('pending'),
+	notificationSent: tinyint("notification_sent").default(0),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP'),
+	resolvedAt: timestamp("resolved_at", { mode: 'string' }),
+},
+(table) => [
+	index("content_idx").on(table.contentType, table.contentId),
+	index("status_idx").on(table.status),
+	index("priority_idx").on(table.priority),
+]);
+
+export const users = mysqlTable("users", {
+	id: int().autoincrement().notNull(),
+	openId: varchar({ length: 64 }).notNull(),
+	name: text(),
+	email: varchar({ length: 320 }),
+	loginMethod: varchar({ length: 64 }),
+	role: mysqlEnum(['user','admin','sanad_owner','sanad_staff','sme_owner','gig_worker','government_official']).default('user').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+	lastSignedIn: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	phone: varchar({ length: 20 }),
+	avatarUrl: text(),
+	referralCode: varchar({ length: 20 }),
+	preferredLanguage: varchar({ length: 10 }).default('en'),
+	notificationPreferences: json(),
+	whatsappEnabled: tinyint().default(0),
+	mfaEnabled: tinyint().default(0),
+	mfaSecret: varchar({ length: 255 }),
+	mfaBackupCodes: json(),
+	mfaEnabledAt: timestamp({ mode: 'string' }),
+	emailVerified: tinyint().default(0),
+	emailVerificationToken: varchar({ length: 255 }),
+	emailVerificationExpiry: timestamp({ mode: 'string' }),
+	recoveryEmail: varchar({ length: 320 }),
+	recoveryEmailVerified: tinyint().default(0),
+	passwordResetToken: varchar({ length: 255 }),
+	passwordResetExpiry: timestamp({ mode: 'string' }),
+},
+(table) => [
+	index("users_openId_unique").on(table.openId),
+	index("email_idx").on(table.email),
+	index("role_idx").on(table.role),
+	index("users_referralCode_unique").on(table.referralCode),
+]);

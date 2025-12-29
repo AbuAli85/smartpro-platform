@@ -453,8 +453,8 @@ export default function StaffPerformance() {
                 ))}
 
               {metrics
-                .filter((m) => m.resolutionRate >= 80)
-                .map((m) => (
+                .filter((m: any) => m.resolutionRate >= 80)
+                .map((m: any) => (
                   <div key={m.staffId} className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
                     <CheckCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
                     <div>
@@ -469,8 +469,8 @@ export default function StaffPerformance() {
                 ))}
 
               {metrics
-                .filter((m) => m.avgResponseTimeMinutes > 20)
-                .map((m) => (
+                .filter((m: any) => m.avgResponseTimeMinutes > 20)
+                .map((m: any) => (
                   <div key={m.staffId} className="flex items-start gap-3 p-3 bg-yellow-50 dark:bg-yellow-950 rounded-lg">
                     <Clock className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
                     <div>
