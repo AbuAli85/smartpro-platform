@@ -51,7 +51,7 @@
   "offices": {
     "title": "مكاتب سند",
     "subtitle": "ابحث عن مقدمي الخدمات التجارية المعتمدين في جميع أنحاء عمان",
-    "filters": "التصفية",
+    "filters": "الفلاتر",
     "clearFilters": "مسح التصفية",
     "governorate": "المحافظة",
     "category": "فئة الخدمة",
@@ -149,5 +149,64 @@
     "points": "نقاط",
     "referral": "إحالة",
     "system": "نظام"
+  },
+  "marketplace": {
+    "title": "السوق",
+    "requestService": {
+      "title": "اطلب خدمة",
+      "subtitle": "انشر احتياجاتك من الخدمات واستقبل عروضًا تنافسية من مكاتب سند المؤهلة",
+      "serviceTitle": "عنوان الخدمة",
+      "serviceTitlePlaceholder": "مثال: أحتاج تسجيل تجاري لمطعم جديد",
+      "serviceTitleHint": "الحد الأدنى 10 أحرف - كن محددًا وواضحًا",
+      "serviceType": "نوع الخدمة",
+      "selectServiceType": "اختر نوع الخدمة",
+      "detailedDescription": "الوصف التفصيلي",
+      "descriptionPlaceholder": "صف ما تحتاجه بالتفصيل...",
+      "descriptionHint": "الحد الأدنى 50 حرفًا - قم بتضمين جميع التفاصيل ذات الصلة",
+      "specialRequirements": "المتطلبات الخاصة (اختياري)",
+      "requirementsPlaceholder": "أي متطلبات محددة أو مستندات مطلوبة أو تفضيلات...",
+      "minimumBudget": "الحد الأدنى للميزانية (ريال عماني)",
+      "maximumBudget": "الحد الأقصى للميزانية (ريال عماني)",
+      "budgetPlaceholder": "مثال: {amount}",
+      "deadline": "الموعد النهائي (اختياري)",
+      "urgency": "الاستعجال",
+      "urgencyLow": "منخفض - جدول زمني مرن",
+      "urgencyMedium": "متوسط - خلال شهر",
+      "urgencyHigh": "عالي - خلال أسبوعين",
+      "urgencyUrgent": "عاجل - في أقرب وقت ممكن",
+      "preferredGovernorate": "المحافظة المفضلة",
+      "anyLocation": "أي موقع",
+      "wilayat": "الولاية (اختياري)",
+      "wilayatPlaceholder": "ولاية محددة",
+      "remoteAccepted": "أقبل تقديم الخدمة عن بُعد (لا حاجة لزيارة فعلية)",
+      "postRequest": "انشر طلب الخدمة",
+      "posting": "جاري النشر...",
+      "successMessage": "تم نشر طلب الخدمة بنجاح!",
+      "errorMessage": "فشل نشر طلب الخدمة"
+    },
+    "serviceTypes": {
+      "commercialRegistration": "التسجيل التجاري",
+      "taxRegistration": "التسجيل الضريبي",
+      "vatRegistration": "تسجيل ضريبة القيمة المضافة",
+      "businessLicense": "رخصة تجارية",
+      "tradeLicense": "رخصة تجارة",
+      "legalConsultation": "استشارة قانونية",
+      "accountingServices": "خدمات محاسبية",
+      "documentTranslation": "ترجمة المستندات",
+      "other": "أخرى"
+    },
+    "governorates": {
+      "muscat": "مسقط",
+      "dhofar": "ظفار",
+      "musandam": "مسندم",
+      "alBuraimi": "البريمي",
+      "adDakhiliyah": "الداخلية",
+      "alBatinahNorth": "شمال الباطنة",
+      "alBatinahSouth": "جنوب الباطنة",
+      "ashSharqiyahNorth": "شمال الشرقية",
+      "ashSharqiyahSouth": "جنوب الشرقية",
+      "alDhahirah": "الظاهرة",
+      "alWusta": "الوسطى"
+    }
   }
 }

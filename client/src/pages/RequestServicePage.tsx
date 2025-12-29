@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { FileText, DollarSign, Calendar, MapPin, Zap } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const SERVICE_TYPES = [
   "Commercial Registration",
@@ -44,6 +45,7 @@ const GOVERNORATES = [
 ];
 
 export default function RequestServicePage() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [formData, setFormData] = useState({
     title: "",
@@ -61,11 +63,11 @@ export default function RequestServicePage() {
 
   const createRequest = trpc.serviceMarketplace.createRequest.useMutation({
     onSuccess: (data) => {
-      toast.success("Service request posted successfully!");
+      toast.success(t("marketplace.requestService.successMessage"));
       setLocation(`/marketplace/requests/${data.id}`);
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to post service request");
+      toast.error(error.message || t("marketplace.requestService.errorMessage"));
     },
   });
 
@@ -87,22 +89,56 @@ export default function RequestServicePage() {
     });
   };
 
+  // Helper function to get translated service type
+  const getServiceTypeTranslation = (type: string) => {
+    const typeMap: Record<string, string> = {
+      "Commercial Registration": t("marketplace.serviceTypes.commercialRegistration"),
+      "Tax Registration": t("marketplace.serviceTypes.taxRegistration"),
+      "VAT Registration": t("marketplace.serviceTypes.vatRegistration"),
+      "Business License": t("marketplace.serviceTypes.businessLicense"),
+      "Trade License": t("marketplace.serviceTypes.tradeLicense"),
+      "Legal Consultation": t("marketplace.serviceTypes.legalConsultation"),
+      "Accounting Services": t("marketplace.serviceTypes.accountingServices"),
+      "Document Translation": t("marketplace.serviceTypes.documentTranslation"),
+      "Other": t("marketplace.serviceTypes.other"),
+    };
+    return typeMap[type] || type;
+  };
+
+  // Helper function to get translated governorate
+  const getGovernorateTranslation = (gov: string) => {
+    const govMap: Record<string, string> = {
+      "Muscat": t("marketplace.governorates.muscat"),
+      "Dhofar": t("marketplace.governorates.dhofar"),
+      "Musandam": t("marketplace.governorates.musandam"),
+      "Al Buraimi": t("marketplace.governorates.alBuraimi"),
+      "Ad Dakhiliyah": t("marketplace.governorates.adDakhiliyah"),
+      "Al Batinah North": t("marketplace.governorates.alBatinahNorth"),
+      "Al Batinah South": t("marketplace.governorates.alBatinahSouth"),
+      "Ash Sharqiyah North": t("marketplace.governorates.ashSharqiyahNorth"),
+      "Ash Sharqiyah South": t("marketplace.governorates.ashSharqiyahSouth"),
+      "Al Dhahirah": t("marketplace.governorates.alDhahirah"),
+      "Al Wusta": t("marketplace.governorates.alWusta"),
+    };
+    return govMap[gov] || gov;
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <div className="container py-8 max-w-4xl">
         <Breadcrumb
           items={[
-            { label: "Marketplace", href: "/marketplace" },
-            { label: "Request Service" },
+            { label: t("marketplace.title"), href: "/marketplace" },
+            { label: t("marketplace.requestService.title") },
           ]}
           className="mb-6"
         />
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-3xl">Request a Service</CardTitle>
+            <CardTitle className="text-3xl">{t("marketplace.requestService.title")}</CardTitle>
             <CardDescription>
-              Post your service needs and receive competitive bids from qualified Sanad offices
+              {t("marketplace.requestService.subtitle")}
             </CardDescription>
           </CardHeader>
 
@@ -111,25 +147,25 @@ export default function RequestServicePage() {
               {/* Title */}
               <div className="space-y-2">
                 <Label htmlFor="title">
-                  Service Title <span className="text-red-500">*</span>
+                  {t("marketplace.requestService.serviceTitle")} <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="title"
-                  placeholder="e.g., Need Commercial Registration for New Restaurant"
+                  placeholder={t("marketplace.requestService.serviceTitlePlaceholder")}
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   required
                   minLength={10}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Minimum 10 characters - Be specific and clear
+                  {t("marketplace.requestService.serviceTitleHint")}
                 </p>
               </div>
 
               {/* Service Type */}
               <div className="space-y-2">
                 <Label htmlFor="serviceType">
-                  Service Type <span className="text-red-500">*</span>
+                  {t("marketplace.requestService.serviceType")} <span className="text-red-500">*</span>
                 </Label>
                 <Select
                   value={formData.serviceType}
@@ -137,12 +173,12 @@ export default function RequestServicePage() {
                   required
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select service type" />
+                    <SelectValue placeholder={t("marketplace.requestService.selectServiceType")} />
                   </SelectTrigger>
                   <SelectContent>
                     {SERVICE_TYPES.map((type) => (
                       <SelectItem key={type} value={type}>
-                        {type}
+                        {getServiceTypeTranslation(type)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -152,11 +188,11 @@ export default function RequestServicePage() {
               {/* Description */}
               <div className="space-y-2">
                 <Label htmlFor="description">
-                  Detailed Description <span className="text-red-500">*</span>
+                  {t("marketplace.requestService.detailedDescription")} <span className="text-red-500">*</span>
                 </Label>
                 <Textarea
                   id="description"
-                  placeholder="Describe what you need in detail..."
+                  placeholder={t("marketplace.requestService.descriptionPlaceholder")}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   required
@@ -164,7 +200,7 @@ export default function RequestServicePage() {
                   rows={5}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Minimum 50 characters - Include all relevant details
+                  {t("marketplace.requestService.descriptionHint")}
                 </p>
               </div>
 
@@ -172,11 +208,11 @@ export default function RequestServicePage() {
               <div className="space-y-2">
                 <Label htmlFor="requirements">
                   <FileText className="w-4 h-4 inline mr-2" />
-                  Special Requirements (Optional)
+                  {t("marketplace.requestService.specialRequirements")}
                 </Label>
                 <Textarea
                   id="requirements"
-                  placeholder="Any specific requirements, documents needed, or preferences..."
+                  placeholder={t("marketplace.requestService.requirementsPlaceholder")}
                   value={formData.requirements}
                   onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
                   rows={3}
@@ -188,26 +224,26 @@ export default function RequestServicePage() {
                 <div className="space-y-2">
                   <Label htmlFor="budgetMin">
                     <DollarSign className="w-4 h-4 inline mr-2" />
-                    Minimum Budget (OMR)
+                    {t("marketplace.requestService.minimumBudget")}
                   </Label>
                   <Input
                     id="budgetMin"
                     type="number"
                     step="0.01"
                     min="0"
-                    placeholder="e.g., 100"
+                    placeholder={t("marketplace.requestService.budgetPlaceholder", { amount: "100" })}
                     value={formData.budgetMin}
                     onChange={(e) => setFormData({ ...formData, budgetMin: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="budgetMax">Maximum Budget (OMR)</Label>
+                  <Label htmlFor="budgetMax">{t("marketplace.requestService.maximumBudget")}</Label>
                   <Input
                     id="budgetMax"
                     type="number"
                     step="0.01"
                     min="0"
-                    placeholder="e.g., 500"
+                    placeholder={t("marketplace.requestService.budgetPlaceholder", { amount: "500" })}
                     value={formData.budgetMax}
                     onChange={(e) => setFormData({ ...formData, budgetMax: e.target.value })}
                   />
@@ -219,7 +255,7 @@ export default function RequestServicePage() {
                 <div className="space-y-2">
                   <Label htmlFor="deadline">
                     <Calendar className="w-4 h-4 inline mr-2" />
-                    Deadline (Optional)
+                    {t("marketplace.requestService.deadline")}
                   </Label>
                   <Input
                     id="deadline"
@@ -232,7 +268,7 @@ export default function RequestServicePage() {
                 <div className="space-y-2">
                   <Label htmlFor="urgency">
                     <Zap className="w-4 h-4 inline mr-2" />
-                    Urgency
+                    {t("marketplace.requestService.urgency")}
                   </Label>
                   <Select
                     value={formData.urgency}
@@ -242,10 +278,10 @@ export default function RequestServicePage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="low">Low - Flexible timeline</SelectItem>
-                      <SelectItem value="medium">Medium - Within a month</SelectItem>
-                      <SelectItem value="high">High - Within 2 weeks</SelectItem>
-                      <SelectItem value="urgent">Urgent - ASAP</SelectItem>
+                      <SelectItem value="low">{t("marketplace.requestService.urgencyLow")}</SelectItem>
+                      <SelectItem value="medium">{t("marketplace.requestService.urgencyMedium")}</SelectItem>
+                      <SelectItem value="high">{t("marketplace.requestService.urgencyHigh")}</SelectItem>
+                      <SelectItem value="urgent">{t("marketplace.requestService.urgencyUrgent")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -256,29 +292,29 @@ export default function RequestServicePage() {
                 <div className="space-y-2">
                   <Label htmlFor="governorate">
                     <MapPin className="w-4 h-4 inline mr-2" />
-                    Preferred Governorate
+                    {t("marketplace.requestService.preferredGovernorate")}
                   </Label>
                   <Select
                     value={formData.governorate}
                     onValueChange={(value) => setFormData({ ...formData, governorate: value })}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Any location" />
+                      <SelectValue placeholder={t("marketplace.requestService.anyLocation")} />
                     </SelectTrigger>
                     <SelectContent>
                       {GOVERNORATES.map((gov) => (
                         <SelectItem key={gov} value={gov}>
-                          {gov}
+                          {getGovernorateTranslation(gov)}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="wilayat">Wilayat (Optional)</Label>
+                  <Label htmlFor="wilayat">{t("marketplace.requestService.wilayat")}</Label>
                   <Input
                     id="wilayat"
-                    placeholder="Specific wilayat"
+                    placeholder={t("marketplace.requestService.wilayatPlaceholder")}
                     value={formData.wilayat}
                     onChange={(e) => setFormData({ ...formData, wilayat: e.target.value })}
                   />
@@ -297,7 +333,7 @@ export default function RequestServicePage() {
                   className="w-4 h-4"
                 />
                 <Label htmlFor="remoteAccepted" className="cursor-pointer">
-                  I accept remote service delivery (no physical visit required)
+                  {t("marketplace.requestService.remoteAccepted")}
                 </Label>
               </div>
 
@@ -308,14 +344,14 @@ export default function RequestServicePage() {
                   variant="outline"
                   onClick={() => setLocation("/marketplace")}
                 >
-                  Cancel
+                  {t("common.cancel")}
                 </Button>
                 <Button
                   type="submit"
                   disabled={createRequest.isPending}
                   className="flex-1"
                 >
-                  {createRequest.isPending ? "Posting..." : "Post Service Request"}
+                  {createRequest.isPending ? t("marketplace.requestService.posting") : t("marketplace.requestService.postRequest")}
                 </Button>
               </div>
             </form>
