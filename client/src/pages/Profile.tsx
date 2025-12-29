@@ -6,12 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { User, Mail, Phone, Calendar, Shield } from "lucide-react";
+import { User, Mail, Phone, Calendar, Shield, Lock, CheckCircle, XCircle, Key, Monitor } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { useLocation } from "wouter";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Profile() {
   const { t } = useLanguage();
   const { user, loading } = useAuth();
+  const [, navigate] = useLocation();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -249,7 +252,7 @@ export default function Profile() {
                 </div>
 
                 {user.loginMethod && (
-                  <div className="flex items-center justify-between py-2">
+                  <div className="flex items-center justify-between py-2 border-b">
                     <div className="flex items-center gap-2 text-gray-600">
                       <User className="w-4 h-4" />
                       <span>Login Method</span>
@@ -259,6 +262,64 @@ export default function Profile() {
                     </span>
                   </div>
                 )}
+                
+                {/* MFA Status */}
+                <div className="flex items-center justify-between py-2">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Lock className="w-4 h-4" />
+                    <span>Two-Factor Authentication</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {user.mfaEnabled ? (
+                      <Badge variant="default" className="bg-green-600">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        Enabled
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary">
+                        <XCircle className="w-3 h-3 mr-1" />
+                        Not Enabled
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Security Settings Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Lock className="w-5 h-5 text-[#003366]" />
+                  Security Settings
+                </CardTitle>
+                <CardDescription>
+                  Manage your security preferences and authentication methods
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => navigate("/security/mfa")}
+                >
+                  <Key className="w-4 h-4 mr-2" />
+                  {user.mfaEnabled ? "Manage" : "Enable"} Two-Factor Authentication
+                  {user.role === "admin" && !user.mfaEnabled && (
+                    <Badge variant="destructive" className="ml-auto">
+                      Required
+                    </Badge>
+                  )}
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => navigate("/security/sessions")}
+                >
+                  <Monitor className="w-4 h-4 mr-2" />
+                  Manage Active Sessions
+                </Button>
               </CardContent>
             </Card>
           </div>

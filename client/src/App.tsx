@@ -63,6 +63,10 @@ import OnboardingWizard from "./pages/OnboardingWizard";
 import OfficeAnalytics from "./pages/OfficeAnalytics";
 import AuditLogs from "./pages/AuditLogs";
 import MFASettings from "./pages/MFASettings";
+import { VerifyEmail } from "./pages/VerifyEmail";
+import { RequestPasswordReset } from "./pages/RequestPasswordReset";
+import { ResetPassword } from "./pages/ResetPassword";
+import { SessionManagement } from "./pages/SessionManagement";
 import { useNotifications } from "./hooks/useNotifications";
 import { useMarketplaceNotifications } from "./hooks/useMarketplaceNotifications";
 import { SocketProvider } from "./contexts/SocketContext";
@@ -209,6 +213,14 @@ function Router() {
       <Route path="/notifications" component={NotificationPreferences} />
       <Route path="/language-settings" component={LanguageSettings} />
       <Route path="/security/mfa" component={MFASettings} />
+      
+      {/* Account Recovery */}
+      <Route path="/verify-email" component={VerifyEmail} />
+      <Route path="/request-password-reset" component={RequestPasswordReset} />
+      <Route path="/reset-password" component={ResetPassword} />
+      
+      {/* Session Management */}
+      <Route path="/security/sessions" component={SessionManagement} />
       
       {/* Loyalty */}
       <Route path="/loyalty" component={LoyaltyDashboard} />

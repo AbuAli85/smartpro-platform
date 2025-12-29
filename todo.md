@@ -143,35 +143,45 @@
 - [x] Add mfaEnabled and mfaSecret fields to users table
 - [x] Install speakeasy library for TOTP
 - [x] Create MFA setup flow with QR code generation
-- [ ] Add MFA verification step after OAuth login
+- [ ] Add MFA verification step after OAuth login (Phase 2)
 - [x] Generate and store backup codes
 - [x] Create MFA settings page for users
-- [ ] Make MFA mandatory for admin accounts
-- [ ] Add MFA status to user profile
+- [x] Make MFA mandatory for admin accounts (Phase 1 Part 2)
+- [x] Add MFA enforcement middleware for admin routes
+- [x] Create MFA setup prompt for admins without 2FA
+- [x] Add MFA status badge to user profile page (Phase 1 Part 2)
+- [x] Add quick link to MFA settings from profile
 - [x] Add unit tests for MFA functionality
+- [ ] Add unit tests for MFA enforcement
 
-### 3. Account Recovery System
-- [ ] Add emailVerified and recoveryEmail fields to users table
-- [ ] Create email verification flow during registration
-- [ ] Implement password reset request procedure
-- [ ] Create password reset token generation and validation
-- [ ] Wire up existing password reset email template
-- [ ] Add password reset page (frontend)
-- [ ] Implement admin override for account recovery
-- [ ] Add rate limiting for password reset requests
-- [ ] Add unit tests for account recovery
+### 3. Account Recovery System (Phase 1 Part 2)
+- [x] Add emailVerified, emailVerificationToken, emailVerificationExpiry fields to users table
+- [x] Add recoveryEmail and recoveryEmailVerified fields to users table
+- [x] Create email verification backend functions
+- [x] Create password reset backend functions (token generation, validation)
+- [x] Build email verification tRPC procedures
+- [x] Build password reset tRPC procedures (request, verify, reset)
+- [x] Create email verification UI page
+- [x] Create password reset request UI page
+- [x] Create password reset confirmation UI page
+- [x] Wire up existing password reset email template
+- [x] Integrate with audit logging (email_verified, password_reset_requested, password_reset_completed)
+- [ ] Add rate limiting for password reset requests (Future enhancement)
+- [x] Add unit tests for account recovery
 
-### 4. Session Management UI
-- [ ] Create sessions database table
-- [ ] Store session metadata (device, IP, last_active)
-- [ ] Create getSessions tRPC procedure
-- [ ] Create revokeSession tRPC procedure
-- [ ] Create revokeAllSessions tRPC procedure
-- [ ] Build Active Sessions page component
-- [ ] Add session activity timeline
-- [ ] Add "Revoke All Other Sessions" button
-- [ ] Integrate into user settings/profile
-- [ ] Add unit tests for session management
+### 4. Session Management UI (Phase 1 Part 2)
+- [x] Create active_sessions database table (sessionId, userId, deviceInfo, ipAddress, lastActive, createdAt)
+- [x] Implement session tracking on login (store session metadata)
+- [x] Create session management backend functions (list, revoke, revoke all)
+- [x] Build session management tRPC procedures (getActiveSessions, revokeSession, revokeAllOtherSessions)
+- [x] Create Session Management UI page at /security/sessions
+- [x] Display active sessions with device info, location, last active time
+- [x] Add revoke individual session functionality
+- [x] Add "Revoke All Other Sessions" button
+- [x] Show current session indicator
+- [x] Integrate with audit logging (session_revoked, all_sessions_revoked)
+- [x] Add navigation link to profile page
+- [x] Add unit tests for session management
 
 ### 5. Testing and Documentation
 - [ ] Write comprehensive unit tests for all new features

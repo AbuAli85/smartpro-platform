@@ -6,8 +6,9 @@ import { sql } from "drizzle-orm";
 import { notifyOwner } from "../_core/notification";
 import { sendOfficeVerificationEmail } from "../_core/emailSms";
 import { sendRoleChangeNotificationEmail } from "../_core/emailTemplates";
+import { enforceMFAForAdmin } from "../_core/mfaEnforcement";
 
-// Admin-only procedure
+// Admin-only procedure with MFA enforcement
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (ctx.user?.role !== "admin") {
     throw new TRPCError({
@@ -15,6 +16,10 @@ const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
       message: "Admin access required",
     });
   }
+  
+  // Enforce MFA for admin users
+  enforceMFAForAdmin(ctx);
+  
   return next({ ctx });
 });
 

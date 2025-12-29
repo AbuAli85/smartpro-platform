@@ -35,6 +35,15 @@ export const users = mysqlTable("users", {
   mfaBackupCodes: json("mfaBackupCodes").$type<string[]>(),
   mfaEnabledAt: timestamp("mfaEnabledAt"),
   
+  // Account Recovery
+  emailVerified: boolean("emailVerified").default(false),
+  emailVerificationToken: varchar("emailVerificationToken", { length: 255 }),
+  emailVerificationExpiry: timestamp("emailVerificationExpiry"),
+  recoveryEmail: varchar("recoveryEmail", { length: 320 }),
+  recoveryEmailVerified: boolean("recoveryEmailVerified").default(false),
+  passwordResetToken: varchar("passwordResetToken", { length: 255 }),
+  passwordResetExpiry: timestamp("passwordResetExpiry"),
+  
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -1462,6 +1471,11 @@ export const authAuditLog = mysqlTable("auth_audit_log", {
     "mfa_verified",
     "mfa_failed",
     "email_verified",
+    "email_verification_sent",
+    "recovery_email_added",
+    "recovery_email_verified",
+    "session_revoked",
+    "all_sessions_revoked",
     "account_locked",
     "account_unlocked"
   ]).notNull(),
@@ -1509,3 +1523,41 @@ export const authAuditLog = mysqlTable("auth_audit_log", {
 
 export type AuthAuditLog = typeof authAuditLog.$inferSelect;
 export type InsertAuthAuditLog = typeof authAuditLog.$inferInsert;
+
+// ============================================================================
+// SESSION MANAGEMENT
+// ============================================================================
+
+export const activeSessions = mysqlTable("active_sessions", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Session identification
+  sessionId: varchar("sessionId", { length: 255 }).notNull().unique(),
+  userId: int("userId").notNull(),
+  
+  // Device and location information
+  deviceInfo: json("deviceInfo").$type<{
+    browser?: string;
+    os?: string;
+    device?: string;
+    isMobile?: boolean;
+  }>(),
+  ipAddress: varchar("ipAddress", { length: 45 }), // IPv6 compatible
+  userAgent: text("userAgent"),
+  
+  // Session metadata
+  lastActive: timestamp("lastActive").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  expiresAt: timestamp("expiresAt"),
+  
+  // Status
+  isActive: boolean("isActive").default(true).notNull(),
+}, (table) => ({
+  userIdIdx: index("user_id_idx").on(table.userId),
+  sessionIdIdx: index("session_id_idx").on(table.sessionId),
+  lastActiveIdx: index("last_active_idx").on(table.lastActive),
+  isActiveIdx: index("is_active_idx").on(table.isActive),
+}));
+
+export type ActiveSession = typeof activeSessions.$inferSelect;
+export type InsertActiveSession = typeof activeSessions.$inferInsert;

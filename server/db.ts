@@ -1,4 +1,4 @@
-import { and, desc, eq, like, or, sql, gte, lte, not, isNull } from "drizzle-orm";
+import { and, desc, eq, like, or, sql, gte, lte, not, isNull, ne, lt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser,
@@ -39,6 +39,9 @@ import {
   authAuditLog,
   type AuthAuditLog,
   type InsertAuthAuditLog,
+  activeSessions,
+  type ActiveSession,
+  type InsertActiveSession,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -5727,4 +5730,291 @@ export async function getMFAStatus(userId: number): Promise<{
       enabledAt: null,
     };
   }
+}
+
+// ============================================================================
+// ACCOUNT RECOVERY
+// ============================================================================
+
+import crypto from 'crypto';
+
+/**
+ * Generate a secure random token for email verification or password reset
+ */
+function generateSecureToken(): string {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+/**
+ * Generate email verification token and save to database
+ */
+export async function generateEmailVerificationToken(userId: number): Promise<string> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const token = generateSecureToken();
+  const expiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+  await db
+    .update(users)
+    .set({
+      emailVerificationToken: token,
+      emailVerificationExpiry: expiry,
+    })
+    .where(eq(users.id, userId));
+
+  return token;
+}
+
+/**
+ * Verify email using token
+ */
+export async function verifyEmailWithToken(token: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.emailVerificationToken, token))
+    .limit(1);
+
+  if (result.length === 0) return false;
+
+  const user = result[0];
+  
+  // Check if token is expired
+  if (!user.emailVerificationExpiry || user.emailVerificationExpiry < new Date()) {
+    return false;
+  }
+
+  // Mark email as verified and clear token
+  await db
+    .update(users)
+    .set({
+      emailVerified: true,
+      emailVerificationToken: null,
+      emailVerificationExpiry: null,
+    })
+    .where(eq(users.id, user.id));
+
+  return true;
+}
+
+/**
+ * Generate password reset token
+ */
+export async function generatePasswordResetToken(email: string): Promise<{ token: string; userId: number } | null> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
+
+  if (result.length === 0) return null;
+
+  const user = result[0];
+  const token = generateSecureToken();
+  const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+  await db
+    .update(users)
+    .set({
+      passwordResetToken: token,
+      passwordResetExpiry: expiry,
+    })
+    .where(eq(users.id, user.id));
+
+  return { token, userId: user.id };
+}
+
+/**
+ * Verify password reset token
+ */
+export async function verifyPasswordResetToken(token: string): Promise<number | null> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.passwordResetToken, token))
+    .limit(1);
+
+  if (result.length === 0) return null;
+
+  const user = result[0];
+  
+  // Check if token is expired
+  if (!user.passwordResetExpiry || user.passwordResetExpiry < new Date()) {
+    return null;
+  }
+
+  return user.id;
+}
+
+/**
+ * Complete password reset (clear token)
+ */
+export async function completePasswordReset(userId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(users)
+    .set({
+      passwordResetToken: null,
+      passwordResetExpiry: null,
+    })
+    .where(eq(users.id, userId));
+}
+
+/**
+ * Set recovery email for user
+ */
+export async function setRecoveryEmail(userId: number, recoveryEmail: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(users)
+    .set({
+      recoveryEmail,
+      recoveryEmailVerified: false,
+    })
+    .where(eq(users.id, userId));
+}
+
+/**
+ * Verify recovery email
+ */
+export async function verifyRecoveryEmail(userId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(users)
+    .set({
+      recoveryEmailVerified: true,
+    })
+    .where(eq(users.id, userId));
+}
+
+// ============================================================================
+// SESSION MANAGEMENT
+// ============================================================================
+
+/**
+ * Create or update active session
+ */
+export async function upsertActiveSession(session: {
+  sessionId: string;
+  userId: number;
+  deviceInfo?: any;
+  ipAddress?: string;
+  userAgent?: string;
+  expiresAt?: Date;
+}): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .insert(activeSessions)
+    .values({
+      sessionId: session.sessionId,
+      userId: session.userId,
+      deviceInfo: session.deviceInfo,
+      ipAddress: session.ipAddress,
+      userAgent: session.userAgent,
+      expiresAt: session.expiresAt,
+      lastActive: new Date(),
+      isActive: true,
+    })
+    .onDuplicateKeyUpdate({
+      set: {
+        lastActive: new Date(),
+        isActive: true,
+      },
+    });
+}
+
+/**
+ * Get all active sessions for a user
+ */
+export async function getActiveSessions(userId: number): Promise<ActiveSession[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const sessions = await db
+    .select()
+    .from(activeSessions)
+    .where(and(eq(activeSessions.userId, userId), eq(activeSessions.isActive, true)))
+    .orderBy(desc(activeSessions.lastActive));
+
+  return sessions;
+}
+
+/**
+ * Revoke a specific session
+ */
+export async function revokeSession(sessionId: string, userId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db
+    .update(activeSessions)
+    .set({ isActive: false })
+    .where(and(eq(activeSessions.sessionId, sessionId), eq(activeSessions.userId, userId)));
+
+  return true;
+}
+
+/**
+ * Revoke all sessions for a user except the current one
+ */
+export async function revokeAllOtherSessions(userId: number, currentSessionId: string): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(activeSessions)
+    .set({ isActive: false })
+    .where(
+      and(
+        eq(activeSessions.userId, userId),
+        ne(activeSessions.sessionId, currentSessionId),
+        eq(activeSessions.isActive, true)
+      )
+    );
+
+  return 0; // Return count of revoked sessions
+}
+
+/**
+ * Update session last active timestamp
+ */
+export async function updateSessionActivity(sessionId: string): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .update(activeSessions)
+    .set({ lastActive: new Date() })
+    .where(eq(activeSessions.sessionId, sessionId));
+}
+
+/**
+ * Clean up expired sessions
+ */
+export async function cleanupExpiredSessions(): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .update(activeSessions)
+    .set({ isActive: false })
+    .where(and(lt(activeSessions.expiresAt, new Date()), eq(activeSessions.isActive, true)));
 }

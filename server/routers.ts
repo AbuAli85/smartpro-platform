@@ -43,6 +43,8 @@ import { recommendationsRouter } from "./routers/recommendations";
 import { campaignsRouter } from "./routers/campaigns";
 import { auditLogRouter } from "./routers/auditLog";
 import { mfaRouter } from "./routers/mfa";
+import { accountRecoveryRouter } from "./routes/accountRecovery";
+import { sessionManagementRouter } from "./routes/sessionManagement";
 
 export const appRouter = router({
   system: systemRouter,
@@ -160,6 +162,8 @@ export const appRouter = router({
   campaigns: campaignsRouter,
   auditLog: auditLogRouter,
   mfa: mfaRouter,
+  accountRecovery: accountRecoveryRouter,
+  sessionManagement: sessionManagementRouter,
 });
 
 export type AppRouter = typeof appRouter;
