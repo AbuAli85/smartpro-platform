@@ -16,7 +16,7 @@ import {
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { FileText, DollarSign, Calendar, MapPin, Zap } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const SERVICE_TYPES = [
   "Commercial Registration",
@@ -45,7 +45,7 @@ const GOVERNORATES = [
 ];
 
 export default function RequestServicePage() {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const [, setLocation] = useLocation();
   const [formData, setFormData] = useState({
     title: "",
@@ -231,7 +231,7 @@ export default function RequestServicePage() {
                     type="number"
                     step="0.01"
                     min="0"
-                    placeholder={t("marketplace.requestService.budgetPlaceholder", { amount: "100" })}
+                    placeholder={t("marketplace.requestService.budgetPlaceholder").replace("{{amount}}", "100")}
                     value={formData.budgetMin}
                     onChange={(e) => setFormData({ ...formData, budgetMin: e.target.value })}
                   />
@@ -243,7 +243,7 @@ export default function RequestServicePage() {
                     type="number"
                     step="0.01"
                     min="0"
-                    placeholder={t("marketplace.requestService.budgetPlaceholder", { amount: "500" })}
+                    placeholder={t("marketplace.requestService.budgetPlaceholder").replace("{{amount}}", "500")}
                     value={formData.budgetMax}
                     onChange={(e) => setFormData({ ...formData, budgetMax: e.target.value })}
                   />
