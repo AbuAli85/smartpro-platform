@@ -19,6 +19,9 @@ const resources = {
       "home.title": "SmartPro",
       "home.subtitle": "National Digital Infrastructure for Business Services",
       "home.description": "Connect with certified Sanad offices across Oman. Access 3,000+ document templates. Complete your business services faster, cheaper, and smarter.",
+      "home.affordability.title": "Affordable Omanization at 400 OMR",
+      "home.affordability.subtitle": "Making compliance accessible for small businesses",
+      "home.affordability.description": "SmartPro enables small businesses to hire Omani employees at 400 OMR minimum (including PASI support) - 73% less than traditional 1,500 OMR/month PRO services. Real work, real compliance, affordable pricing.",
       "home.cta": "Browse Sanad Offices",
       "home.features.title": "Why Choose SmartPro?",
       "home.features.offices.title": "Certified Sanad Offices",
@@ -27,6 +30,8 @@ const resources = {
       "home.features.templates.desc": "Access professional templates for contracts, letters, NOCs, and more",
       "home.features.booking.title": "Easy Online Booking",
       "home.features.booking.desc": "Book services instantly and track your orders in real-time",
+      "home.hero.badge": "Enabling Omanization for 26,000+ Small Businesses",
+      "home.hero.impactStatement": "Simplifying business, strengthening Omanization, and securing the future of Omani employment",
       
       // Offices
       "offices.title": "Sanad Offices",
@@ -99,6 +104,59 @@ const resources = {
       "common.next": "Next",
       "common.page": "Page",
       "common.of": "of",
+      
+      // Pricing & Affordability
+      "pricing.traditional": "Traditional PRO Services",
+      "pricing.traditional.cost": "1,500 OMR/month",
+      "pricing.traditional.desc": "Too expensive for small businesses",
+      "pricing.smartpro": "SmartPro Solution",
+      "pricing.smartpro.cost": "400 OMR minimum",
+      "pricing.smartpro.desc": "With PASI support - Real work, real compliance",
+      "pricing.savings": "Your Savings",
+      "pricing.savings.amount": "73% Less",
+      "pricing.savings.desc": "Save 1,100 OMR/month - Accessible for 26,000+ SMEs",
+      
+      // Stats
+      "home.stats.verifiedOffices": "Verified Offices",
+      "home.stats.servicesCompleted": "Services Completed",
+      "home.stats.avgRating": "Average Rating",
+      
+      // Feature Cards
+      "home.featureCards.sectionBadge": "Platform Features",
+      "home.featureCards.sectionTitle": "Everything You Need",
+      "home.featureCards.sectionSubtitle": "Comprehensive business services in one platform",
+      "home.featureCards.verifiedOffices": "Verified Sanad Offices",
+      "home.featureCards.verifiedOfficesDesc": "Access certified business service providers across all Oman governorates",
+      "home.featureCards.exploreOffices": "Explore Offices",
+      "home.featureCards.marketplace": "Service Marketplace",
+      "home.featureCards.marketplaceDesc": "Browse and compare services from multiple offices",
+      "home.featureCards.browseMarketplace": "Browse Marketplace",
+      "home.featureCards.documentTemplates": "Document Templates",
+      "home.featureCards.documentTemplatesDesc": "3,000+ professional templates for all business needs",
+      "home.featureCards.viewTemplates": "View Templates",
+      "home.featureCards.easyBooking": "Easy Booking",
+      "home.featureCards.easyBookingDesc": "Book services instantly and track in real-time",
+      "home.featureCards.myBookings": "My Bookings",
+      "home.featureCards.realtimeChat": "Real-time Chat",
+      "home.featureCards.realtimeChatDesc": "Direct communication with office owners",
+      "home.featureCards.openChat": "Open Chat",
+      "home.featureCards.loyaltyRewards": "Loyalty Rewards",
+      "home.featureCards.loyaltyRewardsDesc": "Earn points and get discounts on services",
+      "home.featureCards.viewRewards": "View Rewards",
+      
+      // How It Works
+      "home.how.badge": "Simple Process",
+      "home.how.title": "How It Works",
+      "home.how.subtitle": "Get started in three easy steps",
+      "home.how.step1.title": "Browse & Compare",
+      "home.how.step1.desc": "Search verified Sanad offices and compare services",
+      "home.how.step2.title": "Book Service",
+      "home.how.step2.desc": "Select your service and schedule appointment",
+      "home.how.step3.title": "Get It Done",
+      "home.how.step3.desc": "Track progress and receive completed documents",
+      
+      // Regional
+      "home.browseOffices": "Browse Offices",
     },
   },
   ar: {
@@ -117,6 +175,9 @@ const resources = {
       "home.title": "سمارت برو",
       "home.subtitle": "البنية التحتية الرقمية الوطنية لخدمات الأعمال",
       "home.description": "تواصل مع مكاتب السند المعتمدة في جميع أنحاء عُمان. احصل على أكثر من 3000 قالب مستند. أكمل خدماتك التجارية بشكل أسرع وأرخص وأذكى.",
+      "home.affordability.title": "التعمين بأسعار معقولة بـ 400 ريال عماني",
+      "home.affordability.subtitle": "جعل الامتثال في متناول الشركات الصغيرة",
+      "home.affordability.description": "تمكّن سمارت برو الشركات الصغيرة من توظيف موظفين عمانيين بحد أدنى 400 ريال عماني (بما في ذلك دعم التأمينات الاجتماعية) - أقل بنسبة 73٪ من خدمات PRO التقليدية البالغة 1,500 ريال عماني شهرياً. عمل حقيقي، امتثال حقيقي، أسعار معقولة.",
       "home.cta": "تصفح مكاتب السند",
       "home.features.title": "لماذا تختار سمارت برو؟",
       "home.features.offices.title": "مكاتب سند معتمدة",
@@ -125,6 +186,8 @@ const resources = {
       "home.features.templates.desc": "احصل على قوالب احترافية للعقود والخطابات وشهادات عدم الممانعة والمزيد",
       "home.features.booking.title": "حجز سهل عبر الإنترنت",
       "home.features.booking.desc": "احجز الخدمات فوراً وتتبع طلباتك في الوقت الفعلي",
+      "home.hero.badge": "تمكين التعمين لأكثر من 26,000 شركة صغيرة",
+      "home.hero.impactStatement": "تبسيط الأعمال، تعزيز التعمين، وتأمين مستقبل التوظيف العماني",
       
       // Offices
       "offices.title": "مكاتب السند",

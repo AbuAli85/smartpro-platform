@@ -113,6 +113,69 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Affordability Section - 400 OMR Messaging */}
+        <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-yellow-50 via-white to-blue-50 dark:from-slate-800 dark:via-slate-900 dark:to-slate-800">
+          <div className="container">
+            <div className="mx-auto max-w-5xl">
+              <div className="text-center mb-8 sm:mb-12">
+                <Badge className="mb-4 bg-yellow-100 text-yellow-800 border-yellow-200">
+                  💰 {t("home.affordability.subtitle")}
+                </Badge>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
+                  {t("home.affordability.title")}
+                </h2>
+                <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
+                  {t("home.affordability.description")}
+                </p>
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-3 mt-8 sm:mt-12">
+                <Card className="border-2 border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10">
+                  <CardHeader>
+                    <div className="flex items-center justify-between mb-2">
+                      <Badge variant="outline" className="bg-red-100 text-red-700 border-red-300">Traditional</Badge>
+                      <TrendingUp className="w-5 h-5 text-red-500" />
+                    </div>
+                    <CardTitle className="text-3xl font-bold text-red-600 dark:text-red-400">1,500 OMR</CardTitle>
+                    <CardDescription className="text-red-700 dark:text-red-300">
+                      Per month - Too expensive for small businesses
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+
+                <Card className="border-2 border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10 relative">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <Badge className="bg-green-600 text-white">✓ SmartPro Solution</Badge>
+                  </div>
+                  <CardHeader>
+                    <div className="flex items-center justify-between mb-2">
+                      <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">Affordable</Badge>
+                      <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    </div>
+                    <CardTitle className="text-3xl font-bold text-green-600 dark:text-green-400">400 OMR</CardTitle>
+                    <CardDescription className="text-green-700 dark:text-green-300">
+                      Minimum with PASI support - Real work, real compliance
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+
+                <Card className="border-2 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10">
+                  <CardHeader>
+                    <div className="flex items-center justify-between mb-2">
+                      <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-300">Savings</Badge>
+                      <Star className="w-5 h-5 text-blue-500" />
+                    </div>
+                    <CardTitle className="text-3xl font-bold text-blue-600 dark:text-blue-400">73% Less</CardTitle>
+                    <CardDescription className="text-blue-700 dark:text-blue-300">
+                      Save 1,100 OMR/month - Accessible for 26,000+ SMEs
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Features Section */}
         <section className="py-12 sm:py-16 md:py-20 lg:py-32 bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-800">
           <div className="container">
