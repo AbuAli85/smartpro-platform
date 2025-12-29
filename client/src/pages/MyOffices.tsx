@@ -113,7 +113,7 @@ export default function MyOffices() {
           <Link href="/office-registration">
             <Button>
               <Plus className="w-4 h-4 mr-2" />
-              Register New Office
+              {t("actions.registerNewOffice")}
             </Button>
         </Link>
       </div>

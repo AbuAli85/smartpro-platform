@@ -416,7 +416,7 @@ export default function ChatInbox() {
               onClick={() => setIsExportDialogOpen(true)}
             >
               <Download className="mr-2 h-4 w-4" />
-              Export Conversations
+              {t("actions.exportConversations")}
             </Button>
             <AvailabilityToggle />
           </div>
@@ -428,7 +428,7 @@ export default function ChatInbox() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MessageCircle className="h-5 w-5" />
-                Conversations
+                {t("chat.conversations")}
               </CardTitle>
               
               {/* Search */}
@@ -437,7 +437,7 @@ export default function ChatInbox() {
                 <Input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search conversations..."
+                  placeholder={t("chat.searchConversations")}
                   className="pl-9"
                 />
               </div>
@@ -445,8 +445,8 @@ export default function ChatInbox() {
               {/* Filter Tabs */}
               <Tabs value={filter} onValueChange={(v) => setFilter(v as "active" | "archived")} className="mt-4">
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="active">Active</TabsTrigger>
-                  <TabsTrigger value="archived">Archived</TabsTrigger>
+                  <TabsTrigger value="active">{t("chat.active")}</TabsTrigger>
+                  <TabsTrigger value="archived">{t("chat.archived")}</TabsTrigger>
                 </TabsList>
               </Tabs>
             </CardHeader>

@@ -125,7 +125,7 @@ export default function CannedResponses() {
           <DialogTrigger asChild>
             <Button onClick={() => resetForm()}>
               <Plus className="mr-2 h-4 w-4" />
-              New Response
+              {t("actions.newResponse")}
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -229,13 +229,13 @@ export default function CannedResponses() {
       {/* Office Selector */}
       <Card className="mb-6">
         <CardContent className="pt-6">
-          <label className="text-sm font-medium mb-2 block">Select Office</label>
+          <label className="text-sm font-medium mb-2 block">{t("cannedResponses.selectOffice")}</label>
           <Select
             value={selectedOfficeId?.toString()}
             onValueChange={(value) => setSelectedOfficeId(parseInt(value))}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Choose an office" />
+              <SelectValue placeholder={t("cannedResponses.chooseOffice")} />
             </SelectTrigger>
             <SelectContent>
               {offices?.map((office: any) => (

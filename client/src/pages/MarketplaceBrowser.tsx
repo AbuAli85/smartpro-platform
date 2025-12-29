@@ -65,7 +65,7 @@ export default function MarketplaceBrowser() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Filter className="w-5 h-5" />
-              Filters
+              {t("marketplace.filters")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -77,7 +77,7 @@ export default function MarketplaceBrowser() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Services</SelectItem>
+                    <SelectItem value="all">{t("marketplace.allServices")}</SelectItem>
                     <SelectItem value="Commercial Registration">Commercial Registration</SelectItem>
                     <SelectItem value="Tax Registration">Tax Registration</SelectItem>
                     <SelectItem value="VAT Registration">VAT Registration</SelectItem>
@@ -114,7 +114,7 @@ export default function MarketplaceBrowser() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Locations</SelectItem>
+                    <SelectItem value="all">{t("marketplace.allLocations")}</SelectItem>
                     <SelectItem value="Muscat">Muscat</SelectItem>
                     <SelectItem value="Salalah">Salalah</SelectItem>
                     <SelectItem value="Sohar">Sohar</SelectItem>
@@ -136,7 +136,7 @@ export default function MarketplaceBrowser() {
                     <div>
                       <CardTitle className="text-lg">{request.serviceType}</CardTitle>
                       <CardDescription className="mt-1">
-                        Posted {new Date(request.createdAt).toLocaleDateString()}
+                        {t("marketplace.posted")} {new Date(request.createdAt).toLocaleDateString()}
                       </CardDescription>
                     </div>
                     <Badge variant={request.urgency === "urgent" ? "destructive" : "secondary"}>
@@ -181,7 +181,7 @@ export default function MarketplaceBrowser() {
                     className="w-full"
                     onClick={() => handleOpenBidDialog(request)}
                   >
-                    Submit Bid
+                    {t("actions.submitBid")}
                   </Button>
                 </CardContent>
               </Card>

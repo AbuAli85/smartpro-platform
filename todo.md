@@ -240,3 +240,70 @@
 - [x] Update AdminDashboard.tsx with translation keys
 - [x] Update UserManagement.tsx with translation keys
 - [x] Update OfficeVerification.tsx with translation keys
+
+## 🔴 Owner Dashboard Pages Translation Fixes (Dec 29, 2025 - Round 2)
+
+### Bookings Page
+- [x] Translate "Booking Details" section header
+- [x] Translate "Office Information" section header
+- [x] Translate "View Office Profile" button
+- [x] Translate "Service Description" label
+- [x] Translate "Created:" and "Updated:" labels
+- [x] Translate "confirmed" badge status
+- [x] Translate "Cancel" button
+
+### Service Requests Page  
+- [x] Translate "Bids", "Service", "Deadline", "Budget" labels
+- [x] Translate "No bids received yet" message
+- [x] Translate "Open" badge status
+
+### Marketplace Page
+- [x] Translate "Filters" header
+- [x] Translate filter labels (Location, Max Budget, Min Budget, Service Type)
+- [x] Translate "All Locations", "All Services" options
+- [x] Translate "high" urgency badge
+- [x] Translate "Posted" date label
+- [x] Translate "bids submitted" label
+- [x] Translate "Submit Bid" button
+
+### My Offices Page
+- [x] Translate "Register New Office" button
+- [x] Fix "My Offices" title (already has translation key but showing English)
+- [x] Fix subtitle (already has translation key but showing English)
+
+### Owner Dashboard Page
+- [x] Fix "No Offices Found" empty state
+
+### Analytics Page
+- [x] Fix page title and subtitle (already have translation keys)
+- [x] Translate "Last 30 days" dropdown
+- [x] Translate stat card titles (Average Rating, Active Customers, etc.)
+- [x] Translate "vs last period" text
+- [x] Translate chart titles and descriptions
+
+### Chat Inbox Page
+- [x] Translate "Export Conversations" button
+- [x] Translate "Offline" status badge
+- [x] Translate "Conversations" header
+- [x] Translate "Search conversations..." placeholder
+- [x] Translate "Active", "Archived" tabs
+- [x] Translate "Staff Members" section
+
+### Canned Responses Page
+- [x] Translate "New Response" button
+- [x] Translate "Select Office" label
+- [x] Translate "Choose an office" placeholder
+
+### Staff Management Page
+- [x] Translate "Add Staff Member" button
+- [x] Translate "Staff Members" section header
+
+### Component Updates Needed
+- [x] Update BookingsList.tsx
+- [x] Update MyServiceRequests.tsx (additional fields)
+- [x] Update MarketplaceBrowser.tsx (additional fields)
+- [x] Update MyOffices.tsx (button text)
+- [x] Update Analytics.tsx (additional fields)
+- [x] Update ChatInbox.tsx (additional fields)
+- [x] Update CannedResponses.tsx (additional fields)
+- [x] Update StaffManagement.tsx (additional fields)

@@ -139,7 +139,7 @@ export default function BookingsList() {
                               onClick={() => setCancelBookingId(booking.id)}
                             >
                               <XCircle className="w-4 h-4 mr-2" />
-                              Cancel
+                              {t("actions.cancel")}
                             </Button>
                           )}
                           {booking.status === "completed" && (
@@ -162,7 +162,7 @@ export default function BookingsList() {
                         <div className="space-y-4">
                           <div>
                             <h3 className="font-semibold text-sm text-muted-foreground mb-3">
-                              Booking Details
+                              {t("booking.details")}
                             </h3>
                             <div className="space-y-2">
                               <div className="flex items-center gap-2">
@@ -198,7 +198,7 @@ export default function BookingsList() {
                           {booking.serviceDescription && (
                             <div>
                               <h3 className="font-semibold text-sm text-muted-foreground mb-2">
-                                Service Description
+                                {t("booking.serviceDescription")}
                               </h3>
                               <p className="text-sm">{booking.serviceDescription}</p>
                             </div>
@@ -218,7 +218,7 @@ export default function BookingsList() {
                         <div className="space-y-4">
                           <div>
                             <h3 className="font-semibold text-sm text-muted-foreground mb-3">
-                              Office Information
+                              {t("booking.officeInformation")}
                             </h3>
                             <div className="space-y-2">
                               {booking.officePhone && (
@@ -270,7 +270,7 @@ export default function BookingsList() {
                             onClick={() => setLocation(`/offices/${booking.officeId}`)}
                           >
                             <Building2 className="w-4 h-4 mr-2" />
-                            View Office Profile
+                            {t("actions.viewOfficeProfile")}
                           </Button>
                         </div>
                       </div>
@@ -329,11 +329,11 @@ export default function BookingsList() {
                       <Separator className="my-4" />
                       <div className="flex items-center justify-between text-xs text-muted-foreground">
                         <span>
-                          Created: {new Date(booking.createdAt).toLocaleDateString()}
+                          {t("booking.created")} {new Date(booking.createdAt).toLocaleDateString()}
                         </span>
                         {booking.updatedAt && booking.updatedAt !== booking.createdAt && (
                           <span>
-                            Updated: {new Date(booking.updatedAt).toLocaleDateString()}
+                            {t("booking.updated")} {new Date(booking.updatedAt).toLocaleDateString()}
                           </span>
                         )}
                       </div>

@@ -222,7 +222,7 @@ export default function Analytics() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
               <Card className="border-2 hover:border-primary/50 transition-colors">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t("analytics.totalRevenue")}</CardTitle>
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -298,8 +298,8 @@ export default function Analytics() {
               {/* Booking Trends */}
               <Card className="col-span-2">
                 <CardHeader>
-                  <CardTitle>Booking Trends</CardTitle>
-                  <CardDescription>Track booking activity over time</CardDescription>
+                  <CardTitle>{t("analytics.bookingTrends")}</CardTitle>
+                  <CardDescription>{t("analytics.bookingTrendsDesc")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {bookingTrendsData && (
@@ -331,8 +331,8 @@ export default function Analytics() {
               {/* Popular Services */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Popular Services</CardTitle>
-                  <CardDescription>Most booked services</CardDescription>
+                  <CardTitle>{t("analytics.popularServices")}</CardTitle>
+                  <CardDescription>{t("analytics.popularServicesDesc")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {popularServicesData && (

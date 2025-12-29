@@ -161,13 +161,13 @@ export default function StaffManagement() {
         </div>
         <Button onClick={() => setIsAddDialogOpen(true)}>
           <UserPlus className="h-4 w-4 mr-2" />
-          Add Staff Member
+          {t("actions.addStaffMember")}
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Staff Members</CardTitle>
+          <CardTitle>{t("chat.staffMembers")}</CardTitle>
         </CardHeader>
         <CardContent>
           {staff && staff.length > 0 ? (

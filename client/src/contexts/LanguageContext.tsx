@@ -805,6 +805,67 @@ export const translations: Record<Language, Record<string, string>> = {
     "actions.postServiceRequest": "Post a Service Request",
     "actions.registerYourFirstOffice": "Register Your First Office",
     "actions.addYourFirstStaffMember": "Add Your First Staff Member",
+    "actions.registerNewOffice": "Register New Office",
+    "actions.addStaffMember": "Add Staff Member",
+    "actions.newResponse": "New Response",
+    "actions.exportConversations": "Export Conversations",
+    "actions.submitBid": "Submit Bid",
+    "actions.cancel": "Cancel",
+    "actions.viewOfficeProfile": "View Office Profile",
+    
+    // Booking Details
+    "booking.details": "Booking Details",
+    "booking.officeInformation": "Office Information",
+    "booking.serviceDescription": "Service Description",
+    "booking.created": "Created:",
+    "booking.updated": "Updated:",
+    "booking.status.confirmed": "confirmed",
+    
+    // Service Request Details
+    "serviceRequest.bids": "Bids",
+    "serviceRequest.service": "Service",
+    "serviceRequest.deadline": "Deadline",
+    "serviceRequest.budget": "Budget",
+    "serviceRequest.noBidsYet": "No bids received yet. Offices will be notified about your request",
+    "serviceRequest.status.open": "Open",
+    "serviceRequest.bidsSubmitted": "bids submitted",
+    
+    // Marketplace Filters
+    "marketplace.filters": "Filters",
+    "marketplace.location": "Location",
+    "marketplace.maxBudget": "Max Budget (OMR)",
+    "marketplace.minBudget": "Min Budget (OMR)",
+    "marketplace.serviceType": "Service Type",
+    "marketplace.allLocations": "All Locations",
+    "marketplace.allServices": "All Services",
+    "marketplace.urgency.high": "high",
+    "marketplace.posted": "Posted",
+    
+    // Analytics
+    "analytics.last30Days": "Last 30 days",
+    "analytics.averageRating": "Average Rating",
+    "analytics.activeCustomers": "Active Customers",
+    "analytics.totalBookings": "Total Bookings",
+    "analytics.totalRevenue": "Total Revenue",
+    "analytics.vsLastPeriod": "vs last period",
+    "analytics.revenueTrends": "Revenue Trends",
+    "analytics.revenueTrendsDesc": "Revenue generated over time",
+    "analytics.bookingTrends": "Booking Trends",
+    "analytics.bookingTrendsDesc": "Number of bookings over time",
+    "analytics.popularServices": "Popular Services",
+    "analytics.popularServicesDesc": "Top performing services by booking count",
+    
+    // Chat
+    "chat.conversations": "Conversations",
+    "chat.searchConversations": "Search conversations...",
+    "chat.active": "Active",
+    "chat.archived": "Archived",
+    "chat.offline": "Offline",
+    "chat.staffMembers": "Staff Members",
+    
+    // Canned Responses
+    "cannedResponses.selectOffice": "Select Office",
+    "cannedResponses.chooseOffice": "Choose an office",
   },
   ar: {
     // Navigation
@@ -1595,6 +1656,67 @@ export const translations: Record<Language, Record<string, string>> = {
     "actions.postServiceRequest": "نشر طلب خدمة",
     "actions.registerYourFirstOffice": "سجل مكتبك الأول",
     "actions.addYourFirstStaffMember": "أضف أول موظف",
+    "actions.registerNewOffice": "تسجيل مكتب جديد",
+    "actions.addStaffMember": "إضافة موظف",
+    "actions.newResponse": "رد جديد",
+    "actions.exportConversations": "تصدير المحادثات",
+    "actions.submitBid": "تقديم عرض",
+    "actions.cancel": "إلغاء",
+    "actions.viewOfficeProfile": "عرض ملف المكتب",
+    
+    // Booking Details
+    "booking.details": "تفاصيل الحجز",
+    "booking.officeInformation": "معلومات المكتب",
+    "booking.serviceDescription": "وصف الخدمة",
+    "booking.created": "تم الإنشاء:",
+    "booking.updated": "تم التحديث:",
+    "booking.status.confirmed": "مؤكد",
+    
+    // Service Request Details
+    "serviceRequest.bids": "العروض",
+    "serviceRequest.service": "الخدمة",
+    "serviceRequest.deadline": "الموعد النهائي",
+    "serviceRequest.budget": "الميزانية",
+    "serviceRequest.noBidsYet": "لم يتم استلام عروض بعد. سيتم إعلام المكاتب بطلبك",
+    "serviceRequest.status.open": "مفتوح",
+    "serviceRequest.bidsSubmitted": "عروض مقدمة",
+    
+    // Marketplace Filters
+    "marketplace.filters": "الفلاتر",
+    "marketplace.location": "الموقع",
+    "marketplace.maxBudget": "الحد الأقصى للميزانية (ريال عماني)",
+    "marketplace.minBudget": "الحد الأدنى للميزانية (ريال عماني)",
+    "marketplace.serviceType": "نوع الخدمة",
+    "marketplace.allLocations": "جميع المواقع",
+    "marketplace.allServices": "جميع الخدمات",
+    "marketplace.urgency.high": "عالية",
+    "marketplace.posted": "تم النشر",
+    
+    // Analytics
+    "analytics.last30Days": "آخر 30 يومًا",
+    "analytics.averageRating": "متوسط التقييم",
+    "analytics.activeCustomers": "العملاء النشطون",
+    "analytics.totalBookings": "إجمالي الحجوزات",
+    "analytics.totalRevenue": "إجمالي الإيرادات",
+    "analytics.vsLastPeriod": "مقارنة بالفترة السابقة",
+    "analytics.revenueTrends": "اتجاهات الإيرادات",
+    "analytics.revenueTrendsDesc": "الإيرادات المحققة عبر الوقت",
+    "analytics.bookingTrends": "اتجاهات الحجوزات",
+    "analytics.bookingTrendsDesc": "عدد الحجوزات عبر الوقت",
+    "analytics.popularServices": "الخدمات الأكثر طلبًا",
+    "analytics.popularServicesDesc": "أفضل الخدمات أداءً حسب عدد الحجوزات",
+    
+    // Chat
+    "chat.conversations": "المحادثات",
+    "chat.searchConversations": "البحث في المحادثات...",
+    "chat.active": "نشط",
+    "chat.archived": "مؤرشف",
+    "chat.offline": "غير متصل",
+    "chat.staffMembers": "أعضاء الفريق",
+    
+    // Canned Responses
+    "cannedResponses.selectOffice": "اختر مكتب",
+    "cannedResponses.chooseOffice": "اختر مكتبًا",
   },
 };
 

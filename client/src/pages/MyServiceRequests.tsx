@@ -115,7 +115,7 @@ export default function MyServiceRequests() {
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Building2 className="h-4 w-4 text-gray-500" />
-                  <span className="font-medium">Bids:</span>
+                  <span className="font-medium">{t("serviceRequest.bids")}:</span>
                   <span className="font-semibold text-[#003366]">{request.bids?.length || 0}</span>
                 </div>
               </div>
@@ -195,7 +195,7 @@ export default function MyServiceRequests() {
               {(!request.bids || request.bids.length === 0) && request.status === "open" && (
                 <div className="mt-4 p-4 bg-gray-50 rounded-lg text-center">
                   <AlertCircle className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-                  <p className="text-sm text-gray-600">No bids received yet. Offices will be notified about your request.</p>
+                  <p className="text-sm text-gray-600">{t("serviceRequest.noBidsYet")}</p>
                 </div>
               )}
             </CardContent>
