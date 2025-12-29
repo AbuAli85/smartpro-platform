@@ -47,6 +47,11 @@ export default function Home() {
                 {getRegionalContent("home.hero.title")}
               </h1>
               
+              {/* Impact Statement Tagline */}
+              <p className="mt-3 sm:mt-4 text-lg sm:text-xl md:text-2xl font-serif italic text-yellow-200 max-w-3xl mx-auto px-4 leading-relaxed">
+                {t("home.hero.impactStatement")}
+              </p>
+              
               <p className="mt-4 sm:mt-6 text-base sm:text-lg md:text-xl leading-6 sm:leading-7 md:leading-8 text-blue-100 max-w-2xl mx-auto px-4">
                 {getRegionalContent("home.hero.subtitle")}
               </p>
