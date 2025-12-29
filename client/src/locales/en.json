@@ -32,6 +32,7 @@
     "profile": "Profile",
     "adminDashboard": "Admin Dashboard",
     "adminAnalytics": "Admin Analytics",
+    "securityDashboard": "Security Dashboard",
     "logout": "Logout"
   },
   "home": {

@@ -43,8 +43,9 @@ import { recommendationsRouter } from "./routers/recommendations";
 import { campaignsRouter } from "./routers/campaigns";
 import { auditLogRouter } from "./routers/auditLog";
 import { mfaRouter } from "./routers/mfa";
-import { accountRecoveryRouter } from "./routes/accountRecovery";
-import { sessionManagementRouter } from "./routes/sessionManagement";
+import { accountRecoveryRouter } from "./routers/accountRecovery";
+import { sessionManagementRouter } from "./routers/sessionManagement";
+import { securityDashboardRouter } from "./routers/securityDashboard";
 
 export const appRouter = router({
   system: systemRouter,
@@ -164,6 +165,7 @@ export const appRouter = router({
   mfa: mfaRouter,
   accountRecovery: accountRecoveryRouter,
   sessionManagement: sessionManagementRouter,
+  securityDashboard: securityDashboardRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -47,6 +47,24 @@ export function registerOAuthRoutes(app: Express) {
       const cookieOptions = getSessionCookieOptions(req);
       res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
 
+      // Track active session
+      if (user?.id) {
+        await db.upsertActiveSession({
+          sessionId: sessionToken,
+          userId: user.id,
+          deviceInfo: {
+            browser: req.headers["user-agent"]?.split("/")[0] || "Unknown",
+            os: req.headers["user-agent"]?.includes("Windows") ? "Windows" : 
+                req.headers["user-agent"]?.includes("Mac") ? "macOS" : 
+                req.headers["user-agent"]?.includes("Linux") ? "Linux" : "Unknown",
+            isMobile: /mobile/i.test(req.headers["user-agent"] || ""),
+          },
+          ipAddress: req.ip || req.socket.remoteAddress || "Unknown",
+          userAgent: req.headers["user-agent"],
+          expiresAt: new Date(Date.now() + ONE_YEAR_MS),
+        });
+      }
+
       // Log successful login
       await db.logAuthEvent({
         userId: user?.id,

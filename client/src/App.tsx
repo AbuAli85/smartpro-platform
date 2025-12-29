@@ -67,6 +67,7 @@ import { VerifyEmail } from "./pages/VerifyEmail";
 import { RequestPasswordReset } from "./pages/RequestPasswordReset";
 import { ResetPassword } from "./pages/ResetPassword";
 import { SessionManagement } from "./pages/SessionManagement";
+import SecurityDashboard from "./pages/admin/SecurityDashboard";
 import { useNotifications } from "./hooks/useNotifications";
 import { useMarketplaceNotifications } from "./hooks/useMarketplaceNotifications";
 import { SocketProvider } from "./contexts/SocketContext";
@@ -168,6 +169,11 @@ function Router() {
       <Route path="/admin/translation-management">
         <ProtectedRoute requirePermission="canManageTranslations">
           <TranslationManagement />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/security-dashboard">
+        <ProtectedRoute requirePermission="canAccessAdminPanel">
+          <SecurityDashboard />
         </ProtectedRoute>
       </Route>
       

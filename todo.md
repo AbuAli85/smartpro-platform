@@ -194,6 +194,50 @@
 
 ---
 
+## 🔐 Phase 1 Part 3: Advanced Security Enhancements (Dec 29, 2025)
+
+### 1. Session Tracking on Login
+- [x] Integrate upsertActiveSession into OAuth callback handler
+- [x] Extract device information from user agent
+- [x] Extract IP address from request headers
+- [x] Generate unique session IDs
+- [x] Store session metadata in active_sessions table
+- [ ] Test session creation on login
+- [ ] Verify sessions appear in Session Management UI
+
+### 2. Password Reset Rate Limiting
+- [x] Install express-rate-limit package (if not already installed)
+- [x] Create rate limiter for password reset request endpoint
+- [x] Set appropriate limits (e.g., 3 requests per hour per IP)
+- [x] Add rate limiter to password reset verify endpoint
+- [x] Add custom error messages for rate limit exceeded
+- [ ] Test rate limiting with multiple requests
+- [ ] Add unit tests for rate limiting
+
+### 3. Admin Security Dashboard
+- [x] Create SecurityDashboard page component at /admin/security-dashboard
+- [x] Add tRPC procedure for security metrics (MFA enrollments, password resets, suspicious activity)
+- [x] Build database functions for security statistics
+- [x] Create dashboard cards for key metrics
+- [x] Add recent MFA enrollments table
+- [x] Add recent password reset requests table
+- [x] Add suspicious session activity section
+- [x] Add audit log summary with filtering
+- [x] Add charts for security trends
+- [x] Add navigation link to admin sidebar
+- [x] Add route protection (admin-only)
+- [ ] Add unit tests for security metrics
+
+### 4. Testing and Documentation
+- [ ] Test session tracking end-to-end
+- [ ] Test rate limiting with automated requests
+- [ ] Test security dashboard with sample data
+- [x] Update DEPLOYMENT.md with new features
+- [x] Update todo.md with completion status
+- [x] Create security enhancement summary document
+
+---
+
 ## 🎯 PRODUCTION DEPLOYMENT CHECKLIST
 
 - [x] All pages translated

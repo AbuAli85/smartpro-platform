@@ -32,6 +32,7 @@
     "profile": "الملف الشخصي",
     "adminDashboard": "لوحة الإدارة",
     "adminAnalytics": "تحليلات الإدارة",
+    "securityDashboard": "لوحة معلومات الأمان",
     "logout": "تسجيل الخروج"
   },
   "home": {
