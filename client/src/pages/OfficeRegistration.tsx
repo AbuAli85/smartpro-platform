@@ -17,13 +17,7 @@ import { OMAN_GOVERNORATES, OMAN_CITIES, getCitiesByGovernorate, getBilingualLab
 import { useAutoSave, loadDraft } from "@/hooks/useAutoSave";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import { Save, Clock } from "lucide-react";
-
-const STEPS = [
-  { id: 1, title: "Basic Information", icon: Building2 },
-  { id: 2, title: "Location & Contact", icon: MapPin },
-  { id: 3, title: "Services & Verification", icon: FileText },
-  { id: 4, title: "Review & Submit", icon: CheckCircle2 },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const DRAFT_KEY = "office-registration-draft";
 
@@ -32,6 +26,14 @@ export default function OfficeRegistration() {
   const [currentStep, setCurrentStep] = useState(1);
   const [showDraftRestorePrompt, setShowDraftRestorePrompt] = useState(false);
   const { vibrate } = useHapticFeedback();
+  const { t } = useLanguage();
+  
+  const STEPS = [
+    { id: 1, title: t("officeReg.step1"), icon: Building2 },
+    { id: 2, title: t("officeReg.step2"), icon: MapPin },
+    { id: 3, title: t("officeReg.step3"), icon: FileText },
+    { id: 4, title: t("officeReg.step4"), icon: CheckCircle2 },
+  ];
   
   // Initialize form data with draft if available
   const [formData, setFormData] = useState(() => {
@@ -71,14 +73,6 @@ export default function OfficeRegistration() {
 
   const utils = trpc.useUtils();
   
-  // Auto-save hook
-  const { lastSaved, isSaving, clearDraft } = useAutoSave({
-    key: DRAFT_KEY,
-    data: formData,
-    interval: 30000, // 30 seconds
-    enabled: !registerOfficeMutation.isPending,
-  });
-  
   const registerOfficeMutation = trpc.officeOwner.registerOffice.useMutation({
     onSuccess: async () => {
       // Clear draft after successful submission
@@ -102,8 +96,16 @@ export default function OfficeRegistration() {
     },
   });
 
+  // Auto-save hook
+  const { lastSaved, isSaving, clearDraft } = useAutoSave({
+    key: DRAFT_KEY,
+    data: formData,
+    interval: 30000, // 30 seconds
+    enabled: !registerOfficeMutation.isPending,
+  });
+
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev: typeof formData) => ({ ...prev, [field]: value }));
   };
   
   const handleRestoreDraft = () => {
@@ -146,7 +148,7 @@ export default function OfficeRegistration() {
 
   // Handle governorate change - clear city selection
   const handleGovernorateChange = (value: string) => {
-    setFormData(prev => ({ ...prev, region: value, city: "" }));
+    setFormData((prev: typeof formData) => ({ ...prev, region: value, city: "" }));
   };
 
   // Get filtered cities based on selected governorate
@@ -155,7 +157,7 @@ export default function OfficeRegistration() {
     : OMAN_CITIES;
 
   const handleServiceToggle = (serviceId: string) => {
-    setFormData(prev => ({
+    setFormData((prev: typeof formData) => ({
       ...prev,
       selectedServices: prev.selectedServices.includes(serviceId)
         ? prev.selectedServices.filter((id: string) => id !== serviceId)
@@ -260,9 +262,9 @@ export default function OfficeRegistration() {
         
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">Register Your Sanad Office</h1>
+          <h1 className="text-4xl font-bold text-foreground mb-2">{t("officeReg.title")}</h1>
           <p className="text-muted-foreground text-lg">
-            Join SmartPro platform and connect with thousands of SMEs
+            {t("officeReg.subtitle")}
           </p>
           
           {/* Auto-save Indicator */}
@@ -332,19 +334,19 @@ export default function OfficeRegistration() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="officeName">Office Name (English) *</Label>
+                    <Label htmlFor="officeName">{t("officeReg.officeName")} *</Label>
                     <Input
                       id="officeName"
-                      placeholder="e.g., Al-Riyadh Business Services"
+                      placeholder={t("officeReg.officeNamePlaceholder")}
                       value={formData.officeName}
                       onChange={(e) => handleInputChange("officeName", e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="officeNameAr">Office Name (Arabic)</Label>
+                    <Label htmlFor="officeNameAr">{t("officeReg.officeNameAr")}</Label>
                     <Input
                       id="officeNameAr"
-                      placeholder="مثال: خدمات الأعمال الرياض"
+                      placeholder={t("officeReg.officeNameArPlaceholder")}
                       value={formData.officeNameAr}
                       onChange={(e) => handleInputChange("officeNameAr", e.target.value)}
                       dir="rtl"
@@ -353,20 +355,20 @@ export default function OfficeRegistration() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="licenseNumber">Business License Number *</Label>
+                  <Label htmlFor="licenseNumber">{t("officeReg.licenseNumber")} *</Label>
                   <Input
                     id="licenseNumber"
-                    placeholder="Enter your official license number"
+                    placeholder={t("officeReg.licenseNumberPlaceholder")}
                     value={formData.licenseNumber}
                     onChange={(e) => handleInputChange("licenseNumber", e.target.value)}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description (English) *</Label>
+                  <Label htmlFor="description">{t("officeReg.description")} *</Label>
                   <Textarea
                     id="description"
-                    placeholder="Describe your office, services, and what makes you unique..."
+                    placeholder={t("officeReg.descriptionPlaceholder")}
                     value={formData.description}
                     onChange={(e) => handleInputChange("description", e.target.value)}
                     rows={4}
@@ -374,10 +376,10 @@ export default function OfficeRegistration() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="descriptionAr">Description (Arabic)</Label>
+                  <Label htmlFor="descriptionAr">{t("officeReg.descriptionAr")}</Label>
                   <Textarea
                     id="descriptionAr"
-                    placeholder="صف مكتبك وخدماتك وما يميزك..."
+                    placeholder={t("officeReg.descriptionArPlaceholder")}
                     value={formData.descriptionAr}
                     onChange={(e) => handleInputChange("descriptionAr", e.target.value)}
                     rows={4}
@@ -783,7 +785,7 @@ export default function OfficeRegistration() {
                 disabled={currentStep === 1 || registerOfficeMutation.isPending}
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
+                {t("common.back")}
               </Button>
 
               {currentStep < 4 ? (
@@ -791,7 +793,7 @@ export default function OfficeRegistration() {
                   onClick={handleNext}
                   disabled={!isStepValid() || registerOfficeMutation.isPending}
                 >
-                  {currentStep === 3 ? "Review Application" : "Next"}
+                  {currentStep === 3 ? t("officeReg.step4") : t("common.next")}
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               ) : (
