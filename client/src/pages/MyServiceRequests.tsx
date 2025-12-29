@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, Package, Calendar, DollarSign, Clock, Building2, CheckCircle, XCircle, AlertCircle, FileText, TrendingUp, Users, Star } from "lucide-react";
+import { Loader2, Package, Calendar, DollarSign, Clock, Building2, CheckCircle, XCircle, AlertCircle, FileText, TrendingUp, Users, Star, ChevronDown, ChevronUp, MessageSquare } from "lucide-react";
+import { StatusTimeline } from "@/components/RequestTimeline";
+import { RequestMessaging } from "@/components/RequestMessaging";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -14,6 +16,32 @@ export default function MyServiceRequests() {
   const [selectedRequestId, setSelectedRequestId] = useState<number | null>(null);
   const [selectedBidId, setSelectedBidId] = useState<number | null>(null);
   const [showAcceptDialog, setShowAcceptDialog] = useState(false);
+  const [expandedTimelines, setExpandedTimelines] = useState<Set<number>>(new Set());
+  const [expandedMessaging, setExpandedMessaging] = useState<Set<number>>(new Set());
+
+  const toggleTimeline = (requestId: number) => {
+    setExpandedTimelines((prev) => {
+      const next = new Set(prev);
+      if (next.has(requestId)) {
+        next.delete(requestId);
+      } else {
+        next.add(requestId);
+      }
+      return next;
+    });
+  };
+
+  const toggleMessaging = (requestId: number) => {
+    setExpandedMessaging((prev) => {
+      const next = new Set(prev);
+      if (next.has(requestId)) {
+        next.delete(requestId);
+      } else {
+        next.add(requestId);
+      }
+      return next;
+    });
+  };
 
   const { data: requests, isLoading, refetch } = trpc.serviceMarketplace.getMyRequests.useQuery();
   const acceptBidMutation = trpc.serviceMarketplace.acceptBid.useMutation({
@@ -253,6 +281,66 @@ export default function MyServiceRequests() {
                   <p className="text-sm text-gray-600">{t("serviceRequest.noBidsYet")}</p>
                 </div>
               )}
+
+              {/* Timeline Section */}
+              <div className="mt-4 border-t pt-4">
+                <Button
+                  variant="ghost"
+                  onClick={() => toggleTimeline(request.id)}
+                  className="w-full flex items-center justify-between text-sm font-medium"
+                >
+                  <span className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    {t("serviceRequest.viewTimeline") || "View Progress Timeline"}
+                  </span>
+                  {expandedTimelines.has(request.id) ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </Button>
+
+                {expandedTimelines.has(request.id) && (
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <StatusTimeline
+                      currentStatus={request.status}
+                      createdAt={new Date(request.createdAt)}
+                      updatedAt={new Date(request.updatedAt)}
+                      acceptedAt={request.acceptedAt ? new Date(request.acceptedAt) : undefined}
+                      completedAt={request.completedAt ? new Date(request.completedAt) : undefined}
+                      cancelledAt={request.cancelledAt ? new Date(request.cancelledAt) : undefined}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Messaging Section */}
+              <div className="mt-4 border-t pt-4">
+                <Button
+                  variant="ghost"
+                  onClick={() => toggleMessaging(request.id)}
+                  className="w-full flex items-center justify-between text-sm font-medium"
+                >
+                  <span className="flex items-center gap-2">
+                    <MessageSquare className="h-4 w-4" />
+                    {t("serviceRequest.viewMessages") || "View Messages"}
+                  </span>
+                  {expandedMessaging.has(request.id) ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </Button>
+
+                {expandedMessaging.has(request.id) && (
+                  <div className="mt-4">
+                    <RequestMessaging
+                      requestId={request.id}
+                      senderType="customer"
+                    />
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         ))}

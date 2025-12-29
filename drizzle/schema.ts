@@ -1302,6 +1302,37 @@ export const serviceRequests = mysqlTable("service_requests", {
   locationIdx: index("location_idx").on(table.governorate, table.wilayat),
 }));
 
+export const requestMessages = mysqlTable("request_messages", {
+  id: int("id").primaryKey().autoincrement(),
+  requestId: int("request_id").notNull(),
+  senderId: int("sender_id").notNull(),
+  senderType: mysqlEnum("sender_type", ["customer", "office"]).notNull(),
+  
+  // Message content
+  message: text("message").notNull(),
+  attachments: json("attachments").$type<Array<{
+    url: string;
+    filename: string;
+    fileType: string;
+    fileSize: number;
+  }>>(),
+  
+  // Status
+  isRead: boolean("is_read").default(false),
+  readAt: timestamp("read_at"),
+  
+  // Metadata
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
+}, (table) => ({
+  requestIdx: index("request_idx").on(table.requestId),
+  senderIdx: index("sender_idx").on(table.senderId),
+  createdAtIdx: index("created_at_idx").on(table.createdAt),
+}));
+
+export type RequestMessage = typeof requestMessages.$inferSelect;
+export type InsertRequestMessage = typeof requestMessages.$inferInsert;
+
 export const serviceBids = mysqlTable("service_bids", {
   id: int("id").primaryKey().autoincrement(),
   requestId: int("request_id").notNull(),

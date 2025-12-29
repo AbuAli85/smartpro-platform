@@ -402,6 +402,46 @@ The platform is stable, fully functional, and ready for users. Minor console war
 - [x] Test wizard flow validation
 - [ ] Manual end-to-end testing (pending user verification)
 
+### Professional UX Enhancements - Phase 3 (In Progress - Dec 29, 2025)
+
+#### Timeline Integration
+- [x] Integrate StatusTimeline component into MyServiceRequests page
+- [x] Add timeline to request detail view/expanded cards
+- [x] Display timestamps for each status change
+- [x] Add visual indicators for current status
+- [x] Show estimated completion dates
+
+#### Request Messaging System
+- [x] Create request_messages database table
+- [x] Build message tRPC router with CRUD procedures
+- [x] Create RequestMessaging component with chat interface
+- [x] Implement file attachment support (images, PDFs)
+- [x] Add real-time message notifications via polling (5s interval)
+- [x] Create message notification badges
+- [x] Build message history with timestamps
+- [ ] Add typing indicators (future enhancement)
+- [x] Implement read/unread status
+
+#### Email Notification System
+- [x] Create bilingual email templates for request lifecycle
+- [x] Implement "Request Received" confirmation email (already exists)
+- [x] Implement "New Bid Received" notification email (already exists)
+- [ ] Implement "Bid Accepted" notification email (to office) (template ready, needs integration)
+- [ ] Implement "Service In Progress" update email (future enhancement)
+- [ ] Implement "Service Completed" notification email (template ready, needs integration)
+- [x] Add QR code embedding in emails (already in confirmation email)
+- [x] Add tracking links in all emails
+- [x] Integrate with existing email service (Resend)
+- [ ] Add email preferences to user settings (future enhancement)
+
+#### Testing Phase 3
+- [ ] Write unit tests for timeline integration
+- [ ] Write unit tests for messaging system
+- [ ] Write unit tests for email notifications
+- [ ] Test real-time message delivery
+- [ ] Test email delivery and formatting
+- [ ] Test end-to-end request workflow with all features
+
 ### Testing
 - [x] Write unit tests for email notification system
 - [x] Write unit tests for AI-powered features

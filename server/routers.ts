@@ -47,6 +47,7 @@ import { accountRecoveryRouter } from "./routers/accountRecovery";
 import { sessionManagementRouter } from "./routers/sessionManagement";
 import { securityDashboardRouter } from "./routers/securityDashboard";
 import { documentUploadRouter } from "./routers/documentUpload";
+import { requestMessagingRouter } from "./routers/requestMessaging";
 
 export const appRouter = router({
   system: systemRouter,
@@ -159,6 +160,7 @@ export const appRouter = router({
   serviceMarketplace: serviceMarketplaceRouter,
   serviceBundle: serviceBundleRouter,
   documentUpload: documentUploadRouter,
+  requestMessaging: requestMessagingRouter,
   storage: storageRouter,
   reviews: reviewsRouter,
   recommendations: recommendationsRouter,

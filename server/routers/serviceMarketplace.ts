@@ -332,6 +332,9 @@ export const serviceMarketplaceRouter = router({
           customerName: user.name || "Customer",
           price: bid.proposedPrice,
         });
+
+        // TODO: Send bid accepted email notification to office
+        // Will be implemented in Phase 3
       }
 
       return { bookingId };
