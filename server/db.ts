@@ -115,48 +115,42 @@ export async function upsertUser(user: InsertUser): Promise<void> {
   }
 
   try {
-    // Build values object with only the fields we're setting
-    const values: Partial<InsertUser> = {
-      openId: user.openId,
-    };
-    const updateSet: Record<string, unknown> = {};
-
-    const textFields = ["name", "email", "loginMethod", "phone", "avatarUrl"] as const;
-    type TextField = (typeof textFields)[number];
-
-    const assignNullable = (field: TextField) => {
-      const value = user[field];
-      if (value === undefined) return;
-      const normalized = value ?? null;
-      values[field] = normalized;
-      updateSet[field] = normalized;
-    };
-
-    textFields.forEach(assignNullable);
-
-    if (user.lastSignedIn !== undefined) {
-      values.lastSignedIn = user.lastSignedIn;
-      updateSet.lastSignedIn = user.lastSignedIn;
+    // Check if user exists first
+    const existing = await getUserByOpenId(user.openId);
+    
+    if (existing) {
+      // User exists - update only the fields we have
+      const updateData: any = {};
+      if (user.name !== undefined) updateData.name = user.name;
+      if (user.email !== undefined) updateData.email = user.email;
+      if (user.phone !== undefined) updateData.phone = user.phone;
+      if (user.loginMethod !== undefined) updateData.loginMethod = user.loginMethod;
+      if (user.avatarUrl !== undefined) updateData.avatarUrl = user.avatarUrl;
+      if (user.role !== undefined) updateData.role = user.role;
+      updateData.lastSignedIn = user.lastSignedIn || new Date();
+      
+      await db.update(users)
+        .set(updateData)
+        .where(eq(users.openId, user.openId));
+    } else {
+      // User doesn't exist - insert with only the fields we have
+      const insertData: any = {
+        openId: user.openId,
+        lastSignedIn: user.lastSignedIn || new Date(),
+      };
+      if (user.name !== undefined) insertData.name = user.name;
+      if (user.email !== undefined) insertData.email = user.email;
+      if (user.phone !== undefined) insertData.phone = user.phone;
+      if (user.loginMethod !== undefined) insertData.loginMethod = user.loginMethod;
+      if (user.avatarUrl !== undefined) insertData.avatarUrl = user.avatarUrl;
+      if (user.role !== undefined) {
+        insertData.role = user.role;
+      } else if (user.openId === ENV.ownerOpenId) {
+        insertData.role = 'admin';
+      }
+      
+      await db.insert(users).values(insertData);
     }
-    if (user.role !== undefined) {
-      values.role = user.role;
-      updateSet.role = user.role;
-    } else if (user.openId === ENV.ownerOpenId) {
-      values.role = 'admin';
-      updateSet.role = 'admin';
-    }
-
-    if (!values.lastSignedIn) {
-      values.lastSignedIn = new Date();
-    }
-
-    if (Object.keys(updateSet).length === 0) {
-      updateSet.lastSignedIn = new Date();
-    }
-
-    await db.insert(users).values(values as InsertUser).onDuplicateKeyUpdate({
-      set: updateSet,
-    });
   } catch (error) {
     console.error("[Database] Failed to upsert user:", error);
     throw error;

@@ -548,3 +548,9 @@ The platform is stable, fully functional, and ready for users. Minor console war
 - [x] Fix OAuth callback database insert error (upsertUser failing)
 - [x] Investigate column mismatch in users table insert
 - [x] Test OAuth login flow end-to-end
+
+## OAuth Database Insert Error Fix - COMPLETED (Dec 29, 2025)
+- [x] Fixed upsertUser function to avoid default value insertion
+- [x] Changed from onDuplicateKeyUpdate to separate INSERT/UPDATE logic
+- [x] Tested server restart - no errors
+- [ ] User to test OAuth login with real credentials
