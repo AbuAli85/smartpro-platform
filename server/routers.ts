@@ -46,6 +46,7 @@ import { mfaRouter } from "./routers/mfa";
 import { accountRecoveryRouter } from "./routers/accountRecovery";
 import { sessionManagementRouter } from "./routers/sessionManagement";
 import { securityDashboardRouter } from "./routers/securityDashboard";
+import { documentUploadRouter } from "./routers/documentUpload";
 
 export const appRouter = router({
   system: systemRouter,
@@ -157,6 +158,7 @@ export const appRouter = router({
   translatorTraining: translatorTrainingRouter,
   serviceMarketplace: serviceMarketplaceRouter,
   serviceBundle: serviceBundleRouter,
+  documentUpload: documentUploadRouter,
   storage: storageRouter,
   reviews: reviewsRouter,
   recommendations: recommendationsRouter,

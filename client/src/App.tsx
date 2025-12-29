@@ -48,6 +48,8 @@ import TranslationManagement from "./pages/TranslationManagement";
 import NotificationPreferences from "./pages/NotificationPreferences";
 import LanguageSettings from "./pages/LanguageSettings";
 import RequestServicePage from "./pages/RequestServicePage";
+import RequestServiceWizard from "./pages/RequestServiceWizard";
+import RequestSuccessPage from "./pages/RequestSuccessPage";
 import MarketplaceBrowser from "./pages/MarketplaceBrowser";
 import MyServiceRequests from "./pages/MyServiceRequests";
 import OfficeRegistration from "./pages/OfficeRegistration";
@@ -100,7 +102,10 @@ function Router() {
       {/* Marketplace */}
       <Route path="/request-service" component={RequestServicePage} />
       <Route path="/marketplace" component={MarketplaceBrowser} />
+      <Route path="/marketplace/request" component={RequestServiceWizard} />
+      <Route path="/marketplace/requests/:id/success" component={RequestSuccessPage} />
       <Route path="/my-requests" component={MyServiceRequests} />
+      <Route path="/my-service-requests" component={MyServiceRequests} />
       
       {/* Documents */}
       <Route path="/documents" component={MyDocuments} />
