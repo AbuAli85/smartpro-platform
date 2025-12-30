@@ -12,6 +12,7 @@ import { CanonicalURL } from "@/components/CanonicalURL";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useRegionalContent } from "@/hooks/useRegionalContent";
+import { useArabicNumbers } from "@/hooks/useArabicNumbers";
 import { RegionSelector } from "@/components/RegionSelector";
 import { FeaturedRegionalServices } from "@/components/FeaturedRegionalServices";
 import { RecommendedOffices } from "@/components/RecommendedOffices";
@@ -21,6 +22,7 @@ export default function Home() {
   const { t } = useLanguage();
   const { user } = useAuth();
   const { region, setRegion, getRegionalContent } = useRegionalContent();
+  const { toArabic, formatNumber } = useArabicNumbers();
 
   return (
     <>
@@ -97,15 +99,15 @@ export default function Home() {
               {/* Stats */}
               <div className="mt-10 sm:mt-12 md:mt-16 grid grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-2xl mx-auto px-4">
                 <div className="text-center">
-                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">500+</div>
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">{toArabic('500+')}</div>
                   <div className="text-xs sm:text-sm text-blue-200 mt-1">{t("home.stats.verifiedOffices")}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">10K+</div>
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">{toArabic('10K+')}</div>
                   <div className="text-xs sm:text-sm text-blue-200 mt-1">{t("home.stats.servicesCompleted")}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">4.9★</div>
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">{toArabic('4.9')}★</div>
                   <div className="text-xs sm:text-sm text-blue-200 mt-1">{t("home.stats.avgRating")}</div>
                 </div>
               </div>

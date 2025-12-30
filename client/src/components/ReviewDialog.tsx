@@ -1,10 +1,10 @@
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  RTLDialog as Dialog,
+  RTLDialogContent as DialogContent,
+  RTLDialogDescription as DialogDescription,
+  RTLDialogHeader as DialogHeader,
+  RTLDialogTitle as DialogTitle,
+} from "@/components/RTLDialog";
 import { ReviewForm } from "./ReviewForm";
 
 interface ReviewDialogProps {

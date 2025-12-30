@@ -1,6 +1,7 @@
 import { trpc } from "@/lib/trpc";
 import { useRegionalContent } from "@/hooks/useRegionalContent";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useArabicNumbers } from "@/hooks/useArabicNumbers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +11,7 @@ import { Link } from "wouter";
 export function RecommendedOffices() {
   const { region } = useRegionalContent();
   const { t, language } = useLanguage();
+  const { formatNumber, formatRating } = useArabicNumbers();
   
   const { data, isLoading } = trpc.recommendations.getRecommended.useQuery({
     region: region === "all" ? null : region,
@@ -96,10 +98,10 @@ export function RecommendedOffices() {
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1">
                     <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="font-semibold">{office.rating.toFixed(1)}</span>
+                    <span className="font-semibold">{formatNumber(office.rating, { decimals: 1 })}</span>
                   </div>
                   <span className="text-sm text-gray-600">
-                    ({office.reviewCount} {t("recommendations.reviews")})
+                    ({formatNumber(office.reviewCount)} {t("recommendations.reviews")})
                   </span>
                 </div>
 
@@ -112,7 +114,7 @@ export function RecommendedOffices() {
                 {/* Stats */}
                 <div className="flex items-center justify-between text-sm text-gray-600">
                   <span>
-                    {office.completedBookings} {t("recommendations.completedBookings")}
+                    {formatNumber(office.completedBookings)} {t("recommendations.completedBookings")}
                   </span>
                 </div>
 

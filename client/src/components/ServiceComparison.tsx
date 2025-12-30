@@ -3,12 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  RTLDialog as Dialog,
+  RTLDialogContent as DialogContent,
+  RTLDialogDescription as DialogDescription,
+  RTLDialogHeader as DialogHeader,
+  RTLDialogTitle as DialogTitle,
+} from "@/components/RTLDialog";
 import {
   CheckCircle2,
   X,

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { RTLDialog as Dialog, RTLDialogContent as DialogContent, RTLDialogHeader as DialogHeader, RTLDialogTitle as DialogTitle, RTLDialogFooter as DialogFooter } from "@/components/RTLDialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";

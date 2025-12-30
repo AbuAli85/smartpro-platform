@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { RTLDialog as Dialog, RTLDialogContent as DialogContent, RTLDialogDescription as DialogDescription, RTLDialogFooter as DialogFooter, RTLDialogHeader as DialogHeader, RTLDialogTitle as DialogTitle } from "@/components/RTLDialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { RTLDialog as Dialog, RTLDialogContent as DialogContent, RTLDialogHeader as DialogHeader, RTLDialogTitle as DialogTitle } from "@/components/RTLDialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Star } from "lucide-react";

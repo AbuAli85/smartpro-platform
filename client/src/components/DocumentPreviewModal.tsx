@@ -1,10 +1,10 @@
 import { useState } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  RTLDialog as Dialog,
+  RTLDialogContent as DialogContent,
+  RTLDialogHeader as DialogHeader,
+  RTLDialogTitle as DialogTitle,
+} from "@/components/RTLDialog";
 import { Button } from "@/components/ui/button";
 import { X, Download, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
 
