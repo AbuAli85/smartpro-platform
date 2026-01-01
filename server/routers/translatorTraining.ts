@@ -13,7 +13,7 @@ export const translatorTrainingRouter = router({
     .query(async ({ input }) => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
-      const conditions = [eq(trainingMaterials.isActive, true)];
+      const conditions = [eq(trainingMaterials.isActive, 1)];
       if (input.category) {
         conditions.push(eq(trainingMaterials.category, input.category));
       }
@@ -33,7 +33,7 @@ export const translatorTrainingRouter = router({
       return await db
         .select()
         .from(trainingQuizzes)
-        .where(eq(trainingQuizzes.isActive, true))
+        .where(eq(trainingQuizzes.isActive, 1))
         .orderBy(trainingQuizzes.createdAt);
     }),
 
@@ -122,7 +122,7 @@ export const translatorTrainingRouter = router({
             .where(eq(quizOptions.id, selectedOptionId))
             .limit(1);
 
-          if (option[0]?.isCorrect) {
+          if (option[0]?.isCorrect === 1) {
             correctCount++;
           }
         }
@@ -137,7 +137,7 @@ export const translatorTrainingRouter = router({
         userId: ctx.user.id,
         score,
         totalQuestions: questions.length,
-        passed,
+        passed: passed ? 1 : 0,
       });
 
       return {
@@ -205,7 +205,7 @@ export const translatorTrainingRouter = router({
         options: z.array(z.object({
           optionText: z.string(),
           optionTextAr: z.string().optional(),
-          isCorrect: z.boolean(),
+          isCorrect: z.number().int().min(0).max(1),
         })),
       })),
     }))
@@ -245,7 +245,7 @@ export const translatorTrainingRouter = router({
             questionId,
             optionText: opt.optionText,
             optionTextAr: opt.optionTextAr,
-            isCorrect: opt.isCorrect,
+            isCorrect: opt.isCorrect ? 1 : 0,
             orderIndex: j,
           });
         }

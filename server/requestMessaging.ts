@@ -45,7 +45,7 @@ export async function markMessageAsRead(messageId: number) {
   if (!db) throw new Error("Database not available");
   await db
     .update(requestMessages)
-    .set({ isRead: true, readAt: new Date() })
+    .set({ isRead: true, readAt: new Date().toISOString().toISOString() })
     .where(eq(requestMessages.id, messageId));
   // Fetch the updated message
   const [updated] = await db
@@ -64,7 +64,7 @@ export async function markAllMessagesAsRead(requestId: number, userId: number) {
   if (!db) throw new Error("Database not available");
   return db
     .update(requestMessages)
-    .set({ isRead: true, readAt: new Date() })
+    .set({ isRead: true, readAt: new Date().toISOString().toISOString() })
     .where(
       and(
         eq(requestMessages.requestId, requestId),

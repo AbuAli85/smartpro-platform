@@ -158,7 +158,7 @@ export async function saveUntranslatedAlerts(items: UntranslatedItem[]): Promise
         priority,
         status: "pending",
         notificationSent: false,
-        createdAt: new Date(),
+        createdAt: new Date().toISOString().toISOString(),
       });
     } else {
       // Update existing alert priority if changed

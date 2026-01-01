@@ -155,7 +155,7 @@ export async function cancelBooking(
       status: "cancelled",
       cancellationReason: reason,
       cancelledBy: userId,
-      cancelledAt: new Date(),
+      cancelledAt: new Date().toISOString().toISOString(),
       cancellationPenalty: cancellationResult.penaltyAmount.toString(),
       refundAmount: cancellationResult.refundAmount.toString(),
       paymentStatus: cancellationResult.refundAmount > 0 ? "refunded" : "unpaid",

@@ -29,7 +29,7 @@ export const collaborativeReviewRouter = router({
         status: "pending",
         submittedBy: ctx.user.id,
         submittedByName: ctx.user.name || "Unknown",
-        submittedAt: new Date(),
+        submittedAt: new Date().toISOString(),
       });
 
       // Send email notification to admins
@@ -144,7 +144,7 @@ export const collaborativeReviewRouter = router({
         userId: ctx.user.id,
         userName: ctx.user.name || "Unknown",
         comment: input.comment,
-        createdAt: new Date(),
+        createdAt: new Date().toISOString(),
       });
 
       return { success: true };
@@ -181,7 +181,7 @@ export const collaborativeReviewRouter = router({
           reviewedBy: ctx.user.id,
           reviewedByName: ctx.user.name || "Unknown",
           reviewNotes: input.reviewNotes,
-          reviewedAt: new Date(),
+          reviewedAt: new Date().toISOString(),
         })
         .where(eq(translationReviews.id, input.reviewId));
 
@@ -266,7 +266,7 @@ export const collaborativeReviewRouter = router({
           reviewedBy: ctx.user.id,
           reviewedByName: ctx.user.name || "Unknown",
           reviewNotes: input.reviewNotes,
-          reviewedAt: new Date(),
+          reviewedAt: new Date().toISOString(),
         })
         .where(eq(translationReviews.id, input.reviewId));
 
@@ -314,7 +314,7 @@ export const collaborativeReviewRouter = router({
           reviewedBy: ctx.user.id,
           reviewedByName: ctx.user.name || "Unknown",
           reviewNotes: input.reviewNotes,
-          reviewedAt: new Date(),
+          reviewedAt: new Date().toISOString(),
         })
         .where(eq(translationReviews.id, input.reviewId));
 

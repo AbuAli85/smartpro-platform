@@ -338,7 +338,7 @@ export const sanadOfficeRouter = router({
         startTime: z.string().optional(),
         endTime: z.string().optional(),
         slotDuration: z.number().optional(),
-        isActive: z.boolean().optional(),
+        isActive: z.number().int().min(0).max(1).optional(),
       })
     )
     .mutation(async ({ input }) => {

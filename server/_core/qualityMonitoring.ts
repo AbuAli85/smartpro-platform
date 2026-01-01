@@ -171,7 +171,7 @@ async function createAlert(params: {
     thresholdValue: params.thresholdValue.toString(),
     message: params.message,
     status: "active",
-    detectedAt: new Date(),
+    detectedAt: new Date().toISOString().toISOString(),
   });
 
   // Send email notification
@@ -230,7 +230,7 @@ async function createAlert(params: {
       .update(qualityAlerts)
       .set({
         emailSent: true,
-        emailSentAt: new Date(),
+        emailSentAt: new Date().toISOString().toISOString(),
       })
       .where(
         and(

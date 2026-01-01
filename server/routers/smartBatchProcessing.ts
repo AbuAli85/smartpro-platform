@@ -111,7 +111,7 @@ export const smartBatchProcessingRouter = router({
         useMemorySuggestions: input.useMemorySuggestions,
         createdBy: ctx.user.id,
         createdByName: ctx.user.name || "Unknown",
-        createdAt: new Date(),
+        createdAt: new Date().toISOString(),
       });
 
       const jobId = (result as any).insertId;
@@ -239,7 +239,7 @@ async function processBatchJob(
       .update(batchTranslationJobs)
       .set({
         status: "processing",
-        startedAt: new Date(),
+        startedAt: new Date().toISOString(),
       })
       .where(eq(batchTranslationJobs.id, jobId));
 
@@ -382,7 +382,7 @@ async function processBatchJob(
         queuedForReviewCount,
         failedCount,
         results: results as any,
-        completedAt: new Date(),
+        completedAt: new Date().toISOString(),
       })
       .where(eq(batchTranslationJobs.id, jobId));
 
@@ -392,7 +392,7 @@ async function processBatchJob(
       .update(batchTranslationJobs)
       .set({
         status: "failed",
-        completedAt: new Date(),
+        completedAt: new Date().toISOString(),
       })
       .where(eq(batchTranslationJobs.id, jobId));
   }
@@ -499,7 +499,7 @@ async function processTranslation(params: {
         status: "pending",
         submittedBy: 1, // System user
         submittedByName: "Smart Batch Processor",
-        submittedAt: new Date(),
+        submittedAt: new Date().toISOString(),
       });
 
       return {
