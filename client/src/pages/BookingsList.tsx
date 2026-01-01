@@ -25,6 +25,12 @@ import {
 import { BookingCalendar } from "@/components/BookingCalendar";
 import CancellationDialog from "@/components/CancellationDialog";
 import ReviewDialog from "@/components/ReviewDialog";
+import { RescheduleBookingDialog } from "@/components/RescheduleBookingDialog";
+import { BookingStatusTimeline } from "@/components/BookingStatusTimeline";
+import { CustomerChatInterface } from "@/components/CustomerChatInterface";
+import { DocumentDeliverySection } from "@/components/DocumentDeliverySection";
+import { PaymentInformationCard } from "@/components/PaymentInformationCard";
+import { BookingRemindersCard } from "@/components/BookingRemindersCard";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useFormatNumber } from "@/hooks/useFormatNumber";
 import { useLocation } from "wouter";
@@ -37,6 +43,7 @@ export default function BookingsList() {
   const [, setLocation] = useLocation();
   const [cancelBookingId, setCancelBookingId] = useState<number | null>(null);
   const [reviewBooking, setReviewBooking] = useState<any | null>(null);
+  const [rescheduleBooking, setRescheduleBooking] = useState<any | null>(null);
   
   const { data: bookings, isLoading, refetch } = trpc.booking.getMyBookings.useQuery();
 
@@ -135,14 +142,24 @@ export default function BookingsList() {
                         </div>
                         <div className="flex gap-2">
                           {canCancel(booking.status) && (
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => setCancelBookingId(booking.id)}
-                            >
-                              <XCircle className="w-4 h-4 mr-2" />
-                              {t("actions.cancel")}
-                            </Button>
+                            <>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setRescheduleBooking(booking)}
+                              >
+                                <Calendar className="w-4 h-4 mr-2" />
+                                {t("booking.reschedule")}
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => setCancelBookingId(booking.id)}
+                              >
+                                <XCircle className="w-4 h-4 mr-2" />
+                                {t("actions.cancel")}
+                              </Button>
+                            </>
                           )}
                           {booking.status === "completed" && (
                             <Button
@@ -272,6 +289,66 @@ export default function BookingsList() {
                         </div>
                       </div>
 
+                      {/* Booking Timeline */}
+                      <Separator className="my-4" />
+                      <BookingStatusTimeline
+                        booking={{
+                          id: booking.id,
+                          status: booking.status,
+                          createdAt: new Date(booking.createdAt),
+                          updatedAt: new Date(booking.updatedAt),
+                          scheduledDate: booking.scheduledDate ? new Date(booking.scheduledDate) : undefined,
+                          scheduledTime: booking.scheduledTime,
+                          completedAt: booking.completedAt ? new Date(booking.completedAt) : undefined,
+                          cancelledAt: booking.cancelledAt ? new Date(booking.cancelledAt) : undefined,
+                          cancelReason: booking.cancellationReason,
+                        }}
+                      />
+
+                      {/* Customer Chat */}
+                      {(booking.status === "confirmed" || booking.status === "pending") && (
+                        <>
+                          <Separator className="my-4" />
+                          <CustomerChatInterface
+                            bookingId={booking.id}
+                            officeId={booking.officeId}
+                            officeName={booking.officeName}
+                          />
+                        </>
+                      )}
+
+                      {/* Document Delivery */}
+                      {(booking.status === "completed" || booking.status === "confirmed") && (
+                        <>
+                          <Separator className="my-4" />
+                          <DocumentDeliverySection bookingId={booking.id} />
+                        </>
+                      )}
+
+                      {/* Payment Information */}
+                      {booking.price && (
+                        <>
+                          <Separator className="my-4" />
+                          <PaymentInformationCard
+                            bookingId={booking.id}
+                            price={booking.price}
+                            status={booking.status}
+                          />
+                        </>
+                      )}
+
+                      {/* Booking Reminders */}
+                      {booking.scheduledDate && (booking.status === "confirmed" || booking.status === "pending") && (
+                        <>
+                          <Separator className="my-4" />
+                          <BookingRemindersCard
+                            bookingId={booking.id}
+                            scheduledDate={new Date(booking.scheduledDate)}
+                            status={booking.status}
+                          />
+                        </>
+                      )}
+
                       {/* Cancellation Info */}
                       {booking.status === "cancelled" && booking.cancellationReason && (
                         <>
@@ -378,6 +455,24 @@ export default function BookingsList() {
           }}
           onSuccess={() => {
             setReviewBooking(null);
+            refetch();
+          }}
+        />
+      )}
+      {rescheduleBooking && (
+        <RescheduleBookingDialog
+          bookingId={rescheduleBooking.id}
+          currentDate={new Date(rescheduleBooking.scheduledDate)}
+          currentTime={rescheduleBooking.scheduledTime}
+          officeId={rescheduleBooking.officeId}
+          open={true}
+          onOpenChange={(open) => {
+            if (!open) {
+              setRescheduleBooking(null);
+            }
+          }}
+          onSuccess={() => {
+            setRescheduleBooking(null);
             refetch();
           }}
         />
