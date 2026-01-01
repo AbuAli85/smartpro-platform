@@ -4584,8 +4584,13 @@ export async function listServiceRequests(filters: {
   }
 
   const results = await query.orderBy(desc(serviceRequests.createdAt));
-  // Return plain objects to ensure proper serialization
-  return results.map(r => ({ ...r }));
+  // Return plain objects with mapped field names for frontend compatibility
+  return results.map(r => ({
+    ...r,
+    minBudget: r.budgetMin ? parseFloat(r.budgetMin) : 0,
+    maxBudget: r.budgetMax ? parseFloat(r.budgetMax) : 0,
+    location: r.governorate || '',
+  }));
 }
 
 export async function getUserServiceRequests(userId: number) {
@@ -4630,8 +4635,13 @@ export async function getUserServiceRequests(userId: number) {
     })
   );
 
-  // Return plain objects to ensure proper serialization
-  return requestsWithBids.map(r => ({ ...r }));
+  // Return plain objects with mapped field names for frontend compatibility
+  return requestsWithBids.map(r => ({
+    ...r,
+    minBudget: r.budgetMin ? parseFloat(r.budgetMin) : 0,
+    maxBudget: r.budgetMax ? parseFloat(r.budgetMax) : 0,
+    location: r.governorate || '',
+  }));
 }
 
 export async function getServiceRequest(requestId: number) {
@@ -4644,8 +4654,15 @@ export async function getServiceRequest(requestId: number) {
     .where(eq(serviceRequests.id, requestId))
     .limit(1);
 
-  // Return plain object to ensure proper serialization
-  return results.length > 0 ? { ...results[0] } : null;
+  // Return plain object with mapped field names for frontend compatibility
+  if (results.length === 0) return null;
+  const r = results[0];
+  return {
+    ...r,
+    minBudget: r.budgetMin ? parseFloat(r.budgetMin) : 0,
+    maxBudget: r.budgetMax ? parseFloat(r.budgetMax) : 0,
+    location: r.governorate || '',
+  };
 }
 
 export async function updateServiceRequest(

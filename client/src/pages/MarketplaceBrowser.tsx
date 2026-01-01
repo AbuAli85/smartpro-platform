@@ -129,14 +129,17 @@ export default function MarketplaceBrowser() {
     setSearchQuery("");
   };
 
-  const formatDate = (date: Date | string) => {
+  const formatDate = (date: Date | string | null | undefined) => {
+    if (!date) return t("marketplace.noDeadline") || "No deadline";
     const d = new Date(date);
+    // Check if date is valid
+    if (isNaN(d.getTime())) return t("marketplace.noDeadline") || "No deadline";
     const formatted = d.toLocaleDateString(language === "ar" ? "ar-OM" : "en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
     });
-    return language === "ar" ? formatted : formatted;
+    return formatted;
   };
 
   if (isLoading) {

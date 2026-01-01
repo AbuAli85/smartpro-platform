@@ -686,6 +686,7 @@ export const translations: Record<Language, Record<string, string>> = {
     "marketplace.filters.search": "Search",
     "marketplace.filters.clearAll": "Clear All",
     "marketplace.filters.posted": "Posted",
+    "marketplace.noDeadline": "No deadline",
     
     // Marketplace Statistics
     "marketplace.stats.totalRequests": "Total Requests",
@@ -1607,6 +1608,7 @@ export const translations: Record<Language, Record<string, string>> = {
     "marketplace.filters.search": "البحث",
     "marketplace.filters.clearAll": "مسح الكل",
     "marketplace.filters.posted": "نُشر في",
+    "marketplace.noDeadline": "لا يوجد موعد نهائي",
     
     // Marketplace Statistics
     "marketplace.stats.totalRequests": "إجمالي الطلبات",
