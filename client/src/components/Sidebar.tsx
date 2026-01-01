@@ -134,6 +134,7 @@ export function Sidebar({ className }: SidebarProps) {
         { name: t("nav.cannedResponses"), href: "/owner/canned-responses", icon: MessageSquareText, requiresAuth: true, requirePermission: "canManageCannedResponses" as const },
         { name: t("nav.staffManagement"), href: "/owner/staff", icon: Users, requiresAuth: true, requirePermission: "canManageStaff" as const },
         { name: t("nav.staffPerformance"), href: "/owner/staff-performance", icon: Activity, requiresAuth: true, requirePermission: "canManageStaff" as const },
+        { name: t("nav.clients") || "Clients", href: "/owner/clients", icon: Users, requiresAuth: true, requirePermission: "canManageOffice" as const },
         { name: t("nav.followUpSettings"), href: "/owner/follow-up-settings", icon: Clock, requiresAuth: true, requirePermission: "canManageOffice" as const },
         { name: t("nav.officeMessages") || "Request Messages", href: "/office-messages", icon: MessageSquare, requiresAuth: true, requirePermission: "canManageOffice" as const },
       ],

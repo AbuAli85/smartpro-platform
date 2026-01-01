@@ -108,7 +108,7 @@ export const smartBatchProcessingRouter = router({
         targetEntityIds: input.targetEntityIds as any,
         status: "pending",
         confidenceThreshold: input.confidenceThreshold,
-        useMemorySuggestions: input.useMemorySuggestions,
+        useMemorySuggestions: input.useMemorySuggestions ? 1 : 0,
         createdBy: ctx.user.id,
         createdByName: ctx.user.name || "Unknown",
         createdAt: new Date().toISOString(),

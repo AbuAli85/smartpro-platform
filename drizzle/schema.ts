@@ -1058,3 +1058,81 @@ export const clientNotes = mysqlTable("client_notes", {
 	index("created_at_idx").on(table.createdAt),
 	index("is_important_idx").on(table.isImportant),
 ]);
+
+
+// Financial Management Tables
+export const invoices = mysqlTable("invoices", {
+	id: int().autoincrement().notNull(),
+	invoiceNumber: varchar("invoice_number", { length: 50 }).notNull(),
+	officeId: int("office_id").notNull(),
+	clientId: int("client_id"), // Optional: can be null for walk-in customers
+	clientName: varchar("client_name", { length: 255 }).notNull(),
+	clientEmail: varchar("client_email", { length: 255 }),
+	clientPhone: varchar("client_phone", { length: 20 }),
+	clientAddress: text("client_address"),
+	issueDate: date("issue_date").notNull(),
+	dueDate: date("due_date").notNull(),
+	status: mysqlEnum(['draft','sent','paid','overdue','cancelled']).default('draft').notNull(),
+	subtotal: decimal({ precision: 10, scale: 2 }).notNull(),
+	taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).default('0.00').notNull(),
+	discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }).default('0.00').notNull(),
+	totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
+	currency: varchar({ length: 3 }).default('OMR').notNull(),
+	notes: text(),
+	items: json(), // Array of line items: [{description, quantity, unitPrice, total}]
+	createdBy: int("created_by").notNull(),
+	createdByName: varchar("created_by_name", { length: 255 }).notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow(),
+},
+(table) => [
+	index("invoice_number_unique").on(table.invoiceNumber),
+	index("office_id_idx").on(table.officeId),
+	index("client_id_idx").on(table.clientId),
+	index("status_idx").on(table.status),
+	index("issue_date_idx").on(table.issueDate),
+	index("due_date_idx").on(table.dueDate),
+]);
+
+export const payments = mysqlTable("payments", {
+	id: int().autoincrement().notNull(),
+	invoiceId: int("invoice_id").notNull(),
+	officeId: int("office_id").notNull(),
+	amount: decimal({ precision: 10, scale: 2 }).notNull(),
+	paymentMethod: mysqlEnum("payment_method", ['cash','bank_transfer','credit_card','debit_card','cheque','other']).notNull(),
+	paymentDate: date("payment_date").notNull(),
+	referenceNumber: varchar("reference_number", { length: 100 }),
+	notes: text(),
+	createdBy: int("created_by").notNull(),
+	createdByName: varchar("created_by_name", { length: 255 }).notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("invoice_id_idx").on(table.invoiceId),
+	index("office_id_idx").on(table.officeId),
+	index("payment_date_idx").on(table.paymentDate),
+	index("payment_method_idx").on(table.paymentMethod),
+]);
+
+export const expenses = mysqlTable("expenses", {
+	id: int().autoincrement().notNull(),
+	officeId: int("office_id").notNull(),
+	category: mysqlEnum(['rent','utilities','salaries','supplies','marketing','travel','insurance','maintenance','software','other']).notNull(),
+	description: text().notNull(),
+	amount: decimal({ precision: 10, scale: 2 }).notNull(),
+	expenseDate: date("expense_date").notNull(),
+	paymentMethod: mysqlEnum("payment_method", ['cash','bank_transfer','credit_card','debit_card','cheque','other']),
+	receiptUrl: text("receipt_url"), // S3 URL for receipt/invoice
+	vendor: varchar({ length: 255 }),
+	notes: text(),
+	createdBy: int("created_by").notNull(),
+	createdByName: varchar("created_by_name", { length: 255 }).notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow(),
+},
+(table) => [
+	index("office_id_idx").on(table.officeId),
+	index("category_idx").on(table.category),
+	index("expense_date_idx").on(table.expenseDate),
+	index("created_at_idx").on(table.createdAt),
+]);

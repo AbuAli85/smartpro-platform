@@ -591,4 +591,113 @@ export const bookingRouter = router({
 
       return result;
     }),
+
+  // Reschedule an existing booking
+  rescheduleBooking: protectedProcedure
+    .input(
+      z.object({
+        bookingId: z.number(),
+        newDate: z.string(), // ISO date string
+        newTimeSlot: z.string().optional(), // e.g., "10:00" or "14:30"
+        reason: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { user } = ctx;
+
+      // Get existing booking
+      const booking = await db.getBookingById(input.bookingId);
+      if (!booking) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Booking not found",
+        });
+      }
+
+      // Verify user owns this booking
+      if (booking.userId !== user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You can only reschedule your own bookings",
+        });
+      }
+
+      // Check if booking can be rescheduled
+      if (booking.status === 'cancelled' || booking.status === 'completed') {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Cannot reschedule ${booking.status} booking`,
+        });
+      }
+
+      // Check if new date is in the future
+      const newDate = new Date(input.newDate);
+      if (newDate < new Date()) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Cannot reschedule to a past date",
+        });
+      }
+
+      // If time slot provided, check availability
+      if (input.newTimeSlot) {
+        const availableSlots = await db.getAvailableTimeSlots(
+          booking.officeId,
+          new Date(input.newDate)
+        );
+        if (!availableSlots.includes(input.newTimeSlot)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Selected time slot is not available",
+          });
+        }
+      }
+
+      // Update booking
+      await db.updateBookingDateTime({
+        bookingId: input.bookingId,
+        newDate: input.newDate,
+        newTimeSlot: input.newTimeSlot,
+      });
+
+      // Log activity
+      await db.logActivity({
+        userId: user.id,
+        action: "rescheduled",
+        entityType: "booking",
+        entityId: input.bookingId,
+        description: `Rescheduled booking #${input.bookingId} to ${input.newDate}${input.newTimeSlot ? ` at ${input.newTimeSlot}` : ''}`,
+      });
+
+      // Send email notification to customer
+      await sendEmail({
+        to: user.email,
+        subject: "Booking Rescheduled - SmartPro",
+        html: `
+          <h2>Your booking has been rescheduled</h2>
+          <p>Dear ${user.name},</p>
+          <p>Your booking #${input.bookingId} has been successfully rescheduled.</p>
+          <p><strong>New Date:</strong> ${new Date(input.newDate).toLocaleDateString()}</p>
+          ${input.newTimeSlot ? `<p><strong>New Time:</strong> ${input.newTimeSlot}</p>` : ''}
+          ${input.reason ? `<p><strong>Reason:</strong> ${input.reason}</p>` : ''}
+          <p>If you have any questions, please contact the office.</p>
+          <p>Thank you for using SmartPro!</p>
+        `,
+      });
+
+      // Notify office owner
+      await notifyOwner({
+        title: "Booking Rescheduled",
+        content: `Booking #${input.bookingId} has been rescheduled by ${user.name} to ${input.newDate}${input.newTimeSlot ? ` at ${input.newTimeSlot}` : ''}`,
+      });
+
+      // Get updated booking
+      const updatedBooking = await db.getBookingById(input.bookingId);
+
+      return {
+        success: true,
+        message: "Booking rescheduled successfully",
+        booking: updatedBooking,
+      };
+    }),
 });

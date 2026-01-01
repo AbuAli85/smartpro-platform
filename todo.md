@@ -921,19 +921,206 @@ The platform is stable, fully functional, and ready for users. Minor console war
 - [ ] Add navigation link to office owner dashboard
 - [ ] Add translation keys for client management
 
+### Phase 1.1b: Complete Client Management System
+- [x] Add "Clients" navigation link to Sidebar under Office Management section
+- [x] Add comprehensive translation keys for client management (English + Arabic)
+- [ ] Implement file upload for client documents (replace URL input with DocumentUpload component)
+- [ ] Add tags management UI with tag creation and assignment
+- [ ] Test client management end-to-end
+
 ### Phase 1.2: Financial Management System - TODO
-- [ ] Create invoices table
-- [ ] Create payments table  
-- [ ] Create expenses table
-- [ ] Create financial router
-- [ ] Create InvoiceGenerator page
+#### Database Schema
+- [ ] Create invoices table (invoice number, client, amount, status, due date, etc.)
+- [ ] Create payments table (payment method, amount, date, invoice reference)
+- [ ] Create expenses table (category, amount, date, description, receipt URL)
+- [ ] Add financial summary fields to offices table
+
+#### Backend API
+- [ ] Create financial router with invoice CRUD procedures
+- [ ] Add payment tracking procedures
+- [ ] Add expense management procedures
+- [ ] Add financial reports procedures (revenue, expenses, profit)
+- [ ] Add invoice generation with PDF export
+- [ ] Add payment reminders system
+
+#### Frontend Pages
+- [ ] Create InvoiceList page with filters and search
+- [ ] Create InvoiceDetail page with payment history
+- [ ] Create CreateInvoice page with line items
 - [ ] Create PaymentTracking dashboard
-- [ ] Create FinancialDashboard with charts
+- [ ] Create ExpenseManagement page
+- [ ] Create FinancialDashboard with revenue/expense charts
+- [ ] Add navigation links to Sidebar
+- [ ] Add translation keys for financial management
 
 ### Phase 1.3: Calendar View & Appointment Management - TODO
-- [ ] Install calendar library
-- [ ] Create CalendarView component
+#### Setup
+- [ ] Install FullCalendar or react-big-calendar library
+- [ ] Install date-fns for date manipulation
+
+#### Calendar Component
+- [ ] Create CalendarView component with month/week/day views
+- [ ] Integrate with existing booking system data
+- [ ] Add color-coding by booking status (confirmed, pending, completed, cancelled)
+- [ ] Add event click handler to view booking details
+- [ ] Add event hover tooltips with quick info
+
+#### Advanced Features
+- [ ] Implement drag-and-drop rescheduling functionality
+- [ ] Add appointment creation from calendar (click empty slot)
+- [ ] Add conflict detection for double-booking prevention
+- [ ] Add time slot availability visualization
+- [ ] Add calendar filters (by service, by status, by staff)
+
+#### Integration
 - [ ] Create AppointmentCalendar page
-- [ ] Add drag-and-drop rescheduling
-- [ ] Add conflict detection
-- [ ] Integrate with booking system
+- [ ] Add navigation link to Sidebar
+- [ ] Add translation keys for calendar view
+- [ ] Test calendar with various booking scenarios
+
+## Phase 2: Customer/Client Experience Review & Enhancement
+
+### Phase 2.1: Customer Experience Audit
+- [ ] Review all customer-facing pages (Home, Offices, Booking, Templates, Marketplace)
+- [ ] Test complete customer journey from landing to booking completion
+- [ ] Identify missing features customers need
+- [ ] Document gaps in customer dashboard
+- [ ] Create prioritized list of customer features to implement
+- [ ] Review customer communication channels (chat, notifications, email)
+
+### Phase 2.2: Customer Dashboard Enhancements
+- [ ] Review My Bookings page for completeness
+- [ ] Review My Service Requests page for completeness
+- [ ] Review My Documents page for completeness
+- [ ] Add customer profile management features
+- [ ] Add booking history with detailed timeline
+- [ ] Add favorite offices feature
+- [ ] Add service recommendations based on history
+
+### Phase 2.3: Booking Experience Improvements
+- [ ] Review booking wizard for usability
+- [ ] Add service comparison feature
+- [ ] Add office comparison feature
+- [ ] Add booking modification/rescheduling
+- [ ] Add booking cancellation with refund policy
+- [ ] Add booking reminders (email/SMS)
+
+### Phase 2.4: Communication & Support
+- [ ] Review chat system from customer perspective
+- [ ] Add FAQ section
+- [ ] Add help center/knowledge base
+- [ ] Add customer support contact options
+- [ ] Add feedback/rating system improvements
+
+### Phase 2.5: Implement All Customer Features
+- [ ] Implement all identified missing customer features
+- [ ] Complete any partial implementations
+- [ ] Ensure smooth booking flow
+- [ ] Ensure smooth communication with offices
+- [ ] Add customer dashboard enhancements
+
+## Phase 3: End-to-End Testing & Final Delivery
+
+### Phase 3.1: Office Owner Testing
+- [ ] Test complete office registration flow
+- [ ] Test office dashboard and analytics
+- [ ] Test client management system
+- [ ] Test financial management system
+- [ ] Test calendar and appointment management
+- [ ] Test staff management features
+- [ ] Test chat and communication features
+
+### Phase 3.2: Customer Testing
+- [ ] Test complete customer registration/login flow
+- [ ] Test office browsing and search
+- [ ] Test service booking flow
+- [ ] Test service request marketplace
+- [ ] Test document generation
+- [ ] Test chat with offices
+- [ ] Test customer dashboard features
+
+### Phase 3.3: Integration Testing
+- [ ] Verify all integrations working (email, SMS, payments, storage)
+- [ ] Test real-time features (chat, notifications)
+- [ ] Test bilingual functionality (EN/AR)
+- [ ] Test mobile responsiveness
+- [ ] Fix any bugs found during testing
+
+### Phase 3.4: Final Delivery
+- [ ] Create comprehensive platform documentation
+- [ ] Create user guides for office owners
+- [ ] Create user guides for customers
+- [ ] Create admin guide
+- [ ] Save final checkpoint
+- [ ] Deliver complete platform to user with summary
+
+## 🎯 PRIORITY: Critical Customer Features Implementation (Jan 1, 2026)
+
+### Feature 1: Booking Modification/Rescheduling System
+- [x] Add rescheduleBooking procedure to booking router
+- [x] Add updateBookingDateTime function to db.ts
+- [ ] Create RescheduleBookingDialog component
+- [ ] Add "Reschedule" button to BookingsList.tsx
+- [ ] Add real-time availability checking
+- [ ] Send email notifications on reschedule
+- [ ] Add translation keys for reschedule feature
+- [ ] Test rescheduling workflow end-to-end
+
+### Feature 2: Booking Status Tracking
+- [ ] Create BookingStatusTimeline component
+- [ ] Add status milestones (Confirmed → In Progress → Ready → Completed)
+- [ ] Add updateBookingStatus procedure
+- [ ] Add progress percentage calculation
+- [ ] Add estimated completion date field
+- [ ] Integrate timeline into booking detail view
+- [ ] Add translation keys for status tracking
+- [ ] Test status updates and timeline display
+
+### Feature 3: Customer Chat Interface
+- [ ] Create CustomerChat.tsx page (separate from owner chat)
+- [ ] Add /chat route to App.tsx
+- [ ] Create BookingChatButton component
+- [ ] Link chat to specific booking context
+- [ ] Add unread message indicators
+- [ ] Add email notification for new customer messages
+- [ ] Update sidebar navigation for customer chat
+- [ ] Test chat functionality from customer perspective
+
+### Feature 4: Document Delivery System
+- [ ] Create booking_documents table (if not exists)
+- [ ] Create BookingDocuments component with tabs
+- [ ] Add document upload functionality for offices
+- [ ] Add document download for customers
+- [ ] Add PDF preview capability
+- [ ] Add document status (draft, final, signed)
+- [ ] Send notification when document added
+- [ ] Add translation keys for documents
+- [ ] Test document upload and download
+
+### Feature 5: Payment Information Display
+- [ ] Add payment status badge to booking cards
+- [ ] Show payment method in booking details
+- [ ] Create "Download Receipt" button
+- [ ] Link bookings to invoices table
+- [ ] Show payment history if multiple payments
+- [ ] Display refund status for cancelled bookings
+- [ ] Add translation keys for payment info
+- [ ] Test payment information display
+
+### Feature 6: Booking Reminders
+- [ ] Create sendBookingReminders.ts job
+- [ ] Schedule daily cron job to check upcoming bookings
+- [ ] Send email reminders 24h before appointment
+- [ ] Send SMS reminders (if Twilio configured)
+- [ ] Add in-app notification for reminders
+- [ ] Add "Reschedule from reminder" link
+- [ ] Test reminder delivery timing
+- [ ] Monitor reminder job execution
+
+### Testing & Documentation
+- [ ] Test all 6 features end-to-end
+- [ ] Fix any bugs found during testing
+- [ ] Update user documentation
+- [ ] Create customer feature guide
+- [ ] Save final checkpoint
+- [ ] Deliver complete platform with summary

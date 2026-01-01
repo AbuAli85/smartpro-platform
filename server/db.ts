@@ -720,6 +720,25 @@ export async function updateBooking(id: number, updates: Partial<Booking>) {
   await db.update(bookings).set(updates).where(eq(bookings.id, id));
 }
 
+export async function updateBookingDateTime(params: {
+  bookingId: number;
+  newDate: string;
+  newTimeSlot?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const updates: any = {
+    bookingDate: params.newDate,
+  };
+
+  if (params.newTimeSlot) {
+    updates.timeSlot = params.newTimeSlot;
+  }
+
+  await db.update(bookings).set(updates).where(eq(bookings.id, params.bookingId));
+}
+
 // ============================================================================
 // REVIEWS
 // ============================================================================
@@ -4911,7 +4930,7 @@ export async function deleteServiceBundle(bundleId: number) {
   if (!db) throw new Error("Database not available");
 
   // Soft delete by setting isActive to false
-  await db.update(serviceBundles).set({ isActive: false }).where(eq(serviceBundles.id, bundleId));
+  await db.update(serviceBundles).set({ isActive: 0 }).where(eq(serviceBundles.id, bundleId));
 }
 
 export async function getAllActiveBundles() {
