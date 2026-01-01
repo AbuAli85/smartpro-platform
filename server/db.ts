@@ -27,6 +27,8 @@ import {
   authAuditLog,
   activeSessions,
   securityAlerts,
+  bookingReminders,
+  bookingDocuments,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -6786,6 +6788,215 @@ export async function closeServiceRequest(requestId: number, userId: number): Pr
     return true;
   } catch (error) {
     console.error("[Database] Failed to close service request:", error);
+    return false;
+  }
+}
+
+
+// ============================================================================
+// Booking Reminders
+// ============================================================================
+
+export async function createBookingReminder(data: {
+  bookingId: number;
+  reminder24h?: boolean;
+  reminder2h?: boolean;
+  emailEnabled?: boolean;
+  smsEnabled?: boolean;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const { bookingReminders } = await import("../drizzle/schema");
+    
+    await db
+      .insert(bookingReminders)
+      .values({
+        bookingId: data.bookingId,
+        reminder24h: data.reminder24h !== undefined ? (data.reminder24h ? 1 : 0) : 1,
+        reminder2h: data.reminder2h !== undefined ? (data.reminder2h ? 1 : 0) : 1,
+        emailEnabled: data.emailEnabled !== undefined ? (data.emailEnabled ? 1 : 0) : 1,
+        smsEnabled: data.smsEnabled !== undefined ? (data.smsEnabled ? 1 : 0) : 1,
+      });
+
+    // Return the created reminder by fetching it
+    return await getBookingReminder(data.bookingId);
+  } catch (error) {
+    console.error("[Database] Failed to create booking reminder:", error);
+    return null;
+  }
+}
+
+export async function getBookingReminder(bookingId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const { bookingReminders } = await import("../drizzle/schema");
+    
+    const reminders = await db
+      .select()
+      .from(bookingReminders)
+      .where(eq(bookingReminders.bookingId, bookingId))
+      .limit(1);
+
+    return reminders[0] || null;
+  } catch (error) {
+    console.error("[Database] Failed to get booking reminder:", error);
+    return null;
+  }
+}
+
+export async function updateBookingReminder(
+  bookingId: number,
+  data: {
+    reminder24h?: boolean;
+    reminder2h?: boolean;
+    emailEnabled?: boolean;
+    smsEnabled?: boolean;
+  }
+) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const { bookingReminders } = await import("../drizzle/schema");
+    
+    const updateData: any = {};
+    if (data.reminder24h !== undefined) updateData.reminder24h = data.reminder24h ? 1 : 0;
+    if (data.reminder2h !== undefined) updateData.reminder2h = data.reminder2h ? 1 : 0;
+    if (data.emailEnabled !== undefined) updateData.emailEnabled = data.emailEnabled ? 1 : 0;
+    if (data.smsEnabled !== undefined) updateData.smsEnabled = data.smsEnabled ? 1 : 0;
+
+    await db
+      .update(bookingReminders)
+      .set(updateData)
+      .where(eq(bookingReminders.bookingId, bookingId));
+
+    return await getBookingReminder(bookingId);
+  } catch (error) {
+    console.error("[Database] Failed to update booking reminder:", error);
+    return null;
+  }
+}
+
+// ============================================================================
+// Booking Documents
+// ============================================================================
+
+export async function createBookingDocument(data: {
+  bookingId: number;
+  officeId: number;
+  fileName: string;
+  fileUrl: string;
+  fileKey: string;
+  fileSize?: number;
+  mimeType?: string;
+  uploadedBy: number;
+  uploadedByName: string;
+  notes?: string;
+  status?: 'pending' | 'approved' | 'rejected';
+}) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const { bookingDocuments } = await import("../drizzle/schema");
+    
+    const result = await db
+      .insert(bookingDocuments)
+      .values({
+        bookingId: data.bookingId,
+        officeId: data.officeId,
+        fileName: data.fileName,
+        fileUrl: data.fileUrl,
+        fileKey: data.fileKey,
+        fileSize: data.fileSize,
+        mimeType: data.mimeType,
+        uploadedBy: data.uploadedBy,
+        uploadedByName: data.uploadedByName,
+        notes: data.notes,
+        status: data.status || 'approved',
+      });
+
+    // Return the created document with ID
+    return {
+      id: Number(result.insertId),
+      ...data,
+      status: data.status || 'approved',
+    };
+  } catch (error) {
+    console.error("[Database] Failed to create booking document:", error);
+    return null;
+  }
+}
+
+export async function getBookingDocuments(bookingId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const { bookingDocuments } = await import("../drizzle/schema");
+    
+    const documents = await db
+      .select()
+      .from(bookingDocuments)
+      .where(eq(bookingDocuments.bookingId, bookingId))
+      .orderBy(desc(bookingDocuments.uploadedAt));
+
+    return documents;
+  } catch (error) {
+    console.error("[Database] Failed to get booking documents:", error);
+    return [];
+  }
+}
+
+export async function getOfficeBookingDocuments(officeId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const { bookingDocuments } = await import("../drizzle/schema");
+    
+    const documents = await db
+      .select()
+      .from(bookingDocuments)
+      .where(eq(bookingDocuments.officeId, officeId))
+      .orderBy(desc(bookingDocuments.uploadedAt));
+
+    return documents;
+  } catch (error) {
+    console.error("[Database] Failed to get office booking documents:", error);
+    return [];
+  }
+}
+
+export async function deleteBookingDocument(documentId: number, officeId: number) {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    const { bookingDocuments } = await import("../drizzle/schema");
+    
+    // Verify document belongs to this office
+    const docs = await db
+      .select()
+      .from(bookingDocuments)
+      .where(eq(bookingDocuments.id, documentId))
+      .limit(1);
+
+    if (!docs[0] || docs[0].officeId !== officeId) {
+      return false;
+    }
+
+    await db
+      .delete(bookingDocuments)
+      .where(eq(bookingDocuments.id, documentId));
+
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete booking document:", error);
     return false;
   }
 }

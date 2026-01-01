@@ -263,3 +263,58 @@ export function notifyOfficeRejected(ownerId: number, officeData: {
     timestamp: new Date().toISOString(),
   });
 }
+
+/**
+ * Notify user about booking status change
+ */
+export function emitBookingStatusChanged(userId: number, bookingData: {
+  bookingId: number;
+  status: string;
+  officeName: string;
+  scheduledDate?: string;
+  scheduledTime?: string;
+}) {
+  emitMarketplaceNotification(userId, "booking:status_changed", {
+    type: "booking_status_changed",
+    message: `Booking status updated to ${bookingData.status}`,
+    ...bookingData,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+/**
+ * Notify user about document upload
+ */
+export function emitDocumentUploaded(userId: number, documentData: {
+  bookingId: number;
+  documentName: string;
+  officeName: string;
+}) {
+  emitMarketplaceNotification(userId, "booking:document_uploaded", {
+    type: "document_uploaded",
+    message: `${documentData.officeName} uploaded a document: ${documentData.documentName}`,
+    ...documentData,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+/**
+ * Emit chat message to specific booking room
+ */
+export function emitChatMessage(bookingId: number, messageData: {
+  id: number;
+  senderId: number;
+  senderName: string;
+  senderType: string;
+  message: string;
+  timestamp: string;
+}) {
+  if (!io) {
+    console.warn("[Socket.IO] Cannot emit chat message - io not initialized");
+    return;
+  }
+  
+  const room = `booking_${bookingId}`;
+  io.to(room).emit("new_message", messageData);
+  console.log(`[Socket.IO] Emitted chat message to room ${room}`);
+}

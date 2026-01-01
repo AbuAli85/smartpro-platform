@@ -9,6 +9,7 @@ import { sendBookingConfirmation } from "../_core/whatsapp";
 import { generateBookingCalendarInvite } from "../_core/calendarInvite";
 import { calculateCancellation, cancelBooking } from "../cancellationPolicy";
 import { emitBookingNotification } from "../_core/notifications";
+import { emitBookingStatusChanged } from "../_core/socket";
 
 export const bookingRouter = router({
   // Get available time slots for a specific date
@@ -22,6 +23,19 @@ export const bookingRouter = router({
     .query(async ({ input }) => {
       const date = new Date(input.date);
       const slots = await db.getAvailableTimeSlots(input.officeId, date);
+      return slots;
+    }),
+
+  // Alias for getAvailableSlots (for compatibility)
+  getAvailableTimeSlots: publicProcedure
+    .input(
+      z.object({
+        officeId: z.number(),
+        date: z.coerce.date(), // Accept Date object directly
+      })
+    )
+    .query(async ({ input }) => {
+      const slots = await db.getAvailableTimeSlots(input.officeId, input.date);
       return slots;
     }),
 
@@ -197,6 +211,15 @@ export const bookingRouter = router({
         );
       }
 
+      // Create default reminder settings for this booking
+      await db.createBookingReminder({
+        bookingId,
+        reminder24h: true,
+        reminder2h: true,
+        emailEnabled: true,
+        smsEnabled: false,
+      });
+
       // Create notification for booking confirmation
       await db.createNotification({
         userId: user.id,
@@ -362,6 +385,20 @@ export const bookingRouter = router({
         }
       } catch (error) {
         console.error("Failed to send status update SMS:", error);
+      }
+
+      // Emit WebSocket event for real-time status update
+      try {
+        const office = await db.getSanadOfficeById(booking.officeId);
+        emitBookingStatusChanged(booking.userId, {
+          bookingId: input.bookingId,
+          status: input.status,
+          officeName: office?.officeName || "Office",
+          scheduledDate: booking.scheduledDate ? new Date(booking.scheduledDate).toISOString() : undefined,
+          scheduledTime: booking.scheduledTime || undefined,
+        });
+      } catch (error) {
+        console.error("Failed to emit booking status change:", error);
       }
 
       return { success: true };
@@ -768,13 +805,24 @@ export const bookingRouter = router({
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
 
-      // TODO: Implement actual reminder settings retrieval from database
-      // For now, return default settings
+      // Get reminder settings from database
+      const reminderSettings = await db.getBookingReminder(input.bookingId);
+      
+      if (!reminderSettings) {
+        // Return default settings if none exist
+        return {
+          reminder24h: true,
+          reminder2h: true,
+          emailReminder: true,
+          smsReminder: false,
+        };
+      }
+
       return {
-        reminder24h: true,
-        reminder2h: true,
-        emailReminder: true,
-        smsReminder: false,
+        reminder24h: Boolean(reminderSettings.reminder24h),
+        reminder2h: Boolean(reminderSettings.reminder2h),
+        emailReminder: Boolean(reminderSettings.emailEnabled),
+        smsReminder: Boolean(reminderSettings.smsEnabled),
       };
     }),
 
@@ -799,8 +847,30 @@ export const bookingRouter = router({
         throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       }
 
-      // TODO: Implement actual reminder settings update in database
-      // For now, just return success
+      // Check if reminder settings exist
+      let reminderSettings = await db.getBookingReminder(input.bookingId);
+      
+      if (!reminderSettings) {
+        // Create default reminder settings
+        await db.createBookingReminder({
+          bookingId: input.bookingId,
+        });
+      }
+
+      // Update the specific reminder setting
+      const updateData: any = {};
+      if (input.reminderType === 'reminder24h') {
+        updateData.reminder24h = input.enabled;
+      } else if (input.reminderType === 'reminder2h') {
+        updateData.reminder2h = input.enabled;
+      } else if (input.reminderType === 'emailReminder') {
+        updateData.emailEnabled = input.enabled;
+      } else if (input.reminderType === 'smsReminder') {
+        updateData.smsEnabled = input.enabled;
+      }
+
+      await db.updateBookingReminder(input.bookingId, updateData);
+
       return { success: true };
     }),
 });

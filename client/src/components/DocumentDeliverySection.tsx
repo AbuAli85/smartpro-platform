@@ -16,7 +16,7 @@ export function DocumentDeliverySection({ bookingId }: DocumentDeliverySectionPr
   const { t } = useLanguage();
 
   // Fetch documents for this booking
-  const { data: documents, isLoading } = trpc.booking.getBookingDocuments.useQuery({ bookingId });
+  const { data: documents, isLoading } = trpc.bookingDocuments.getByBooking.useQuery({ bookingId });
 
   const handleDownload = (documentUrl: string, documentName: string) => {
     // Open in new tab for download

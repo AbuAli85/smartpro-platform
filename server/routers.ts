@@ -51,6 +51,7 @@ import { requestMessagingRouter } from "./routers/requestMessaging";
 import { officeNotificationPreferencesRouter } from "./routers/officeNotificationPreferences";
 import { loginAnalyticsRouter } from "./routers/loginAnalytics";
 import { clientManagementRouter } from "./routers/clientManagement";
+import { bookingDocumentsRouter } from "./routers/bookingDocuments";
 
 export const appRouter = router({
   system: systemRouter,
@@ -176,6 +177,7 @@ export const appRouter = router({
   securityDashboard: securityDashboardRouter,
   loginAnalytics: loginAnalyticsRouter,
   clientManagement: clientManagementRouter,
+  bookingDocuments: bookingDocumentsRouter,
 });
 
 export type AppRouter = typeof appRouter;

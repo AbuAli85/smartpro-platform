@@ -1124,3 +1124,50 @@ The platform is stable, fully functional, and ready for users. Minor console war
 - [ ] Create customer feature guide
 - [ ] Save final checkpoint
 - [ ] Deliver complete platform with summary
+
+---
+
+## 🚀 BOOKING SYSTEM ENHANCEMENTS (Jan 2, 2026)
+
+### Feature 1: Database Persistence for Reminder Settings
+- [x] Create booking_reminders table with fields (bookingId, reminder24h, reminder2h, emailEnabled, smsEnabled)
+- [x] Add database helper functions (createBookingReminder, updateBookingReminder, getBookingReminder)
+- [x] Update booking.getReminderSettings to fetch from database
+- [x] Update booking.updateReminderSettings to persist to database
+- [x] Auto-create default reminder settings on booking creation
+- [ ] Write unit tests for reminder persistence
+
+**Priority:** High  
+**Timeline:** 1-2 hours  
+**Impact:** High - Enables actual reminder scheduling and user preferences
+
+### Feature 2: Document Upload System for Offices
+- [x] Create booking_documents table with fields (bookingId, officeId, fileName, fileUrl, fileKey, uploadedAt, status)
+- [x] Add database helper functions (uploadBookingDocument, getBookingDocuments, deleteBookingDocument)
+- [x] Create bookingDocuments tRPC router with upload/list/delete procedures
+- [x] Build DocumentUploadInterface component for office owners
+- [x] Integrate with existing DocumentDeliverySection component
+- [x] Add S3 storage integration for document files
+- [x] Add email notifications when documents are uploaded
+- [ ] Write unit tests for document upload system
+
+**Priority:** High  
+**Timeline:** 2-3 hours  
+**Impact:** High - Enables digital document delivery and reduces manual processes
+
+### Feature 3: Real-time WebSocket Updates
+- [x] Extend Socket.IO server with booking and chat event handlers
+- [x] Implement booking:statusChanged event emission
+- [x] Implement booking:documentUploaded event emission
+- [x] Chat:newMessage already implemented (existing functionality)
+- [x] Update booking status changes to emit WebSocket events
+- [x] Update document uploads to emit WebSocket events
+- [ ] Add real-time notification toasts for booking updates (frontend integration)
+- [ ] Test WebSocket connection and event delivery
+- [ ] Write integration tests for real-time features
+
+**Priority:** High  
+**Timeline:** 2-3 hours  
+**Impact:** High - Improves user experience with instant updates
+
+---

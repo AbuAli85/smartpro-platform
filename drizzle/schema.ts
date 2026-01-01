@@ -1136,3 +1136,39 @@ export const expenses = mysqlTable("expenses", {
 	index("expense_date_idx").on(table.expenseDate),
 	index("created_at_idx").on(table.createdAt),
 ]);
+
+export const bookingReminders = mysqlTable("booking_reminders", {
+	id: int().autoincrement().notNull(),
+	bookingId: int("booking_id").notNull(),
+	reminder24h: tinyint("reminder_24h").default(1).notNull(),
+	reminder2h: tinyint("reminder_2h").default(1).notNull(),
+	emailEnabled: tinyint("email_enabled").default(1).notNull(),
+	smsEnabled: tinyint("sms_enabled").default(1).notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("booking_id_idx").on(table.bookingId),
+]);
+
+export const bookingDocuments = mysqlTable("booking_documents", {
+	id: int().autoincrement().notNull(),
+	bookingId: int("booking_id").notNull(),
+	officeId: int("office_id").notNull(),
+	fileName: varchar("file_name", { length: 255 }).notNull(),
+	fileUrl: text("file_url").notNull(),
+	fileKey: varchar("file_key", { length: 500 }).notNull(),
+	fileSize: int("file_size"),
+	mimeType: varchar("mime_type", { length: 100 }),
+	status: mysqlEnum(['pending','approved','rejected']).default('approved').notNull(),
+	uploadedBy: int("uploaded_by").notNull(),
+	uploadedByName: varchar("uploaded_by_name", { length: 255 }).notNull(),
+	uploadedAt: timestamp("uploaded_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	notes: text(),
+},
+(table) => [
+	index("booking_id_idx").on(table.bookingId),
+	index("office_id_idx").on(table.officeId),
+	index("status_idx").on(table.status),
+	index("uploaded_at_idx").on(table.uploadedAt),
+]);
