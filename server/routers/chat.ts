@@ -284,7 +284,7 @@ export const chatRouter = router({
       }
 
       // Get messages for this conversation
-      const messages = await db.getConversationMessages(conversation.conversation.id);
+      const messages = await db.getChatMessages(conversation.conversation.id);
       return messages;
     }),
 
@@ -320,7 +320,7 @@ export const chatRouter = router({
       const savedMessage = await db.sendMessage({
         conversationId: conversation.conversation.id,
         senderId: ctx.user.id,
-        senderType: "customer",
+        senderType: "user",
         message: input.message,
       });
 
