@@ -342,6 +342,25 @@ export const notifications = mysqlTable("notifications", {
 	index("date_idx").on(table.createdAt),
 ]);
 
+export const officeNotificationPreferences = mysqlTable("office_notification_preferences", {
+	id: int().autoincrement().notNull(),
+	officeId: int().notNull(),
+	serviceTypes: json().notNull(),
+	governorates: json().notNull(),
+	minBudget: int().default(0).notNull(),
+	maxBudget: int().default(999999).notNull(),
+	emailNotifications: tinyint().default(1).notNull(),
+	inAppNotifications: tinyint().default(1).notNull(),
+	isActive: tinyint().default(1).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("office_idx").on(table.officeId),
+	index("active_idx").on(table.isActive),
+	index("office_prefs_unique").on(table.officeId),
+]);
+
 export const officeAvailability = mysqlTable("office_availability", {
 	id: int().autoincrement().notNull(),
 	officeId: int().notNull(),
@@ -741,7 +760,7 @@ export const serviceRequests = mysqlTable("service_requests", {
 	governorate: varchar({ length: 100 }),
 	wilayat: varchar({ length: 100 }),
 	remoteAccepted: tinyint("remote_accepted").default(1),
-	status: mysqlEnum(['open','bidding','awarded','in_progress','completed','cancelled']).default('open').notNull(),
+	status: mysqlEnum(['open','bidding','awarded','in_progress','completed','cancelled','expired']).default('open').notNull(),
 	acceptedBidId: int("accepted_bid_id"),
 	viewCount: int("view_count").default(0),
 	bidCount: int("bid_count").default(0),

@@ -24,6 +24,37 @@
 
 ---
 
+## 🎯 Marketplace Enhancements (Jan 1, 2026)
+
+### Feature 1: Budget Range Filtering
+- [x] Add budget range slider component to filters
+- [x] Implement min/max budget state management
+- [x] Update filtering logic to include budget range
+- [x] Add budget range display in active filters
+- [x] Test budget filtering with various ranges
+
+### Feature 2: Bid Notification System
+- [x] Create notification preferences for offices (service types, locations)
+- [x] Implement matching algorithm to find relevant offices
+- [x] Send email notifications when matching requests are posted
+- [x] Send in-app notifications via notification system
+- [x] Add notification settings page for offices (frontend)
+- [x] Test notification delivery and matching logic
+
+### Feature 3: Request Expiration Handling
+- [x] Add status field to service_requests table (open, closed, expired)
+- [x] Create scheduled job to check and expire requests
+- [x] Update marketplace to filter out expired requests
+- [x] Add visual indicators for expiring soon requests
+- [x] Implement manual close functionality for request owners
+- [x] Test expiration logic and status updates
+
+**Priority:** High  
+**Timeline:** 2-3 hours  
+**Impact:** High - Improves marketplace usability and engagement
+
+---
+
 ## ✅ COMPLETED - Comprehensive Platform Review (Dec 29, 2025)
 
 ### Review Summary

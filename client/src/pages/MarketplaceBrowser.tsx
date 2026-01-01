@@ -8,9 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar, DollarSign, MapPin, Clock, Building2, Filter, Search, X, TrendingUp, AlertCircle, ChevronDown } from "lucide-react";
 import { BidSubmissionDialog } from "@/components/BidSubmissionDialog";
+import { BudgetRangeSlider } from "@/components/BudgetRangeSlider";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useArabicNumbers } from "@/hooks/useArabicNumbers";
+import { isExpiringSoon, getDaysRemaining } from "@/lib/dateHelpers";
 
 type SortOption = "newest" | "oldest" | "budget-high" | "budget-low" | "urgent";
 
@@ -22,8 +24,7 @@ export default function MarketplaceBrowser() {
   
   // Filters
   const [serviceType, setServiceType] = useState<string>("all");
-  const [minBudget, setMinBudget] = useState<string>("");
-  const [maxBudget, setMaxBudget] = useState<string>("");
+  const [budgetRange, setBudgetRange] = useState<[number, number]>([0, 10000]);
   const [location, setLocation] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortBy, setSortBy] = useState<SortOption>("newest");
@@ -53,14 +54,13 @@ export default function MarketplaceBrowser() {
     }
 
     // Apply budget filter
-    if (minBudget) {
-      const min = parseFloat(minBudget);
-      filtered = filtered.filter((req) => req.maxBudget >= min);
-    }
-    if (maxBudget) {
-      const max = parseFloat(maxBudget);
-      filtered = filtered.filter((req) => req.minBudget <= max);
-    }
+    const [minBudget, maxBudget] = budgetRange;
+    // Filter requests where their budget range overlaps with selected range
+    filtered = filtered.filter((req) => {
+      // Request's max budget should be >= selected min
+      // Request's min budget should be <= selected max
+      return req.maxBudget >= minBudget && req.minBudget <= maxBudget;
+    });
 
     // Apply sorting
     filtered.sort((a, b) => {
@@ -83,7 +83,7 @@ export default function MarketplaceBrowser() {
     });
 
     return filtered;
-  }, [requests, searchQuery, minBudget, maxBudget, sortBy]);
+  }, [requests, searchQuery, budgetRange, sortBy]);
 
   // Calculate statistics
   const statistics = useMemo(() => {
@@ -104,11 +104,10 @@ export default function MarketplaceBrowser() {
     let count = 0;
     if (serviceType !== "all") count++;
     if (location !== "all") count++;
-    if (minBudget) count++;
-    if (maxBudget) count++;
+    if (budgetRange[0] > 0 || budgetRange[1] < 10000) count++;
     if (searchQuery) count++;
     return count;
-  }, [serviceType, location, minBudget, maxBudget, searchQuery]);
+  }, [serviceType, location, budgetRange, searchQuery]);
 
   const handleOpenBidDialog = (request: any) => {
     setSelectedRequest(request);
@@ -124,8 +123,7 @@ export default function MarketplaceBrowser() {
   const clearAllFilters = () => {
     setServiceType("all");
     setLocation("all");
-    setMinBudget("");
-    setMaxBudget("");
+    setBudgetRange([0, 10000]);
     setSearchQuery("");
   };
 
@@ -286,18 +284,10 @@ export default function MarketplaceBrowser() {
                 </button>
               </Badge>
             )}
-            {minBudget && (
+            {(budgetRange[0] > 0 || budgetRange[1] < 10000) && (
               <Badge variant="secondary" className="gap-1">
-                {t("marketplace.filters.minBudget") || "Min"}: {formatNumber(minBudget)} {t("currency.omr") || "OMR"}
-                <button onClick={() => setMinBudget("")} className="ml-1 hover:text-destructive">
-                  <X className="w-3 h-3" />
-                </button>
-              </Badge>
-            )}
-            {maxBudget && (
-              <Badge variant="secondary" className="gap-1">
-                {t("marketplace.filters.maxBudget") || "Max"}: {formatNumber(maxBudget)} {t("currency.omr") || "OMR"}
-                <button onClick={() => setMaxBudget("")} className="ml-1 hover:text-destructive">
+                {t("marketplace.filters.budget") || "Budget"}: {formatNumber(budgetRange[0])}-{formatNumber(budgetRange[1])} {t("currency.omr") || "OMR"}
+                <button onClick={() => setBudgetRange([0, 10000])} className="ml-1 hover:text-destructive">
                   <X className="w-3 h-3" />
                 </button>
               </Badge>
@@ -326,7 +316,7 @@ export default function MarketplaceBrowser() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <Label>{t("marketplace.serviceType") || "Service Type"}</Label>
                   <Select value={serviceType} onValueChange={setServiceType}>
@@ -345,28 +335,6 @@ export default function MarketplaceBrowser() {
                 </div>
 
                 <div>
-                  <Label>{t("marketplace.filters.minBudget") || "Min Budget"} ({t("currency.omr") || "OMR"})</Label>
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    value={minBudget}
-                    onChange={(e) => setMinBudget(e.target.value)}
-                    min="0"
-                  />
-                </div>
-
-                <div>
-                  <Label>{t("marketplace.filters.maxBudget") || "Max Budget"} ({t("currency.omr") || "OMR"})</Label>
-                  <Input
-                    type="number"
-                    placeholder="1000"
-                    value={maxBudget}
-                    onChange={(e) => setMaxBudget(e.target.value)}
-                    min="0"
-                  />
-                </div>
-
-                <div>
                   <Label>{t("marketplace.location") || "Location"}</Label>
                   <Select value={location} onValueChange={setLocation}>
                     <SelectTrigger>
@@ -381,6 +349,16 @@ export default function MarketplaceBrowser() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                <div className="md:col-span-2">
+                  <BudgetRangeSlider
+                    min={0}
+                    max={10000}
+                    step={100}
+                    value={budgetRange}
+                    onChange={setBudgetRange}
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -391,11 +369,15 @@ export default function MarketplaceBrowser() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredAndSortedRequests.map((request: any) => {
               const isUrgent = request.urgency === "urgent" || request.urgency === "high";
+              const expiringSoon = isExpiringSoon(request.deadline);
+              const daysRemaining = getDaysRemaining(request.deadline);
               return (
                 <Card 
                   key={request.id} 
                   className={`hover:shadow-lg transition-all duration-300 hover:-translate-y-1 ${
                     isUrgent ? "border-red-500 border-2" : ""
+                  } ${
+                    expiringSoon ? "border-orange-500 border-2" : ""
                   }`}
                 >
                   <CardHeader>
@@ -407,12 +389,21 @@ export default function MarketplaceBrowser() {
                           {t("marketplace.filters.posted") || "Posted"} {formatDate(request.createdAt)}
                         </CardDescription>
                       </div>
-                      <Badge 
-                        variant={isUrgent ? "destructive" : "secondary"}
-                        className="shrink-0"
-                      >
-                        {request.urgency}
-                      </Badge>
+                      <div className="flex gap-2 shrink-0">
+                        <Badge 
+                          variant={isUrgent ? "destructive" : "secondary"}
+                        >
+                          {request.urgency}
+                        </Badge>
+                        {expiringSoon && daysRemaining !== null && (
+                          <Badge 
+                            variant="outline"
+                            className="border-orange-500 text-orange-500"
+                          >
+                            {daysRemaining === 0 ? "Expires today" : `${daysRemaining}d left`}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">

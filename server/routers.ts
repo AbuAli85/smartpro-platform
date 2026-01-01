@@ -48,6 +48,7 @@ import { sessionManagementRouter } from "./routers/sessionManagement";
 import { securityDashboardRouter } from "./routers/securityDashboard";
 import { documentUploadRouter } from "./routers/documentUpload";
 import { requestMessagingRouter } from "./routers/requestMessaging";
+import { officeNotificationPreferencesRouter } from "./routers/officeNotificationPreferences";
 import { loginAnalyticsRouter } from "./routers/loginAnalytics";
 
 export const appRouter = router({
@@ -162,6 +163,7 @@ export const appRouter = router({
   serviceBundle: serviceBundleRouter,
   documentUpload: documentUploadRouter,
   requestMessaging: requestMessagingRouter,
+  officeNotificationPreferences: officeNotificationPreferencesRouter,
   storage: storageRouter,
   reviews: reviewsRouter,
   recommendations: recommendationsRouter,

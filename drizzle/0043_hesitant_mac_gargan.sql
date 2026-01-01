@@ -1,0 +1,1 @@
+ALTER TABLE `service_requests` MODIFY COLUMN `status` enum('open','bidding','awarded','in_progress','completed','cancelled','expired') NOT NULL DEFAULT 'open';

@@ -6575,3 +6575,198 @@ export async function getHourlyLoginPatterns(
     return [];
   }
 }
+
+
+// ============================================================================
+// OFFICE NOTIFICATION PREFERENCES
+// ============================================================================
+
+export async function getOfficeNotificationPreferences(officeId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const { officeNotificationPreferences } = await import("../drizzle/schema");
+    const prefs = await db
+      .select()
+      .from(officeNotificationPreferences)
+      .where(eq(officeNotificationPreferences.officeId, officeId))
+      .limit(1);
+
+    return prefs[0] || null;
+  } catch (error) {
+    console.error("[Database] Failed to get office notification preferences:", error);
+    return null;
+  }
+}
+
+export async function upsertOfficeNotificationPreferences(data: {
+  officeId: number;
+  serviceTypes: string[];
+  governorates: string[];
+  minBudget: number;
+  maxBudget: number;
+  emailNotifications: boolean;
+  inAppNotifications: boolean;
+  isActive: boolean;
+}) {
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    const { officeNotificationPreferences } = await import("../drizzle/schema");
+    
+    // Check if preferences exist
+    const existing = await getOfficeNotificationPreferences(data.officeId);
+
+    if (existing) {
+      // Update existing preferences
+      await db
+        .update(officeNotificationPreferences)
+        .set({
+          serviceTypes: JSON.stringify(data.serviceTypes),
+          governorates: JSON.stringify(data.governorates),
+          minBudget: data.minBudget,
+          maxBudget: data.maxBudget,
+          emailNotifications: data.emailNotifications ? 1 : 0,
+          inAppNotifications: data.inAppNotifications ? 1 : 0,
+          isActive: data.isActive ? 1 : 0,
+        })
+        .where(eq(officeNotificationPreferences.officeId, data.officeId));
+    } else {
+      // Insert new preferences
+      await db.insert(officeNotificationPreferences).values({
+        officeId: data.officeId,
+        serviceTypes: JSON.stringify(data.serviceTypes),
+        governorates: JSON.stringify(data.governorates),
+        minBudget: data.minBudget,
+        maxBudget: data.maxBudget,
+        emailNotifications: data.emailNotifications ? 1 : 0,
+        inAppNotifications: data.inAppNotifications ? 1 : 0,
+        isActive: data.isActive ? 1 : 0,
+      });
+    }
+  } catch (error) {
+    console.error("[Database] Failed to upsert office notification preferences:", error);
+    throw error;
+  }
+}
+
+export async function getMatchingOfficesForNotification(request: {
+  serviceType: string;
+  governorate: string;
+  budgetMin: number;
+  budgetMax: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const { officeNotificationPreferences } = await import("../drizzle/schema");
+    
+    // Get all active notification preferences
+    const allPrefs = await db
+      .select()
+      .from(officeNotificationPreferences)
+      .where(eq(officeNotificationPreferences.isActive, 1));
+
+    // Filter preferences that match the request
+    const matchingPrefs = allPrefs.filter((pref: any) => {
+      // Parse JSON fields
+      const serviceTypes = JSON.parse(pref.serviceTypes || '[]');
+      const governorates = JSON.parse(pref.governorates || '[]');
+
+      // Check service type match (empty array means all types)
+      const serviceTypeMatch = serviceTypes.length === 0 || serviceTypes.includes(request.serviceType);
+
+      // Check governorate match (empty array means all locations)
+      const governorateMatch = governorates.length === 0 || governorates.includes(request.governorate);
+
+      // Check budget overlap
+      const budgetMatch = 
+        request.budgetMax >= pref.minBudget && 
+        request.budgetMin <= pref.maxBudget;
+
+      return serviceTypeMatch && governorateMatch && budgetMatch;
+    });
+
+    return matchingPrefs;
+  } catch (error) {
+    console.error("[Database] Failed to get matching offices for notification:", error);
+    return [];
+  }
+}
+
+
+// ============================================================================
+// SERVICE REQUEST EXPIRATION
+// ============================================================================
+
+export async function expireOldServiceRequests(): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+
+  try {
+    const { serviceRequests } = await import("../drizzle/schema");
+    
+    // Find all open requests past their deadline
+    const now = new Date();
+    const expiredRequests = await db
+      .select()
+      .from(serviceRequests)
+      .where(
+        and(
+          eq(serviceRequests.status, 'open'),
+          lt(serviceRequests.deadline, now.toISOString())
+        )
+      );
+
+    if (expiredRequests.length === 0) {
+      return 0;
+    }
+
+    // Update status to expired
+    for (const request of expiredRequests) {
+      await db
+        .update(serviceRequests)
+        .set({ status: 'expired' })
+        .where(eq(serviceRequests.id, request.id));
+    }
+
+    return expiredRequests.length;
+  } catch (error) {
+    console.error("[Database] Failed to expire old service requests:", error);
+    return 0;
+  }
+}
+
+export async function closeServiceRequest(requestId: number, userId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    const { serviceRequests } = await import("../drizzle/schema");
+    
+    // Verify user owns this request
+    const request = await db
+      .select()
+      .from(serviceRequests)
+      .where(eq(serviceRequests.id, requestId))
+      .limit(1);
+
+    if (!request[0] || request[0].userId !== userId) {
+      return false;
+    }
+
+    // Update status to cancelled (closed by owner)
+    await db
+      .update(serviceRequests)
+      .set({ status: 'cancelled' })
+      .where(eq(serviceRequests.id, requestId));
+
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to close service request:", error);
+    return false;
+  }
+}

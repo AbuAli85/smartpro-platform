@@ -70,55 +70,52 @@ export const serviceMarketplaceRouter = router({
         // Don't fail the request if email fails
       }
 
-      // Smart office matching and notifications
+      // Smart office matching and notifications using preferences
       try {
-        // Get all offices that could match
-        const allOffices = await db.getAllOffices();
-        const officesWithStats = allOffices.map((office: any) => ({
-          id: office.id,
-          name: office.officeName,
-          governorate: office.governorate || '',
-          serviceCategories: office.serviceCategories || [],
-          averageRating: office.averageRating || 0,
-          completedBookings: office.completedBookings || 0,
-          responseTime: 4, // Default 4 hours, can be calculated from historical data
-        }));
-
-        const matchedOffices = await matchOffices({
+        // Get offices that have notification preferences matching this request
+        const matchingPrefs = await db.getMatchingOfficesForNotification({
           serviceType: input.serviceType,
           governorate: input.governorate || 'Any Location',
-          budget: input.budgetMax || 1000,
-          urgency: input.urgency,
-          description: input.description,
-          offices: officesWithStats,
+          budgetMin: input.budgetMin || 0,
+          budgetMax: input.budgetMax || 999999,
         });
 
-        // Notify matched offices (top 5)
-        for (const match of matchedOffices.slice(0, 5)) {
-          const office = allOffices.find((o: any) => o.id === match.officeId);
-          if (office && office.createdBy) {
-            // Create in-app notification
-            await db.createNotification({
-              userId: office.createdBy,
-              type: 'system',
-              title: 'New Service Request Available',
-              message: `A new ${input.serviceType} request matches your expertise (Match: ${match.matchScore}%)`,
-              actionUrl: `/marketplace/requests/${requestId}`,
-            });
+        // Get full office details for matched offices
+        const allOffices = await db.getAllOffices();
+        const matchedOfficeIds = matchingPrefs.map((pref: any) => pref.officeId);
+        const matchedOffices = allOffices.filter((office: any) => matchedOfficeIds.includes(office.id));
 
-            // Send email notification
-            const officeOwner = await db.getUserById(office.createdBy);
-            if (officeOwner?.email) {
-              await sendNewRequestNotificationToOffice({
-                to: officeOwner.email,
-                officeName: office.officeName,
-                serviceTitle: input.title,
-                serviceType: input.serviceType,
-                budget: input.budgetMax ? `${input.budgetMin || 0} - ${input.budgetMax}` : 'Not specified',
-                deadline: input.deadline ? new Date(input.deadline).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Flexible',
-                governorate: input.governorate || 'Any Location',
-                language: 'ar',
+        // Notify matched offices
+        for (const office of matchedOffices) {
+          if (office && office.createdBy) {
+            const pref = matchingPrefs.find((p: any) => p.officeId === office.id);
+            
+            // Create in-app notification if enabled
+            if (pref && pref.inAppNotifications) {
+              await db.createNotification({
+                userId: office.createdBy,
+                type: 'system',
+                title: 'New Service Request Available',
+                message: `A new ${input.serviceType} request matches your preferences in ${input.governorate || 'your area'}`,
+                actionUrl: `/marketplace/requests/${requestId}`,
               });
+            }
+
+            // Send email notification if enabled
+            if (pref && pref.emailNotifications) {
+              const officeOwner = await db.getUserById(office.createdBy);
+              if (officeOwner?.email) {
+                await sendNewRequestNotificationToOffice({
+                  to: officeOwner.email,
+                  officeName: office.officeName,
+                  serviceTitle: input.title,
+                  serviceType: input.serviceType,
+                  budget: input.budgetMax ? `${input.budgetMin || 0} - ${input.budgetMax}` : 'Not specified',
+                  deadline: input.deadline ? new Date(input.deadline).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Flexible',
+                  governorate: input.governorate || 'Any Location',
+                  language: 'ar',
+                });
+              }
             }
           }
         }
@@ -136,6 +133,23 @@ export const serviceMarketplaceRouter = router({
           requirements: analysis.requirementChecklist,
         }
       };
+    }),
+
+  // Close/cancel a service request (owner only)
+  closeRequest: protectedProcedure
+    .input(z.object({ requestId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const user = ctx.user!;
+      const success = await db.closeServiceRequest(input.requestId, user.id);
+      
+      if (!success) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have permission to close this request",
+        });
+      }
+
+      return { success: true };
     }),
 
   // List all open service requests (for offices)
