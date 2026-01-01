@@ -73,6 +73,8 @@ import { ResetPassword } from "./pages/ResetPassword";
 import { SessionManagement } from "./pages/SessionManagement";
 import SecurityDashboard from "./pages/admin/SecurityDashboard";
 import LoginAnalytics from "./pages/admin/LoginAnalytics";
+import ClientList from "./pages/ClientList";
+import ClientProfile from "./pages/ClientProfile";
 import { useNotifications } from "./hooks/useNotifications";
 import { useMarketplaceNotifications } from "./hooks/useMarketplaceNotifications";
 import { SocketProvider } from "./contexts/SocketContext";
@@ -229,6 +231,18 @@ function Router() {
       <Route path="/office-messages">
         <ProtectedRoute requirePermission="canManageOffice">
           <OfficeRequestMessages />
+        </ProtectedRoute>
+      </Route>
+      
+      {/* Client Management */}
+      <Route path="/clients">
+        <ProtectedRoute requirePermission="canManageOffice">
+          <ClientList />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/clients/:id">
+        <ProtectedRoute requirePermission="canManageOffice">
+          <ClientProfile />
         </ProtectedRoute>
       </Route>
       

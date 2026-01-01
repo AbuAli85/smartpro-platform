@@ -552,3 +552,388 @@ The platform is stable, fully functional, and ready for users. Minor console war
 **Status:** Production Ready with Active Development
 
 - [x] Redesign User Management page with professional and advanced UI/UX
+
+
+---
+
+## 🏢 SANAD OFFICE OWNER COMPLETE FEATURE IMPLEMENTATION (Jan 1, 2026)
+
+**Goal:** Transform SmartPro from a booking platform into a complete business operating system for Sanad offices
+
+**Current Completeness:** 65% → **Target:** 100%
+
+---
+
+### PHASE 1: CRITICAL BUSINESS OPERATIONS (Priority: 🔴 CRITICAL)
+
+#### 1.1 Client Management System (CRM)
+- [ ] Create clients table in database schema (fields: id, officeId, name, email, phone, address, notes, tags, createdAt, updatedAt)
+- [ ] Create client_tags table for tagging system
+- [ ] Create client_documents table for document storage
+- [ ] Create clientManagement router with full CRUD procedures
+- [ ] Add getClientsByOffice procedure with search and filters
+- [ ] Add getClientDetails procedure with full history
+- [ ] Add addClientNote procedure
+- [ ] Add addClientTag procedure
+- [ ] Add uploadClientDocument procedure
+- [ ] Implement ClientList page with search, filters, and pagination
+- [ ] Implement ClientProfile page with tabs (Overview, History, Documents, Notes)
+- [ ] Add client creation modal/page
+- [ ] Add client editing functionality
+- [ ] Integrate client selection in booking system
+- [ ] Add client history widget (all bookings, payments, communications)
+- [ ] Add client segmentation by tags
+- [ ] Write vitest tests for clientManagement router
+
+#### 1.2 Financial Management System
+- [ ] Create invoices table (id, officeId, clientId, bookingId, invoiceNumber, amount, tax, total, status, dueDate, paidDate, createdAt)
+- [ ] Create payments table (id, invoiceId, amount, method, transactionId, status, paidAt, createdAt)
+- [ ] Create expenses table (id, officeId, category, amount, description, receiptUrl, date, createdAt)
+- [ ] Create financial router with all procedures
+- [ ] Add generateInvoice procedure (auto-generate from booking)
+- [ ] Add getInvoicesByOffice procedure with filters
+- [ ] Add recordPayment procedure
+- [ ] Add getPaymentHistory procedure
+- [ ] Add addExpense procedure
+- [ ] Add getExpensesByOffice procedure
+- [ ] Add getFinancialSummary procedure (revenue, expenses, profit)
+- [ ] Add getRevenueByPeriod procedure (daily, weekly, monthly)
+- [ ] Implement InvoiceGenerator page with PDF export
+- [ ] Implement InvoiceList page with status filters
+- [ ] Implement PaymentTracking dashboard
+- [ ] Implement ExpenseTracking page
+- [ ] Implement FinancialDashboard with charts (revenue, expenses, profit trends)
+- [ ] Implement ProfitLossStatement page
+- [ ] Add automatic invoice generation on booking completion
+- [ ] Add payment reminder system (scheduled job)
+- [ ] Add invoice email sending functionality
+- [ ] Write vitest tests for financial router
+
+#### 1.3 Calendar View & Appointment Management
+- [ ] Install and configure calendar library (e.g., react-big-calendar or fullcalendar)
+- [ ] Create CalendarView component with day/week/month views
+- [ ] Implement AppointmentCalendar page
+- [ ] Add drag-and-drop appointment rescheduling
+- [ ] Add appointment conflict detection algorithm
+- [ ] Add visual conflict warnings
+- [ ] Add buffer time configuration in office settings
+- [ ] Add buffer time enforcement in booking system
+- [ ] Create appointment reminder system (scheduled job)
+- [ ] Add calendar export functionality (iCal format)
+- [ ] Add calendar sync preparation (Google Calendar API integration)
+- [ ] Add appointment color coding by status
+- [ ] Add appointment quick view modal
+- [ ] Integrate calendar with existing booking system
+- [ ] Add calendar filters (by service, status, staff)
+- [ ] Write vitest tests for calendar functionality
+
+---
+
+### PHASE 2: ENHANCED OPERATIONS (Priority: 🟡 HIGH)
+
+#### 2.1 Team Collaboration Tools
+- [ ] Create team_messages table (id, officeId, senderId, message, attachmentUrl, createdAt)
+- [ ] Create tasks table (id, officeId, assignedTo, title, description, status, priority, dueDate, createdAt)
+- [ ] Create shifts table (id, officeId, staffId, dayOfWeek, startTime, endTime, createdAt)
+- [ ] Create teamCollaboration router
+- [ ] Add sendTeamMessage procedure
+- [ ] Add getTeamMessages procedure
+- [ ] Add createTask procedure
+- [ ] Add updateTaskStatus procedure
+- [ ] Add getTasksByOffice procedure
+- [ ] Add createShift procedure
+- [ ] Add getShiftSchedule procedure
+- [ ] Implement InternalTeamChat page with real-time updates
+- [ ] Implement TaskBoard page (Kanban-style)
+- [ ] Implement ShiftScheduler page with calendar view
+- [ ] Implement TeamCalendar page (shared calendar)
+- [ ] Add team announcements feature
+- [ ] Add document sharing with team (file upload)
+- [ ] Add team performance goals tracking
+- [ ] Write vitest tests for teamCollaboration router
+
+#### 2.2 Enhanced Booking Workflow Management
+- [ ] Add internalNotes field to bookings table
+- [ ] Create booking_attachments table
+- [ ] Create service_checklists table (id, serviceId, checklistItem, order, createdAt)
+- [ ] Create booking_checklist_progress table (id, bookingId, checklistItemId, completed, completedAt)
+- [ ] Add custom booking statuses to database
+- [ ] Enhance booking router with new procedures
+- [ ] Add addBookingNote procedure
+- [ ] Add uploadBookingAttachment procedure
+- [ ] Add updateChecklistProgress procedure
+- [ ] Add createFollowUpTask procedure
+- [ ] Implement BookingDetail page with full workflow
+- [ ] Add booking notes section (internal only)
+- [ ] Add service delivery checklist widget
+- [ ] Add booking attachments section
+- [ ] Add booking follow-up tasks
+- [ ] Add booking reminder system (to office)
+- [ ] Enhance booking approval workflow
+- [ ] Write vitest tests for enhanced booking features
+
+#### 2.3 Marketing & Promotions System
+- [ ] Create promotions table (id, officeId, title, description, discountType, discountValue, code, startDate, endDate, usageLimit, usageCount, isActive, createdAt)
+- [ ] Create promotion_usage table (id, promotionId, bookingId, userId, usedAt)
+- [ ] Create referrals table (id, officeId, referrerId, referredId, status, rewardAmount, createdAt)
+- [ ] Create marketing router
+- [ ] Add createPromotion procedure
+- [ ] Add getPromotionsByOffice procedure
+- [ ] Add validatePromotionCode procedure
+- [ ] Add applyPromotion procedure
+- [ ] Add createReferralProgram procedure
+- [ ] Add trackReferral procedure
+- [ ] Add sendEmailCampaign procedure
+- [ ] Add sendSMSCampaign procedure
+- [ ] Implement PromotionManager page
+- [ ] Implement PromotionCreator form
+- [ ] Implement DiscountCodeManager page
+- [ ] Implement ReferralProgram page
+- [ ] Implement EmailCampaignBuilder page
+- [ ] Implement SMSMarketing page
+- [ ] Implement LoyaltyProgram page
+- [ ] Add promotion analytics dashboard
+- [ ] Integrate promotions with booking system
+- [ ] Add automatic discount application
+- [ ] Write vitest tests for marketing router
+
+---
+
+### PHASE 3: ADVANCED FEATURES (Priority: 🟠 MEDIUM)
+
+#### 3.1 Reporting & Compliance System
+- [ ] Create compliance_documents table (id, officeId, documentType, documentUrl, issueDate, expiryDate, status, createdAt)
+- [ ] Create staff_certifications table (id, staffId, certificationType, certificateUrl, issueDate, expiryDate, createdAt)
+- [ ] Create custom_reports table (id, officeId, reportName, reportConfig, createdBy, createdAt)
+- [ ] Create complianceRouter
+- [ ] Add uploadComplianceDocument procedure
+- [ ] Add getComplianceDocuments procedure
+- [ ] Add trackLicenseRenewal procedure
+- [ ] Add addStaffCertification procedure
+- [ ] Add getStaffCertifications procedure
+- [ ] Add generateCustomReport procedure
+- [ ] Add exportAllData procedure
+- [ ] Implement ComplianceDocuments page
+- [ ] Implement LicenseRenewalTracker page
+- [ ] Implement StaffCertifications page
+- [ ] Implement CustomReportBuilder page
+- [ ] Implement AuditTrailReports page
+- [ ] Implement DataExport page (all data export)
+- [ ] Add compliance alerts (expiring licenses/certifications)
+- [ ] Add regulatory compliance checks
+- [ ] Write vitest tests for compliance router
+
+#### 3.2 Client Communication Automation
+- [ ] Create email_campaigns table (id, officeId, campaignName, subject, body, recipientCount, sentCount, openRate, clickRate, createdAt, sentAt)
+- [ ] Create sms_campaigns table (id, officeId, campaignName, message, recipientCount, sentCount, deliveryRate, createdAt, sentAt)
+- [ ] Create communication_templates table (id, officeId, templateType, templateName, subject, body, createdAt)
+- [ ] Enhance marketing router with communication procedures
+- [ ] Add sendBulkSMS procedure
+- [ ] Add createEmailCampaign procedure
+- [ ] Add sendEmailCampaign procedure
+- [ ] Add sendWhatsAppMessage procedure (integration)
+- [ ] Add scheduleAppointmentReminder procedure
+- [ ] Add sendServiceCompletionNotification procedure
+- [ ] Add sendReviewRequest procedure
+- [ ] Add createNewsletter procedure
+- [ ] Implement BulkSMSManager page
+- [ ] Implement EmailCampaignManager page
+- [ ] Implement WhatsAppIntegration page
+- [ ] Implement AutomatedReminders settings page
+- [ ] Implement ReviewRequestAutomation page
+- [ ] Implement NewsletterManager page
+- [ ] Implement CommunicationTemplates page
+- [ ] Add campaign analytics dashboard
+- [ ] Write vitest tests for communication features
+
+#### 3.3 Quality Assurance System
+- [ ] Create quality_checklists table (id, officeId, checklistName, checklistItems, serviceId, createdAt)
+- [ ] Create quality_reviews table (id, bookingId, reviewerId, score, notes, createdAt)
+- [ ] Create satisfaction_surveys table (id, officeId, surveyName, questions, createdAt)
+- [ ] Create survey_responses table (id, surveyId, bookingId, responses, submittedAt)
+- [ ] Create complaints table (id, officeId, bookingId, clientId, complaint, status, resolution, createdAt)
+- [ ] Create qualityAssurance router
+- [ ] Add createQualityChecklist procedure
+- [ ] Add conductQualityReview procedure
+- [ ] Add createSatisfactionSurvey procedure
+- [ ] Add getSurveyResponses procedure
+- [ ] Add submitComplaint procedure
+- [ ] Add resolveComplaint procedure
+- [ ] Add getQualityMetrics procedure
+- [ ] Implement QualityChecklists page
+- [ ] Implement InternalReviewSystem page
+- [ ] Implement QualityMetrics dashboard
+- [ ] Implement SatisfactionSurveys page
+- [ ] Implement ComplaintManagement page
+- [ ] Implement ServiceImprovementTracker page
+- [ ] Add quality alerts (low scores, complaints)
+- [ ] Write vitest tests for quality assurance router
+
+---
+
+### PHASE 4: ADDITIONAL ENHANCEMENTS (Priority: 🟢 LOW)
+
+#### 4.1 Resource Management System
+- [ ] Create resources table (id, officeId, resourceType, resourceName, description, isAvailable, createdAt)
+- [ ] Create resource_bookings table (id, resourceId, bookingId, startTime, endTime, createdAt)
+- [ ] Create resource_maintenance table (id, resourceId, maintenanceType, description, scheduledDate, completedDate, cost, createdAt)
+- [ ] Create resourceManagement router
+- [ ] Add createResource procedure
+- [ ] Add getResourcesByOffice procedure
+- [ ] Add bookResource procedure
+- [ ] Add getResourceAvailability procedure
+- [ ] Add scheduleResourceMaintenance procedure
+- [ ] Add getMaintenanceLogs procedure
+- [ ] Implement ResourceManager page
+- [ ] Implement ResourceAvailabilityCalendar page
+- [ ] Implement ResourceMaintenanceLogs page
+- [ ] Implement AssetManagement page
+- [ ] Write vitest tests for resource management router
+
+#### 4.2 Enhanced Document Management
+- [ ] Expand documentTemplate router for office-specific library
+- [ ] Add document expiry tracking for client documents
+- [ ] Add documentSigningWorkflow procedures
+- [ ] Add document templates per service
+- [ ] Add document version control
+- [ ] Implement OfficeDocumentLibrary page
+- [ ] Implement DocumentExpiryTracker page
+- [ ] Implement DocumentSigningWorkflow page
+- [ ] Implement ServiceDocumentTemplates page
+- [ ] Implement DocumentVersionControl page
+- [ ] Write vitest tests for enhanced document features
+
+---
+
+### INTEGRATION & TESTING
+
+#### Database & Backend
+- [ ] Run database migrations for all new tables
+- [ ] Verify all foreign key relationships
+- [ ] Add database indexes for performance
+- [ ] Optimize complex queries
+- [ ] Add database triggers where needed
+- [ ] Test all tRPC procedures individually
+- [ ] Write comprehensive vitest tests (target: 80% coverage)
+- [ ] Test error handling and edge cases
+
+#### Frontend Integration
+- [ ] Integrate all new pages with App.tsx routing
+- [ ] Add navigation links to office owner dashboard
+- [ ] Ensure consistent UI/UX across all pages
+- [ ] Add loading states to all pages
+- [ ] Add error boundaries
+- [ ] Add empty states with helpful messages
+- [ ] Test responsive design on all pages
+- [ ] Verify RTL layout for Arabic
+
+#### End-to-End Testing
+- [ ] Test complete client management workflow
+- [ ] Test complete financial management workflow
+- [ ] Test complete booking workflow with calendar
+- [ ] Test team collaboration features
+- [ ] Test marketing and promotions
+- [ ] Test compliance and reporting
+- [ ] Test quality assurance system
+- [ ] Test with real office owner scenarios
+
+#### Performance & Optimization
+- [ ] Run performance profiling
+- [ ] Optimize database queries
+- [ ] Add caching where appropriate
+- [ ] Optimize bundle size
+- [ ] Test with large datasets
+- [ ] Load testing with Artillery
+
+#### Documentation
+- [ ] Update office owner user guide
+- [ ] Create feature documentation for each system
+- [ ] Add inline help text
+- [ ] Create video tutorials (optional)
+- [ ] Update API documentation
+
+---
+
+## 📊 IMPLEMENTATION METRICS
+
+**Total New Features:** 9 major systems  
+**Total New Database Tables:** ~25 tables  
+**Total New tRPC Routers:** 6 routers  
+**Total New Pages:** ~40 pages  
+**Estimated Development Time:** 3-4 weeks  
+**Expected Impact:** Transform platform from 65% to 100% completeness
+
+---
+
+## 🎯 SUCCESS CRITERIA
+
+- [ ] All critical features (Phase 1) implemented and tested
+- [ ] Office owners can manage complete client lifecycle
+- [ ] Financial management fully functional with invoicing
+- [ ] Calendar view provides visual appointment management
+- [ ] Team collaboration tools enable internal coordination
+- [ ] Marketing tools support customer acquisition and retention
+- [ ] Compliance and reporting meet regulatory requirements
+- [ ] Quality assurance system maintains service standards
+- [ ] All features have 80%+ test coverage
+- [ ] Platform achieves 100% feature completeness for Sanad offices
+
+
+
+---
+
+## 🏢 SANAD OFFICE OWNER - FOCUSED IMPLEMENTATION (Jan 1, 2026 - In Progress)
+
+**Strategy:** Focus on top 3 critical features (Client CRM, Financial Management, Calendar) to reach 85% completeness
+
+### Phase 1.1: Client Management System (CRM) - IN PROGRESS
+
+#### Database Schema ✅
+- [x] Create clients table in database schema
+- [x] Create client_documents table
+- [x] Create client_notes table
+- [x] Add date type import to schema
+- [x] Manually create tables in database
+
+#### Backend API ✅
+- [x] Create db-clients.ts with all helper functions
+- [x] Create clientManagement router with CRUD procedures
+- [x] Add getClientsByOffice procedure with search and filters
+- [x] Add getClientDetails procedure with full history
+- [x] Add client document procedures (add, get, delete)
+- [x] Add client note procedures (add, get, update, delete)
+- [x] Add searchClients procedure
+- [x] Add getClientStats procedure
+- [x] Add getTopClients procedure
+- [x] Add getRecentClients procedure
+- [x] Add getExpiringDocuments procedure
+- [x] Register clientManagement router in main routers.ts
+- [x] Fix database connection pattern (use getDb())
+
+#### Frontend Pages - IN PROGRESS
+- [x] Create ClientList page with search and filters
+- [x] Create ClientProfile page with tabs (Overview, History, Documents, Notes)
+- [x] Add client editing functionality
+- [ ] Add document upload UI with S3 integration (URL input only, need file upload)
+- [x] Add notes management UI
+- [ ] Add client tags management
+- [x] Add route to App.tsx
+- [ ] Add navigation link to office owner dashboard
+- [ ] Add translation keys for client management
+
+### Phase 1.2: Financial Management System - TODO
+- [ ] Create invoices table
+- [ ] Create payments table  
+- [ ] Create expenses table
+- [ ] Create financial router
+- [ ] Create InvoiceGenerator page
+- [ ] Create PaymentTracking dashboard
+- [ ] Create FinancialDashboard with charts
+
+### Phase 1.3: Calendar View & Appointment Management - TODO
+- [ ] Install calendar library
+- [ ] Create CalendarView component
+- [ ] Create AppointmentCalendar page
+- [ ] Add drag-and-drop rescheduling
+- [ ] Add conflict detection
+- [ ] Integrate with booking system

@@ -1,4 +1,4 @@
-import { mysqlTable, mysqlSchema, AnyMySqlColumn, index, int, varchar, json, text, timestamp, mysqlEnum, decimal, foreignKey, tinyint } from "drizzle-orm/mysql-core"
+import { mysqlTable, mysqlSchema, AnyMySqlColumn, index, int, varchar, json, text, timestamp, mysqlEnum, decimal, foreignKey, tinyint, date } from "drizzle-orm/mysql-core"
 import { sql } from "drizzle-orm"
 
 export const activeSessions = mysqlTable("active_sessions", {
@@ -986,4 +986,75 @@ export const users = mysqlTable("users", {
 	index("email_idx").on(table.email),
 	index("role_idx").on(table.role),
 	index("users_referralCode_unique").on(table.referralCode),
+]);
+
+
+// Client Management System
+export const clients = mysqlTable("clients", {
+	id: int().autoincrement().notNull(),
+	officeId: int().notNull(),
+	userId: int(), // Link to user account if they have one
+	name: varchar({ length: 255 }).notNull(),
+	email: varchar({ length: 320 }),
+	phone: varchar({ length: 20 }),
+	address: text(),
+	city: varchar({ length: 100 }),
+	region: varchar({ length: 100 }),
+	dateOfBirth: date(),
+	nationalId: varchar({ length: 50 }),
+	notes: text(),
+	tags: json(), // Array of tag strings
+	status: mysqlEnum(['active','inactive','blocked']).default('active').notNull(),
+	totalBookings: int().default(0).notNull(),
+	totalSpent: decimal({ precision: 10, scale: 2 }).default('0.00').notNull(),
+	lastBookingDate: timestamp({ mode: 'string' }),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("office_id_idx").on(table.officeId),
+	index("user_id_idx").on(table.userId),
+	index("email_idx").on(table.email),
+	index("phone_idx").on(table.phone),
+	index("status_idx").on(table.status),
+	index("created_at_idx").on(table.createdAt),
+]);
+
+export const clientDocuments = mysqlTable("client_documents", {
+	id: int().autoincrement().notNull(),
+	clientId: int().notNull(),
+	officeId: int().notNull(),
+	documentType: varchar({ length: 100 }).notNull(), // e.g., 'id_copy', 'contract', 'receipt'
+	documentName: varchar({ length: 255 }).notNull(),
+	documentUrl: text().notNull(),
+	fileSize: int(), // in bytes
+	mimeType: varchar({ length: 100 }),
+	expiryDate: date(),
+	notes: text(),
+	uploadedBy: int().notNull(), // user ID who uploaded
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("client_id_idx").on(table.clientId),
+	index("office_id_idx").on(table.officeId),
+	index("document_type_idx").on(table.documentType),
+	index("expiry_date_idx").on(table.expiryDate),
+	index("created_at_idx").on(table.createdAt),
+]);
+
+export const clientNotes = mysqlTable("client_notes", {
+	id: int().autoincrement().notNull(),
+	clientId: int().notNull(),
+	officeId: int().notNull(),
+	note: text().notNull(),
+	createdBy: int().notNull(), // staff member who created the note
+	createdByName: varchar({ length: 255 }).notNull(),
+	isImportant: tinyint().default(0).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("client_id_idx").on(table.clientId),
+	index("office_id_idx").on(table.officeId),
+	index("created_at_idx").on(table.createdAt),
+	index("is_important_idx").on(table.isImportant),
 ]);
