@@ -26,12 +26,14 @@ import { BookingCalendar } from "@/components/BookingCalendar";
 import CancellationDialog from "@/components/CancellationDialog";
 import ReviewDialog from "@/components/ReviewDialog";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useFormatNumber } from "@/hooks/useFormatNumber";
 import { useLocation } from "wouter";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { PullToRefreshIndicator } from "@/components/PullToRefreshIndicator";
 
 export default function BookingsList() {
   const { t } = useLanguage();
+  const { formatNumber, formatCurrency, formatDate, formatTime } = useFormatNumber();
   const [, setLocation] = useLocation();
   const [cancelBookingId, setCancelBookingId] = useState<number | null>(null);
   const [reviewBooking, setReviewBooking] = useState<any | null>(null);
@@ -169,26 +171,21 @@ export default function BookingsList() {
                                 <Calendar className="w-4 h-4 text-muted-foreground" />
                                 <span className="text-sm">
                                   {booking.scheduledDate
-                                    ? new Date(booking.scheduledDate).toLocaleDateString("en-US", {
-                                        weekday: "long",
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "numeric",
-                                      })
+                                    ? formatDate(new Date(booking.scheduledDate))
                                      : t("bookings.dateNotScheduled")}
                                 </span>
                               </div>
                               {booking.scheduledTime && (
                                 <div className="flex items-center gap-2">
                                   <Clock className="w-4 h-4 text-muted-foreground" />
-                                  <span className="text-sm">{booking.scheduledTime}</span>
+                                  <span className="text-sm">{formatTime(booking.scheduledTime)}</span>
                                 </div>
                               )}
                               {booking.price && (
                                 <div className="flex items-center gap-2">
                                   <DollarSign className="w-4 h-4 text-muted-foreground" />
                                   <span className="text-sm font-semibold">
-                                     {booking.price} {booking.currency || t("bookings.defaultCurrency")}
+                                     {formatCurrency(parseFloat(booking.price) || 0)}
                                   </span>
                                 </div>
                               )}

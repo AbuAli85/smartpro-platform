@@ -10,9 +10,11 @@ import { StatusTimeline } from "@/components/RequestTimeline";
 import { RequestMessaging } from "@/components/RequestMessaging";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useFormatNumber } from "@/hooks/useFormatNumber";
 
 export default function MyServiceRequests() {
   const { t } = useLanguage();
+  const { formatNumber, formatCurrency, formatDate } = useFormatNumber();
   const [selectedRequestId, setSelectedRequestId] = useState<number | null>(null);
   const [selectedBidId, setSelectedBidId] = useState<number | null>(null);
   const [showAcceptDialog, setShowAcceptDialog] = useState(false);
@@ -135,7 +137,7 @@ export default function MyServiceRequests() {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
+            <div className="text-2xl font-bold">{formatNumber(stats.total)}</div>
             <p className="text-xs text-muted-foreground mt-1">All time</p>
           </CardContent>
         </Card>
@@ -146,7 +148,7 @@ export default function MyServiceRequests() {
             <Clock className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{stats.active}</div>
+            <div className="text-2xl font-bold text-blue-600">{formatNumber(stats.active)}</div>
             <p className="text-xs text-muted-foreground mt-1">In progress</p>
           </CardContent>
         </Card>
@@ -157,7 +159,7 @@ export default function MyServiceRequests() {
             <CheckCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
+            <div className="text-2xl font-bold text-green-600">{formatNumber(stats.completed)}</div>
             <p className="text-xs text-muted-foreground mt-1">Successfully finished</p>
           </CardContent>
         </Card>
@@ -168,7 +170,7 @@ export default function MyServiceRequests() {
             <Users className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-600">{stats.totalBids}</div>
+            <div className="text-2xl font-bold text-purple-600">{formatNumber(stats.totalBids)}</div>
             <p className="text-xs text-muted-foreground mt-1">From all offices</p>
           </CardContent>
         </Card>
@@ -191,12 +193,12 @@ export default function MyServiceRequests() {
                 <div className="flex items-center gap-2 text-sm">
                   <DollarSign className="h-4 w-4 text-gray-500" />
                   <span className="font-medium">Budget:</span>
-                  <span>{request.budget} OMR</span>
+                  <span>{formatCurrency(parseFloat(request.budget) || 0)}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Calendar className="h-4 w-4 text-gray-500" />
                   <span className="font-medium">Deadline:</span>
-                  <span>{new Date(request.deadline).toLocaleDateString()}</span>
+                  <span>{formatDate(new Date(request.deadline))}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Package className="h-4 w-4 text-gray-500" />
@@ -206,7 +208,7 @@ export default function MyServiceRequests() {
                 <div className="flex items-center gap-2 text-sm">
                   <Building2 className="h-4 w-4 text-gray-500" />
                   <span className="font-medium">{t("serviceRequest.bids")}:</span>
-                  <span className="font-semibold text-[#003366]">{request.bids?.length || 0}</span>
+                  <span className="font-semibold text-[#003366]">{formatNumber(request.bids?.length || 0)}</span>
                 </div>
               </div>
 
@@ -242,7 +244,7 @@ export default function MyServiceRequests() {
                                 </div>
                               </TableCell>
                               <TableCell>
-                                <span className="font-semibold text-[#003366]">{bid.price} OMR</span>
+                                <span className="font-semibold text-[#003366]">{formatCurrency(parseFloat(bid.price) || 0)}</span>
                               </TableCell>
                               <TableCell>
                                 <div className="flex items-center gap-1">
