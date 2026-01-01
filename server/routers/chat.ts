@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import { translateMessage } from "../_core/translation";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import * as db from "../db";
@@ -253,5 +254,76 @@ export const chatRouter = router({
     }))
     .query(async ({ input }) => {
       return await db.getConversationsByTags(input.officeId, input.tags);
+    }),
+
+  // Get messages for a specific booking
+  getBookingMessages: protectedProcedure
+    .input(z.object({
+      bookingId: z.number(),
+      officeId: z.number(),
+    }))
+    .query(async ({ ctx, input }) => {
+      // Find or create conversation for this booking
+      const userConversations = await db.getUserChatConversations(ctx.user.id);
+      let conversation = userConversations.find(c => c.conversation.officeId === input.officeId);
+
+      if (!conversation) {
+        // Create new conversation if it doesn't exist
+        const conversationId = await db.createChatConversation({
+          userId: ctx.user.id,
+          officeId: input.officeId,
+        });
+
+        // Fetch the newly created conversation
+        const newConversations = await db.getUserChatConversations(ctx.user.id);
+        conversation = newConversations.find(c => c.conversation.id === conversationId);
+      }
+
+      if (!conversation) {
+        return [];
+      }
+
+      // Get messages for this conversation
+      const messages = await db.getConversationMessages(conversation.conversation.id);
+      return messages;
+    }),
+
+  // Send message for a specific booking
+  sendBookingMessage: protectedProcedure
+    .input(z.object({
+      bookingId: z.number(),
+      officeId: z.number(),
+      message: z.string().min(1),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // Find or create conversation for this booking
+      const userConversations = await db.getUserChatConversations(ctx.user.id);
+      let conversation = userConversations.find(c => c.conversation.officeId === input.officeId);
+
+      if (!conversation) {
+        // Create new conversation if it doesn't exist
+        const conversationId = await db.createChatConversation({
+          userId: ctx.user.id,
+          officeId: input.officeId,
+        });
+
+        // Fetch the newly created conversation
+        const newConversations = await db.getUserChatConversations(ctx.user.id);
+        conversation = newConversations.find(c => c.conversation.id === conversationId);
+      }
+
+      if (!conversation) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to create conversation" });
+      }
+
+      // Send message
+      const savedMessage = await db.sendMessage({
+        conversationId: conversation.conversation.id,
+        senderId: ctx.user.id,
+        senderType: "customer",
+        message: input.message,
+      });
+
+      return { success: true, message: savedMessage };
     }),
 });

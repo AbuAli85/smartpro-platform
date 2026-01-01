@@ -700,4 +700,107 @@ export const bookingRouter = router({
         booking: updatedBooking,
       };
     }),
+
+  // Get payment information for a booking
+  getPaymentInfo: protectedProcedure
+    .input(z.object({ bookingId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const booking = await db.getBookingById(input.bookingId);
+      
+      if (!booking) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Booking not found" });
+      }
+
+      // Verify user owns this booking or is admin
+      if (booking.userId !== ctx.user!.id && ctx.user!.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
+      }
+
+      // Return payment information
+      return {
+        totalAmount: parseFloat(booking.price || "0"),
+        paidAmount: parseFloat(booking.price || "0"), // Assuming full payment for now
+        serviceCharge: parseFloat(booking.price || "0"),
+        tax: 0,
+        discount: 0,
+        paymentStatus: booking.status === "completed" ? "paid" : "pending",
+        paymentMethod: "Cash", // Default payment method
+        transactionId: `TXN-${booking.id}-${Date.now()}`,
+        paidAt: booking.status === "completed" ? booking.updatedAt : null,
+        invoiceUrl: null, // TODO: Generate invoice URL
+        receiptUrl: null, // TODO: Generate receipt URL
+        note: null,
+      };
+    }),
+
+  // Get documents for a booking
+  getBookingDocuments: protectedProcedure
+    .input(z.object({ bookingId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const booking = await db.getBookingById(input.bookingId);
+      
+      if (!booking) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Booking not found" });
+      }
+
+      // Verify user owns this booking or is admin
+      if (booking.userId !== ctx.user!.id && ctx.user!.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
+      }
+
+      // TODO: Implement actual document retrieval from database
+      // For now, return empty array
+      return [];
+    }),
+
+  // Get reminder settings for a booking
+  getReminderSettings: protectedProcedure
+    .input(z.object({ bookingId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const booking = await db.getBookingById(input.bookingId);
+      
+      if (!booking) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Booking not found" });
+      }
+
+      // Verify user owns this booking or is admin
+      if (booking.userId !== ctx.user!.id && ctx.user!.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
+      }
+
+      // TODO: Implement actual reminder settings retrieval from database
+      // For now, return default settings
+      return {
+        reminder24h: true,
+        reminder2h: true,
+        emailReminder: true,
+        smsReminder: false,
+      };
+    }),
+
+  // Update reminder settings for a booking
+  updateReminderSettings: protectedProcedure
+    .input(
+      z.object({
+        bookingId: z.number(),
+        reminderType: z.string(),
+        enabled: z.boolean(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const booking = await db.getBookingById(input.bookingId);
+      
+      if (!booking) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Booking not found" });
+      }
+
+      // Verify user owns this booking
+      if (booking.userId !== ctx.user!.id) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
+      }
+
+      // TODO: Implement actual reminder settings update in database
+      // For now, just return success
+      return { success: true };
+    }),
 });
