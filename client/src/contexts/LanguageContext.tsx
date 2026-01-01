@@ -673,6 +673,35 @@ export const translations: Record<Language, Record<string, string>> = {
     "marketplace.bidAmount": "Bid Amount",
     "marketplace.estimatedDuration": "Estimated Duration",
     "marketplace.proposalDetails": "Proposal Details",
+    "marketplace.bidSubmitted": "Bid Submitted Successfully!",
+    "marketplace.bidsSubmitted": "bids submitted",
+    
+    // Marketplace Filters
+    "marketplace.filters.title": "Filters",
+    "marketplace.filters.active": "Active filters",
+    "marketplace.filters.allServices": "All Services",
+    "marketplace.filters.allLocations": "All Locations",
+    "marketplace.filters.minBudget": "Min Budget",
+    "marketplace.filters.maxBudget": "Max Budget",
+    "marketplace.filters.search": "Search",
+    "marketplace.filters.clearAll": "Clear All",
+    "marketplace.filters.posted": "Posted",
+    
+    // Marketplace Statistics
+    "marketplace.stats.totalRequests": "Total Requests",
+    "marketplace.stats.avgBudget": "Avg Budget",
+    "marketplace.stats.urgent": "Urgent",
+    "marketplace.stats.totalBids": "Total Bids",
+    
+    // Marketplace Search
+    "marketplace.search.placeholder": "Search by service type, description, or location...",
+    
+    // Marketplace Sorting
+    "marketplace.sort.newest": "Newest First",
+    "marketplace.sort.oldest": "Oldest First",
+    "marketplace.sort.budgetHigh": "Highest Budget",
+    "marketplace.sort.budgetLow": "Lowest Budget",
+    "marketplace.sort.urgent": "Most Urgent",
     
     // Marketplace - Request Service Page
     "marketplace.requestService.title": "Request a Service",
@@ -814,6 +843,8 @@ export const translations: Record<Language, Record<string, string>> = {
     "empty.noServiceRequestsYetDesc": "You haven't posted any service requests. Start by posting a request to receive competitive bids from offices.",
     "empty.noServiceRequestsFound": "No Service Requests Found",
     "empty.noServiceRequestsFoundDesc": "Try adjusting your filters or check back later for new requests",
+    "empty.noMatchingRequests": "No matching requests found",
+    "empty.tryAdjustingFilters": "Try adjusting your filters to see more results",
     "empty.noOfficesYet": "No offices registered yet",
     "empty.noOfficesYetDesc": "Register your first Sanad office to start offering business services",
     "empty.noOfficesFound": "No Offices Found",
@@ -842,6 +873,12 @@ export const translations: Record<Language, Record<string, string>> = {
     "pages.staffManagementDesc": "Manage your office staff and their roles",
     "pages.staffPerformance": "Staff Performance Dashboard",
     "pages.staffPerformanceDesc": "Track team performance metrics and identify areas for improvement",
+    
+    // Loading States
+    "loading.serviceRequests": "Loading service requests...",
+    
+    // Currency
+    "currency.omr": "OMR",
     
     // Action Buttons
     "actions.postServiceRequest": "Post a Service Request",
@@ -1557,6 +1594,35 @@ export const translations: Record<Language, Record<string, string>> = {
     "marketplace.bidAmount": "مبلغ العرض",
     "marketplace.estimatedDuration": "المدة المقدرة",
     "marketplace.proposalDetails": "تفاصيل العرض",
+    "marketplace.bidSubmitted": "تم تقديم العرض بنجاح!",
+    "marketplace.bidsSubmitted": "عروض مقدمة",
+    
+    // Marketplace Filters
+    "marketplace.filters.title": "التصفية",
+    "marketplace.filters.active": "التصفيات النشطة",
+    "marketplace.filters.allServices": "جميع الخدمات",
+    "marketplace.filters.allLocations": "جميع المواقع",
+    "marketplace.filters.minBudget": "الحد الأدنى للميزانية",
+    "marketplace.filters.maxBudget": "الحد الأقصى للميزانية",
+    "marketplace.filters.search": "البحث",
+    "marketplace.filters.clearAll": "مسح الكل",
+    "marketplace.filters.posted": "نُشر في",
+    
+    // Marketplace Statistics
+    "marketplace.stats.totalRequests": "إجمالي الطلبات",
+    "marketplace.stats.avgBudget": "متوسط الميزانية",
+    "marketplace.stats.urgent": "عاجل",
+    "marketplace.stats.totalBids": "إجمالي العروض",
+    
+    // Marketplace Search
+    "marketplace.search.placeholder": "ابحث حسب نوع الخدمة أو الوصف أو الموقع...",
+    
+    // Marketplace Sorting
+    "marketplace.sort.newest": "الأحدث أولاً",
+    "marketplace.sort.oldest": "الأقدم أولاً",
+    "marketplace.sort.budgetHigh": "أعلى ميزانية",
+    "marketplace.sort.budgetLow": "أقل ميزانية",
+    "marketplace.sort.urgent": "الأكثر إلحاحاً",
     
     // Marketplace - Request Service Page
     "marketplace.requestService.title": "طلب خدمة",
@@ -1698,6 +1764,8 @@ export const translations: Record<Language, Record<string, string>> = {
     "empty.noServiceRequestsYetDesc": "لم تقم بنشر أي طلبات خدمة. ابدأ بنشر طلب لتلقي عروض تنافسية من المكاتب.",
     "empty.noServiceRequestsFound": "لم يتم العثور على طلبات خدمة",
     "empty.noServiceRequestsFoundDesc": "حاول تعديل الفلاتر أو تحقق مرة أخرى لاحقاً للحصول على طلبات جديدة",
+    "empty.noMatchingRequests": "لم يتم العثور على طلبات مطابقة",
+    "empty.tryAdjustingFilters": "حاول تعديل التصفيات لرؤية المزيد من النتائج",
     "empty.noOfficesYet": "لا توجد مكاتب مسجلة بعد",
     "empty.noOfficesYetDesc": "سجل مكتب سند الأول لبدء تقديم خدمات الأعمال",
     "empty.noOfficesFound": "لم يتم العثور على مكاتب",
@@ -1726,6 +1794,12 @@ export const translations: Record<Language, Record<string, string>> = {
     "pages.staffManagementDesc": "إدارة موظفي مكتبك وأدوارهم",
     "pages.staffPerformance": "لوحة أداء الموظفين",
     "pages.staffPerformanceDesc": "تتبع مقاييس أداء الفريق وتحديد مجالات التحسين",
+    
+    // Loading States
+    "loading.serviceRequests": "جاري تحميل طلبات الخدمة...",
+    
+    // Currency
+    "currency.omr": "ر.ع",
     
     // Action Buttons
     "actions.postServiceRequest": "نشر طلب خدمة",
