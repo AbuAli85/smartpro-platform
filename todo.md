@@ -74,6 +74,32 @@
 
 ---
 
+## ✅ RESOLVED - tRPC Transformation Errors (Jan 1, 2026)
+
+### Issue
+- [x] Fix tRPC transformation errors - change z.date() to z.coerce.date() in all router input schemas
+
+**Root Cause:** Many routers use z.date() for input validation, but dates come from client as ISO strings. Need to use z.coerce.date() to automatically convert strings to Date objects.
+
+**Affected Routers:**
+- [x] analytics.ts (4 procedures) - Fixed
+- [x] adminAnalytics.ts (3 procedures) - Fixed
+- [x] chatAnalytics.ts (1 procedure) - Fixed
+- [x] booking.ts (1 field) - Fixed
+- [x] campaigns.ts (1 procedure) - Fixed
+- [x] chat.ts (1 procedure) - Fixed
+- [x] translationQuality.ts (2 procedures) - Fixed
+- [x] auditLog.ts (2 procedures) - Fixed
+- [x] securityDashboard.ts (1 procedure) - Fixed
+- ✅ loginAnalytics.ts - Already using z.string() (correct)
+- ✅ translationAnalytics.ts - Already using z.string() (correct)
+
+**Priority:** Critical  
+**Timeline:** 30 minutes  
+**Impact:** High - Blocks all date-based queries
+
+---
+
 ## 🟡 MEDIUM PRIORITY - Console Warnings (Non-Blocking)
 
 ### TRPCClientError Issues

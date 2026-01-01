@@ -7,8 +7,8 @@ export const analyticsRouter = router({
   bookingTrends: protectedProcedure
     .input(
       z.object({
-        startDate: z.date(),
-        endDate: z.date(),
+        startDate: z.coerce.date(),
+        endDate: z.coerce.date(),
         groupBy: z.enum(["day", "week", "month"]).default("day"),
       })
     )
@@ -20,8 +20,8 @@ export const analyticsRouter = router({
   popularServices: protectedProcedure
     .input(
       z.object({
-        startDate: z.date(),
-        endDate: z.date(),
+        startDate: z.coerce.date(),
+        endDate: z.coerce.date(),
         limit: z.number().int().min(1).max(20).default(10),
       })
     )
@@ -33,8 +33,8 @@ export const analyticsRouter = router({
   peakTimes: protectedProcedure
     .input(
       z.object({
-        startDate: z.date(),
-        endDate: z.date(),
+        startDate: z.coerce.date(),
+        endDate: z.coerce.date(),
       })
     )
     .query(async ({ input }) => {
@@ -45,10 +45,10 @@ export const analyticsRouter = router({
   revenueMetrics: protectedProcedure
     .input(
       z.object({
-        startDate: z.date(),
-        endDate: z.date(),
-        previousPeriodStartDate: z.date(),
-        previousPeriodEndDate: z.date(),
+        startDate: z.coerce.date(),
+        endDate: z.coerce.date(),
+        previousPeriodStartDate: z.coerce.date(),
+        previousPeriodEndDate: z.coerce.date()
       })
     )
     .query(async ({ input }) => {

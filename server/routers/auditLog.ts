@@ -71,8 +71,8 @@ export const auditLogRouter = router({
           "account_unlocked",
         ])).optional(),
         severity: z.array(z.enum(["info", "warning", "error", "critical"])).optional(),
-        startDate: z.date().optional(),
-        endDate: z.date().optional(),
+        startDate: z.coerce.date().optional(),
+        endDate: z.coerce.date().optional(),
       })
     )
     .query(async ({ ctx, input }) => {
@@ -104,8 +104,8 @@ export const auditLogRouter = router({
   getStats: protectedProcedure
     .input(
       z.object({
-        startDate: z.date().optional(),
-        endDate: z.date().optional(),
+        startDate: z.coerce.date().optional(),
+        endDate: z.coerce.date().optional(),
       })
     )
     .query(async ({ ctx, input }) => {

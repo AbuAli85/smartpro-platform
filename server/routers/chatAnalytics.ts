@@ -7,8 +7,8 @@ export const chatAnalyticsRouter = router({
   getAnalytics: protectedProcedure
     .input(z.object({
       officeId: z.number().optional(),
-      startDate: z.date().optional(),
-      endDate: z.date().optional(),
+      startDate: z.coerce.date().optional(),
+      endDate: z.coerce.date().optional(),
     }))
     .query(async ({ ctx, input }) => {
       // If officeId provided, verify user owns the office

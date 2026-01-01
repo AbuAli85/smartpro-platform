@@ -19,8 +19,8 @@ export const adminAnalyticsRouter = router({
   officePerformance: adminProcedure
     .input(
       z.object({
-        startDate: z.date(),
-        endDate: z.date(),
+        startDate: z.coerce.date(),
+        endDate: z.coerce.date(),
         limit: z.number().int().min(1).max(50).default(20),
       })
     )
@@ -32,8 +32,8 @@ export const adminAnalyticsRouter = router({
   userGrowth: adminProcedure
     .input(
       z.object({
-        startDate: z.date(),
-        endDate: z.date(),
+        startDate: z.coerce.date(),
+        endDate: z.coerce.date(),
         groupBy: z.enum(["day", "week", "month"]).default("day"),
       })
     )
@@ -45,8 +45,8 @@ export const adminAnalyticsRouter = router({
   revenueByGovernorate: adminProcedure
     .input(
       z.object({
-        startDate: z.date(),
-        endDate: z.date(),
+        startDate: z.coerce.date(),
+        endDate: z.coerce.date(),
       })
     )
     .query(async ({ input }) => {

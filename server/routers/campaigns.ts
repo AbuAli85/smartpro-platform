@@ -196,8 +196,8 @@ export const campaignsRouter = router({
         ctaLink: z.string().optional(),
         discountPercentage: z.number().optional(),
         discountCode: z.string().optional(),
-        startDate: z.date(),
-        endDate: z.date(),
+        startDate: z.coerce.date(),
+        endDate: z.coerce.date(),
         priority: z.number().default(0),
       })
     )

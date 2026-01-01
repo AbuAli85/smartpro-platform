@@ -61,8 +61,8 @@ export const translationQualityRouter = router({
   getTranslatorPerformance: adminProcedure
     .input(
       z.object({
-        startDate: z.date().optional(),
-        endDate: z.date().optional(),
+        startDate: z.coerce.date().optional(),
+        endDate: z.coerce.date().optional(),
         limit: z.number().optional(),
       })
     )
@@ -166,8 +166,8 @@ export const translationQualityRouter = router({
   getAccuracyTrends: adminProcedure
     .input(
       z.object({
-        startDate: z.date().optional(),
-        endDate: z.date().optional(),
+        startDate: z.coerce.date().optional(),
+        endDate: z.coerce.date().optional(),
         groupBy: z.enum(["day", "week", "month"]).optional(),
       })
     )

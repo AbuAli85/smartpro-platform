@@ -33,7 +33,7 @@ export const bookingRouter = router({
         serviceId: z.number().optional(),
         serviceDescription: z.string().min(10, "Please describe the service you need"),
         requirements: z.string().optional(),
-        preferredDate: z.date().optional(),
+        preferredDate: z.coerce.date().optional(),
         scheduledDate: z.string().optional(), // ISO date string
         scheduledTime: z.string().optional(), // e.g., "09:00"
         duration: z.number().default(60),

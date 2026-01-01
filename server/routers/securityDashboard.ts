@@ -77,8 +77,8 @@ export const securityDashboardRouter = router({
         eventType: z.string().optional(),
         userId: z.number().optional(),
         severity: z.string().optional(),
-        startDate: z.date().optional(),
-        endDate: z.date().optional(),
+        startDate: z.coerce.date().optional(),
+        endDate: z.coerce.date().optional(),
       })
     )
     .query(async ({ input }) => {

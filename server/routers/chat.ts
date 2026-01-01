@@ -117,8 +117,8 @@ export const chatRouter = router({
     .input(z.object({
       query: z.string(),
       conversationId: z.number().optional(),
-      startDate: z.date().optional(),
-      endDate: z.date().optional(),
+      startDate: z.coerce.date().optional(),
+      endDate: z.coerce.date().optional(),
     }))
     .query(async ({ ctx, input }) => {
       return await db.searchChatMessages({
