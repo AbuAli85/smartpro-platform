@@ -11,12 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { RTLDialog, RTLDialogContent, RTLDialogHeader, RTLDialogTitle, RTLDialogDescription } from "@/components/RTLDialog";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   FileIcon,
   Image as ImageIcon,
@@ -37,6 +33,7 @@ interface FileGalleryProps {
 }
 
 export function FileGallery({ conversationId, isOpen, onClose }: FileGalleryProps) {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [fileTypeFilter, setFileTypeFilter] = useState<"all" | "images" | "documents">("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -110,17 +107,20 @@ export function FileGallery({ conversationId, isOpen, onClose }: FileGalleryProp
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[80vh]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <FileIcon className="h-5 w-5" />
-              File Gallery
-              <Badge variant="secondary" className="ml-2">
-                {filteredFiles.length} files
-              </Badge>
-            </DialogTitle>
-          </DialogHeader>
+      <RTLDialog open={isOpen} onOpenChange={onClose}>
+        <RTLDialogContent className="max-w-4xl">
+          <RTLDialogHeader>
+            <RTLDialogTitle>
+              <div className="flex items-center gap-2">
+                <FileIcon className="h-5 w-5" />
+                {t("files.gallery") || "File Gallery"}
+                <Badge variant="secondary" className="ml-2">
+                  {filteredFiles.length} {t("files.count") || "files"}
+                </Badge>
+              </div>
+            </RTLDialogTitle>
+          </RTLDialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto">
 
           <div className="space-y-4">
             {/* Filters */}
@@ -255,26 +255,29 @@ export function FileGallery({ conversationId, isOpen, onClose }: FileGalleryProp
               )}
             </ScrollArea>
           </div>
-        </DialogContent>
-      </Dialog>
+          </div>
+        </RTLDialogContent>
+      </RTLDialog>
 
       {/* File Preview Dialog */}
       {selectedFile && (
-        <Dialog open={!!selectedFile} onOpenChange={() => setSelectedFile(null)}>
-          <DialogContent className="max-w-3xl">
-            <DialogHeader>
-              <DialogTitle className="flex items-center justify-between">
-                <span className="truncate">{selectedFile.name}</span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDownload(selectedFile.url, selectedFile.name)}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Download
-                </Button>
-              </DialogTitle>
-            </DialogHeader>
+        <RTLDialog open={!!selectedFile} onOpenChange={() => setSelectedFile(null)}>
+          <RTLDialogContent className="max-w-3xl">
+            <RTLDialogHeader>
+              <RTLDialogTitle>
+                <div className="flex items-center justify-between w-full">
+                  <span className="truncate">{selectedFile.name}</span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDownload(selectedFile.url, selectedFile.name)}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    {t("files.download") || "Download"}
+                  </Button>
+                </div>
+              </RTLDialogTitle>
+            </RTLDialogHeader>
             <div className="space-y-4">
               {selectedFile.type?.startsWith("image/") ? (
                 <img
@@ -313,8 +316,8 @@ export function FileGallery({ conversationId, isOpen, onClose }: FileGalleryProp
                 )}
               </div>
             </div>
-          </DialogContent>
-        </Dialog>
+          </RTLDialogContent>
+        </RTLDialog>
       )}
     </>
   );

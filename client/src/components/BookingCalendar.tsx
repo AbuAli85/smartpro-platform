@@ -4,11 +4,12 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { type Booking } from "../../../drizzle/schema";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, MapPin, FileText, User } from "lucide-react";
 import { useState } from "react";
+import { RTLDialog, RTLDialogContent, RTLDialogHeader, RTLDialogTitle, RTLDialogDescription } from "@/components/RTLDialog";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface BookingCalendarProps {
   bookings: Booking[];
@@ -17,6 +18,7 @@ interface BookingCalendarProps {
 }
 
 export function BookingCalendar({ bookings, onEventClick, onDateClick }: BookingCalendarProps) {
+  const { t } = useLanguage();
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
   // Transform bookings into FullCalendar events
@@ -149,12 +151,14 @@ export function BookingCalendar({ bookings, onEventClick, onDateClick }: Booking
       </div>
 
       {/* Booking Details Dialog */}
-      <Dialog open={!!selectedBooking} onOpenChange={() => setSelectedBooking(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Booking Details</DialogTitle>
-            <DialogDescription>Booking ID: #{selectedBooking?.id}</DialogDescription>
-          </DialogHeader>
+      <RTLDialog open={!!selectedBooking} onOpenChange={() => setSelectedBooking(null)}>
+        <RTLDialogContent className="max-w-2xl">
+          <RTLDialogHeader>
+            <RTLDialogTitle>{t("booking.details") || "Booking Details"}</RTLDialogTitle>
+            <RTLDialogDescription>
+              {t("booking.id") || "Booking ID"}: #{selectedBooking?.id || ""}
+            </RTLDialogDescription>
+          </RTLDialogHeader>
 
           {selectedBooking && (
             <div className="space-y-4">
@@ -246,8 +250,8 @@ export function BookingCalendar({ bookings, onEventClick, onDateClick }: Booking
               )}
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </RTLDialogContent>
+      </RTLDialog>
     </>
   );
 }

@@ -19,6 +19,7 @@ import {
 } from "chart.js";
 import { Line, Bar } from "react-chartjs-2";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useFormatNumber } from "@/hooks/useFormatNumber";
 
 // Register Chart.js components
 ChartJS.register(
@@ -35,6 +36,7 @@ ChartJS.register(
 
 export default function Analytics() {
   const { t } = useLanguage();
+  const { formatCurrency, formatNumber, formatPercent } = useFormatNumber();
   const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d">("30d");
   const [groupBy, setGroupBy] = useState<"day" | "week" | "month">("day");
 
@@ -227,21 +229,21 @@ export default function Analytics() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {revenueMetrics?.currentRevenue.toFixed(3)} OMR
+                    {formatCurrency(revenueMetrics?.currentRevenue)}
                   </div>
                   <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                     {revenueMetrics && revenueMetrics.growthPercentage >= 0 ? (
                       <>
                         <TrendingUp className="h-3 w-3 text-green-600" />
                         <span className="text-green-600">
-                          +{revenueMetrics.growthPercentage.toFixed(1)}%
+                          +{formatPercent(revenueMetrics.growthPercentage)}
                         </span>
                       </>
                     ) : (
                       <>
                         <TrendingDown className="h-3 w-3 text-red-600" />
                         <span className="text-red-600">
-                          {revenueMetrics?.growthPercentage.toFixed(1)}%
+                          {formatPercent(revenueMetrics?.growthPercentage)}
                         </span>
                       </>
                     )}
@@ -256,9 +258,9 @@ export default function Analytics() {
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{revenueMetrics?.totalBookings || 0}</div>
+                  <div className="text-2xl font-bold">{formatNumber(revenueMetrics?.totalBookings || 0)}</div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {revenueMetrics?.completedBookings || 0} completed
+                    {formatNumber(revenueMetrics?.completedBookings || 0)} completed
                   </p>
                 </CardContent>
               </Card>
@@ -270,7 +272,7 @@ export default function Analytics() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {revenueMetrics?.averageBookingValue.toFixed(3)} OMR
+                    {formatCurrency(revenueMetrics?.averageBookingValue)}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">Per booking</p>
                 </CardContent>

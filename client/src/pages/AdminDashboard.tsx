@@ -25,9 +25,11 @@ import { useLocation } from "wouter";
 import { exportToCSV, exportToExcel, exportMultiSheetExcel } from "@/lib/exportUtils";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useFormatNumber } from "@/hooks/useFormatNumber";
 
 export default function AdminDashboard() {
   const { t } = useLanguage();
+  const { formatNumber } = useFormatNumber();
   const { user } = useAuth();
   const [, setLocation] = useLocation();
 
@@ -63,9 +65,9 @@ export default function AdminDashboard() {
               <Building2 className="h-5 w-5 text-[#003366]" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{stats?.totalOffices || 0}</div>
+              <div className="text-3xl font-bold">{formatNumber(stats?.totalOffices || 0)}</div>
               <p className="text-xs text-gray-500 mt-1">
-                {stats?.activeOffices || 0} active
+                {formatNumber(stats?.activeOffices || 0)} active
               </p>
             </CardContent>
           </Card>
@@ -78,7 +80,7 @@ export default function AdminDashboard() {
               <Users className="h-5 w-5 text-[#003366]" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{stats?.totalUsers || 0}</div>
+              <div className="text-3xl font-bold">{formatNumber(stats?.totalUsers || 0)}</div>
               <p className="text-xs text-gray-500 mt-1">
                 {t("admin.registeredUsers")}
               </p>
@@ -93,7 +95,7 @@ export default function AdminDashboard() {
               <FileText className="h-5 w-5 text-[#003366]" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{stats?.totalDocuments || 0}</div>
+              <div className="text-3xl font-bold">{formatNumber(stats?.totalDocuments || 0)}</div>
               <p className="text-xs text-gray-500 mt-1">
                 Total generated documents
               </p>
@@ -108,7 +110,7 @@ export default function AdminDashboard() {
               <Calendar className="h-5 w-5 text-[#003366]" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{stats?.totalBookings || 0}</div>
+              <div className="text-3xl font-bold">{formatNumber(stats?.totalBookings || 0)}</div>
               <p className="text-xs text-gray-500 mt-1">
                 {t("admin.allTimeBookings")}
               </p>

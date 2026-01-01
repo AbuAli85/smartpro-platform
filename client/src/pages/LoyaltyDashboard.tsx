@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Gift, TrendingUp, Award, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { useFormatNumber } from "@/hooks/useFormatNumber";
 
 export default function LoyaltyDashboard() {
   const { t } = useTranslation();
+  const { formatNumber, formatCurrency } = useFormatNumber();
   const { data: loyalty, isLoading: loadingLoyalty } = trpc.loyalty.getMyLoyalty.useQuery();
   const { data: transactions, isLoading: loadingTransactions } = trpc.loyalty.getMyTransactions.useQuery({ limit: 50 });
 
@@ -50,10 +52,10 @@ export default function LoyaltyDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-4xl font-bold text-[#003366]">
-                {loyalty?.availablePoints || 0}
+                {formatNumber(loyalty?.availablePoints || 0)}
               </div>
               <p className="text-sm text-gray-600 mt-2">
-                Worth {pointsValue.toFixed(2)} OMR
+                Worth {formatCurrency(pointsValue)}
               </p>
             </CardContent>
           </Card>
@@ -68,7 +70,7 @@ export default function LoyaltyDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-4xl font-bold text-green-600">
-                {loyalty?.totalPoints || 0}
+                {formatNumber(loyalty?.totalPoints || 0)}
               </div>
               <p className="text-sm text-gray-600 mt-2">All-time points</p>
             </CardContent>

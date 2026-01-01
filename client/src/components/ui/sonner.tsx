@@ -1,15 +1,20 @@
 import { useTheme } from "next-themes"
 import { Toaster as Sonner } from "sonner"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = "system" } = useTheme()
+  const { language } = useLanguage()
+  const isRTL = language === "ar"
 
   return (
     <Sonner
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
+      dir={isRTL ? "rtl" : "ltr"}
+      position={isRTL ? "top-left" : "top-right"}
       toastOptions={{
         classNames: {
           toast:
@@ -19,6 +24,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
             "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
           cancelButton:
             "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
+        },
+        style: {
+          direction: isRTL ? "rtl" : "ltr",
         },
       }}
       {...props}

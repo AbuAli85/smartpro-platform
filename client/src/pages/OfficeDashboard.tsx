@@ -9,8 +9,10 @@ import { toast } from "sonner";
 import AvailabilityEditor from "@/components/AvailabilityEditor";
 import { OfficeAnalytics } from "@/components/OfficeAnalytics";
 import { ServiceCatalog } from "@/components/ServiceCatalog";
+import { useFormatNumber } from "@/hooks/useFormatNumber";
 
 export default function OfficeDashboard() {
+  const { formatNumber } = useFormatNumber();
   const [selectedTab, setSelectedTab] = useState("analytics");
 
   // Get office owned by current user
@@ -109,7 +111,7 @@ export default function OfficeDashboard() {
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats?.totalBookings || 0}</div>
+              <div className="text-2xl font-bold">{formatNumber(stats?.totalBookings || 0)}</div>
               <p className="text-xs text-muted-foreground">All time</p>
             </CardContent>
           </Card>
@@ -120,7 +122,7 @@ export default function OfficeDashboard() {
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats?.cancelledBookings || 0}</div>
+              <div className="text-2xl font-bold">{formatNumber(stats?.cancelledBookings || 0)}</div>
               <p className="text-xs text-muted-foreground">Cancelled bookings</p>
             </CardContent>
           </Card>
@@ -131,7 +133,7 @@ export default function OfficeDashboard() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats?.completedBookings || 0}</div>
+              <div className="text-2xl font-bold">{formatNumber(stats?.completedBookings || 0)}</div>
               <p className="text-xs text-muted-foreground">Completed bookings</p>
             </CardContent>
           </Card>
@@ -142,7 +144,7 @@ export default function OfficeDashboard() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats?.totalBookings || 0}</div>
+              <div className="text-2xl font-bold">{formatNumber(stats?.totalBookings || 0)}</div>
               <p className="text-xs text-muted-foreground">Unique clients</p>
             </CardContent>
           </Card>

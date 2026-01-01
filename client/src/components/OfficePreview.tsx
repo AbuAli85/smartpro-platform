@@ -1,7 +1,8 @@
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Building2, MapPin, Phone, Mail, Globe, Star, Clock } from "lucide-react";
+import { RTLDialog, RTLDialogContent, RTLDialogHeader, RTLDialogTitle, RTLDialogDescription } from "@/components/RTLDialog";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface OfficePreviewProps {
   open: boolean;
@@ -23,6 +24,7 @@ interface OfficePreviewProps {
 }
 
 export default function OfficePreview({ open, onOpenChange, office }: OfficePreviewProps) {
+  const { t } = useLanguage();
   const enabledDays = office.workingHours 
     ? Object.entries(office.workingHours)
         .filter(([_, hours]) => hours.enabled)
@@ -30,14 +32,15 @@ export default function OfficePreview({ open, onOpenChange, office }: OfficePrev
     : [];
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Office Profile Preview</DialogTitle>
-          <DialogDescription>
-            This is how customers will see your office profile
-          </DialogDescription>
-        </DialogHeader>
+    <RTLDialog open={open} onOpenChange={onOpenChange}>
+      <RTLDialogContent className="max-w-4xl">
+        <RTLDialogHeader>
+          <RTLDialogTitle>{t("office.profilePreview") || "Office Profile Preview"}</RTLDialogTitle>
+          <RTLDialogDescription>
+            {t("office.profilePreviewDesc") || "This is how customers will see your office profile"}
+          </RTLDialogDescription>
+        </RTLDialogHeader>
+        <div className="max-h-[70vh] overflow-y-auto">
 
         <div className="space-y-6">
           {/* Cover Image */}
@@ -165,7 +168,8 @@ export default function OfficePreview({ open, onOpenChange, office }: OfficePrev
             </Button>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+        </div>
+      </RTLDialogContent>
+    </RTLDialog>
   );
 }
