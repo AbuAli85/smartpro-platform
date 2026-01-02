@@ -60,11 +60,14 @@ export function SocketProvider({ children }: SocketProviderProps) {
 
     // Create single shared socket connection
     const newSocket = io(window.location.origin, {
-      transports: ["websocket", "polling"],
+      transports: ["polling", "websocket"], // Try polling first, then upgrade to websocket
       reconnection: true,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-      reconnectionAttempts: 5,
+      reconnectionDelay: 2000,
+      reconnectionDelayMax: 10000,
+      reconnectionAttempts: 3,
+      timeout: 30000, // Increase timeout to 30 seconds
+      path: "/socket.io",
+      autoConnect: true,
     });
 
     newSocket.on("connect", () => {
