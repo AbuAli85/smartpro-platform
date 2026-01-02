@@ -29,7 +29,7 @@ export default function SecurityDashboard() {
   const { data: sessionStats } = trpc.securityDashboard.getActiveSessionsStats.useQuery();
   const { data: eventsTrend } = trpc.securityDashboard.getSecurityEventsTrend.useQuery({ days: timeRange });
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: string | Date) => {
     return format(new Date(date), "PPp", { locale: isRTL ? ar : undefined });
   };
 

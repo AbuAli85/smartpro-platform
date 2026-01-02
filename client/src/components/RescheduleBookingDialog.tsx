@@ -49,7 +49,7 @@ export function RescheduleBookingDialog({
   const rescheduleMutation = trpc.booking.rescheduleBooking.useMutation({
     onSuccess: () => {
       toast.success(t("booking.rescheduleSuccess"));
-      utils.booking.getUserBookings.invalidate();
+      utils.booking.getMyBookings.invalidate();
       onOpenChange(false);
       onSuccess?.();
       // Reset form

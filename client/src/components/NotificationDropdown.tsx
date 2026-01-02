@@ -79,7 +79,7 @@ export function NotificationDropdown() {
     }
   };
   
-  const formatTime = (date: Date) => {
+  const formatTime = (date: string | Date) => {
     const now = new Date();
     const diff = now.getTime() - new Date(date).getTime();
     const minutes = Math.floor(diff / 60000);
