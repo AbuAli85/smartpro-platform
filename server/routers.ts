@@ -54,6 +54,7 @@ import { clientManagementRouter } from "./routers/clientManagement";
 import { bookingDocumentsRouter } from "./routers/bookingDocuments";
 import { staffManagementRouter } from "./routers/staffManagement";
 import { financialManagementRouter } from "./routers/financialManagement";
+import { draftFormsRouter } from "./routers/draftForms";
 
 export const appRouter = router({
   system: systemRouter,
@@ -182,6 +183,7 @@ export const appRouter = router({
   bookingDocuments: bookingDocumentsRouter,
   staffManagement: staffManagementRouter,
   financialManagement: financialManagementRouter,
+  draftForms: draftFormsRouter,
 });
 
 export type AppRouter = typeof appRouter;

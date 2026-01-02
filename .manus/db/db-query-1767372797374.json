@@ -1,0 +1,9 @@
+{
+  "query": "INSERT IGNORE INTO __drizzle_migrations (hash, created_at) VALUES ('0019_freezing_songbird', UNIX_TIMESTAMP() * 1000);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute INSERT IGNORE INTO __drizzle_migrations (hash, created_at) VALUES ('0019_freezing_songbird', UNIX_TIMESTAMP() * 1000);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1917
+}

@@ -237,6 +237,25 @@ export const chatTransferHistory = mysqlTable("chat_transfer_history", {
 	index("to_user_idx").on(table.toUserId),
 ]);
 
+export const draftForms = mysqlTable("draft_forms", {
+	id: int().autoincrement().notNull(),
+	draftId: varchar({ length: 255 }).notNull(),
+	userId: int(),
+	formType: varchar({ length: 100 }).notNull(),
+	formData: json().notNull(),
+	metadata: json(),
+	expiresAt: timestamp({ mode: 'string' }).notNull(),
+	isExpired: tinyint().default(0).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("draft_id_unique").on(table.draftId),
+	index("user_idx").on(table.userId),
+	index("form_type_idx").on(table.formType),
+	index("expires_at_idx").on(table.expiresAt),
+]);
+
 export const documentTemplates = mysqlTable("document_templates", {
 	id: int().autoincrement().notNull(),
 	templateName: varchar({ length: 255 }).notNull(),

@@ -108,6 +108,162 @@ Example format: [{"text": "Response 1..."}, {"text": "Response 2..."}, {"text": 
         return generateFallbackResponses(rating, comment, tone);
       }
     }),
+
+  /**
+   * Submit a reply to a review (office owners only)
+   */
+  submitReply: protectedProcedure
+    .input(
+      z.object({
+        reviewId: z.number(),
+        responseText: z.string().min(10).max(1000),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = ctx.user!;
+      
+      // Get review details to verify ownership
+      const review = await ctx.db
+        .select()
+        .from(ctx.schema.reviews)
+        .where(ctx.eq(ctx.schema.reviews.id, input.reviewId))
+        .limit(1);
+      
+      if (!review || review.length === 0) {
+        throw new Error("Review not found");
+      }
+      
+      // Check if user owns the office
+      const office = await ctx.db
+        .select()
+        .from(ctx.schema.sanadOffices)
+        .where(ctx.eq(ctx.schema.sanadOffices.id, review[0].officeId))
+        .limit(1);
+      
+      if (!office || office.length === 0) {
+        throw new Error("Office not found");
+      }
+      
+      // Verify ownership or staff membership
+      const isOwner = office[0].ownerId === user.id;
+      const isStaff = await ctx.db
+        .select()
+        .from(ctx.schema.officeStaff)
+        .where(
+          ctx.and(
+            ctx.eq(ctx.schema.officeStaff.officeId, office[0].id),
+            ctx.eq(ctx.schema.officeStaff.userId, user.id),
+            ctx.eq(ctx.schema.officeStaff.isActive, 1)
+          )
+        )
+        .limit(1);
+      
+      if (!isOwner && (!isStaff || isStaff.length === 0)) {
+        throw new Error("You don't have permission to reply to this review");
+      }
+      
+      // Update review with reply
+      await ctx.db
+        .update(ctx.schema.reviews)
+        .set({
+          responseText: input.responseText,
+          respondedAt: new Date().toISOString(),
+          respondedBy: user.id,
+        })
+        .where(ctx.eq(ctx.schema.reviews.id, input.reviewId));
+      
+      // Send notification to reviewer
+      const reviewer = review[0].userId;
+      await ctx.db.insert(ctx.schema.notifications).values({
+        userId: reviewer,
+        type: "review",
+        title: "Office replied to your review",
+        message: `${office[0].officeName} has responded to your review.`,
+        reviewId: input.reviewId,
+        actionUrl: `/offices/${office[0].slug}#review-${input.reviewId}`,
+        isRead: 0,
+      });
+      
+      return { success: true };
+    }),
+
+  /**
+   * Edit an existing reply
+   */
+  editReply: protectedProcedure
+    .input(
+      z.object({
+        reviewId: z.number(),
+        responseText: z.string().min(10).max(1000),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = ctx.user!;
+      
+      // Get review details
+      const review = await ctx.db
+        .select()
+        .from(ctx.schema.reviews)
+        .where(ctx.eq(ctx.schema.reviews.id, input.reviewId))
+        .limit(1);
+      
+      if (!review || review.length === 0) {
+        throw new Error("Review not found");
+      }
+      
+      // Verify user is the one who replied
+      if (review[0].respondedBy !== user.id) {
+        throw new Error("You can only edit your own replies");
+      }
+      
+      // Update reply
+      await ctx.db
+        .update(ctx.schema.reviews)
+        .set({
+          responseText: input.responseText,
+          respondedAt: new Date().toISOString(),
+        })
+        .where(ctx.eq(ctx.schema.reviews.id, input.reviewId));
+      
+      return { success: true };
+    }),
+
+  /**
+   * Delete a reply
+   */
+  deleteReply: protectedProcedure
+    .input(z.object({ reviewId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const user = ctx.user!;
+      
+      // Get review details
+      const review = await ctx.db
+        .select()
+        .from(ctx.schema.reviews)
+        .where(ctx.eq(ctx.schema.reviews.id, input.reviewId))
+        .limit(1);
+      
+      if (!review || review.length === 0) {
+        throw new Error("Review not found");
+      }
+      
+      // Verify user is the one who replied
+      if (review[0].respondedBy !== user.id) {
+        throw new Error("You can only delete your own replies");
+      }
+      
+      // Remove reply
+      await ctx.db
+        .update(ctx.schema.reviews)
+        .set({
+          responseText: null,
+          respondedAt: null,
+          respondedBy: null,
+        })
+        .where(ctx.eq(ctx.schema.reviews.id, input.reviewId));
+      
+      return { success: true };
+    }),
 });
 
 /**
