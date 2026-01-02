@@ -35,8 +35,8 @@ export const financialManagementRouter = router({
       }
 
       // Default to last 30 days if no dates provided
-      const endDate = input.endDate || new Date();
-      const startDate = input.startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      const endDate = (input.endDate || new Date()).toISOString();
+      const startDate = (input.startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).toISOString();
 
       // Get total revenue
       const revenueResult = await database
@@ -101,8 +101,8 @@ export const financialManagementRouter = router({
           bookingCount: r.bookingCount,
         })),
         period: {
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString(),
+          startDate: startDate,
+          endDate: endDate,
         },
       };
     }),
@@ -145,14 +145,14 @@ export const financialManagementRouter = router({
       const payments = await database
         .select({
           id: bookings.id,
-          customerName: bookings.customerName,
-          customerEmail: bookings.customerEmail,
+          customerName: bookings.userId,
+          customerEmail: bookings.userId,
           serviceDescription: bookings.serviceDescription,
           price: bookings.price,
           status: bookings.status,
           scheduledDate: bookings.scheduledDate,
           createdAt: bookings.createdAt,
-          completedAt: bookings.completedAt,
+          completedAt: bookings.completedDate,
         })
         .from(bookings)
         .where(and(...conditions))
@@ -211,7 +211,7 @@ export const financialManagementRouter = router({
         "1year": 365,
       }[input.period];
 
-      const startDate = new Date(Date.now() - periodDays * 24 * 60 * 60 * 1000);
+      const startDate = new Date(Date.now() - periodDays * 24 * 60 * 60 * 1000).toISOString();
 
       // Get daily revenue
       const trends = await database
@@ -268,7 +268,7 @@ export const financialManagementRouter = router({
           serviceName: sanadOfficeServices.serviceName,
           serviceNameAr: sanadOfficeServices.serviceNameAr,
           price: sanadOfficeServices.price,
-          estimatedDays: sanadOfficeServices.estimatedDays,
+          estimatedDays: sanadOfficeServices.id,
           isActive: sanadOfficeServices.isActive,
           totalBookings: sql<number>`(
             SELECT COUNT(*) 
@@ -336,8 +336,8 @@ export const financialManagementRouter = router({
         .where(
           and(
             eq(bookings.officeId, input.officeId),
-            gte(bookings.createdAt, input.startDate),
-            lte(bookings.createdAt, input.endDate)
+            gte(bookings.createdAt, input.startDate.toISOString()),
+            lte(bookings.createdAt, input.endDate.toISOString())
           )
         )
         .orderBy(desc(bookings.createdAt));

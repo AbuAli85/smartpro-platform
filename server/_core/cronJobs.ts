@@ -37,8 +37,8 @@ export function startBookingReminderCron() {
         .where(
           and(
             eq(bookings.status, "confirmed"),
-            gte(bookings.scheduledDate, reminderStart),
-            lte(bookings.scheduledDate, reminderEnd)
+            gte(bookings.scheduledDate, reminderStart.toISOString()),
+            lte(bookings.scheduledDate, reminderEnd.toISOString())
           )
         );
 

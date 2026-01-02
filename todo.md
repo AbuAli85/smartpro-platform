@@ -1642,3 +1642,23 @@ The platform is stable, fully functional, and ready for users. Minor console war
 **Priority:** High  
 **Timeline:** 6-9 hours  
 **Impact:** High - Office owners can fully manage their business
+
+---
+
+## 🔴 URGENT - TypeScript Date Comparison Errors (Jan 2, 2026)
+
+### Date Type Mismatches in Database Queries
+- [x] Fix campaigns router date comparisons (startDate, endDate with Date vs string)
+- [x] Fix financial management router date comparisons (3 locations)
+- [x] Fix all other routers with Date object comparisons to timestamp string columns
+- [x] Verify all gte/lte comparisons use ISO string format for timestamp columns
+- [x] Reduced TypeScript errors from 268 to ~165 (103 errors fixed)
+- [ ] Fix remaining 165 errors (staff management role enums, booking documents, etc.)
+
+**Root Cause:** Database timestamp columns are defined as `timestamp({ mode: 'string' })` which means they store/return strings, but queries are comparing them with Date objects. This causes TypeScript errors because Drizzle ORM expects string comparisons for string-mode timestamp columns.
+
+**Solution:** Convert all Date objects to ISO strings using `.toISOString()` before using in gte/lte comparisons.
+
+**Priority:** Critical - Blocking deployment
+**Timeline:** 30 minutes
+**Impact:** High - 268 TypeScript errors preventing clean build

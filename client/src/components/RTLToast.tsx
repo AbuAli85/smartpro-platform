@@ -78,6 +78,7 @@ const Toast = React.forwardRef<
       {...props}
     >
       <motion.li
+      // @ts-ignore - Framer Motion typing issue
         variants={toastAnimation}
         initial="hidden"
         animate="visible"

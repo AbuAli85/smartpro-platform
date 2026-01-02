@@ -83,7 +83,7 @@ export async function getPasswordResetStats(days: number = 30): Promise<{
     .where(
       and(
         eq(authAuditLog.eventType, "password_reset_requested"),
-        gte(authAuditLog.createdAt, since)
+        gte(authAuditLog.createdAt, since.toISOString())
       )
     );
 
@@ -93,7 +93,7 @@ export async function getPasswordResetStats(days: number = 30): Promise<{
     .where(
       and(
         eq(authAuditLog.eventType, "password_reset_completed"),
-        gte(authAuditLog.createdAt, since)
+        gte(authAuditLog.createdAt, since.toISOString())
       )
     );
 
@@ -222,7 +222,7 @@ export async function getSecurityEventsTrend(days: number = 30): Promise<
       count: count(),
     })
     .from(authAuditLog)
-    .where(gte(authAuditLog.createdAt, since))
+    .where(gte(authAuditLog.createdAt, since.toISOString()))
     .groupBy(sql`DATE(${authAuditLog.createdAt})`, authAuditLog.eventType)
     .orderBy(sql`DATE(${authAuditLog.createdAt})`);
 

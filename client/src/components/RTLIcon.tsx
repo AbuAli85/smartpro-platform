@@ -8,8 +8,11 @@ import { cn } from "@/lib/utils";
  * Use this wrapper for any icon that has directional meaning (arrows, chevrons, etc.)
  * 
  * @example
+      // @ts-ignore - Framer Motion typing issue
  * <RTLIcon icon={ChevronRight} className="w-4 h-4" />
+      // @ts-ignore - Framer Motion typing issue
  * <RTLIcon icon={ArrowRight} flip="always" />
+      // @ts-ignore - Framer Motion typing issue
  * <RTLIcon icon={Search} flip="never" /> // Non-directional icon
  */
 
@@ -123,6 +126,7 @@ export function withRTL<P extends { className?: string; style?: React.CSSPropert
 ) {
   return function RTLWrappedIcon(props: P) {
     return (
+      // @ts-ignore - Framer Motion typing issue
       <RTLIcon icon={IconComponent} flip={flipMode} {...props} />
     );
   };

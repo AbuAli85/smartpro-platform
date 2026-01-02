@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 interface CustomerChatInterfaceProps {
+  officeId?: number;
   bookingId: number;
   officeId: number;
   officeName: string;

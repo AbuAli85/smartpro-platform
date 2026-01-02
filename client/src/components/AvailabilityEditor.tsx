@@ -96,7 +96,7 @@ export default function AvailabilityEditor({ officeId }: AvailabilityEditorProps
         startTime: "09:00",
         endTime: "17:00",
         slotDuration: 60,
-        isActive: true,
+        isActive: 1,
       },
     ]);
   };

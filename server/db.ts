@@ -882,8 +882,8 @@ export async function getAvailableTimeSlots(officeId: number, date: Date) {
     .from(bookings)
     .where(and(
       eq(bookings.officeId, officeId),
-      gte(bookings.scheduledDate, startOfDay),
-      lte(bookings.scheduledDate, endOfDay),
+      gte(bookings.scheduledDate, startOfDay.toISOString()),
+      lte(bookings.scheduledDate, endOfDay.toISOString()),
       not(eq(bookings.status, "cancelled"))
     ));
   
@@ -1226,7 +1226,7 @@ export async function getOfficeAnalytics(officeId: number, startDate: Date, endD
       .where(
         and(
           eq(bookings.officeId, officeId),
-          gte(bookings.scheduledDate, startDate),
+          gte(bookings.scheduledDate, startDate.toISOString()),
           lte(bookings.scheduledDate, endDate)
         )
       );
@@ -1239,7 +1239,7 @@ export async function getOfficeAnalytics(officeId: number, startDate: Date, endD
         and(
           eq(bookings.officeId, officeId),
           eq(bookings.status, "completed"),
-          gte(bookings.scheduledDate, startDate),
+          gte(bookings.scheduledDate, startDate.toISOString()),
           lte(bookings.scheduledDate, endDate)
         )
       );
@@ -1254,7 +1254,7 @@ export async function getOfficeAnalytics(officeId: number, startDate: Date, endD
       .where(
         and(
           eq(reviews.officeId, officeId),
-          gte(reviews.createdAt, startDate),
+          gte(reviews.createdAt, startDate.toISOString()),
           lte(reviews.createdAt, endDate)
         )
       );
@@ -1269,7 +1269,7 @@ export async function getOfficeAnalytics(officeId: number, startDate: Date, endD
       .where(
         and(
           eq(bookings.officeId, officeId),
-          gte(bookings.scheduledDate, startDate),
+          gte(bookings.scheduledDate, startDate.toISOString()),
           lte(bookings.scheduledDate, endDate)
         )
       )
@@ -1285,7 +1285,7 @@ export async function getOfficeAnalytics(officeId: number, startDate: Date, endD
       .where(
         and(
           eq(bookings.officeId, officeId),
-          gte(bookings.scheduledDate, startDate),
+          gte(bookings.scheduledDate, startDate.toISOString()),
           lte(bookings.scheduledDate, endDate)
         )
       )
@@ -1884,7 +1884,7 @@ export async function getBookingTrends(params: {
       cancelledBookings: sql<number>`SUM(CASE WHEN ${bookings.status} = 'cancelled' THEN 1 ELSE 0 END)`.as('cancelledBookings'),
     })
     .from(bookings)
-    .where(and(gte(bookings.createdAt, startDate), lte(bookings.createdAt, endDate)))
+    .where(and(gte(bookings.createdAt, startDate.toISOString()), lte(bookings.createdAt, endDate)))
     .groupBy(sql`period`)
     .orderBy(sql`period`);
 
@@ -1913,7 +1913,7 @@ export async function getPopularServicesAnalytics(params: {
     .innerJoin(sanadOfficeServices, eq(bookings.serviceId, sanadOfficeServices.id))
     .where(
       and(
-        gte(bookings.createdAt, startDate),
+        gte(bookings.createdAt, startDate.toISOString()),
         lte(bookings.createdAt, endDate),
         // Filter out cancelled bookings
         not(eq(bookings.status, "cancelled"))
@@ -1944,7 +1944,7 @@ export async function getPeakBookingTimesAnalytics(params: {
     .from(bookings)
     .where(
       and(
-        gte(bookings.createdAt, startDate),
+        gte(bookings.createdAt, startDate.toISOString()),
         lte(bookings.createdAt, endDate),
         not(isNull(bookings.scheduledTime))
       )
@@ -1984,7 +1984,7 @@ export async function getRevenueMetricsAnalytics(params: {
     .leftJoin(sanadOfficeServices, eq(bookings.serviceId, sanadOfficeServices.id))
     .where(
       and(
-        gte(bookings.createdAt, startDate),
+        gte(bookings.createdAt, startDate.toISOString()),
         lte(bookings.createdAt, endDate)
       )
     );
@@ -2150,7 +2150,7 @@ export async function getOfficePerformanceMetrics(params: {
         or(
           isNull(bookings.createdAt),
           and(
-            gte(bookings.createdAt, startDate),
+            gte(bookings.createdAt, startDate.toISOString()),
             lte(bookings.createdAt, endDate)
           )
         )
@@ -2191,7 +2191,7 @@ export async function getUserGrowthStats(params: {
       newUsers: sql<number>`COUNT(*)`.as('newUsers'),
     })
     .from(users)
-    .where(and(gte(users.createdAt, startDate), lte(users.createdAt, endDate)))
+    .where(and(gte(users.createdAt, startDate.toISOString()), lte(users.createdAt, endDate)))
     .groupBy(sql`period`)
     .orderBy(sql`period`);
 
@@ -2225,7 +2225,7 @@ export async function getRevenueByGovernorate(params: {
         or(
           isNull(bookings.createdAt),
           and(
-            gte(bookings.createdAt, startDate),
+            gte(bookings.createdAt, startDate.toISOString()),
             lte(bookings.createdAt, endDate)
           )
         )
@@ -2667,7 +2667,7 @@ export async function searchChatMessages(params: {
   }
 
   if (startDate) {
-    conditions.push(gte(chatMessages.createdAt, startDate));
+    conditions.push(gte(chatMessages.createdAt, startDate.toISOString()));
   }
 
   if (endDate) {
@@ -2729,7 +2729,7 @@ export async function getChatAnalytics(params: {
   }
 
   if (startDate) {
-    conditions.push(gte(chatConversations.createdAt, startDate));
+    conditions.push(gte(chatConversations.createdAt, startDate.toISOString()));
   }
 
   if (endDate) {
@@ -3408,7 +3408,7 @@ export async function getSatisfactionTrends(days: number = 30) {
       totalRatings: sql<number>`COUNT(${chatRatings.id})`,
     })
     .from(chatRatings)
-    .where(gte(chatRatings.createdAt, startDate))
+    .where(gte(chatRatings.createdAt, startDate.toISOString()))
     .groupBy(sql`DATE(${chatRatings.createdAt})`)
     .orderBy(sql`DATE(${chatRatings.createdAt})`);
   
@@ -5231,7 +5231,7 @@ export async function getOfficeAnalyticsData(officeId: number, startDate: Date, 
     .where(
       and(
         eq(bookings.officeId, officeId),
-        gte(bookings.createdAt, startDate),
+        gte(bookings.createdAt, startDate.toISOString()),
         lte(bookings.createdAt, endDate)
       )
     );
@@ -6288,7 +6288,7 @@ export async function getLoginAnalyticsSummary(
             eq(authAuditLog.eventType, "login_success"),
             eq(authAuditLog.eventType, "login_failure")
           ),
-          gte(authAuditLog.createdAt, startDate),
+          gte(authAuditLog.createdAt, startDate.toISOString()),
           lte(authAuditLog.createdAt, endDate)
         )
       );
@@ -6352,7 +6352,7 @@ export async function getLoginTrends(
             eq(authAuditLog.eventType, "login_success"),
             eq(authAuditLog.eventType, "login_failure")
           ),
-          gte(authAuditLog.createdAt, startDate),
+          gte(authAuditLog.createdAt, startDate.toISOString()),
           lte(authAuditLog.createdAt, endDate)
         )
       )
@@ -6429,7 +6429,7 @@ export async function getAuthMethodsDistribution(
       .where(
         and(
           eq(authAuditLog.eventType, "login_success"),
-          gte(authAuditLog.createdAt, startDate),
+          gte(authAuditLog.createdAt, startDate.toISOString()),
           lte(authAuditLog.createdAt, endDate)
         )
       );
@@ -6480,7 +6480,7 @@ export async function getGeographicDistribution(
       .from(activeSessions)
       .where(
         and(
-          gte(activeSessions.createdAt, startDate),
+          gte(activeSessions.createdAt, startDate.toISOString()),
           lte(activeSessions.createdAt, endDate)
         )
       );
@@ -6569,7 +6569,7 @@ export async function getHourlyLoginPatterns(
             eq(authAuditLog.eventType, "login_success"),
             eq(authAuditLog.eventType, "login_failure")
           ),
-          gte(authAuditLog.createdAt, startDate),
+          gte(authAuditLog.createdAt, startDate.toISOString()),
           lte(authAuditLog.createdAt, endDate)
         )
       );

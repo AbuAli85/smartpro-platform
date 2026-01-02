@@ -22,7 +22,7 @@ export const campaignsRouter = router({
       }
 
       try {
-        const now = new Date();
+        const now = new Date().toISOString();
         
         // Build conditions
         const conditions = [

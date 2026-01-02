@@ -132,7 +132,7 @@ export function RescheduleBookingDialog({
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                 {timeSlots.map((slot) => (
                   <Button
-                    key={slot}
+                    key={`${slot.time}-${slot.available}`}
                     variant={selectedTime === slot ? "default" : "outline"}
                     size="sm"
                     onClick={() => setSelectedTime(slot)}

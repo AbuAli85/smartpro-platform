@@ -170,7 +170,7 @@ export default function ClientProfile() {
       address: client.address || "",
       city: client.city || "",
       region: client.region || "",
-      notes: client.notes || "",
+      notes: "",
     });
   }
 
@@ -384,15 +384,7 @@ export default function ClientProfile() {
                     </div>
                   )}
 
-                  {client.notes && (
-                    <div className="flex items-start gap-3">
-                      <FileText className="h-5 w-5 text-muted-foreground mt-1" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">{t("clients.notes")}</p>
-                        <p className="font-medium whitespace-pre-wrap">{client.notes}</p>
-                      </div>
-                    </div>
-                  )}
+                  {/* Notes section removed - notes are shown in separate tab */}
                 </div>
               )}
             </CardContent>

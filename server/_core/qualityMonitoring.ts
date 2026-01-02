@@ -41,7 +41,7 @@ export async function calculateQualityMetrics(): Promise<QualityMetrics> {
       revisions: sql<number>`SUM(CASE WHEN ${translationActivityLog.actionType} = 'updated' THEN 1 ELSE 0 END)`,
     })
     .from(translationActivityLog)
-    .where(gte(translationActivityLog.createdAt, thirtyDaysAgo));
+    .where(gte(translationActivityLog.createdAt, thirtyDaysAgo.toISOString()));
 
   const totalActivities = Number(activityStats[0]?.total || 0);
   const revisionCount = Number(activityStats[0]?.revisions || 0);
@@ -54,7 +54,7 @@ export async function calculateQualityMetrics(): Promise<QualityMetrics> {
       total: sql<number>`COUNT(*)`,
     })
     .from(translationMemory)
-    .where(gte(translationMemory.createdAt, thirtyDaysAgo));
+    .where(gte(translationMemory.createdAt, thirtyDaysAgo.toISOString()));
 
   const memoryEntries = Number(memoryStats[0]?.total || 0);
   const memoryUsageRate = totalActivities > 0 ? (memoryEntries / totalActivities) * 100 : 0;
@@ -153,7 +153,7 @@ async function createAlert(params: {
     .where(
       and(
         sql`${qualityAlerts.alertType} = ${params.alertType}`,
-        gte(qualityAlerts.detectedAt, oneDayAgo),
+        gte(qualityAlerts.detectedAt, oneDayAgo.toISOString()),
         sql`${qualityAlerts.status} = 'active'`
       )
     );
@@ -171,7 +171,7 @@ async function createAlert(params: {
     thresholdValue: params.thresholdValue.toString(),
     message: params.message,
     status: "active",
-    detectedAt: new Date().toISOString().toISOString(),
+    detectedAt: new Date().toISOString(),
   });
 
   // Send email notification
@@ -230,7 +230,7 @@ async function createAlert(params: {
       .update(qualityAlerts)
       .set({
         emailSent: true,
-        emailSentAt: new Date().toISOString().toISOString(),
+        emailSentAt: new Date().toISOString(),
       })
       .where(
         and(

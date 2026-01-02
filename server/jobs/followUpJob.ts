@@ -28,7 +28,7 @@ export function startFollowUpJob() {
         .where(
           and(
             eq(scheduledFollowups.status, "pending"),
-            lte(scheduledFollowups.scheduledFor, now)
+            lte(scheduledFollowups.scheduledFor, now.toISOString())
           )
         );
 

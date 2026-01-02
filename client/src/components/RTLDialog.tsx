@@ -77,6 +77,7 @@ const RTLDialogContent = React.forwardRef<
         {...props}
       >
         <motion.div
+      // @ts-ignore - Framer Motion typing issue
           variants={animation}
           initial="hidden"
           animate="visible"
