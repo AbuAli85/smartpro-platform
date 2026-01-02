@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Building2, Calendar, CheckCircle, XCircle, Star, TrendingUp, DollarSign, Users, MessageSquare } from "lucide-react";
+import { Building2, Calendar, CheckCircle, XCircle, Star, TrendingUp, DollarSign, Users, MessageSquare, Settings, Edit, Plus, Trash2, Clock } from "lucide-react";
 import { toast } from "sonner";
 
 export default function OfficeOwnerDashboard() {
@@ -205,6 +205,8 @@ export default function OfficeOwnerDashboard() {
         <TabsList>
           <TabsTrigger value="bookings">Booking Requests</TabsTrigger>
           <TabsTrigger value="reviews">Reviews</TabsTrigger>
+          <TabsTrigger value="services">Services</TabsTrigger>
+          <TabsTrigger value="hours">Operating Hours</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
@@ -391,6 +393,83 @@ export default function OfficeOwnerDashboard() {
           </Card>
         </TabsContent>
 
+        {/* Services Tab */}
+        <TabsContent value="services" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Manage Services</CardTitle>
+                  <CardDescription>
+                    Add, edit, or remove services offered by your office
+                  </CardDescription>
+                </div>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Service
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add New Service</DialogTitle>
+                      <DialogDescription>
+                        Create a new service offering for your office
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div>
+                        <Label>Service Name</Label>
+                        <Input placeholder="e.g., Company Registration" />
+                      </div>
+                      <div>
+                        <Label>Description</Label>
+                        <Textarea placeholder="Describe the service..." rows={3} />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label>Price (OMR)</Label>
+                          <Input type="number" placeholder="0.00" />
+                        </div>
+                        <div>
+                          <Label>Estimated Days</Label>
+                          <Input type="number" placeholder="1" />
+                        </div>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button>Add Service</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-center text-muted-foreground py-8">
+                Service management coming soon. Use the Add Service button above.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Operating Hours Tab */}
+        <TabsContent value="hours" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Operating Hours</CardTitle>
+              <CardDescription>
+                Set your office working hours for each day of the week
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-center text-muted-foreground py-8">
+                Operating hours management coming soon
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         {/* Settings Tab */}
         <TabsContent value="settings" className="space-y-4">
           <Card>
@@ -400,7 +479,69 @@ export default function OfficeOwnerDashboard() {
                 Manage your office availability and preferences
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-between pb-4 border-b">
+                <div>
+                  <p className="font-medium">Office Information</p>
+                  <p className="text-sm text-muted-foreground">
+                    Update your office details, contact info, and description
+                  </p>
+                </div>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline">
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit Office Info
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>Edit Office Information</DialogTitle>
+                      <DialogDescription>
+                        Update your office details and contact information
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+                      <div>
+                        <Label>Office Name</Label>
+                        <Input defaultValue={selectedOffice?.officeName} />
+                      </div>
+                      <div>
+                        <Label>Description</Label>
+                        <Textarea defaultValue={selectedOffice?.description || ""} rows={4} />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label>Email</Label>
+                          <Input type="email" defaultValue={selectedOffice?.email} />
+                        </div>
+                        <div>
+                          <Label>Phone</Label>
+                          <Input defaultValue={selectedOffice?.phone} />
+                        </div>
+                      </div>
+                      <div>
+                        <Label>Address</Label>
+                        <Textarea defaultValue={selectedOffice?.addressLine1} rows={2} />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label>Governorate</Label>
+                          <Input defaultValue={selectedOffice?.governorate} />
+                        </div>
+                        <div>
+                          <Label>Wilayat</Label>
+                          <Input defaultValue={selectedOffice?.wilayat} />
+                        </div>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button>Save Changes</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Office Status</p>

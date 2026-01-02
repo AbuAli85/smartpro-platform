@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, Building2 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -31,6 +31,7 @@ import { Button } from "./ui/button";
 const menuItems = [
   { icon: LayoutDashboard, label: "Page 1", path: "/" },
   { icon: Users, label: "Page 2", path: "/some-path" },
+  { icon: Building2, label: "Office Dashboard", path: "/owner/dashboard", permission: "canViewOfficeAnalytics" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -113,7 +114,14 @@ function DashboardLayoutContent({
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const activeMenuItem = menuItems.find(item => item.path === location);
+  
+  // Filter menu items based on user permissions
+  const visibleMenuItems = menuItems.filter(item => {
+    if (!item.permission) return true;
+    return user?.permissions?.[item.permission as keyof typeof user.permissions];
+  });
+  
+  const activeMenuItem = visibleMenuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -184,7 +192,7 @@ function DashboardLayoutContent({
 
           <SidebarContent className="gap-0">
             <SidebarMenu className="px-2 py-1">
-              {menuItems.map(item => {
+              {visibleMenuItems.map(item => {
                 const isActive = location === item.path;
                 return (
                   <SidebarMenuItem key={item.path}>
