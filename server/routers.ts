@@ -52,6 +52,8 @@ import { officeNotificationPreferencesRouter } from "./routers/officeNotificatio
 import { loginAnalyticsRouter } from "./routers/loginAnalytics";
 import { clientManagementRouter } from "./routers/clientManagement";
 import { bookingDocumentsRouter } from "./routers/bookingDocuments";
+import { staffManagementRouter } from "./routers/staffManagement";
+import { financialManagementRouter } from "./routers/financialManagement";
 
 export const appRouter = router({
   system: systemRouter,
@@ -178,6 +180,8 @@ export const appRouter = router({
   loginAnalytics: loginAnalyticsRouter,
   clientManagement: clientManagementRouter,
   bookingDocuments: bookingDocumentsRouter,
+  staffManagement: staffManagementRouter,
+  financialManagement: financialManagementRouter,
 });
 
 export type AppRouter = typeof appRouter;

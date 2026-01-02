@@ -75,6 +75,7 @@ import SecurityDashboard from "./pages/admin/SecurityDashboard";
 import LoginAnalytics from "./pages/admin/LoginAnalytics";
 import ClientList from "./pages/ClientList";
 import ClientProfile from "./pages/ClientProfile";
+import FinancialDashboard from "./pages/FinancialDashboard";
 import { useNotifications } from "./hooks/useNotifications";
 import { useMarketplaceNotifications } from "./hooks/useMarketplaceNotifications";
 import { SocketProvider } from "./contexts/SocketContext";
@@ -278,6 +279,11 @@ function Router() {
       <Route path="/owner/analytics">
         <ProtectedRoute requirePermission="canViewOfficeAnalytics">
           <OfficeAnalytics />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/owner/financial">
+        <ProtectedRoute requirePermission="canManageOffice">
+          <FinancialDashboard />
         </ProtectedRoute>
       </Route>
       <Route path="/owner/templates">
