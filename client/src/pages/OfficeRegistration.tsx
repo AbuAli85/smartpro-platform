@@ -18,6 +18,7 @@ import { useAutoSave, loadDraft } from "@/hooks/useAutoSave";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import { Save, Clock } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { FieldLabelWithTooltip } from "@/components/FieldTooltip";
 
 const DRAFT_KEY = "office-registration-draft";
 
@@ -278,6 +279,28 @@ export default function OfficeRegistration() {
           )}
         </div>
 
+        {/* Progress Percentage */}
+        <Card className="mb-6">
+          <CardContent className="pt-6">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-medium">
+                  {t("wizard.step")} {currentStep} {t("common.of")} {STEPS.length}
+                </span>
+                <span className="text-gray-500">
+                  {Math.round((currentStep / STEPS.length) * 100)}% {t("wizard.complete")}
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                  className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                  style={{ width: `${(currentStep / STEPS.length) * 100}%` }}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Progress Steps */}
         <div className="flex items-center justify-between mb-8 px-4">
           {STEPS.map((step, index) => {
@@ -355,7 +378,13 @@ export default function OfficeRegistration() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="licenseNumber">{t("officeReg.licenseNumber")} *</Label>
+                  <FieldLabelWithTooltip
+                    htmlFor="licenseNumber"
+                    label={t("officeReg.licenseNumber")}
+                    required
+                    tooltip="Your official business license number issued by the Ministry of Commerce"
+                    tooltipAr="رقم الرخصة التجارية الرسمية الصادرة من وزارة التجارة"
+                  />
                   <Input
                     id="licenseNumber"
                     placeholder={t("officeReg.licenseNumberPlaceholder")}
@@ -416,7 +445,13 @@ export default function OfficeRegistration() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="region">Governorate *</Label>
+                    <FieldLabelWithTooltip
+                      htmlFor="region"
+                      label="Governorate"
+                      required
+                      tooltip="Select the governorate where your office is physically located"
+                      tooltipAr="اختر المحافظة التي يقع فيها مكتبك فعلياً"
+                    />
                     <Select value={formData.region} onValueChange={handleGovernorateChange}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select governorate" />
@@ -453,11 +488,17 @@ export default function OfficeRegistration() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number *</Label>
+                    <FieldLabelWithTooltip
+                      htmlFor="phone"
+                      label="Phone"
+                      required
+                      tooltip="Primary contact number for customers to reach your office"
+                      tooltipAr="رقم الاتصال الأساسي للعملاء للوصول إلى مكتبك"
+                    />
                     <Input
                       id="phone"
                       type="tel"
-                      placeholder="+968 XX XXX XXXX"
+                      placeholder="+968 XXXX XXXX"
                       value={formData.phone}
                       onChange={(e) => handleInputChange("phone", e.target.value)}
                     />

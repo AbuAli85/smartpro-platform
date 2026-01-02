@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Search, Filter, Download, Eye } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { TemplatePreviewDialog } from "@/components/TemplatePreviewDialog";
 
 // Categories will be translated dynamically in the component
 
@@ -140,12 +141,14 @@ export default function Templates() {
                           {template.category}
                         </Badge>
                       </div>
-                      <Link href={`/templates/${template.id}`}>
-                        <Button size="sm" className="gap-2">
-                          <Eye className="h-4 w-4" />
-                          {t("templates.view")}
-                        </Button>
-                      </Link>
+                      <div className="flex gap-2">
+                        <TemplatePreviewDialog template={template} />
+                        <Link href={`/templates/${template.id}`}>
+                          <Button size="sm" className="gap-2">
+                            {t("templates.fillForm")}
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
