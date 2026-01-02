@@ -1378,7 +1378,22 @@ export const translations: Record<Language, Record<string, string>> = {
     "home.cta.button": "سجل مكتبك الآن",
     
     // Footer
-    
+    "home.footer.tagline": "المنصة الموحدة لخدمات الأعمال في عمان",
+    "home.footer.forCustomers": "للعملاء",
+    "home.footer.browseOffices": "تصفح المكاتب",
+    "home.footer.documentTemplates": "قوالب المستندات",
+    "home.footer.serviceMarketplace": "سوق الخدمات",
+    "home.footer.loyaltyProgram": "برنامج الولاء",
+    "home.footer.forOffices": "للمكاتب",
+    "home.footer.registerOffice": "تسجيل المكتب",
+    "home.footer.manageOffice": "إدارة المكتب",
+    "home.footer.dashboard": "لوحة التحكم",
+    "home.footer.chatInbox": "صندوق الدردشة",
+    "home.footer.support": "الدعم",
+    "home.footer.myAccount": "حسابي",
+    "home.footer.notifications": "الإشعارات",
+    "home.footer.contactUs": "اتصل بنا",
+    "home.footer.copyright": "© 2025 سمارت برو. جميع الحقوق محفوظة.",
     
     // Offices Page (Additional Keys)
     
