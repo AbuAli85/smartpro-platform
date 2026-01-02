@@ -27,8 +27,7 @@ export const staffManagementRouter = router({
     .input(z.object({
       officeId: z.number(),
       userId: z.number(),
-        // @ts-expect-error - Role enum mismatch
-      role: z.enum(["manager", "staff", "translator", "consultant"]),
+      role: z.enum(["owner", "manager", "agent"]),
       canManageBookings: z.boolean().default(false),
       canManageServices: z.boolean().default(false),
       canViewAnalytics: z.boolean().default(false),
@@ -62,7 +61,6 @@ export const staffManagementRouter = router({
         action: "added_staff",
         entityType: "office",
         entityId: input.officeId,
-        // @ts-expect-error - Role enum mismatch
         description: `Added staff member with role: ${input.role}`,
       });
 
@@ -73,8 +71,7 @@ export const staffManagementRouter = router({
   updateStaff: protectedProcedure
     .input(z.object({
       staffId: z.number(),
-        // @ts-expect-error - Role enum mismatch
-      role: z.enum(["manager", "staff", "translator", "consultant"]).optional(),
+      role: z.enum(["owner", "manager", "agent"]).optional(),
       canManageBookings: z.boolean().optional(),
       canManageServices: z.boolean().optional(),
       canViewAnalytics: z.boolean().optional(),

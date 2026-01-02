@@ -100,6 +100,44 @@ const templates = {
       `,
     },
   },
+  documentUploaded: {
+    en: {
+      subject: "Document Uploaded - SmartPro",
+      html: (data: { customerName: string; officeName: string; documentName: string; bookingId: string }) => `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #003366;">Document Uploaded</h1>
+          <p>Dear ${data.customerName},</p>
+          <p>A new document has been uploaded for your booking.</p>
+          <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h2 style="margin-top: 0;">Document Details</h2>
+            <p><strong>Office:</strong> ${data.officeName}</p>
+            <p><strong>Document:</strong> ${data.documentName}</p>
+            <p><strong>Booking ID:</strong> ${data.bookingId}</p>
+          </div>
+          <p>You can view this document in your booking details.</p>
+          <p style="color: #666; font-size: 12px;">SmartPro - National Digital Infrastructure for Business Services</p>
+        </div>
+      `,
+    },
+    ar: {
+      subject: "تم تحميل مستند - سمارت برو",
+      html: (data: { customerName: string; officeName: string; documentName: string; bookingId: string }) => `
+        <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #003366;">تم تحميل مستند</h1>
+          <p>عزيزي ${data.customerName}،</p>
+          <p>تم تحميل مستند جديد لحجزك.</p>
+          <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h2 style="margin-top: 0;">تفاصيل المستند</h2>
+            <p><strong>المكتب:</strong> ${data.officeName}</p>
+            <p><strong>المستند:</strong> ${data.documentName}</p>
+            <p><strong>رقم الحجز:</strong> ${data.bookingId}</p>
+          </div>
+          <p>يمكنك عرض هذا المستند في تفاصيل حجزك.</p>
+          <p style="color: #666; font-size: 12px;">سمارت برو - البنية التحتية الرقمية الوطنية لخدمات الأعمال</p>
+        </div>
+      `,
+    },
+  },
 };
 
 type TemplateType = keyof typeof templates;

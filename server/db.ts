@@ -1227,20 +1227,20 @@ export async function getOfficeAnalytics(officeId: number, startDate: Date, endD
         and(
           eq(bookings.officeId, officeId),
           gte(bookings.scheduledDate, startDate.toISOString()),
-          lte(bookings.scheduledDate, endDate)
+          lte(bookings.scheduledDate, endDate.toISOString())
         )
       );
     
-    // Get revenue (sum of prices for completed bookings)
-    const revenueResult = await db
-      .select({ total: sql<number>`COALESCE(SUM(CAST(${bookings.price} AS DECIMAL(10,2))), 0)` })
+    // Get cancellation rate
+    const cancelledBookingsResult = await db
+      .select({ count: sql<number>`count(*)` })
       .from(bookings)
       .where(
         and(
           eq(bookings.officeId, officeId),
-          eq(bookings.status, "completed"),
+          eq(bookings.status, "cancelled"),
           gte(bookings.scheduledDate, startDate.toISOString()),
-          lte(bookings.scheduledDate, endDate)
+          lte(bookings.scheduledDate, endDate.toISOString())
         )
       );
     
@@ -1255,7 +1255,7 @@ export async function getOfficeAnalytics(officeId: number, startDate: Date, endD
         and(
           eq(reviews.officeId, officeId),
           gte(reviews.createdAt, startDate.toISOString()),
-          lte(reviews.createdAt, endDate)
+          lte(reviews.createdAt, endDate.toISOString())
         )
       );
     
@@ -2946,6 +2946,25 @@ export async function getOfficeStaff(officeId: number) {
       eq(officeStaff.isActive, 1)
     ))
     .orderBy(desc(officeStaff.createdAt));
+}
+
+export async function isOfficeStaff(officeId: number, userId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  
+  const { officeStaff } = await import("../drizzle/schema");
+  
+  const staff = await db
+    .select()
+    .from(officeStaff)
+    .where(and(
+      eq(officeStaff.officeId, officeId),
+      eq(officeStaff.userId, userId),
+      eq(officeStaff.isActive, 1)
+    ))
+    .limit(1);
+  
+  return staff.length > 0;
 }
 
 export async function addOfficeStaff(data: {
