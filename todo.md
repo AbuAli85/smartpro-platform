@@ -1607,3 +1607,38 @@ The platform is stable, fully functional, and ready for users. Minor console war
 **Timeline:** 8-12 hours for Phase 1, 15-20 hours total  
 **Impact:** High - Significantly improves office management capabilities
 
+
+
+---
+
+## 🎯 Office Owner Features - Priority 1 (Essential) - Jan 2, 2026
+
+### Phase 1: Edit Office Info
+- [x] Add state management for edit form data
+- [x] Wire up updateOfficeInfo mutation
+- [x] Add form validation
+- [x] Add loading states and error handling
+- [ ] Test edit functionality end-to-end
+
+### Phase 2: Service Management
+- [x] Fetch and display existing services in table
+- [x] Create add service form with state management
+- [x] Implement edit service dialog
+- [x] Add delete confirmation dialog
+- [x] Add active/inactive toggle (displayed in table)
+- [x] Wire up all CRUD mutations
+- [x] Add optimistic updates (refetch after mutations)
+- [ ] Test all service operations
+
+### Phase 3: Operating Hours
+- [x] Fetch current working hours
+- [x] Build day-by-day schedule editor UI
+- [x] Add time picker components for start/end times
+- [x] Add enable/disable toggle per day
+- [x] Wire up updateOfficeAvailability mutation
+- [x] Add validation for time ranges
+- [ ] Test schedule saving and display
+
+**Priority:** High  
+**Timeline:** 6-9 hours  
+**Impact:** High - Office owners can fully manage their business

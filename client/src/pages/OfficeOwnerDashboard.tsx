@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Building2, Calendar, CheckCircle, XCircle, Star, TrendingUp, DollarSign, Users, MessageSquare, Settings, Edit, Plus, Trash2, Clock } from "lucide-react";
@@ -15,6 +17,53 @@ export default function OfficeOwnerDashboard() {
   const [selectedOfficeId, setSelectedOfficeId] = useState<number | null>(null);
   const [reviewResponse, setReviewResponse] = useState("");
   const [selectedReviewId, setSelectedReviewId] = useState<number | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  
+  // Edit office form state
+  const [editForm, setEditForm] = useState({
+    officeName: "",
+    description: "",
+    email: "",
+    phone: "",
+    addressLine1: "",
+    governorate: "",
+    wilayat: ""
+  });
+
+  // Service management state
+  const [addServiceDialogOpen, setAddServiceDialogOpen] = useState(false);
+  const [editServiceDialogOpen, setEditServiceDialogOpen] = useState(false);
+  const [deleteServiceDialogOpen, setDeleteServiceDialogOpen] = useState(false);
+  const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null);
+  const [serviceForm, setServiceForm] = useState({
+    serviceName: "",
+    serviceNameAr: "",
+    description: "",
+    descriptionAr: "",
+    price: "",
+    estimatedDays: ""
+  });
+
+  // Operating hours state
+  const daysOfWeek = [
+    { key: 'sunday', label: 'Sunday', labelAr: 'الأحد' },
+    { key: 'monday', label: 'Monday', labelAr: 'الإثنين' },
+    { key: 'tuesday', label: 'Tuesday', labelAr: 'الثلاثاء' },
+    { key: 'wednesday', label: 'Wednesday', labelAr: 'الأربعاء' },
+    { key: 'thursday', label: 'Thursday', labelAr: 'الخميس' },
+    { key: 'friday', label: 'Friday', labelAr: 'الجمعة' },
+    { key: 'saturday', label: 'Saturday', labelAr: 'السبت' }
+  ];
+
+  const [workingHours, setWorkingHours] = useState<Record<string, { enabled: boolean; start: string; end: string }>>({
+    sunday: { enabled: true, start: '08:00', end: '17:00' },
+    monday: { enabled: true, start: '08:00', end: '17:00' },
+    tuesday: { enabled: true, start: '08:00', end: '17:00' },
+    wednesday: { enabled: true, start: '08:00', end: '17:00' },
+    thursday: { enabled: true, start: '08:00', end: '17:00' },
+    friday: { enabled: false, start: '08:00', end: '17:00' },
+    saturday: { enabled: false, start: '08:00', end: '17:00' }
+  });
 
   // Fetch offices owned by current user
   const { data: offices, isLoading: officesLoading } = trpc.officeOwner.getMyOffices.useQuery();
@@ -37,6 +86,40 @@ export default function OfficeOwnerDashboard() {
     { officeId: officeId! },
     { enabled: !!officeId }
   );
+
+  const { data: services, refetch: refetchServices } = trpc.officeOwner.getOfficeServices.useQuery(
+    { officeId: officeId! },
+    { enabled: !!officeId }
+  );
+
+  const { data: availability } = trpc.officeOwner.getOfficeAvailability.useQuery(
+    { officeId: officeId! },
+    { enabled: !!officeId }
+  );
+
+  // Load working hours from availability data
+  useEffect(() => {
+    if (availability && availability.length > 0) {
+      const hoursMap: Record<string, { enabled: boolean; start: string; end: string }> = {};
+      availability.forEach((avail: any) => {
+        const dayKey = daysOfWeek[avail.dayOfWeek]?.key;
+        if (dayKey) {
+          hoursMap[dayKey] = {
+            enabled: true,
+            start: avail.startTime || '08:00',
+            end: avail.endTime || '17:00'
+          };
+        }
+      });
+      // Fill in disabled days
+      daysOfWeek.forEach(day => {
+        if (!hoursMap[day.key]) {
+          hoursMap[day.key] = { enabled: false, start: '08:00', end: '17:00' };
+        }
+      });
+      setWorkingHours(hoursMap);
+    }
+  }, [availability]);
 
   // Mutations
   const updateBookingStatus = trpc.booking.updateStatus.useMutation({
@@ -70,6 +153,83 @@ export default function OfficeOwnerDashboard() {
     },
   });
 
+  const updateOfficeInfo = trpc.officeOwner.updateOfficeInfo.useMutation({
+    onSuccess: () => {
+      toast.success("Office information updated successfully");
+      setEditDialogOpen(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const addService = trpc.officeOwner.addService.useMutation({
+    onSuccess: () => {
+      toast.success("Service added successfully");
+      setAddServiceDialogOpen(false);
+      setServiceForm({
+        serviceName: "",
+        serviceNameAr: "",
+        description: "",
+        descriptionAr: "",
+        price: "",
+        estimatedDays: ""
+      });
+      refetchServices();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const updateService = trpc.officeOwner.updateService.useMutation({
+    onSuccess: () => {
+      toast.success("Service updated successfully");
+      setEditServiceDialogOpen(false);
+      setSelectedServiceId(null);
+      refetchServices();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const deleteService = trpc.officeOwner.deleteService.useMutation({
+    onSuccess: () => {
+      toast.success("Service deleted successfully");
+      setDeleteServiceDialogOpen(false);
+      setSelectedServiceId(null);
+      refetchServices();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const updateOfficeAvailability = trpc.officeOwner.updateOfficeAvailability.useMutation({
+    onSuccess: () => {
+      toast.success("Operating hours updated successfully");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  // Populate form when office is selected
+  useEffect(() => {
+    if (selectedOffice) {
+      setEditForm({
+        officeName: selectedOffice.officeName || "",
+        description: selectedOffice.description || "",
+        email: selectedOffice.email || "",
+        phone: selectedOffice.phone || "",
+        addressLine1: selectedOffice.addressLine1 || "",
+        governorate: selectedOffice.governorate || "",
+        wilayat: selectedOffice.wilayat || ""
+      });
+    }
+  }, [selectedOffice]);
+
   const handleApproveBooking = (bookingId: number) => {
     updateBookingStatus.mutate({ bookingId, status: "confirmed" });
   };
@@ -84,6 +244,161 @@ export default function OfficeOwnerDashboard() {
       reviewId: selectedReviewId,
       response: reviewResponse,
     });
+  };
+
+  const handleSaveOfficeInfo = () => {
+    if (!officeId) return;
+    
+    // Validation
+    if (!editForm.officeName.trim()) {
+      toast.error("Office name is required");
+      return;
+    }
+    if (!editForm.email.trim() || !editForm.email.includes('@')) {
+      toast.error("Valid email is required");
+      return;
+    }
+    if (!editForm.phone.trim()) {
+      toast.error("Phone number is required");
+      return;
+    }
+
+    updateOfficeInfo.mutate({
+      officeId,
+      ...editForm
+    });
+  };
+
+  const handleAddService = () => {
+    if (!officeId) return;
+
+    // Validation
+    if (!serviceForm.serviceName.trim()) {
+      toast.error("Service name (English) is required");
+      return;
+    }
+    if (!serviceForm.serviceNameAr.trim()) {
+      toast.error("Service name (Arabic) is required");
+      return;
+    }
+    if (!serviceForm.price || parseFloat(serviceForm.price) <= 0) {
+      toast.error("Valid price is required");
+      return;
+    }
+    if (!serviceForm.estimatedDays || parseInt(serviceForm.estimatedDays) <= 0) {
+      toast.error("Valid estimated days is required");
+      return;
+    }
+
+    addService.mutate({
+      officeId,
+      serviceName: serviceForm.serviceName,
+      serviceNameAr: serviceForm.serviceNameAr,
+      description: serviceForm.description || undefined,
+      descriptionAr: serviceForm.descriptionAr || undefined,
+      price: parseFloat(serviceForm.price),
+      estimatedDays: parseInt(serviceForm.estimatedDays)
+    });
+  };
+
+  const handleEditService = () => {
+    if (!selectedServiceId) return;
+
+    // Validation
+    if (!serviceForm.serviceName.trim()) {
+      toast.error("Service name (English) is required");
+      return;
+    }
+    if (!serviceForm.serviceNameAr.trim()) {
+      toast.error("Service name (Arabic) is required");
+      return;
+    }
+    if (!serviceForm.price || parseFloat(serviceForm.price) <= 0) {
+      toast.error("Valid price is required");
+      return;
+    }
+    if (!serviceForm.estimatedDays || parseInt(serviceForm.estimatedDays) <= 0) {
+      toast.error("Valid estimated days is required");
+      return;
+    }
+
+    updateService.mutate({
+      serviceId: selectedServiceId,
+      serviceName: serviceForm.serviceName,
+      serviceNameAr: serviceForm.serviceNameAr,
+      description: serviceForm.description || undefined,
+      descriptionAr: serviceForm.descriptionAr || undefined,
+      price: parseFloat(serviceForm.price),
+      estimatedDays: parseInt(serviceForm.estimatedDays)
+    });
+  };
+
+  const handleDeleteService = () => {
+    if (!selectedServiceId) return;
+    deleteService.mutate({ serviceId: selectedServiceId });
+  };
+
+  const openEditServiceDialog = (service: any) => {
+    setSelectedServiceId(service.id);
+    setServiceForm({
+      serviceName: service.serviceName || "",
+      serviceNameAr: service.serviceNameAr || "",
+      description: service.description || "",
+      descriptionAr: service.descriptionAr || "",
+      price: service.price?.toString() || "",
+      estimatedDays: service.estimatedDays?.toString() || ""
+    });
+    setEditServiceDialogOpen(true);
+  };
+
+  const openDeleteServiceDialog = (serviceId: number) => {
+    setSelectedServiceId(serviceId);
+    setDeleteServiceDialogOpen(true);
+  };
+
+  const handleSaveWorkingHours = () => {
+    if (!officeId) return;
+
+    // Validation
+    const enabledDays = Object.entries(workingHours).filter(([_, hours]) => hours.enabled);
+    if (enabledDays.length === 0) {
+      toast.error("Please enable at least one working day");
+      return;
+    }
+
+    // Validate time ranges
+    for (const [day, hours] of enabledDays) {
+      if (hours.start >= hours.end) {
+        const dayLabel = daysOfWeek.find(d => d.key === day)?.label;
+        toast.error(`Invalid time range for ${dayLabel}: start time must be before end time`);
+        return;
+      }
+    }
+
+    updateOfficeAvailability.mutate({
+      officeId,
+      workingHours
+    });
+  };
+
+  const toggleDayEnabled = (dayKey: string) => {
+    setWorkingHours(prev => ({
+      ...prev,
+      [dayKey]: {
+        ...prev[dayKey],
+        enabled: !prev[dayKey].enabled
+      }
+    }));
+  };
+
+  const updateDayTime = (dayKey: string, field: 'start' | 'end', value: string) => {
+    setWorkingHours(prev => ({
+      ...prev,
+      [dayKey]: {
+        ...prev[dayKey],
+        [field]: value
+      }
+    }));
   };
 
   if (officesLoading) {
@@ -404,53 +719,277 @@ export default function OfficeOwnerDashboard() {
                     Add, edit, or remove services offered by your office
                   </CardDescription>
                 </div>
-                <Dialog>
+                <Dialog open={addServiceDialogOpen} onOpenChange={setAddServiceDialogOpen}>
                   <DialogTrigger asChild>
                     <Button>
                       <Plus className="h-4 w-4 mr-2" />
                       Add Service
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="max-w-2xl">
                     <DialogHeader>
                       <DialogTitle>Add New Service</DialogTitle>
                       <DialogDescription>
                         Create a new service offering for your office
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <Label>Service Name</Label>
-                        <Input placeholder="e.g., Company Registration" />
-                      </div>
-                      <div>
-                        <Label>Description</Label>
-                        <Textarea placeholder="Describe the service..." rows={3} />
+                    <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label>Service Name (English) *</Label>
+                          <Input 
+                            value={serviceForm.serviceName}
+                            onChange={(e) => setServiceForm({...serviceForm, serviceName: e.target.value})}
+                            placeholder="e.g., Company Registration"
+                          />
+                        </div>
+                        <div>
+                          <Label>Service Name (Arabic) *</Label>
+                          <Input 
+                            value={serviceForm.serviceNameAr}
+                            onChange={(e) => setServiceForm({...serviceForm, serviceNameAr: e.target.value})}
+                            placeholder="مثال: تسجيل الشركات"
+                            dir="rtl"
+                          />
+                        </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label>Price (OMR)</Label>
-                          <Input type="number" placeholder="0.00" />
+                          <Label>Description (English)</Label>
+                          <Textarea 
+                            value={serviceForm.description}
+                            onChange={(e) => setServiceForm({...serviceForm, description: e.target.value})}
+                            placeholder="Describe the service..."
+                            rows={3}
+                          />
                         </div>
                         <div>
-                          <Label>Estimated Days</Label>
-                          <Input type="number" placeholder="1" />
+                          <Label>Description (Arabic)</Label>
+                          <Textarea 
+                            value={serviceForm.descriptionAr}
+                            onChange={(e) => setServiceForm({...serviceForm, descriptionAr: e.target.value})}
+                            placeholder="وصف الخدمة..."
+                            rows={3}
+                            dir="rtl"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label>Price (OMR) *</Label>
+                          <Input 
+                            type="number"
+                            value={serviceForm.price}
+                            onChange={(e) => setServiceForm({...serviceForm, price: e.target.value})}
+                            placeholder="0.00"
+                            min="0"
+                            step="0.01"
+                          />
+                        </div>
+                        <div>
+                          <Label>Estimated Days *</Label>
+                          <Input 
+                            type="number"
+                            value={serviceForm.estimatedDays}
+                            onChange={(e) => setServiceForm({...serviceForm, estimatedDays: e.target.value})}
+                            placeholder="1"
+                            min="1"
+                          />
                         </div>
                       </div>
                     </div>
                     <DialogFooter>
-                      <Button>Add Service</Button>
+                      <Button variant="outline" onClick={() => setAddServiceDialogOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button 
+                        onClick={handleAddService}
+                        disabled={addService.isPending}
+                      >
+                        {addService.isPending ? "Adding..." : "Add Service"}
+                      </Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-center text-muted-foreground py-8">
-                Service management coming soon. Use the Add Service button above.
-              </p>
+              {!services || services.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">
+                  No services yet. Add your first service using the button above.
+                </p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Service Name</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Price</TableHead>
+                      <TableHead>Est. Days</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {services.map((service: any) => (
+                      <TableRow key={service.id}>
+                        <TableCell>
+                          <div>
+                            <div className="font-medium">{service.serviceName}</div>
+                            <div className="text-sm text-muted-foreground" dir="rtl">
+                              {service.serviceNameAr}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="max-w-xs truncate">
+                            {service.description || "No description"}
+                          </div>
+                        </TableCell>
+                        <TableCell>{service.price} OMR</TableCell>
+                        <TableCell>{service.estimatedDays} days</TableCell>
+                        <TableCell>
+                          <Badge variant={service.isActive ? "default" : "secondary"}>
+                            {service.isActive ? "Active" : "Inactive"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => openEditServiceDialog(service)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => openDeleteServiceDialog(service.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
+
+          {/* Edit Service Dialog */}
+          <Dialog open={editServiceDialogOpen} onOpenChange={setEditServiceDialogOpen}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Edit Service</DialogTitle>
+                <DialogDescription>
+                  Update service details and pricing
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Service Name (English) *</Label>
+                    <Input 
+                      value={serviceForm.serviceName}
+                      onChange={(e) => setServiceForm({...serviceForm, serviceName: e.target.value})}
+                      placeholder="e.g., Company Registration"
+                    />
+                  </div>
+                  <div>
+                    <Label>Service Name (Arabic) *</Label>
+                    <Input 
+                      value={serviceForm.serviceNameAr}
+                      onChange={(e) => setServiceForm({...serviceForm, serviceNameAr: e.target.value})}
+                      placeholder="مثال: تسجيل الشركات"
+                      dir="rtl"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Description (English)</Label>
+                    <Textarea 
+                      value={serviceForm.description}
+                      onChange={(e) => setServiceForm({...serviceForm, description: e.target.value})}
+                      placeholder="Describe the service..."
+                      rows={3}
+                    />
+                  </div>
+                  <div>
+                    <Label>Description (Arabic)</Label>
+                    <Textarea 
+                      value={serviceForm.descriptionAr}
+                      onChange={(e) => setServiceForm({...serviceForm, descriptionAr: e.target.value})}
+                      placeholder="وصف الخدمة..."
+                      rows={3}
+                      dir="rtl"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Price (OMR) *</Label>
+                    <Input 
+                      type="number"
+                      value={serviceForm.price}
+                      onChange={(e) => setServiceForm({...serviceForm, price: e.target.value})}
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                  <div>
+                    <Label>Estimated Days *</Label>
+                    <Input 
+                      type="number"
+                      value={serviceForm.estimatedDays}
+                      onChange={(e) => setServiceForm({...serviceForm, estimatedDays: e.target.value})}
+                      placeholder="1"
+                      min="1"
+                    />
+                  </div>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setEditServiceDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleEditService}
+                  disabled={updateService.isPending}
+                >
+                  {updateService.isPending ? "Saving..." : "Save Changes"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          {/* Delete Confirmation Dialog */}
+          <Dialog open={deleteServiceDialogOpen} onOpenChange={setDeleteServiceDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Delete Service</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to delete this service? This action cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setDeleteServiceDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button 
+                  variant="destructive"
+                  onClick={handleDeleteService}
+                  disabled={deleteService.isPending}
+                >
+                  {deleteService.isPending ? "Deleting..." : "Delete"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </TabsContent>
 
         {/* Operating Hours Tab */}
@@ -463,9 +1002,61 @@ export default function OfficeOwnerDashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-center text-muted-foreground py-8">
-                Operating hours management coming soon
-              </p>
+              <div className="space-y-4">
+                {daysOfWeek.map((day) => (
+                  <div key={day.key} className="flex items-center gap-4 p-4 border rounded-lg">
+                    <div className="flex items-center space-x-2 min-w-[120px]">
+                      <input
+                        type="checkbox"
+                        id={`${day.key}-enabled`}
+                        checked={workingHours[day.key]?.enabled || false}
+                        onChange={() => toggleDayEnabled(day.key)}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <label htmlFor={`${day.key}-enabled`} className="font-medium">
+                        {day.label}
+                      </label>
+                    </div>
+                    
+                    {workingHours[day.key]?.enabled && (
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className="flex items-center gap-2">
+                          <Label className="text-sm text-muted-foreground">From:</Label>
+                          <Input
+                            type="time"
+                            value={workingHours[day.key]?.start || '08:00'}
+                            onChange={(e) => updateDayTime(day.key, 'start', e.target.value)}
+                            className="w-32"
+                          />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Label className="text-sm text-muted-foreground">To:</Label>
+                          <Input
+                            type="time"
+                            value={workingHours[day.key]?.end || '17:00'}
+                            onChange={(e) => updateDayTime(day.key, 'end', e.target.value)}
+                            className="w-32"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    
+                    {!workingHours[day.key]?.enabled && (
+                      <span className="text-sm text-muted-foreground">Closed</span>
+                    )}
+                  </div>
+                ))}
+                
+                <div className="flex justify-end pt-4">
+                  <Button 
+                    onClick={handleSaveWorkingHours}
+                    disabled={updateOfficeAvailability.isPending}
+                  >
+                    <Clock className="h-4 w-4 mr-2" />
+                    {updateOfficeAvailability.isPending ? "Saving..." : "Save Working Hours"}
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -487,7 +1078,7 @@ export default function OfficeOwnerDashboard() {
                     Update your office details, contact info, and description
                   </p>
                 </div>
-                <Dialog>
+                <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
                   <DialogTrigger asChild>
                     <Button variant="outline">
                       <Edit className="h-4 w-4 mr-2" />
@@ -503,40 +1094,79 @@ export default function OfficeOwnerDashboard() {
                     </DialogHeader>
                     <div className="space-y-4 max-h-[60vh] overflow-y-auto">
                       <div>
-                        <Label>Office Name</Label>
-                        <Input defaultValue={selectedOffice?.officeName} />
+                        <Label>Office Name *</Label>
+                        <Input 
+                          value={editForm.officeName}
+                          onChange={(e) => setEditForm({...editForm, officeName: e.target.value})}
+                          placeholder="Enter office name"
+                        />
                       </div>
                       <div>
                         <Label>Description</Label>
-                        <Textarea defaultValue={selectedOffice?.description || ""} rows={4} />
+                        <Textarea 
+                          value={editForm.description}
+                          onChange={(e) => setEditForm({...editForm, description: e.target.value})}
+                          rows={4}
+                          placeholder="Describe your office and services"
+                        />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label>Email</Label>
-                          <Input type="email" defaultValue={selectedOffice?.email} />
+                          <Label>Email *</Label>
+                          <Input 
+                            type="email"
+                            value={editForm.email}
+                            onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                            placeholder="office@example.com"
+                          />
                         </div>
                         <div>
-                          <Label>Phone</Label>
-                          <Input defaultValue={selectedOffice?.phone} />
+                          <Label>Phone *</Label>
+                          <Input 
+                            value={editForm.phone}
+                            onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                            placeholder="+968 XXXX XXXX"
+                          />
                         </div>
                       </div>
                       <div>
                         <Label>Address</Label>
-                        <Textarea defaultValue={selectedOffice?.addressLine1} rows={2} />
+                        <Textarea 
+                          value={editForm.addressLine1}
+                          onChange={(e) => setEditForm({...editForm, addressLine1: e.target.value})}
+                          rows={2}
+                          placeholder="Street address"
+                        />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <Label>Governorate</Label>
-                          <Input defaultValue={selectedOffice?.governorate} />
+                          <Input 
+                            value={editForm.governorate}
+                            onChange={(e) => setEditForm({...editForm, governorate: e.target.value})}
+                            placeholder="e.g., Muscat"
+                          />
                         </div>
                         <div>
                           <Label>Wilayat</Label>
-                          <Input defaultValue={selectedOffice?.wilayat} />
+                          <Input 
+                            value={editForm.wilayat}
+                            onChange={(e) => setEditForm({...editForm, wilayat: e.target.value})}
+                            placeholder="e.g., Seeb"
+                          />
                         </div>
                       </div>
                     </div>
                     <DialogFooter>
-                      <Button>Save Changes</Button>
+                      <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button 
+                        onClick={handleSaveOfficeInfo}
+                        disabled={updateOfficeInfo.isPending}
+                      >
+                        {updateOfficeInfo.isPending ? "Saving..." : "Save Changes"}
+                      </Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
