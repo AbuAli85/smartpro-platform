@@ -151,14 +151,17 @@ export const sanadOfficeRouter = router({
         serviceTypes: z.array(z.string()).optional(),
         minPrice: z.number().min(0).optional(),
         maxPrice: z.number().min(0).optional(),
+        priceMin: z.number().min(0).optional(),
+        priceMax: z.number().min(0).optional(),
         minRating: z.number().min(0).max(5).optional(),
         availableToday: z.boolean().optional(),
         availableThisWeek: z.boolean().optional(),
+        languages: z.array(z.string()).optional(),
         sortBy: z.enum(["rating", "reviews", "name", "newest"]).optional(),
       })
     )
     .query(async ({ ctx, input }) => {
-      const { page, limit, governorate, wilayat, search, status, category, serviceTypes, minPrice, maxPrice, minRating, availableToday, availableThisWeek, sortBy } = input;
+      const { page, limit, governorate, wilayat, search, status, category, serviceTypes, minPrice, maxPrice, priceMin, priceMax, minRating, availableToday, availableThisWeek, languages, sortBy } = input;
       const offset = (page - 1) * limit;
 
       const result = await db.listSanadOffices({
@@ -168,11 +171,12 @@ export const sanadOfficeRouter = router({
         status: status || "active", // Default to active for public view
         category,
         serviceTypes,
-        minPrice,
-        maxPrice,
+        minPrice: minPrice || priceMin,
+        maxPrice: maxPrice || priceMax,
         minRating,
         availableToday,
         availableThisWeek,
+        languages,
         sortBy,
         limit,
         offset,

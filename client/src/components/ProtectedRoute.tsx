@@ -1,11 +1,20 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { Redirect } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useRoleAccess, type RolePermissions } from "@/hooks/useRoleAccess";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShieldAlert, ArrowLeft } from "lucide-react";
+import { ShieldAlert, ArrowLeft, Lock } from "lucide-react";
 import { Link } from "wouter";
+import { getLoginUrl } from "@/const";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -39,9 +48,10 @@ export function ProtectedRoute({
     );
   }
 
-  // Not logged in - redirect to home
+  // Not logged in - show login required dialog
   if (!user) {
-    return <Redirect to={fallbackPath} />;}
+    return <LoginRequiredDialog fallbackPath={fallbackPath} />;
+  }
 
   // Check permissions
   let hasAccess = true;
@@ -64,6 +74,53 @@ export function ProtectedRoute({
 
   // Has access - render children
   return <>{children}</>;
+}
+
+function LoginRequiredDialog({ fallbackPath }: { fallbackPath: string }) {
+  const [open, setOpen] = useState(true);
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+
+  if (shouldRedirect) {
+    return <Redirect to={fallbackPath} />;
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={(isOpen) => {
+      setOpen(isOpen);
+      if (!isOpen) {
+        setShouldRedirect(true);
+      }
+    }}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+            <Lock className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+          </div>
+          <DialogTitle className="text-center">Login Required</DialogTitle>
+          <DialogDescription className="text-center">
+            You need to be logged in to access this feature. Please sign in to continue.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex-col sm:flex-col gap-2">
+          <Button
+            onClick={() => {
+              window.location.href = getLoginUrl();
+            }}
+            className="w-full bg-[#003366] hover:bg-[#002244]"
+          >
+            Sign In
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setShouldRedirect(true)}
+            className="w-full"
+          >
+            Go Back
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 function UnauthorizedPage() {

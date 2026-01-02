@@ -655,6 +655,7 @@ export const translations: Record<Language, Record<string, string>> = {
     "pwa.installTitle": "Install SmartPro",
     "pwa.installDescription": "Get quick access and work offline with our mobile app",
     "pwa.installButton": "Install App",
+    "pwa.dontShowAgain": "Don't show this again",
     "pwa.benefit1": "Fast access from home screen",
     "pwa.benefit2": "Work offline with cached data",
     "pwa.benefit3": "Get instant push notifications",
@@ -687,6 +688,15 @@ export const translations: Record<Language, Record<string, string>> = {
     "offices.highestRated": "Highest Rated",
     "offices.mostReviews": "Most Reviews",
     "offices.nameAZ": "Name (A-Z)",
+    "offices.priceLowToHigh": "Price: Low to High",
+    "offices.priceHighToLow": "Price: High to Low",
+    "offices.mostPopular": "Most Popular",
+    "offices.priceRange": "Price Range (OMR)",
+    "offices.minPrice": "Min Price",
+    "offices.maxPrice": "Max Price",
+    "offices.languagesSpoken": "Languages Spoken",
+    "offices.wilayat": "Wilayat",
+    "offices.allWilayats": "All Wilayats",
     "offices.showing": "Showing",
     "offices.of": "of",
     "offices.offices": "offices",
@@ -712,6 +722,8 @@ export const translations: Record<Language, Record<string, string>> = {
     "bookings.past": "Past",
     "bookings.cancelled": "Cancelled",
     "bookings.noBookings": "No bookings found",
+    "bookings.browseOffices": "Browse Offices",
+    "bookings.requestService": "Request a Service",
     "bookings.listView": "List View",
     "bookings.calendarView": "Calendar View",
     "bookings.history": "Booking History",
@@ -1159,12 +1171,30 @@ export const translations: Record<Language, Record<string, string>> = {
     // Common
 
     // PWA
+    "pwa.installTitle": "تثبيت سمارت برو",
+    "pwa.installDescription": "احصل على وصول سريع واعمل دون اتصال بالإنترنت مع تطبيقنا",
+    "pwa.installButton": "تثبيت التطبيق",
+    "pwa.dontShowAgain": "عدم إظهار هذا مرة أخرى",
+    "pwa.benefit1": "وصول سريع من الشاشة الرئيسية",
+    "pwa.benefit2": "العمل دون اتصال بالإنترنت مع البيانات المخزنة مؤقتاً",
+    "pwa.benefit3": "احصل على إشعارات فورية",
     
     // Offices
+    "offices.priceLowToHigh": "السعر: من الأقل إلى الأعلى",
+    "offices.priceHighToLow": "السعر: من الأعلى إلى الأقل",
+    "offices.mostPopular": "الأكثر شعبية",
+    "offices.priceRange": "نطاق السعر (ريال عماني)",
+    "offices.minPrice": "الحد الأدنى للسعر",
+    "offices.maxPrice": "الحد الأقصى للسعر",
+    "offices.languagesSpoken": "اللغات المنطوقة",
+    "offices.wilayat": "الولاية",
+    "offices.allWilayats": "جميع الولايات",
     
     // Templates
     
     // Bookings
+    "bookings.browseOffices": "تصفح المكاتب",
+    "bookings.requestService": "طلب خدمة",
     
     // Booking flow
     

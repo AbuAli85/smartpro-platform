@@ -33,18 +33,26 @@ export function PWAInstallPrompt() {
             {t('pwa.installDescription')}
           </p>
 
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2">
+              <button
+                onClick={promptInstall}
+                className="flex-1 bg-[#003366] hover:bg-[#002244] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+              >
+                {t('pwa.installButton')}
+              </button>
+              <button
+                onClick={() => dismissInstallPrompt(false)}
+                className="px-4 py-2 rounded-lg font-medium transition-colors text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                {t('common.notNow')}
+              </button>
+            </div>
             <button
-              onClick={promptInstall}
-              className="flex-1 bg-[#003366] hover:bg-[#002244] text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+              onClick={() => dismissInstallPrompt(true)}
+              className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 underline transition-colors"
             >
-              {t('pwa.installButton')}
-            </button>
-            <button
-              onClick={dismissInstallPrompt}
-              className="px-4 py-2 rounded-lg font-medium transition-colors text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              {t('common.notNow')}
+              {t('pwa.dontShowAgain')}
             </button>
           </div>
         </div>

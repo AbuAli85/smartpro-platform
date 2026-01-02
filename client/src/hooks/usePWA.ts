@@ -10,7 +10,7 @@ interface PWAState {
   isInstalled: boolean;
   isStandalone: boolean;
   promptInstall: () => Promise<void>;
-  dismissInstallPrompt: () => void;
+  dismissInstallPrompt: (permanent?: boolean) => void;
 }
 
 export function usePWA(): PWAState {
@@ -85,23 +85,32 @@ export function usePWA(): PWAState {
     }
   };
 
-  const dismissInstallPrompt = () => {
+  const dismissInstallPrompt = (permanent = false) => {
     setIsInstallable(false);
-    // Store dismissal in localStorage to avoid showing again for 7 days
-    localStorage.setItem('pwa-install-dismissed', Date.now().toString());
+    setDeferredPrompt(null);
+    // Store dismissal in localStorage
+    if (permanent) {
+      localStorage.setItem('pwa-install-dismissed-permanent', 'true');
+    } else {
+      // Temporary dismissal for current session only
+      sessionStorage.setItem('pwa-install-dismissed-session', 'true');
+    }
   };
 
   // Check if user previously dismissed the prompt
   useEffect(() => {
-    const dismissed = localStorage.getItem('pwa-install-dismissed');
-    if (dismissed) {
-      const dismissedTime = parseInt(dismissed, 10);
-      const sevenDays = 7 * 24 * 60 * 60 * 1000;
-      if (Date.now() - dismissedTime < sevenDays) {
-        setIsInstallable(false);
-      } else {
-        localStorage.removeItem('pwa-install-dismissed');
-      }
+    // Check for permanent dismissal
+    const permanentDismiss = localStorage.getItem('pwa-install-dismissed-permanent');
+    if (permanentDismiss === 'true') {
+      setIsInstallable(false);
+      return;
+    }
+
+    // Check for session dismissal
+    const sessionDismiss = sessionStorage.getItem('pwa-install-dismissed-session');
+    if (sessionDismiss === 'true') {
+      setIsInstallable(false);
+      return;
     }
   }, []);
 

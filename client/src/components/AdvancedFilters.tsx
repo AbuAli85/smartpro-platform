@@ -4,17 +4,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Star } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Star, DollarSign, Languages, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { X, Filter, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import { OMAN_CITIES, getBilingualLabel } from "../../../shared/omanLocations";
 
 export interface FilterState {
   category?: string;
   minRating?: number;
   availableToday?: boolean;
   availableThisWeek?: boolean;
+  priceMin?: number;
+  priceMax?: number;
+  languages?: string[];
+  wilayat?: string;
 }
 
 interface AdvancedFiltersProps {
@@ -68,6 +74,32 @@ export function AdvancedFilters({ filters, onFiltersChange, className }: Advance
         availableToday: checked ? false : filters.availableToday,
       });
     }
+  };
+
+  const handlePriceChange = (type: 'min' | 'max', value: string) => {
+    const numValue = value === '' ? undefined : parseFloat(value);
+    onFiltersChange({
+      ...filters,
+      [type === 'min' ? 'priceMin' : 'priceMax']: numValue,
+    });
+  };
+
+  const handleLanguageToggle = (language: string) => {
+    const currentLanguages = filters.languages || [];
+    const newLanguages = currentLanguages.includes(language)
+      ? currentLanguages.filter(l => l !== language)
+      : [...currentLanguages, language];
+    onFiltersChange({
+      ...filters,
+      languages: newLanguages.length > 0 ? newLanguages : undefined,
+    });
+  };
+
+  const handleWilayatChange = (wilayat: string) => {
+    onFiltersChange({
+      ...filters,
+      wilayat: wilayat === "all" ? undefined : wilayat,
+    });
   };
 
   const clearFilters = () => {
@@ -211,6 +243,95 @@ export function AdvancedFilters({ filters, onFiltersChange, className }: Advance
               </div>
             </div>
           </div>
+
+          {/* Price Range */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium flex items-center gap-2">
+              <DollarSign className="w-4 h-4" />
+              {t("offices.priceRange")}
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label htmlFor="priceMin" className="text-xs text-muted-foreground">
+                  {t("offices.minPrice")}
+                </Label>
+                <Input
+                  id="priceMin"
+                  type="number"
+                  min="0"
+                  step="10"
+                  placeholder="0"
+                  value={filters.priceMin || ''}
+                  onChange={(e) => handlePriceChange('min', e.target.value)}
+                  className="h-9"
+                />
+              </div>
+              <div>
+                <Label htmlFor="priceMax" className="text-xs text-muted-foreground">
+                  {t("offices.maxPrice")}
+                </Label>
+                <Input
+                  id="priceMax"
+                  type="number"
+                  min="0"
+                  step="10"
+                  placeholder="1000"
+                  value={filters.priceMax || ''}
+                  onChange={(e) => handlePriceChange('max', e.target.value)}
+                  className="h-9"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Languages */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium flex items-center gap-2">
+              <Languages className="w-4 h-4" />
+              {t("offices.languagesSpoken")}
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {['Arabic', 'English', 'Hindi', 'Urdu'].map((language) => (
+                <div key={language} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`lang-${language}`}
+                    checked={filters.languages?.includes(language) || false}
+                    onCheckedChange={() => handleLanguageToggle(language)}
+                  />
+                  <Label
+                    htmlFor={`lang-${language}`}
+                    className="text-sm font-normal cursor-pointer"
+                  >
+                    {language}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Wilayat */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium flex items-center gap-2">
+              <MapPin className="w-4 h-4" />
+              {t("offices.wilayat")}
+            </label>
+            <Select
+              value={filters.wilayat || "all"}
+              onValueChange={handleWilayatChange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t("offices.allWilayats")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("offices.allWilayats")}</SelectItem>
+                {OMAN_CITIES.map((city) => (
+                  <SelectItem key={city.value} value={city.value}>
+                    {getBilingualLabel(city.labelEn, city.labelAr)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </CardContent>
       )}
 
@@ -257,6 +378,45 @@ export function AdvancedFilters({ filters, onFiltersChange, className }: Advance
                 Available This Week
                 <button
                   onClick={() => handleAvailabilityChange("week", false)}
+                  className="ml-1 hover:bg-secondary-foreground/20 rounded-full p-0.5"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </Badge>
+            )}
+            {(filters.priceMin || filters.priceMax) && (
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <DollarSign className="h-3 w-3" />
+                {filters.priceMin || 0} - {filters.priceMax || '∞'} OMR
+                <button
+                  onClick={() => {
+                    handlePriceChange('min', '');
+                    handlePriceChange('max', '');
+                  }}
+                  className="ml-1 hover:bg-secondary-foreground/20 rounded-full p-0.5"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </Badge>
+            )}
+            {filters.languages && filters.languages.length > 0 && (
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <Languages className="h-3 w-3" />
+                {filters.languages.join(', ')}
+                <button
+                  onClick={() => onFiltersChange({ ...filters, languages: undefined })}
+                  className="ml-1 hover:bg-secondary-foreground/20 rounded-full p-0.5"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </Badge>
+            )}
+            {filters.wilayat && (
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                {filters.wilayat}
+                <button
+                  onClick={() => handleWilayatChange("all")}
                   className="ml-1 hover:bg-secondary-foreground/20 rounded-full p-0.5"
                 >
                   <X className="w-3 h-3" />

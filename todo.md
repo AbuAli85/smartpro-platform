@@ -1662,3 +1662,49 @@ The platform is stable, fully functional, and ready for users. Minor console war
 **Priority:** Critical - Blocking deployment
 **Timeline:** 30 minutes
 **Impact:** High - 268 TypeScript errors preventing clean build
+
+
+---
+
+## 🔴 CRITICAL - Deep Review Feedback (Jan 2, 2026 - External Review)
+
+### High Priority - User Experience Blockers
+- [x] Fix persistent "Install SmartPro" pop-up (add "don't show again" option, session storage)
+- [ ] Replace test/placeholder data from office listings and leaderboards with real/anonymized data
+- [x] Add pre-login indicators (lock icons, tooltips) for authenticated actions
+- [x] Fix jarring login redirect - add warning modal before external domain redirect
+- [ ] Display actual review text on office profiles (not just ratings)
+- [x] Fix empty "My Bookings" page - add call-to-action to browse offices and book services
+
+### Medium Priority - Feature Enhancements
+- [x] Add advanced filters to Sanad Offices: price range, languages spoken, office hours, distance/wilayat
+- [x] Add sorting options: by price, popularity, nearest location, completed services
+- [ ] Add document template sorting: by category, popularity, date added
+- [ ] Enhance office profiles: detailed descriptions, pricing ranges, photos, staff qualifications
+- [ ] Add review filtering/sorting by sentiment and date
+- [x] Improve filter UI: show active filter count, make filters more discoverable
+
+### Medium Priority - Form & Document Improvements
+- [ ] Add document template preview before requiring form submission
+- [ ] Add tooltips/context boxes for complex fields (Governorate, Wilayat, capital requirements)
+- [ ] Break lengthy document forms into multi-step wizard with progress indicator
+- [ ] Add progress saving for logged-in users on document forms
+- [ ] Add field examples and validation hints in real-time
+
+### Low Priority - User Education & Guidance
+- [ ] Create tutorials/FAQ section for booking process
+- [ ] Add FAQ for document requirements and legal context
+- [ ] Explain leaderboard scoring methodology (how scores are calculated)
+- [ ] Add contact channels (live chat/hotline) for user guidance
+- [ ] Add onboarding tour for first-time users
+
+### Low Priority - Polish & Accessibility
+- [ ] Improve language toggle visibility (English/Arabic) - make it more prominent
+- [ ] Publish privacy and data-usage policies (compliant with Omani laws)
+- [ ] Add user data control features (delete documents, account deletion)
+- [ ] Add security badges on payment and sensitive forms
+- [ ] Optimize images and loading performance (lazy loading, image compression)
+- [ ] Reduce skeleton screen display time on slow connections
+- [ ] Ensure high-contrast text for accessibility
+- [ ] Add screen-reader navigation support
+

@@ -117,7 +117,25 @@ export default function BookingsList() {
                 </CardHeader>
                 <CardContent className="py-12 text-center">
                   <Calendar className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">{t("bookings.noBookings")}</p>
+                  <p className="text-muted-foreground mb-6">{t("bookings.noBookings")}</p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                    <Button 
+                      onClick={() => setLocation('/offices')}
+                      size="lg"
+                      className="bg-[#003366] hover:bg-[#002244]"
+                    >
+                      <Building2 className="w-4 h-4 mr-2" />
+                      {t("bookings.browseOffices")}
+                    </Button>
+                    <Button 
+                      onClick={() => setLocation('/marketplace')}
+                      variant="outline"
+                      size="lg"
+                    >
+                      <FileText className="w-4 h-4 mr-2" />
+                      {t("bookings.requestService")}
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ) : (

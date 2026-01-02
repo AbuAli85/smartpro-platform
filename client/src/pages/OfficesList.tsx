@@ -67,6 +67,10 @@ export default function OfficesList() {
     minRating: advancedFilters.minRating,
     availableToday: advancedFilters.availableToday,
     availableThisWeek: advancedFilters.availableThisWeek,
+    priceMin: advancedFilters.priceMin,
+    priceMax: advancedFilters.priceMax,
+    languages: advancedFilters.languages,
+    wilayat: advancedFilters.wilayat,
   });
 
   // Pull-to-refresh functionality
@@ -89,6 +93,24 @@ export default function OfficesList() {
         return offices.sort((a, b) => a.officeName.localeCompare(b.officeName));
       case "reviews":
         return offices.sort((a, b) => (b.totalReviews || 0) - (a.totalReviews || 0));
+      case "price-low":
+        return offices.sort((a, b) => {
+          const priceA = parseFloat(a.basePrice || "999999");
+          const priceB = parseFloat(b.basePrice || "999999");
+          return priceA - priceB;
+        });
+      case "price-high":
+        return offices.sort((a, b) => {
+          const priceA = parseFloat(a.basePrice || "0");
+          const priceB = parseFloat(b.basePrice || "0");
+          return priceB - priceA;
+        });
+      case "popular":
+        return offices.sort((a, b) => {
+          const popularityA = (b.totalReviews || 0) * parseFloat(b.averageRating || "0");
+          const popularityB = (a.totalReviews || 0) * parseFloat(a.averageRating || "0");
+          return popularityB - popularityA;
+        });
       default:
         return offices;
     }
@@ -158,13 +180,16 @@ export default function OfficesList() {
           </Select>
           
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-full md:w-[180px] h-11">
-              <SelectValue placeholder={t("common.filter")} />
+            <SelectTrigger className="w-full md:w-[200px] h-11">
+              <SelectValue placeholder={t("common.sortBy")} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="rating">{t("offices.highestRated")}</SelectItem>
               <SelectItem value="reviews">{t("offices.mostReviews")}</SelectItem>
               <SelectItem value="name">{t("offices.nameAZ")}</SelectItem>
+              <SelectItem value="price-low">{t("offices.priceLowToHigh")}</SelectItem>
+              <SelectItem value="price-high">{t("offices.priceHighToLow")}</SelectItem>
+              <SelectItem value="popular">{t("offices.mostPopular")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
