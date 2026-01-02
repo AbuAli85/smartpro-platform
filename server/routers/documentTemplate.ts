@@ -292,7 +292,8 @@ export const documentTemplateRouter = router({
 
       if (!template.templateFileUrl) {
         // Return legacy variables if no DOCX file
-        return { placeholders: template.variables?.map(v => v.name) || [] };
+        const vars = template.variables;
+        return { placeholders: Array.isArray(vars) ? vars.map((v: any) => v.name) : [] };
       }
 
       // Download and extract placeholders from DOCX

@@ -158,7 +158,7 @@ export const chatRouter = router({
       );
       
       // Send file message
-      const message = await db.sendFileMessage({
+      const result = await db.sendFileMessage({
         conversationId: input.conversationId,
         senderId: ctx.user.id,
         senderType,
@@ -166,7 +166,7 @@ export const chatRouter = router({
         fileName,
       });
       
-      return { success: true, messageId: message.id, fileUrl };
+      return { success: true, messageId: result.id, fileUrl };
     }),
 
   // Mark messages as read

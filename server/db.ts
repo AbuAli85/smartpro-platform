@@ -29,6 +29,13 @@ import {
   securityAlerts,
   bookingReminders,
   bookingDocuments,
+  type User,
+  type InsertUser,
+  type SanadOffice,
+  type SanadOfficeStaff,
+  type SanadOfficeService,
+  type Booking,
+  type Review,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -3600,7 +3607,7 @@ export async function sendFileMessage(data: {
   
   const { chatMessages, chatConversations } = await import("../drizzle/schema");
   
-  const [message] = await db
+  const [result] = await db
     .insert(chatMessages)
     .values({
       conversationId: data.conversationId,
@@ -3617,12 +3624,12 @@ export async function sendFileMessage(data: {
   await db
     .update(chatConversations)
     .set({
-      lastMessageAt: new Date().toISOString().toISOString().toISOString(),
+      lastMessageAt: new Date().toISOString(),
       lastMessagePreview: `📎 ${data.fileName}`,
     })
     .where(eq(chatConversations.id, data.conversationId));
   
-  return message;
+  return result;
 }
 
 // Chat Export

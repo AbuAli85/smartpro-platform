@@ -1,4 +1,4 @@
-import { mysqlTable, mysqlSchema, AnyMySqlColumn, index, int, varchar, json, text, timestamp, mysqlEnum, decimal, foreignKey, tinyint, date } from "drizzle-orm/mysql-core"
+import { mysqlTable, mysqlSchema, AnyMySqlColumn, index, int, varchar, json, text, timestamp, mysqlEnum, decimal, foreignKey, tinyint, date, InferSelectModel, InferInsertModel } from "drizzle-orm/mysql-core"
 import { sql } from "drizzle-orm"
 
 export const activeSessions = mysqlTable("active_sessions", {
@@ -1167,8 +1167,29 @@ export const bookingDocuments = mysqlTable("booking_documents", {
 	notes: text(),
 },
 (table) => [
-	index("booking_id_idx").on(table.bookingId),
-	index("office_id_idx").on(table.officeId),
-	index("status_idx").on(table.status),
-	index("uploaded_at_idx").on(table.uploadedAt),
-]);
+		index("booking_id_idx").on(table.bookingId),
+		index("office_id_idx").on(table.officeId),
+		index("status_idx").on(table.status),
+		index("uploaded_at_idx").on(table.uploadedAt),
+	]);
+
+
+// Type exports for use in application code
+export type User = InferSelectModel<typeof users>;
+export type InsertUser = InferInsertModel<typeof users>;
+export type SanadOffice = InferSelectModel<typeof sanadOffices>;
+export type InsertSanadOffice = InferInsertModel<typeof sanadOffices>;
+export type SanadOfficeStaff = InferSelectModel<typeof sanadOfficeStaff>;
+export type InsertSanadOfficeStaff = InferInsertModel<typeof sanadOfficeStaff>;
+export type SanadOfficeService = InferSelectModel<typeof sanadOfficeServices>;
+export type InsertSanadOfficeService = InferInsertModel<typeof sanadOfficeServices>;
+export type Booking = InferSelectModel<typeof bookings>;
+export type InsertBooking = InferInsertModel<typeof bookings>;
+export type Review = InferSelectModel<typeof reviews>;
+export type InsertReview = InferInsertModel<typeof reviews>;
+export type DocumentTemplate = InferSelectModel<typeof documentTemplates>;
+export type InsertDocumentTemplate = InferInsertModel<typeof documentTemplates>;
+export type ServiceRequest = InferSelectModel<typeof serviceRequests>;
+export type InsertServiceRequest = InferInsertModel<typeof serviceRequests>;
+export type ServiceBid = InferSelectModel<typeof serviceBids>;
+export type InsertServiceBid = InferInsertModel<typeof serviceBids>;

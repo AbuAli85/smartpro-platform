@@ -10,6 +10,10 @@ interface LanguageContextType {
   setLanguage: (lang: Language) => void;
   t: (key: string) => string;
   dir: "ltr" | "rtl";
+  isRTL: boolean;
+  currentLanguage: Language;
+  isArabic: boolean;
+  formatRating: (rating: number) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -2279,9 +2283,24 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   const dir = language === "ar" ? "rtl" : "ltr";
+  const isRTL = language === "ar";
+  const currentLanguage = language;
+  const isArabic = language === "ar";
+  const formatRating = (rating: number): string => {
+    return rating.toFixed(1);
+  };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, dir }}>
+    <LanguageContext.Provider value={{ 
+      language, 
+      setLanguage, 
+      t, 
+      dir, 
+      isRTL, 
+      currentLanguage, 
+      isArabic, 
+      formatRating 
+    }}>
       {children}
     </LanguageContext.Provider>
   );
