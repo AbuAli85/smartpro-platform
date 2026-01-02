@@ -1206,135 +1206,13 @@ export const translations: Record<Language, Record<string, string>> = {
   },
   ar: {
     // Navigation
-    "nav.home": "الرئيسية",
-    "nav.sanadOffices": "مكاتب سند",
-    "nav.documentTemplates": "قوالب المستندات",
-    "nav.myBookings": "حجوزاتي",
-    "nav.myOffices": "مكاتبي",
-    "nav.ownerDashboard": "لوحة المالك",
-    "nav.chatInbox": "صندوق الدردشة",
-    "nav.chatAnalytics": "تحليلات الدردشة",
-    "nav.cannedResponses": "الردود الجاهزة",
-    "nav.staffManagement": "إدارة الموظفين",
-    "nav.staffPerformance": "أداء الموظفين",
-    "nav.followUpSettings": "إعدادات المتابعة",
-    "nav.loyaltyRewards": "مكافآت الولاء",
-    "nav.referFriends": "إحالة الأصدقاء",
-    "nav.analytics": "التحليلات",
-    "nav.userProfile": "الملف الشخصي",
-    "nav.contentTranslation": "ترجمة المحتوى",
-    "nav.notificationPreferences": "تفضيلات الإشعارات",
-    "nav.adminDashboard": "لوحة الإدارة",
-    "nav.adminAnalytics": "تحليلات الإدارة",
-    "nav.marketplace": "تصفح السوق",
-    "nav.profile": "الملف الشخصي",
-    "nav.logout": "تسجيل الخروج",
-    "nav.myServiceRequests": "طلبات الخدمة",
-    "nav.browseMarketplace": "تصفح السوق",
-    "nav.officeAnalytics": "تحليلات المكتب",
-    "nav.userManagement": "إدارة المستخدمين",
-    "nav.officeVerification": "التحقق من المكاتب",
-    "nav.translationRequests": "طلبات الترجمة",
-    "nav.translationAnalytics": "تحليلات الترجمة",
-    "nav.regionalStatistics": "الإحصائيات الإقليمية",
-    "nav.leaderboards": "لوحات المتصدرين الإقليمية",
-    "nav.translationQuality": "جودة الترجمة",
-    "nav.reviewQueue": "قائمة المراجعة",
-    "nav.batchProcessing": "المعالجة الدفعية",
-    "nav.translatorTraining": "تدريب المترجمين",
-    "nav.securityDashboard": "لوحة الأمان",
-    "nav.loginAnalytics": "تحليلات تسجيل الدخول",
-    "nav.clients": "العملاء",
-    "nav.officeMessages": "رسائل المكتب",
-    "nav.translationManagement": "إدارة الترجمة",
-    "nav.languageSettings": "إعدادات اللغة",
     
     // Sidebar section headers
-    "SIDEBAR.SECTION.MAIN": "القائمة الرئيسية",
-    "SIDEBAR.SECTION.MYSERVICES": "خدماتي",
-    "SIDEBAR.SECTION.OFFICEMANAGEMENT": "إدارة المكتب",
-    "SIDEBAR.SECTION.ADMIN": "الإدارة",
-    "SIDEBAR.SECTION.TRANSLATION": "الترجمة",
-    "SIDEBAR.SECTION.LOYALTY": "الولاء",
-    "SIDEBAR.SECTION.SETTINGS": "الإعدادات",
     
     // Home page
-    "home.hero.title": "كل ما تحتاجه لخدمات الأعمال",
-    "home.hero.subtitle": "منصة موحدة تربط المشاريع الصغيرة والمتوسطة بمكاتب سند المحترفة. أنجز تراخيص عملك وتصاريحك وتسجيلاتك بشكل أسرع.",
-    "home.hero.myBookings": "حجوزاتي",
-    "home.hero.browseServices": "تصفح الخدمات",
-    "home.hero.badge": "مستقبل خدمات الأعمال",
-    "home.hero.registerOffice": "سجل مكتبك",
-    "home.hero.impactStatement": "تبسيط الأعمال، تعزيز التعمين، وتأمين مستقبل التوظيف العماني.",
-    "home.stats.avgRating": "متوسط التقييم",
-    "home.stats.servicesCompleted": "الخدمات المكتملة",
-    "home.stats.verifiedOffices": "المكاتب الموثقة",
-    "home.browseOffices": "تصفح المكاتب",
-    "home.findOffices": "ابحث عن مكاتب",
     
     // Client Management
     
-    // Regions
-    "region.all": "جميع عمان",
-    "region.allOman": "جميع عمان",
-    "region.muscat": "مسقط",
-    "region.dhofar": "ظفار",
-    "region.batinah": "الباطنة",
-    "region.sharqiyah": "الشرقية",
-    "region.dakhliyah": "الداخلية",
-    "region.selectRegion": "اختر المنطقة",
-    "region.yourRegion": "منطقتك",
-    "region.showingOfficesIn": "عرض المكاتب في",
-    "region.showAllRegions": "عرض جميع المناطق",
-    "region.filteringByRegion": "التصفية حسب المنطقة المحددة",
-    
-    // Affordability Section
-    "home.affordability.subtitle": "تسعير ذكي",
-    "home.affordability.title": "خدمات أعمال ميسورة لكل مشروع صغير ومتوسط",
-    "home.affordability.description": "تقلل منصة سمارت برو الرقمية من التكاليف العامة، مما يسمح لمكاتب سند بتقديم أسعار تنافسية. وفر حتى 73٪ مقارنة بمقدمي الخدمات التقليديين مع الحفاظ على أعلى معايير الجودة.",
-    
-    // Services
-    "services.popularInRegion": "الخدمات الشائعة في",
-    "services.businessRegistration": "تسجيل الأعمال",
-    "services.businessRegistrationDesc": "سجل عملك واحصل على التراخيص التجارية",
-    "services.legalServices": "الخدمات القانونية",
-    "services.legalServicesDesc": "الاستشارات القانونية وإعداد المستندات",
-    "services.accountingTax": "المحاسبة والضرائب",
-    "services.accountingTaxDesc": "تقديم الضرائب والمحاسبة والخدمات المالية",
-    "services.viewAllServices": "عرض جميع الخدمات",
-    "home.popularServices": "الخدمات الشائعة",
-    "home.popularServicesSubtitle": "اكتشف خدمات الأعمال الأكثر طلبًا في منطقتك",
-    
-    // Recommendations
-    "recommendations.title": "المكاتب الموصى بها",
-    "recommendations.subtitle": "مكاتب مختارة بعناية بناءً على الأداء والتقييمات",
-    "recommendations.viewOffice": "عرض المكتب",
-    "recommendations.reviews": "تقييم",
-    "recommendations.completedBookings": "حجز مكتمل",
-    
-    // Common
-    "common.connected": "متصل",
-    "common.notNow": "ليس الآن",
-    "common.loading": "جاري التحميل...",
-    "common.error": "خطأ",
-    "common.success": "نجاح",
-    "common.cancel": "إلغاء",
-    "common.save": "حفظ",
-    "common.delete": "حذف",
-    "common.edit": "تعديل",
-    "common.view": "عرض",
-    "common.close": "إغلاق",
-    "common.back": "رجوع",
-    "common.next": "التالي",
-    "common.submit": "إرسال",
-    "common.search": "بحث",
-    "common.filter": "تصفية",
-    "common.sort": "ترتيب",
-    "common.reset": "إعادة تعيين",
-    "common.apply": "تطبيق",
-    "common.confirm": "تأكيد",
-    "common.yes": "نعم",
-    "common.no": "لا",
 
     // Regional Statistics
     
@@ -1358,24 +1236,8 @@ export const translations: Record<Language, Record<string, string>> = {
     // Leaderboards
     
     // How It Works Section
-    "home.how.badge": "عملية بسيطة",
-    "home.how.title": "كيف يعمل",
-    "home.how.subtitle": "أنجز خدمات عملك في 3 خطوات سهلة",
-    "home.how.step1.title": "تصفح وقارن",
-    "home.how.step1.desc": "ابحث عن الخدمات، قارن الأسعار، واقرأ التقييمات من العملاء الموثقين",
-    "home.how.step2.title": "احجز وادفع",
-    "home.how.step2.desc": "اختر مكتبك المفضل، اختر موعدًا، وقم بالدفع الآمن عبر الإنترنت",
-    "home.how.step3.title": "تتبع واستلم",
-    "home.how.step3.desc": "راقب التقدم في الوقت الفعلي واستلم مستنداتك المكتملة رقميًا",
     
     // CTA Section
-    "home.cta.title": "هل أنت مكتب سند؟",
-    "home.cta.subtitle": "انضم إلى منصة سمارت برو وتواصل مع آلاف المشاريع الصغيرة والمتوسطة التي تبحث عن خدماتك. نمّ عملك مع سوقنا الرقمي.",
-    "home.cta.benefit1": "تسجيل مجاني",
-    "home.cta.benefit2": "مزيد من العملاء",
-    "home.cta.benefit3": "أدوات رقمية",
-    "home.cta.benefit4": "دعم 24/7",
-    "home.cta.button": "سجل مكتبك الآن",
     
     // Footer
     
@@ -1383,27 +1245,6 @@ export const translations: Record<Language, Record<string, string>> = {
     // Offices Page (Additional Keys)
     
     // Feature Cards Section
-    "home.featureCards.sectionBadge": "ميزات المنصة",
-    "home.featureCards.sectionTitle": "لماذا تختار سمارت برو؟",
-    "home.featureCards.sectionSubtitle": "كل ما تحتاجه لإدارة خدمات الأعمال في مكان واحد",
-    "home.featureCards.verifiedOffices": "مكاتب سند موثقة",
-    "home.featureCards.verifiedOfficesDesc": "تصفح مئات المكاتب المحترفة الموثقة مع أسعار شفافة وتقييمات",
-    "home.featureCards.exploreOffices": "استكشف المكاتب",
-    "home.featureCards.marketplace": "سوق الخدمات",
-    "home.featureCards.marketplaceDesc": "انشر طلبات الخدمة واحصل على عروض تنافسية من مكاتب متعددة",
-    "home.featureCards.browseMarketplace": "تصفح السوق",
-    "home.featureCards.documentTemplates": "قوالب المستندات",
-    "home.featureCards.documentTemplatesDesc": "احصل على قوالب جاهزة للاستخدام للعقود والطلبات ومستندات الأعمال",
-    "home.featureCards.viewTemplates": "عرض القوالب",
-    "home.featureCards.easyBooking": "حجز سهل",
-    "home.featureCards.easyBookingDesc": "جدول المواعيد، تتبع التقدم، وأدر جميع حجوزاتك في لوحة واحدة",
-    "home.featureCards.myBookings": "حجوزاتي",
-    "home.featureCards.realtimeChat": "دردشة فورية",
-    "home.featureCards.realtimeChatDesc": "تواصل مباشرة مع المكاتب، احصل على تحديثات فورية، وحل الاستفسارات بسرعة",
-    "home.featureCards.openChat": "فتح الدردشة",
-    "home.featureCards.loyaltyRewards": "مكافآت الولاء",
-    "home.featureCards.loyaltyRewardsDesc": "اكسب نقاطًا مع كل حجز واستبدلها بخصومات على الخدمات المستقبلية",
-    "home.featureCards.viewRewards": "عرض المكافآت",
     
     // Common
 
@@ -1443,17 +1284,6 @@ export const translations: Record<Language, Record<string, string>> = {
         // Notifications
     
     // Settings
-    "settings.languageSettings": "إعدادات اللغة",
-    "settings.languageSettingsDesc": "اختر لغتك المفضلة لواجهة المنصة",
-    "settings.preferredLanguage": "اللغة المفضلة",
-    "settings.preferredLanguageDesc": "اختر لغتك المفضلة للواجهة",
-    "settings.selectLanguage": "اختر اللغة",
-    "settings.languageUpdated": "تم تحديث تفضيل اللغة بنجاح",
-    "settings.languageUpdateFailed": "فشل تحديث تفضيل اللغة",
-    "settings.languageInfo": "حول إعدادات اللغة",
-    "settings.languageInfoPoint1": "سيتم حفظ تفضيل اللغة في حسابك",
-    "settings.languageInfoPoint2": "ستتحدث الواجهة فورًا بعد الحفظ",
-    "settings.languageInfoPoint3": "يمكنك التبديل بين العربية والإنجليزية في أي وقت",
     
     // Profile
     
