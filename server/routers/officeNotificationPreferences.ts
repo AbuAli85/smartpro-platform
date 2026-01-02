@@ -31,7 +31,7 @@ export const officeNotificationPreferencesRouter = router({
           maxBudget: 999999,
           emailNotifications: true,
           inAppNotifications: true,
-          isActive: true,
+          isActive: 1,
         };
       }
 
@@ -49,7 +49,7 @@ export const officeNotificationPreferencesRouter = router({
         maxBudget: z.number().min(0),
         emailNotifications: z.boolean(),
         inAppNotifications: z.boolean(),
-        isActive: z.boolean(),
+        isActive: z.number(),
       })
     )
     .mutation(async ({ ctx, input }) => {

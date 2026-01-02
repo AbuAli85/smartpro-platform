@@ -408,7 +408,7 @@ export async function getSanadOfficeServices(officeId: number) {
   return await db
     .select()
     .from(sanadOfficeServices)
-    .where(and(eq(sanadOfficeServices.officeId, officeId), eq(sanadOfficeServices.isActive, true)))
+    .where(and(eq(sanadOfficeServices.officeId, officeId), eq(sanadOfficeServices.isActive, 1)))
     .orderBy(desc(sanadOfficeServices.createdAt));
 }
 
@@ -441,7 +441,7 @@ export async function addOfficeService(data: {
   descriptionAr?: string;
   price: number;
   estimatedDays: number;
-  isActive: boolean;
+  isActive: number;
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -473,7 +473,7 @@ export async function updateOfficeService(data: {
   descriptionAr?: string;
   price?: number;
   estimatedDays?: number;
-  isActive?: boolean;
+  isActive?: number;
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -524,7 +524,7 @@ export async function listDocumentTemplates(filters: {
   if (!db) return { templates: [], total: 0 };
 
   let query = db.select().from(documentTemplates);
-  let conditions: any[] = [eq(documentTemplates.isActive, true)];
+  let conditions: any[] = [eq(documentTemplates.isActive, 1)];
 
   if (filters.category) {
     conditions.push(eq(documentTemplates.category, filters.category));
@@ -827,7 +827,7 @@ export async function getOfficeAvailability(officeId: number) {
     .from(officeAvailability)
     .where(and(
       eq(officeAvailability.officeId, officeId),
-      eq(officeAvailability.isActive, true)
+      eq(officeAvailability.isActive, 1)
     ))
     .orderBy(officeAvailability.dayOfWeek);
 }
@@ -863,7 +863,7 @@ export async function getAvailableTimeSlots(officeId: number, date: Date) {
     .where(and(
       eq(officeAvailability.officeId, officeId),
       eq(officeAvailability.dayOfWeek, dayOfWeek),
-      eq(officeAvailability.isActive, true)
+      eq(officeAvailability.isActive, 1)
     ))
     .limit(1);
   
@@ -1034,7 +1034,7 @@ export async function createOfficeAvailability(data: {
   startTime: string;
   endTime: string;
   slotDuration: number;
-  isActive: boolean;
+  isActive: number;
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -2943,7 +2943,7 @@ export async function getOfficeStaff(officeId: number) {
     .leftJoin(users, eq(officeStaff.userId, users.id))
     .where(and(
       eq(officeStaff.officeId, officeId),
-      eq(officeStaff.isActive, true)
+      eq(officeStaff.isActive, 1)
     ))
     .orderBy(desc(officeStaff.createdAt));
 }
@@ -2968,7 +2968,7 @@ export async function addOfficeStaff(data: {
 
 export async function updateOfficeStaff(staffId: number, data: {
   role?: "owner" | "manager" | "agent";
-  isActive?: boolean;
+  isActive?: number;
 }) {
   const db = await getDb();
   if (!db) return null;
@@ -3035,7 +3035,7 @@ export async function getAvailableStaff(officeId: number) {
     .leftJoin(users, eq(officeStaff.userId, users.id))
     .where(and(
       eq(officeStaff.officeId, officeId),
-      eq(officeStaff.isActive, true),
+      eq(officeStaff.isActive, 1),
       eq(officeStaff.availabilityStatus, "online")
     ))
     .orderBy(desc(officeStaff.lastActiveAt));
@@ -3056,7 +3056,7 @@ export async function getStaffWorkload(officeId: number) {
     .from(officeStaff)
     .where(and(
       eq(officeStaff.officeId, officeId),
-      eq(officeStaff.isActive, true)
+      eq(officeStaff.isActive, 1)
     ));
   
   // Count active conversations per staff member
@@ -3101,7 +3101,7 @@ export async function getStaffPerformanceMetrics(officeId: number, staffUserId?:
     .leftJoin(users, eq(officeStaff.userId, users.id))
     .where(and(
       eq(officeStaff.officeId, officeId),
-      eq(officeStaff.isActive, true),
+      eq(officeStaff.isActive, 1),
       staffUserId ? eq(officeStaff.userId, staffUserId) : sql`1=1`
     ));
   
@@ -3206,7 +3206,7 @@ export async function getStaffPerformanceTrends(officeId: number, days: number =
     .leftJoin(users, eq(officeStaff.userId, users.id))
     .where(and(
       eq(officeStaff.officeId, officeId),
-      eq(officeStaff.isActive, true)
+      eq(officeStaff.isActive, 1)
     ));
   
   // Generate daily data points
@@ -3601,7 +3601,7 @@ export async function sendFileMessage(data: {
   senderType: "user" | "office";
   fileUrl: string;
   fileName: string;
-}) {
+}): Promise<{ id: number }> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
@@ -4854,7 +4854,7 @@ export async function getOfficeBundles(officeId: number) {
   const bundles = await db
     .select()
     .from(serviceBundles)
-    .where(and(eq(serviceBundles.officeId, officeId), eq(serviceBundles.isActive, true)))
+    .where(and(eq(serviceBundles.officeId, officeId), eq(serviceBundles.isActive, 1)))
     .orderBy(desc(serviceBundles.createdAt));
 
   // For each bundle, fetch services
@@ -4925,7 +4925,7 @@ export async function updateServiceBundle(
     discountPercentage: string;
     validFrom: Date;
     validUntil: Date;
-    isActive: boolean;
+    isActive: number;
   }>
 ) {
   const db = await getDb();
@@ -4965,7 +4965,7 @@ export async function getAllActiveBundles() {
     })
     .from(serviceBundles)
     .leftJoin(sanadOffices, eq(serviceBundles.officeId, sanadOffices.id))
-    .where(eq(serviceBundles.isActive, true))
+    .where(eq(serviceBundles.isActive, 1))
     .orderBy(desc(serviceBundles.createdAt));
 
   // For each bundle, fetch services
@@ -6001,7 +6001,7 @@ export async function getActiveSessions(userId: number): Promise<ActiveSession[]
   const sessions = await db
     .select()
     .from(activeSessions)
-    .where(and(eq(activeSessions.userId, userId), eq(activeSessions.isActive, true)))
+    .where(and(eq(activeSessions.userId, userId), eq(activeSessions.isActive, 1)))
     .orderBy(desc(activeSessions.lastActive));
 
   return sessions;
@@ -6036,7 +6036,7 @@ export async function revokeAllOtherSessions(userId: number, currentSessionId: s
       and(
         eq(activeSessions.userId, userId),
         ne(activeSessions.sessionId, currentSessionId),
-        eq(activeSessions.isActive, true)
+        eq(activeSessions.isActive, 1)
       )
     );
 
@@ -6066,7 +6066,7 @@ export async function cleanupExpiredSessions(): Promise<void> {
   await db
     .update(activeSessions)
     .set({ isActive: 0 })
-    .where(and(lt(activeSessions.expiresAt, new Date()), eq(activeSessions.isActive, true)));
+    .where(and(lt(activeSessions.expiresAt, new Date()), eq(activeSessions.isActive, 1)));
 }
 
 // ============================================================================
@@ -6636,7 +6636,7 @@ export async function upsertOfficeNotificationPreferences(data: {
   maxBudget: number;
   emailNotifications: boolean;
   inAppNotifications: boolean;
-  isActive: boolean;
+  isActive: number;
 }) {
   const db = await getDb();
   if (!db) return;

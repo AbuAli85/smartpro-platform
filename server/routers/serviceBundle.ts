@@ -90,7 +90,7 @@ export const serviceBundleRouter = router({
         discountPercentage: z.number().min(1).max(50).optional(),
         validFrom: z.string().optional(),
         validUntil: z.string().optional(),
-        isActive: z.boolean().optional(),
+        isActive: z.number().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {

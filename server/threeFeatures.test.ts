@@ -44,7 +44,7 @@ describe("Advanced Filters, Analytics, and SMS Features", () => {
       description: "Test service",
       price: "100.000",
       estimatedDeliveryDays: 5,
-      isActive: true,
+      isActive: 1,
     });
 
     // Create test booking (skip for now - test will use existing bookings)

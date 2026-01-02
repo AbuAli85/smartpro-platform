@@ -78,7 +78,7 @@ describe("Staff Management", () => {
       if (!testStaffId) return;
 
       const result = await db.updateOfficeStaff(testStaffId, {
-        isActive: false,
+        isActive: 0,
       });
 
       expect(result).toBeDefined();

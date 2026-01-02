@@ -70,7 +70,7 @@ export const chatAssignmentRouter = router({
     .input(z.object({
       staffId: z.number(),
       role: z.enum(["owner", "manager", "agent"]).optional(),
-      isActive: z.boolean().optional(),
+      isActive: z.number().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
       return await db.updateOfficeStaff(input.staffId, {

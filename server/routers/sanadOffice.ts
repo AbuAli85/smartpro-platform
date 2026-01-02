@@ -273,7 +273,7 @@ export const sanadOfficeRouter = router({
         priceType: input.priceType,
         estimatedDeliveryDays: input.estimatedDeliveryDays,
         currency: "OMR",
-        isActive: true,
+        isActive: 1,
       });
 
       await logActivity({
@@ -323,7 +323,7 @@ export const sanadOfficeRouter = router({
         startTime: z.string(),
         endTime: z.string(),
         slotDuration: z.number(),
-        isActive: z.boolean(),
+        isActive: z.number(),
       })
     )
     .mutation(async ({ input }) => {
@@ -486,7 +486,7 @@ export const sanadOfficeRouter = router({
       price: z.string().optional(),
       priceType: z.enum(["fixed", "hourly", "custom"]).optional(),
       estimatedDeliveryDays: z.number().optional(),
-      isActive: z.boolean().optional(),
+        isActive: z.number().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
       const { serviceId, ...updates } = input;
@@ -497,7 +497,7 @@ export const sanadOfficeRouter = router({
   deleteService: protectedProcedure
     .input(z.object({ serviceId: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      await db.updateSanadOfficeService(input.serviceId, { isActive: false });
+      await db.updateSanadOfficeService(input.serviceId, { isActive: 0 });
       return { success: true };
     }),
 

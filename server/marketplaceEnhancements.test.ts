@@ -120,7 +120,7 @@ describe("Marketplace Enhancements", () => {
         maxBudget: 5000,
         emailNotifications: true,
         inAppNotifications: true,
-        isActive: true,
+        isActive: 1,
       });
 
       // Retrieve preferences
@@ -135,7 +135,7 @@ describe("Marketplace Enhancements", () => {
       expect(prefs.maxBudget).toBe(5000);
       expect(prefs.emailNotifications).toBe(true);
       expect(prefs.inAppNotifications).toBe(true);
-      expect(prefs.isActive).toBe(true);
+      expect(prefs.isActive).toBe(1);
     });
 
     it("should match offices based on notification preferences", async () => {
@@ -148,7 +148,7 @@ describe("Marketplace Enhancements", () => {
         maxBudget: 2000,
         emailNotifications: true,
         inAppNotifications: true,
-        isActive: true,
+        isActive: 1,
       });
 
       // Get matching offices for a request
@@ -174,7 +174,7 @@ describe("Marketplace Enhancements", () => {
         maxBudget: 2000,
         emailNotifications: true,
         inAppNotifications: true,
-        isActive: true,
+        isActive: 1,
       });
 
       // Try to match with request outside budget range

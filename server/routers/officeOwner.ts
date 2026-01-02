@@ -209,7 +209,7 @@ export const officeOwnerRouter = router({
       descriptionAr: z.string().max(1000).optional(),
       price: z.number().min(0),
       estimatedDays: z.number().min(1),
-      isActive: z.boolean().default(true),
+      isActive: z.number().default(1),
     }))
     .mutation(async ({ input, ctx }) => {
       // Verify ownership
@@ -236,7 +236,7 @@ export const officeOwnerRouter = router({
       descriptionAr: z.string().max(1000).optional(),
       price: z.number().min(0).optional(),
       estimatedDays: z.number().min(1).optional(),
-      isActive: z.boolean().optional(),
+      isActive: z.number().optional(),
     }))
     .mutation(async ({ input, ctx }) => {
       // Get service to verify ownership

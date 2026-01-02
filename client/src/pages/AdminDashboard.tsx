@@ -30,8 +30,20 @@ import { useFormatNumber } from "@/hooks/useFormatNumber";
 export default function AdminDashboard() {
   const { t } = useLanguage();
   const { formatNumber } = useFormatNumber();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
+
+  // Wait for auth to load
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#003366] mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Redirect if not admin
   if (!user || user.role !== "admin") {

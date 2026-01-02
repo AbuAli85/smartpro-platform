@@ -26,7 +26,7 @@ export const campaignsRouter = router({
         
         // Build conditions
         const conditions = [
-          eq(regionalCampaigns.isActive, true),
+          eq(regionalCampaigns.isActive, 1),
           lte(regionalCampaigns.startDate, now),
           gte(regionalCampaigns.endDate, now),
         ];
@@ -214,6 +214,8 @@ export const campaignsRouter = router({
       try {
         const result = await db.insert(regionalCampaigns).values({
           ...input,
+          startDate: input.startDate.toISOString(),
+          endDate: input.endDate.toISOString(),
           createdBy: ctx.user!.id,
         });
 
@@ -234,7 +236,7 @@ export const campaignsRouter = router({
     .input(
       z.object({
         id: z.number(),
-        isActive: z.boolean().optional(),
+        isActive: z.number().optional(),
         priority: z.number().optional(),
       })
     )

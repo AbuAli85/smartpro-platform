@@ -24,13 +24,24 @@ export function ProtectedRoute({
   fallbackPath = "/",
   showUnauthorized = true,
 }: ProtectedRouteProps) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { hasPermission, hasAnyPermission: checkAnyPermission, hasAllPermissions: checkAllPermissions } = useRoleAccess();
+
+  // Wait for auth to load
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#003366] mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Not logged in - redirect to home
   if (!user) {
-    return <Redirect to={fallbackPath} />;
-  }
+    return <Redirect to={fallbackPath} />;}
 
   // Check permissions
   let hasAccess = true;
