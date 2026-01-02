@@ -458,8 +458,8 @@ export async function addOfficeService(data: {
       price: data.price.toString(),
       estimatedDeliveryDays: data.estimatedDays,
       isActive: data.isActive,
-      createdAt: new Date().toISOString().toISOString().toISOString(),
-      updatedAt: new Date().toISOString().toISOString().toISOString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     });
 
   return { success: true };
@@ -479,7 +479,7 @@ export async function updateOfficeService(data: {
   if (!db) throw new Error("Database not available");
 
   const updateData: any = {
-    updatedAt: new Date().toISOString().toISOString().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 
   if (data.serviceName !== undefined) updateData.serviceName = data.serviceName;
@@ -1118,7 +1118,7 @@ export async function upsertOfficeAvailability(data: {
         endTime: data.endTime,
         slotDuration: data.slotDuration,
         isActive: data.isAvailable ? 1 : 0,
-        updatedAt: new Date().toISOString().toISOString().toISOString(),
+        updatedAt: new Date().toISOString(),
       })
       .where(eq(officeAvailability.id, existing.id));
 
@@ -1134,8 +1134,8 @@ export async function upsertOfficeAvailability(data: {
         endTime: data.endTime,
         slotDuration: data.slotDuration,
         isActive: data.isAvailable ? 1 : 0,
-        createdAt: new Date().toISOString().toISOString().toISOString(),
-        updatedAt: new Date().toISOString().toISOString().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       });
 
     return { success: true };
@@ -1159,7 +1159,7 @@ export async function updateOfficeInfo(data: {
   if (!db) throw new Error("Database not available");
 
   const updateData: any = {
-    updatedAt: new Date().toISOString().toISOString().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 
   if (data.officeName) updateData.officeName = data.officeName;
@@ -1429,8 +1429,8 @@ export async function getUserLoyalty(userId: number) {
       totalPoints: 0,
       availablePoints: 0,
       redeemedPoints: 0,
-      createdAt: new Date().toISOString().toISOString().toISOString(),
-      updatedAt: new Date().toISOString().toISOString().toISOString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
   }
 
@@ -1619,7 +1619,7 @@ export async function trackReferral(referralCode: string, newUserId: number): Pr
       .update(referrals)
       .set({
         referredId: newUserId,
-        updatedAt: new Date().toISOString().toISOString().toISOString(),
+        updatedAt: new Date().toISOString(),
       })
       .where(eq(referrals.id, referral[0].id));
     
@@ -1662,8 +1662,8 @@ export async function completeReferral(referredUserId: number, bookingId: number
         status: "completed",
         pointsAwarded: 1,
         firstBookingId: bookingId,
-        completedAt: new Date().toISOString().toISOString().toISOString(),
-        updatedAt: new Date().toISOString().toISOString().toISOString(),
+        completedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       })
       .where(eq(referrals.id, ref.id));
     
@@ -1812,7 +1812,7 @@ export async function markNotificationAsRead(notificationId: number) {
     .update(notifications)
     .set({
       isRead: 1,
-      readAt: new Date().toISOString().toISOString().toISOString(),
+      readAt: new Date().toISOString(),
     })
     .where(eq(notifications.id, notificationId));
   
@@ -1830,7 +1830,7 @@ export async function markAllNotificationsAsRead(userId: number) {
     .update(notifications)
     .set({
       isRead: 1,
-      readAt: new Date().toISOString().toISOString().toISOString(),
+      readAt: new Date().toISOString(),
     })
     .where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)));
   
@@ -2071,7 +2071,7 @@ export async function markFollowupAsSent(followupId: number) {
   if (!database) throw new Error("Database not initialized");
   await database
     .update(scheduledFollowups)
-    .set({ status: "sent", sentAt: new Date().toISOString().toISOString().toISOString() })
+    .set({ status: "sent", sentAt: new Date().toISOString() })
     .where(eq(scheduledFollowups.id, followupId));
 }
 
@@ -2114,7 +2114,7 @@ export async function saveOfficePerformanceMetrics(metrics: {
     .set({
       performanceScore: metrics.compositeScore.toString(),
       performanceRank: metrics.rank,
-      updatedAt: new Date().toISOString().toISOString().toISOString(),
+      updatedAt: new Date().toISOString(),
     })
     .where(eq(sanadOffices.id, metrics.officeId));
 
@@ -2327,7 +2327,7 @@ export async function toggleOfficeStatus(
     .update(sanadOffices)
     .set({ 
       status: isAvailable ? "active" : "inactive",
-      updatedAt: new Date().toISOString().toISOString().toISOString()
+      updatedAt: new Date().toISOString()
     })
     .where(eq(sanadOffices.id, officeId));
     
@@ -2377,8 +2377,8 @@ export async function addOwnerResponseToReview(
     .update(reviews)
     .set({ 
       responseText: response,
-      respondedAt: new Date().toISOString().toISOString().toISOString(),
-      updatedAt: new Date().toISOString().toISOString().toISOString()
+      respondedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     })
     .where(eq(reviews.id, reviewId));
     
@@ -2597,7 +2597,7 @@ export async function createChatMessage(data: {
   if (data.senderType === "office") {
     await db.update(chatConversations)
       .set({
-        lastMessageAt: new Date().toISOString().toISOString().toISOString(),
+        lastMessageAt: new Date().toISOString(),
         lastMessagePreview: data.message.substring(0, 255),
         unreadByUser: sql`${chatConversations.unreadByUser} + 1`,
       })
@@ -2605,7 +2605,7 @@ export async function createChatMessage(data: {
   } else {
     await db.update(chatConversations)
       .set({
-        lastMessageAt: new Date().toISOString().toISOString().toISOString(),
+        lastMessageAt: new Date().toISOString(),
         lastMessagePreview: data.message.substring(0, 255),
         unreadByOffice: sql`${chatConversations.unreadByOffice} + 1`,
       })
@@ -3008,7 +3008,7 @@ export async function updateStaffAvailability(staffId: number, status: "online" 
     .update(officeStaff)
     .set({ 
       availabilityStatus: status,
-      lastActiveAt: new Date().toISOString().toISOString().toISOString(),
+      lastActiveAt: new Date().toISOString(),
     })
     .where(eq(officeStaff.id, staffId));
   
@@ -3581,7 +3581,7 @@ export async function sendMessage(data: {
   await db
     .update(chatConversations)
     .set({
-      lastMessageAt: new Date().toISOString().toISOString().toISOString(),
+      lastMessageAt: new Date().toISOString(),
       lastMessagePreview: data.message.substring(0, 100),
     })
     .where(eq(chatConversations.id, data.conversationId));
@@ -4017,7 +4017,7 @@ export async function updateTranslationRequestStatus(
     .set({
       status,
       reviewedBy,
-      reviewedAt: new Date().toISOString().toISOString().toISOString(),
+      reviewedAt: new Date().toISOString(),
       reviewNotes,
     })
     .where(eq(translationRequests.id, id));
@@ -4035,7 +4035,7 @@ export async function completeTranslationRequest(
     .set({
       status: "completed",
       completedBy,
-      completedAt: new Date().toISOString().toISOString().toISOString(),
+      completedAt: new Date().toISOString(),
     })
     .where(eq(translationRequests.id, id));
 }
@@ -4244,7 +4244,7 @@ export async function addToTranslationMemory(params: {
       .update(translationMemory)
       .set({
         usageCount: existing[0].usageCount + 1,
-        lastUsedAt: new Date().toISOString().toISOString().toISOString(),
+        lastUsedAt: new Date().toISOString(),
       })
       .where(eq(translationMemory.id, existing[0].id));
     
@@ -4257,7 +4257,7 @@ export async function addToTranslationMemory(params: {
     translatedText: params.translatedText,
     context: params.context,
     usageCount: 1,
-    lastUsedAt: new Date().toISOString().toISOString().toISOString(),
+    lastUsedAt: new Date().toISOString(),
     createdBy: params.createdBy,
   });
 
@@ -5116,7 +5116,7 @@ export async function approveOfficeRegistration(officeId: number, notes?: string
       .set({
         status: "active",
         verificationStatus: "verified",
-        verifiedAt: new Date().toISOString().toISOString().toISOString(),
+        verifiedAt: new Date().toISOString(),
       })
       .where(eq(sanadOffices.id, officeId));
 
@@ -5641,7 +5641,7 @@ export async function enableMFA(
         mfaEnabled: 1,
         mfaSecret: secret,
         mfaBackupCodes: backupCodes,
-        mfaEnabledAt: new Date().toISOString().toISOString().toISOString(),
+        mfaEnabledAt: new Date().toISOString(),
       })
       .where(eq(users.id, userId));
   } catch (error) {
@@ -5979,12 +5979,12 @@ export async function upsertActiveSession(session: {
       userAgent: session.userAgent,
       location: session.location,
       expiresAt: session.expiresAt,
-      lastActive: new Date().toISOString().toISOString().toISOString(),
+      lastActive: new Date().toISOString(),
       isActive: 1,
     })
     .onDuplicateKeyUpdate({
       set: {
-        lastActive: new Date().toISOString().toISOString().toISOString(),
+        lastActive: new Date().toISOString(),
         isActive: 1,
         location: session.location,
       },
@@ -6052,7 +6052,7 @@ export async function updateSessionActivity(sessionId: string): Promise<void> {
 
   await db
     .update(activeSessions)
-    .set({ lastActive: new Date().toISOString().toISOString().toISOString() })
+    .set({ lastActive: new Date().toISOString() })
     .where(eq(activeSessions.sessionId, sessionId));
 }
 
@@ -6160,7 +6160,7 @@ export async function markSecurityAlertNotificationSent(alertId: number): Promis
     .update(securityAlerts)
     .set({
         notificationSent: 1,
-      notificationSentAt: new Date().toISOString().toISOString().toISOString(),
+      notificationSentAt: new Date().toISOString(),
     })
     .where(eq(securityAlerts.id, alertId));
 }

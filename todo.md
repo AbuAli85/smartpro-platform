@@ -15,9 +15,22 @@
 **Status:** ✅ All admin routes now accessible  
 **Testing Progress:** Admin features testing in progress
 
-### TypeScript Errors (269 remaining, down from 284)
+### ✅ RESOLVED: AdminDashboard MFA Issue
+- [x] Fix AdminDashboard to handle MFA requirement (currently shows zeros due to 403 MFA_REQUIRED_FOR_ADMIN errors)
+- [x] Add MFA setup prompt/redirect for admin users who haven't configured MFA
+- [x] Display proper error messages when MFA is required but not configured
+- [x] Update tRPC query error handling to detect MFA_REQUIRED_FOR_ADMIN and show appropriate UI
+
+**Root Cause:** AdminDashboard tRPC queries (admin.getStats, admin.getPendingOffices) return 403 errors because MFA enforcement middleware requires all admin users to have MFA enabled. Dashboard didn't handle this error gracefully.
+
+**Resolution:** Added proper error handling to detect MFA_REQUIRED_FOR_ADMIN errors and display a clear prompt with "Set Up MFA Now" and "Go to Profile" buttons. Also added loading state to prevent showing zeros while queries are in progress.
+
+**Status:** ✅ FIXED - Admin dashboard now shows helpful MFA setup prompt instead of zeros
+
+### TypeScript Errors (231 remaining, down from 284 → 268 → 231)
 - [x] Fix schema.ts isActive field type (boolean → integer) - ✅ FIXED
 - [x] Fix isActive in routers (campaigns, chatAssignment, officeOwner, sanadOffice, serviceBundle, officeNotificationPreferences) - ✅ FIXED
+- [x] Fix triple .toISOString() calls in server/db.ts (33 instances) - ✅ FIXED (reduced errors by 37)
 - [x] Fix isActive in db.ts (all function signatures and comparisons) - ✅ FIXED
 - [x] Fix isActive in test files (staffManagement, threeFeatures, marketplaceEnhancements) - ✅ FIXED
 - [ ] Fix Date type mismatches in campaigns router (Date vs string)

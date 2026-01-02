@@ -51,8 +51,61 @@ export default function AdminDashboard() {
     return null;
   }
 
-  const { data: stats } = trpc.admin.getStats.useQuery();
-  const { data: pendingOffices } = trpc.admin.getPendingOffices.useQuery();
+  const { data: stats, error: statsError, isLoading: statsLoading } = trpc.admin.getStats.useQuery();
+  const { data: pendingOffices, error: pendingOfficesError, isLoading: pendingOfficesLoading } = trpc.admin.getPendingOffices.useQuery();
+
+  // Check if MFA is required - tRPC errors have the structure: error.data.code and error.message
+  const mfaRequired = statsError && 
+    statsError.message === "MFA_REQUIRED_FOR_ADMIN" && 
+    statsError.data?.code === "FORBIDDEN";
+
+  // Show loading while queries are in progress
+  if (statsLoading || pendingOfficesLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#003366] mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show MFA setup prompt if required
+  if (mfaRequired) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="max-w-md w-full">
+          <CardHeader>
+            <CardTitle className="text-2xl text-center">🔐 Multi-Factor Authentication Required</CardTitle>
+            <CardDescription className="text-center">
+              Admin accounts must have MFA enabled for security
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-sm text-blue-900">
+                To access the admin dashboard, you need to set up Two-Factor Authentication (2FA) on your account.
+              </p>
+            </div>
+            <Button 
+              onClick={() => setLocation("/security/mfa-setup")}
+              className="w-full bg-[#003366] hover:bg-[#004488]"
+            >
+              Set Up MFA Now
+            </Button>
+            <Button 
+              onClick={() => setLocation("/profile")}
+              variant="outline"
+              className="w-full"
+            >
+              Go to Profile
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
