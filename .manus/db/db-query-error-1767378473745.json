@@ -1,0 +1,8 @@
+{
+  "query": "SELECT b.id, b.scheduled_date, b.scheduled_time, br.reminder_24h_sent, br.reminder_1h_sent, \nTIMESTAMPDIFF(HOUR, NOW(), b.scheduled_date) as hours_until_appointment\nFROM bookings b\nLEFT JOIN booking_reminders br ON b.id = br.booking_id\nWHERE b.scheduled_date IS NOT NULL AND b.status = 'confirmed'\nORDER BY b.scheduled_date ASC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute SELECT b.id, b.scheduled_date, b.scheduled_time, br.reminder_24h_sent, br.reminder_1h_sent, \nTIMESTAMPDIFF(HOUR, NOW(), b.scheduled_date) as hours_until_appointment\nFROM bookings b\nLEFT JOIN booking_reminders br ON b.id = br.booking_id\nWHERE b.scheduled_date IS NOT NULL AND b.status = 'confirmed'\nORDER BY b.scheduled_date ASC;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'b.scheduled_date' in 'order clause'"
+  ]
+}

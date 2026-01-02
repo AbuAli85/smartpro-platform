@@ -33,7 +33,7 @@ interface Message {
   senderId: number;
   senderType: "user" | "office";
   message: string;
-  createdAt: Date;
+  createdAt: string; // Database returns timestamp as string
   isRead: boolean;
   translatedText?: string;
   detectedLanguage?: string;

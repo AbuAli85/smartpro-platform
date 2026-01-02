@@ -11,7 +11,6 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 interface CustomerChatInterfaceProps {
-  officeId?: number;
   bookingId: number;
   officeId: number;
   officeName: string;
@@ -59,6 +58,7 @@ export function CustomerChatInterface({ bookingId, officeId, officeName }: Custo
 
     sendMessageMutation.mutate({
       bookingId,
+      officeId,
       message: message.trim(),
     });
   };
