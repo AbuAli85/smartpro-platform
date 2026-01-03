@@ -19,6 +19,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { getServiceConfig } from "@/../../shared/serviceRequirements";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { ServiceTooltip } from "@/components/ServiceTooltip";
 
 const ICON_MAP: Record<string, any> = {
   Building2,
@@ -153,9 +154,19 @@ export function Step1ServiceSelection({
                       <IconComponent className="w-6 h-6" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg">
-                        {service.serviceName}
-                      </CardTitle>
+                      <ServiceTooltip 
+                        service={{
+                          serviceName: service.serviceName,
+                          price: service.price,
+                          estimatedDeliveryDays: config.turnaroundTime ? parseInt(config.turnaroundTime) : null,
+                          description: config.description,
+                        }}
+                        showIcon
+                      >
+                        <CardTitle className="text-lg">
+                          {service.serviceName}
+                        </CardTitle>
+                      </ServiceTooltip>
                       <CardDescription className="flex items-center gap-2 mt-1">
                         <span className="font-semibold text-primary">
                           {service.price} OMR

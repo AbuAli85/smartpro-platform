@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { trpc } from "@/lib/trpc";
 import { Building2, MapPin, Star, Search, Plus, Filter } from "lucide-react";
 import { OfficeCoverImage } from "@/components/ResponsiveImage";
+import { OfficeAvatar } from "@/components/OfficeAvatar";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { AdvancedFilters, type FilterState } from "@/components/AdvancedFilters";
@@ -248,7 +249,15 @@ export default function OfficesList() {
                       alt={office.officeName}
                       className="mb-4"
                     />
-                    <CardTitle className="line-clamp-1">{office.officeName}</CardTitle>
+                    <div className="flex items-start gap-3 mb-2">
+                      <OfficeAvatar
+                        logoUrl={office.logoUrl}
+                        officeName={office.officeName}
+                        size="md"
+                        className="mt-1"
+                      />
+                      <CardTitle className="line-clamp-1 flex-1">{office.officeName}</CardTitle>
+                    </div>
                     <CardDescription className="line-clamp-2">
                       {office.description || t("offices.professionalServices")}
                     </CardDescription>

@@ -18,6 +18,7 @@ import { ServiceComparison } from "@/components/ServiceComparison";
 import { ServiceRecommendationQuiz } from "@/components/ServiceRecommendationQuiz";
 import { RecommendationResults } from "@/components/RecommendationResults";
 import { getServiceConfig } from "@/../../shared/serviceRequirements";
+import { useBookingDraft } from "@/hooks/useBookingDraft";
 
 export default function BookOffice() {
   const { t } = useLanguage();
@@ -49,6 +50,9 @@ export default function BookOffice() {
   const [, params] = useRoute("/offices/:id/book");
   const [, setLocation] = useLocation();
   const officeId = params?.id ? parseInt(params.id) : 0;
+
+  // Booking draft auto-save
+  const { autoSaveDraft, loadDraft, clearDraft, promptRestoreDraft } = useBookingDraft(officeId);
 
   // Wizard state
   const [currentStep, setCurrentStep] = useState(1);
@@ -159,6 +163,8 @@ export default function BookOffice() {
   const createBookingMutation = trpc.booking.create.useMutation({
     onSuccess: () => {
       vibrate('success'); // Haptic feedback on success
+      // Clear draft on successful booking
+      clearDraft();
       toast.success(t("booking.createdSuccess"), {
         description: t("booking.createdDescription"),
       });
@@ -226,6 +232,47 @@ export default function BookOffice() {
         return true;
     }
   };
+
+  // Auto-save draft whenever form data changes
+  useEffect(() => {
+    if (selectedServiceId || Object.keys(formData).length > 0 || selectedDate || selectedTime) {
+      autoSaveDraft({
+        officeId,
+        selectedServiceId,
+        formData,
+        selectedDate,
+        selectedTime,
+        currentStep,
+      });
+    }
+  }, [selectedServiceId, formData, selectedDate, selectedTime, currentStep, officeId, autoSaveDraft]);
+
+  // Prompt to restore draft on mount
+  useEffect(() => {
+    const handleRestore = () => {
+      const draft = loadDraft();
+      if (draft) {
+        setSelectedServiceId(draft.selectedServiceId);
+        setFormData(draft.formData);
+        setSelectedDate(draft.selectedDate);
+        setSelectedTime(draft.selectedTime || "");
+        setCurrentStep(draft.currentStep);
+        toast.success(t("booking.draftRestored"), {
+          description: t("booking.continueWhereYouLeft"),
+        });
+      }
+    };
+
+    const handleDiscard = () => {
+      clearDraft();
+      toast.info(t("booking.draftDiscarded"));
+    };
+
+    // Only prompt if we don't have any form data yet
+    if (!selectedServiceId && Object.keys(formData).length === 0) {
+      promptRestoreDraft(handleRestore, handleDiscard);
+    }
+  }, []); // Only run on mount
 
   const handleSubmit = () => {
     if (!office || !selectedService) return;

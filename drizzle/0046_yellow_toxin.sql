@@ -1,1 +1,1 @@
-ALTER TABLE `office_blocked_slots` MODIFY COLUMN `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+-- Migration disabled

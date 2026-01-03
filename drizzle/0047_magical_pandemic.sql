@@ -1,1 +1,1 @@
-ALTER TABLE `office_blocked_slots` DROP COLUMN `created_at`;
+-- Migration disabled

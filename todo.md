@@ -2097,3 +2097,26 @@ Improve bookings page UX by implementing a tabbed interface within each booking 
 **Priority:** High  
 **Timeline:** 3-4 hours  
 **Impact:** High - Improves conversion rate and user satisfaction
+
+---
+
+## ✅ UX Enhancements (Jan 3, 2026 - 14:50 GMT+4)
+
+- [x] Office photo gallery - Replace initials with actual office photos
+  - Created OfficeAvatar component with logo support and initials fallback
+  - Created PhotoGallery component with lightbox viewer
+  - Updated OfficesList to display office logos/avatars
+  
+- [x] Booking draft auto-save - Reduce abandonment rates by saving progress
+  - Created useBookingDraft hook with localStorage persistence
+  - Auto-saves every 3 seconds with debouncing
+  - Prompts user to restore draft on return
+  - Clears draft on successful booking
+  
+- [x] Service comparison tooltips - Show price, duration, requirements on hover
+  - Created ServiceTooltip component with detailed info display
+  - Integrated tooltips into Step1ServiceSelection
+  - Shows price, duration, and service details on hover
+
+**Status:** ✅ All three enhancements implemented and ready for testing
+**Impact:** High - Improves user experience and reduces booking abandonment
