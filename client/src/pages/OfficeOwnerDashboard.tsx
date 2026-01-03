@@ -215,9 +215,6 @@ export default function OfficeOwnerDashboard() {
     },
   });
 
-  // Get selected office
-  const selectedOffice = offices?.find(o => o.id === officeId);
-
   // Populate form when office is selected
   useEffect(() => {
     if (selectedOffice) {
@@ -426,6 +423,8 @@ export default function OfficeOwnerDashboard() {
       </div>
     );
   }
+
+  const selectedOffice = offices.find(o => o.id === officeId);
 
   return (
     <div className="container py-8">

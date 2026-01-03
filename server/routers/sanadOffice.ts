@@ -176,7 +176,7 @@ export const sanadOfficeRouter = router({
         minRating,
         availableToday,
         availableThisWeek,
-        // languages filter not yet implemented in db.listSanadOffices
+        languages,
         sortBy,
         limit,
         offset,

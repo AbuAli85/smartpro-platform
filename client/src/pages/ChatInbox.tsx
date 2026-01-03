@@ -282,7 +282,7 @@ export default function ChatInbox() {
         senderId: data.userId,
         senderType: data.userId === user.id ? "office" : "user",
         message: data.message,
-        createdAt: new Date(data.timestamp).toISOString(),
+        createdAt: new Date(data.timestamp),
         isRead: false,
       }]);
       scrollToBottom();

@@ -2932,7 +2932,6 @@ export async function getOfficeStaff(officeId: number) {
   return await db
     .select({
       id: officeStaff.id,
-      officeId: officeStaff.officeId,
       userId: officeStaff.userId,
       userName: users.name,
       userEmail: users.email,

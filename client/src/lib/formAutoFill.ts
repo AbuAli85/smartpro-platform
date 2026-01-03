@@ -123,9 +123,9 @@ export function extractFormData(formValues: Record<string, any>): Partial<UserFo
   };
   
   for (const [formField, value] of Object.entries(formValues)) {
-    const dataField = fieldMapping[formField] as keyof UserFormData | undefined;
+    const dataField = fieldMapping[formField];
     if (dataField && value && typeof value === "string" && value.trim()) {
-      (extracted as any)[dataField] = value.trim();
+      extracted[dataField] = value.trim();
     }
   }
   
@@ -144,7 +144,7 @@ export function autoFillForm(formFields: string[]): Partial<Record<string, strin
   const filled: Record<string, string> = {};
   
   // Reverse mapping from UserFormData to common form field names
-  const reverseMapping: Partial<Record<keyof UserFormData, string[]>> = {
+  const reverseMapping: Record<keyof UserFormData, string[]> = {
     fullName: ["fullName", "name", "customerName"],
     email: ["email"],
     phone: ["phone", "phoneNumber", "mobile"],
