@@ -21,6 +21,8 @@ export const officeOwnerRouter = router({
       email: z.string().email(),
       website: z.string().url().optional(),
       serviceIds: z.array(z.number()),
+      logoUrl: z.string().optional(),
+      images: z.array(z.string()).optional(),
     }))
     .mutation(async ({ input, ctx }) => {
       // Create the office

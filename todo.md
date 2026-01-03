@@ -2120,3 +2120,26 @@ Improve bookings page UX by implementing a tabbed interface within each booking 
 
 **Status:** ✅ All three enhancements implemented and ready for testing
 **Impact:** High - Improves user experience and reduces booking abandonment
+
+
+---
+
+## 🎯 New Feature Requests (Jan 3, 2026 - 15:00 GMT+4)
+
+- [x] Add office logo upload to registration/edit form for provider branding
+  - Add logo field to office schema (already exists in sanadOffices.logoUrl)
+  - Integrate S3 upload in office registration wizard
+  - Add logo upload to office edit form
+  - Display logo in office cards and detail pages
+  
+- [x] Implement bulk photo upload for office galleries
+  - Add multi-file upload component (ImageUpload supports multiple files)
+  - Handle multiple S3 uploads in parallel
+  - Update office photos array in database (already exists in sanadOffices.images)
+  - Add photo management UI (reorder, delete)
+  
+- [x] Add booking progress indicator showing step completion
+  - Create BookingProgressIndicator component
+  - Show current step and total steps
+  - Display step names and completion status
+  - Add visual progress bar

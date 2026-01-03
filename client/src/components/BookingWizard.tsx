@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { BookingProgressIndicator } from "@/components/BookingProgressIndicator";
 
 interface Step {
   id: number;
@@ -74,8 +75,19 @@ export function BookingWizard({
 
   return (
     <div className="space-y-8" onKeyDown={handleKeyDown} tabIndex={0}>
+      {/* Booking Progress Indicator */}
+      <BookingProgressIndicator
+        currentStep={currentStep}
+        totalSteps={steps.length}
+        steps={steps.map((step, index) => ({
+          id: index + 1,
+          title: step.title,
+          titleAr: step.title, // Using same title for now, can be enhanced later
+        }))}
+      />
+      
       {/* Progress Steps */}
-      <div className="relative" role="navigation" aria-label="Booking steps">
+      <div className="relative hidden" role="navigation" aria-label="Booking steps">
         <div className="flex items-center justify-between">
           {steps.map((step, index) => {
             const stepNumber = index + 1;

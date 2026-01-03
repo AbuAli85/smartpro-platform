@@ -19,6 +19,7 @@ import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import { Save, Clock } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { FieldLabelWithTooltip } from "@/components/FieldTooltip";
+import { ImageUpload } from "@/components/ImageUpload";
 
 const DRAFT_KEY = "office-registration-draft";
 
@@ -50,6 +51,8 @@ export default function OfficeRegistration() {
     description: "",
     descriptionAr: "",
     licenseNumber: "",
+    logoUrl: "",
+    images: [] as string[],
     
     // Step 2: Location & Contact
     address: "",
@@ -126,6 +129,8 @@ export default function OfficeRegistration() {
       description: "",
       descriptionAr: "",
       licenseNumber: "",
+      logoUrl: "",
+      images: [] as string[],
       address: "",
       addressAr: "",
       city: "",
@@ -198,6 +203,8 @@ export default function OfficeRegistration() {
       email: formData.email,
       website: formData.website || undefined,
       serviceIds: formData.selectedServices.map((id: string) => parseInt(id)),
+      logoUrl: formData.logoUrl || undefined,
+      images: formData.images.length > 0 ? formData.images : undefined,
     });
   };
 
@@ -413,6 +420,27 @@ export default function OfficeRegistration() {
                     onChange={(e) => handleInputChange("descriptionAr", e.target.value)}
                     rows={4}
                     dir="rtl"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <ImageUpload
+                    label={t("officeReg.logo")}
+                    helperText={t("officeReg.logoHelper")}
+                    value={formData.logoUrl}
+                    onChange={(value) => handleInputChange("logoUrl", value)}
+                    multiple={false}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <ImageUpload
+                    label={t("officeReg.photos")}
+                    helperText={t("officeReg.photosHelper")}
+                    value={formData.images}
+                    onChange={(value) => handleInputChange("images", value)}
+                    multiple={true}
+                    maxFiles={10}
                   />
                 </div>
               </div>

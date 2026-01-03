@@ -5127,6 +5127,8 @@ export async function createOffice(officeData: {
   isVerified: boolean;
   isAvailable: boolean;
   serviceIds: number[];
+  logoUrl?: string;
+  images?: string[];
 }) {
   const db = await getDb();
   if (!db) {
@@ -5159,6 +5161,8 @@ export async function createOffice(officeData: {
       ownerId: officeData.ownerId,
       status: officeData.isVerified ? "active" : "pending",
       verificationStatus: officeData.isVerified ? "verified" : "pending_verification",
+      logoUrl: officeData.logoUrl || null,
+      images: officeData.images ? JSON.stringify(officeData.images) : null,
       createdBy: officeData.ownerId,
       updatedBy: officeData.ownerId,
     });

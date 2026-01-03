@@ -621,6 +621,20 @@ export const translations: Record<Language, Record<string, string>> = {
     "officeReg.emailPlaceholder": "office@example.com",
     "officeReg.website": "Website (Optional)",
     "officeReg.websitePlaceholder": "https://yourwebsite.com",
+    "officeReg.logo": "Office Logo",
+    "officeReg.logoHelper": "Upload your office logo (recommended size: 400x400px, max 16MB)",
+    "officeReg.photos": "Office Photos",
+    "officeReg.photosHelper": "Upload photos of your office (up to 10 images, max 16MB each)",
+    
+    "imageUpload.uploading": "Uploading...",
+    "imageUpload.uploadSingle": "Upload Image",
+    "imageUpload.uploadMultiple": "Upload Images",
+    "imageUpload.maxFilesError": "Maximum {max} files allowed",
+    "imageUpload.fileSizeError": "File size must be less than 16MB",
+    "imageUpload.uploadError": "Upload failed. Please try again.",
+    "imageUpload.noImagesSingle": "No image uploaded yet",
+    "imageUpload.noImagesMultiple": "No images uploaded yet",
+    "imageUpload.fileCount": "{current} of {max} images",
     
     "home.government": "Government Integrated",
     "home.governmentDesc": "Direct integration with MOCIP, MOL, and ROP for seamless verification and compliance",
@@ -3311,6 +3325,21 @@ export const translations: Record<Language, Record<string, string>> = {
     "bookingAnalytics.highCancellationDesc": "راجع أسباب الإلغاء وفكر في تطبيق سياسة إلغاء أو تحسين جودة الخدمة",
     "bookingAnalytics.peakHoursTitle": "تم تحديد ساعات الذروة للحجز",
     "bookingAnalytics.peakHoursDesc": "الوقت الأكثر شعبية لديك هو",
+    
+    "officeReg.logo": "شعار المكتب",
+    "officeReg.logoHelper": "ارفع شعار مكتبك (الحجم الموصى به: 400×400 بكسل، الحد الأقصى 16 ميجابايت)",
+    "officeReg.photos": "صور المكتب",
+    "officeReg.photosHelper": "ارفع صور مكتبك (حتى 10 صور، الحد الأقصى 16 ميجابايت لكل صورة)",
+    
+    "imageUpload.uploading": "جاري الرفع...",
+    "imageUpload.uploadSingle": "رفع صورة",
+    "imageUpload.uploadMultiple": "رفع صور",
+    "imageUpload.maxFilesError": "الحد الأقصى {max} ملفات مسموح",
+    "imageUpload.fileSizeError": "يجب أن يكون حجم الملف أقل من 16 ميجابايت",
+    "imageUpload.uploadError": "فشل الرفع. يرجى المحاولة مرة أخرى.",
+    "imageUpload.noImagesSingle": "لم يتم رفع أي صورة بعد",
+    "imageUpload.noImagesMultiple": "لم يتم رفع أي صور بعد",
+    "imageUpload.fileCount": "{current} من {max} صور",
   },
 };
 
