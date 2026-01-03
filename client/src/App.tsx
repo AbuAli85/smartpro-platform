@@ -103,7 +103,11 @@ function Router() {
       
       {/* Bookings */}
       <Route path="/offices/:id/book" component={BookOffice} />
-      <Route path="/bookings" component={BookingsList} />
+      <Route path="/bookings">
+        <ProtectedRoute>
+          <BookingsList />
+        </ProtectedRoute>
+      </Route>
       
       {/* Marketplace */}
       <Route path="/request-service" component={RequestServicePage} />
