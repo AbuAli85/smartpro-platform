@@ -125,8 +125,12 @@ export const appRouter = router({
     getNotificationCounts: protectedProcedure.query(async ({ ctx }) => {
       const user = ctx.user!;
       const pendingBookings = await db.getPendingBookingsCount(user.id);
+      const unreadNotifications = await db.getUnreadNotificationsCount(user.id);
+      const unreadMessages = await db.getUnreadMessagesCount(user.id);
       return {
         bookings: pendingBookings,
+        unreadNotifications: unreadNotifications,
+        unreadMessages: unreadMessages,
       };
     }),
   }),

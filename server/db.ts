@@ -1207,6 +1207,64 @@ export async function getPendingBookingsCount(userId: number): Promise<number> {
   }
 }
 
+export async function getUnreadNotificationsCount(userId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get unread notifications count: database not available");
+    return 0;
+  }
+
+  try {
+    const result = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(notifications)
+      .where(
+        and(
+          eq(notifications.userId, userId),
+          eq(notifications.read, 0)
+        )
+      );
+    
+    return result[0]?.count || 0;
+  } catch (error) {
+    console.error("[Database] Error getting unread notifications count:", error);
+    return 0;
+  }
+}
+
+export async function getUnreadMessagesCount(userId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get unread messages count: database not available");
+    return 0;
+  }
+
+  try {
+    // Get count of unread messages in chat conversations where user is a participant
+    const { chatMessages, chatConversations } = await import("../drizzle/schema");
+    
+    const result = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(chatMessages)
+      .innerJoin(chatConversations, eq(chatMessages.conversationId, chatConversations.id))
+      .where(
+        and(
+          or(
+            eq(chatConversations.userId, userId),
+            eq(chatConversations.officeId, userId) // For office owners
+          ),
+          eq(chatMessages.isRead, 0),
+          ne(chatMessages.senderId, userId) // Don't count own messages
+        )
+      );
+    
+    return result[0]?.count || 0;
+  } catch (error) {
+    console.error("[Database] Error getting unread messages count:", error);
+    return 0;
+  }
+}
+
 // ============================================================================
 // OFFICE ANALYTICS
 // ============================================================================
@@ -2932,6 +2990,7 @@ export async function getOfficeStaff(officeId: number) {
   return await db
     .select({
       id: officeStaff.id,
+      officeId: officeStaff.officeId,
       userId: officeStaff.userId,
       userName: users.name,
       userEmail: users.email,
