@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Step {
   id: number;
@@ -31,6 +32,7 @@ export function BookingWizard({
   onSubmit,
   isSubmitting = false,
 }: BookingWizardProps) {
+  const { t } = useLanguage();
   const isFirstStep = currentStep === 1;
   const isLastStep = currentStep === steps.length;
 
@@ -59,10 +61,21 @@ export function BookingWizard({
     }
   };
 
+  // Keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft' && !isFirstStep && !isSubmitting) {
+      handleBack();
+    } else if (e.key === 'ArrowRight' && !isLastStep) {
+      handleNext();
+    } else if (e.key === 'Enter' && isLastStep && !isSubmitting) {
+      handleSubmit();
+    }
+  };
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8" onKeyDown={handleKeyDown} tabIndex={0}>
       {/* Progress Steps */}
-      <div className="relative">
+      <div className="relative" role="navigation" aria-label="Booking steps">
         <div className="flex items-center justify-between">
           {steps.map((step, index) => {
             const stepNumber = index + 1;
@@ -80,6 +93,8 @@ export function BookingWizard({
                       }
                     }}
                     disabled={stepNumber > currentStep}
+                    aria-label={`${step.title}: ${step.description}`}
+                    aria-current={isCurrent ? "step" : undefined}
                     className={cn(
                       "w-12 h-12 rounded-full flex items-center justify-center font-semibold transition-all relative z-10",
                       isCompleted &&
@@ -142,22 +157,23 @@ export function BookingWizard({
           variant="outline"
           onClick={handleBack}
           disabled={isFirstStep || isSubmitting}
+          aria-label={t("booking.back")}
         >
-          Back
+          {t("booking.back")}
         </Button>
 
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">
-            Step {currentStep} of {steps.length}
+            {t("booking.step")} {currentStep} {t("booking.of")} {steps.length}
           </span>
         </div>
 
         {isLastStep ? (
           <Button onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? "Submitting..." : "Confirm Booking"}
+            {isSubmitting ? t("booking.submitting") : t("booking.confirmBookingButton")}
           </Button>
         ) : (
-          <Button onClick={handleNext}>Next Step</Button>
+          <Button onClick={handleNext}>{t("booking.nextStep")}</Button>
         )}
       </div>
     </div>

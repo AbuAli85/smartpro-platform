@@ -21,6 +21,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Step2Props {
   serviceName: string;
@@ -33,6 +34,7 @@ export function Step2ServiceRequirements({
   formData,
   onFormDataChange,
 }: Step2Props) {
+  const { t } = useLanguage();
   const config = getServiceConfig(serviceName);
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, File>>({});
   const [uploadErrors, setUploadErrors] = useState<Record<string, string>>({});
@@ -237,12 +239,19 @@ export function Step2ServiceRequirements({
   ).length;
   const completionPercentage = Math.round((completedFields / totalFields) * 100);
 
+  // Check which documents are actually uploaded
+  const getUploadedDocumentNames = () => {
+    return Object.values(uploadedFiles).map(file => file.name.toLowerCase());
+  };
+
+  const uploadedDocNames = getUploadedDocumentNames();
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Service Requirements</h2>
+        <h2 className="text-2xl font-bold mb-2">{t("booking.serviceRequirements")}</h2>
         <p className="text-muted-foreground">
-          Please provide the required information and documents for{" "}
+          {t("booking.provideRequiredInfo")}{" "}
           <strong>{serviceName}</strong>
         </p>
       </div>
@@ -250,7 +259,7 @@ export function Step2ServiceRequirements({
       {/* Progress Indicator */}
       <Card className="p-4 bg-muted/50">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium">Form Completion</span>
+          <span className="text-sm font-medium">{t("booking.formCompletion")}</span>
           <span className="text-sm font-semibold text-primary">
             {completionPercentage}%
           </span>
@@ -259,10 +268,14 @@ export function Step2ServiceRequirements({
           <div
             className="bg-primary h-2 rounded-full transition-all"
             style={{ width: `${completionPercentage}%` }}
+            role="progressbar"
+            aria-valuenow={completionPercentage}
+            aria-valuemin={0}
+            aria-valuemax={100}
           />
         </div>
         <p className="text-xs text-muted-foreground mt-2">
-          {completedFields} of {totalFields} fields completed
+          {completedFields} {t("booking.of")} {totalFields} {t("booking.fieldsCompleted")}
         </p>
       </Card>
 
@@ -270,11 +283,19 @@ export function Step2ServiceRequirements({
       <Card className="p-4 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900">
         <h3 className="font-semibold mb-3 flex items-center gap-2">
           <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-          Required Documents Checklist
+          {t("booking.requiredDocumentsChecklist")}
         </h3>
         <ul className="space-y-2">
           {config.requiredDocuments.map((doc, index) => {
-            const isUploaded = Object.keys(uploadedFiles).length > index;
+            // Check if this document type is uploaded by matching document name patterns
+            const docLower = doc.toLowerCase();
+            const isUploaded = uploadedDocNames.some(uploadedName => 
+              uploadedName.includes(docLower) || docLower.includes(uploadedName.split('.')[0])
+            ) || Object.keys(uploadedFiles).some(key => {
+              const field = config.formFields.find(f => f.id === key && f.type === 'file');
+              return field && field.label.toLowerCase().includes(docLower);
+            });
+            
             return (
               <li key={index} className="flex items-start gap-2 text-sm">
                 {isUploaded ? (
@@ -321,11 +342,11 @@ export function Step2ServiceRequirements({
       {/* Additional Notes */}
       <div className="space-y-2">
         <Label htmlFor="additionalNotes">
-          Additional Notes or Special Requests (Optional)
+          {t("booking.additionalNotes")}
         </Label>
         <Textarea
           id="additionalNotes"
-          placeholder="Any additional information you'd like to share..."
+          placeholder={t("booking.additionalNotesPlaceholder")}
           value={formData.additionalNotes || ""}
           onChange={(e) => handleFieldChange("additionalNotes", e.target.value)}
           className="min-h-[80px]"

@@ -18,6 +18,7 @@ import {
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { getServiceConfig } from "@/../../shared/serviceRequirements";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const ICON_MAP: Record<string, any> = {
   Building2,
@@ -56,15 +57,16 @@ export function Step1ServiceSelection({
   onOpenComparison,
   onOpenRecommendation,
 }: Step1Props) {
+  const { t } = useLanguage();
   const [expandedService, setExpandedService] = useState<number | null>(null);
 
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold mb-2">Select a Service</h2>
+          <h2 className="text-2xl font-bold mb-2">{t("booking.selectServiceTitle")}</h2>
           <p className="text-muted-foreground">
-            Choose the service you need. Click on a service to see more details.
+            {t("booking.selectServiceDescription")}
           </p>
         </div>
         <div className="flex flex-col items-end gap-2">
@@ -73,9 +75,10 @@ export function Step1ServiceSelection({
               variant="default"
               onClick={onOpenRecommendation}
               className="gap-2"
+              aria-label={t("booking.getRecommendations")}
             >
               <Sparkles className="w-4 h-4" />
-              Get Recommendations
+              {t("booking.getRecommendations")}
             </Button>
           )}
           {onOpenComparison && onToggleComparison && (
@@ -84,8 +87,9 @@ export function Step1ServiceSelection({
                 variant="outline"
                 onClick={onOpenComparison}
                 disabled={selectedForComparison.length < 2}
+                aria-label={t("booking.compareServices")}
               >
-                Compare Services
+                {t("booking.compareServices")}
                 {selectedForComparison.length > 0 && (
                   <Badge variant="secondary" className="ml-2">
                     {selectedForComparison.length}
@@ -93,7 +97,7 @@ export function Step1ServiceSelection({
                 )}
               </Button>
               <p className="text-xs text-muted-foreground">
-                Select 2-3 services to compare
+                {t("booking.selectToCompare")}
               </p>
             </>
           )}
@@ -222,8 +226,9 @@ export function Step1ServiceSelection({
                       e.stopPropagation();
                       onServiceSelect(service.id.toString());
                     }}
+                    aria-label={isSelected ? t("booking.selected") : t("booking.selectThisService")}
                   >
-                    {isSelected ? "Selected" : "Select This Service"}
+                    {isSelected ? t("booking.selected") : t("booking.selectThisService")}
                   </Button>
                 </CardContent>
               )}
@@ -235,8 +240,7 @@ export function Step1ServiceSelection({
       {services.length === 0 && (
         <Card className="p-12 text-center">
           <p className="text-muted-foreground">
-            No services available at this office. Please contact the office
-            directly.
+            {t("booking.noServicesAvailable")}
           </p>
         </Card>
       )}

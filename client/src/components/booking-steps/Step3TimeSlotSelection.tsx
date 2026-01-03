@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Clock, TrendingUp, TrendingDown, Minus, Zap, Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface TimeSlot {
   time: string;
@@ -31,6 +32,7 @@ export function Step3TimeSlotSelection({
   availableSlots,
   isLoadingSlots,
 }: Step3Props) {
+  const { t } = useLanguage();
   const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
   const { vibrate } = useHapticFeedback();
 
@@ -90,9 +92,9 @@ export function Step3TimeSlotSelection({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Select Date & Time</h2>
+        <h2 className="text-2xl font-bold mb-2">{t("booking.selectDateTimeTitle")}</h2>
         <p className="text-muted-foreground">
-          Choose your preferred appointment date and time slot
+          {t("booking.selectDateTimeDescription")}
         </p>
       </div>
 
@@ -102,10 +104,10 @@ export function Step3TimeSlotSelection({
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
               <Zap className="w-5 h-5 text-primary" />
-              <CardTitle className="text-lg">Quick Booking</CardTitle>
+              <CardTitle className="text-lg">{t("booking.quickBooking")}</CardTitle>
             </div>
             <CardDescription>
-              Next available slot: <strong>{nextAvailableSlot.time}</strong>
+              {t("booking.nextAvailableSlot")} <strong>{nextAvailableSlot.time}</strong>
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -117,8 +119,9 @@ export function Step3TimeSlotSelection({
                 onDateSelect(today);
                 onTimeSelect(nextAvailableSlot.time);
               }}
+              aria-label={t("booking.bookNextAvailable")}
             >
-              Book Next Available
+              {t("booking.bookNextAvailable")}
             </Button>
           </CardContent>
         </Card>
@@ -130,17 +133,17 @@ export function Step3TimeSlotSelection({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CalendarIcon className="w-5 h-5" />
-              Select Date
+              {t("booking.selectDate")}
             </CardTitle>
             <CardDescription>
-              Choose your preferred appointment date
+              {t("booking.selectDateDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <DateTimePicker
               selected={selectedDate || null}
               onChange={(date) => onDateSelect(date || undefined)}
-              placeholderText="Select appointment date"
+              placeholderText={t("booking.selectDate")}
               minDate={new Date()}
               filterDate={(date) => {
                 // Only allow future dates
@@ -153,7 +156,7 @@ export function Step3TimeSlotSelection({
             />
             {selectedDate && (
               <div className="mt-4 p-3 bg-muted rounded-lg">
-                <p className="text-sm font-medium">Selected Date:</p>
+                <p className="text-sm font-medium">{t("booking.selectedDate")}</p>
                 <p className="text-lg font-semibold text-primary">
                   {format(selectedDate, "EEEE, MMMM d, yyyy")}
                 </p>
@@ -167,19 +170,19 @@ export function Step3TimeSlotSelection({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="w-5 h-5" />
-              Available Time Slots
+              {t("booking.availableTimeSlots")}
             </CardTitle>
             <CardDescription>
               {selectedDate
-                ? "Select your preferred time"
-                : "Please select a date first"}
+                ? t("booking.selectPreferredTime")
+                : t("booking.selectDateFirst")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {!selectedDate && (
               <div className="text-center py-12 text-muted-foreground">
                 <CalendarIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p>Select a date to view available time slots</p>
+                <p>{t("booking.selectDateToViewSlots")}</p>
               </div>
             )}
 
@@ -189,6 +192,7 @@ export function Step3TimeSlotSelection({
                   <div
                     key={i}
                     className="h-12 bg-muted animate-pulse rounded-lg"
+                    aria-label={t("common.loading")}
                   />
                 ))}
               </div>
@@ -197,9 +201,9 @@ export function Step3TimeSlotSelection({
             {selectedDate && !isLoadingSlots && availableSlots.length === 0 && (
               <div className="text-center py-12 text-muted-foreground">
                 <Clock className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p className="font-medium">No slots available</p>
+                <p className="font-medium">{t("booking.noSlotsAvailableTitle")}</p>
                 <p className="text-sm mt-1">
-                  Please select a different date
+                  {t("booking.selectDifferentDate")}
                 </p>
               </div>
             )}
@@ -210,7 +214,7 @@ export function Step3TimeSlotSelection({
                 {morningSlots.length > 0 && (
                   <div>
                     <h4 className="text-sm font-semibold mb-3 text-muted-foreground">
-                      Morning (8:00 AM - 12:00 PM)
+                      {t("booking.morning")}
                     </h4>
                     <div className="grid grid-cols-2 gap-2">
                       {morningSlots.map((slot) => {
@@ -252,7 +256,7 @@ export function Step3TimeSlotSelection({
                 {afternoonSlots.length > 0 && (
                   <div>
                     <h4 className="text-sm font-semibold mb-3 text-muted-foreground">
-                      Afternoon (12:00 PM - 5:00 PM)
+                      {t("booking.afternoon")}
                     </h4>
                     <div className="grid grid-cols-2 gap-2">
                       {afternoonSlots.map((slot) => {
@@ -294,7 +298,7 @@ export function Step3TimeSlotSelection({
                 {eveningSlots.length > 0 && (
                   <div>
                     <h4 className="text-sm font-semibold mb-3 text-muted-foreground">
-                      Evening (5:00 PM onwards)
+                      {t("booking.evening")}
                     </h4>
                     <div className="grid grid-cols-2 gap-2">
                       {eveningSlots.map((slot) => {
@@ -341,19 +345,19 @@ export function Step3TimeSlotSelection({
       {selectedDate && availableSlots.length > 0 && (
         <Card className="bg-muted/50">
           <CardContent className="pt-4">
-            <h4 className="text-sm font-semibold mb-3">Demand Indicators:</h4>
+            <h4 className="text-sm font-semibold mb-3">{t("booking.demandIndicators")}</h4>
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center gap-2">
                 <TrendingDown className="w-4 h-4 text-green-600 dark:text-green-400" />
-                <span className="text-sm">Low Demand - Best availability</span>
+                <span className="text-sm">{t("booking.lowDemand")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Minus className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
-                <span className="text-sm">Moderate - Good availability</span>
+                <span className="text-sm">{t("booking.moderateDemand")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-red-600 dark:text-red-400" />
-                <span className="text-sm">High Demand - Limited slots</span>
+                <span className="text-sm">{t("booking.highDemand")}</span>
               </div>
             </div>
           </CardContent>

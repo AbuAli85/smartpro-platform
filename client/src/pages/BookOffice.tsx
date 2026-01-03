@@ -57,6 +57,7 @@ export default function BookOffice() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [usePoints, setUsePoints] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   // Comparison state
   const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
@@ -95,8 +96,14 @@ export default function BookOffice() {
     });
   };
 
+  // Validate officeId
+  const isValidOfficeId = officeId > 0 && !isNaN(officeId);
+
   // Get office details
-  const { data: office } = trpc.sanadOffice.getById.useQuery({ id: officeId }, { enabled: officeId > 0 });
+  const { data: office, error: officeError } = trpc.sanadOffice.getById.useQuery(
+    { id: officeId },
+    { enabled: isValidOfficeId }
+  );
 
   // Get recommendations query
   const { data: recommendations } = trpc.sanadOffice.recommendServices.useQuery(
@@ -150,15 +157,15 @@ export default function BookOffice() {
   const createBookingMutation = trpc.booking.create.useMutation({
     onSuccess: () => {
       vibrate('success'); // Haptic feedback on success
-      toast.success("Booking Created!", {
-        description: "Your booking request has been submitted successfully.",
+      toast.success(t("booking.createdSuccess"), {
+        description: t("booking.createdDescription"),
       });
       setLocation("/bookings");
     },
     onError: (error) => {
       vibrate('error'); // Haptic feedback on error
       toast.error(t("booking.bookingFailed"), {
-        description: error.message,
+        description: error.message || t("booking.bookingFailed"),
       });
     },
   });
@@ -221,6 +228,13 @@ export default function BookOffice() {
   const handleSubmit = () => {
     if (!office || !selectedService) return;
 
+    // Validate terms acceptance
+    if (!termsAccepted) {
+      toast.error(t("booking.acceptTermsToProceed"));
+      vibrate('error');
+      return;
+    }
+
     // Build service description from form data
     const serviceDescription = Object.entries(formData)
       .filter(([key, value]) => value && !(value instanceof File))
@@ -239,12 +253,41 @@ export default function BookOffice() {
     });
   };
 
+  // Handle invalid office ID
+  if (!isValidOfficeId) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-destructive mb-4">{t("office.notFound")}</p>
+          <Button onClick={() => setLocation("/offices")}>
+            {t("office.browseOffices")}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle office error
+  if (officeError) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-destructive mb-4">{t("office.notFound")}</p>
+          <Button onClick={() => setLocation("/offices")}>
+            {t("office.browseOffices")}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Loading state
   if (!office) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading office details...</p>
+          <p className="text-muted-foreground">{t("booking.loadingOffice")}</p>
         </div>
       </div>
     );
@@ -259,11 +302,12 @@ export default function BookOffice() {
             variant="ghost"
             onClick={() => setLocation(`/offices/${officeId}`)}
             className="mb-4"
+            aria-label={t("booking.backToOfficeProfile")}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Office Profile
+            {t("booking.backToOfficeProfile")}
           </Button>
-          <h1 className="text-3xl font-bold">Book a Service</h1>
+          <h1 className="text-3xl font-bold">{t("booking.bookService")}</h1>
           <p className="text-muted-foreground mt-2">{office.officeName}</p>
         </div>
       </div>
@@ -355,6 +399,7 @@ export default function BookOffice() {
               loyaltyPoints={loyalty?.availablePoints}
               discount={discount}
               onEditStep={setCurrentStep}
+              onTermsAccepted={setTermsAccepted}
             />
           )}
         </BookingWizard>
