@@ -21,6 +21,9 @@ import {
   DollarSign,
   User,
   MessageSquare,
+  Info,
+  CreditCard,
+  Bell,
 } from "lucide-react";
 import { BookingCalendar } from "@/components/BookingCalendar";
 import CancellationDialog from "@/components/CancellationDialog";
@@ -158,45 +161,72 @@ export default function BookingsList() {
                             {booking.officeName}
                           </CardDescription>
                         </div>
-                        <div className="flex gap-2">
-                          {canCancel(booking.status) && (
-                            <>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setRescheduleBooking(booking)}
-                              >
-                                <Calendar className="w-4 h-4 mr-2" />
-                                {t("booking.reschedule")}
-                              </Button>
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => setCancelBookingId(booking.id)}
-                              >
-                                <XCircle className="w-4 h-4 mr-2" />
-                                {t("actions.cancel")}
-                              </Button>
-                            </>
-                          )}
-                          {booking.status === "completed" && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setReviewBooking(booking)}
-                            >
-                              <Star className="w-4 h-4 mr-2" />
-                              Review
-                            </Button>
-                          )}
-                        </div>
                       </div>
                     </CardHeader>
 
                     <CardContent className="pt-6">
-                      <div className="grid md:grid-cols-2 gap-6">
-                        {/* Left Column - Booking Details */}
-                        <div className="space-y-4">
+                      {/* Tabbed Interface for Booking Details */}
+                      <Tabs defaultValue="overview" className="w-full">
+                        <TabsList className="grid w-full grid-cols-5 mb-4">
+                          <TabsTrigger value="overview" className="flex items-center gap-1 text-xs sm:text-sm">
+                            <Info className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span className="hidden sm:inline">Overview</span>
+                          </TabsTrigger>
+                          <TabsTrigger value="office" className="flex items-center gap-1 text-xs sm:text-sm">
+                            <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span className="hidden sm:inline">Office</span>
+                          </TabsTrigger>
+                          <TabsTrigger value="communication" className="flex items-center gap-1 text-xs sm:text-sm">
+                            <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span className="hidden sm:inline">Chat</span>
+                          </TabsTrigger>
+                          <TabsTrigger value="documents" className="flex items-center gap-1 text-xs sm:text-sm">
+                            <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span className="hidden sm:inline">Docs</span>
+                          </TabsTrigger>
+                          <TabsTrigger value="payment" className="flex items-center gap-1 text-xs sm:text-sm">
+                            <CreditCard className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span className="hidden sm:inline">Payment</span>
+                          </TabsTrigger>
+                        </TabsList>
+
+                        {/* Overview Tab */}
+                        <TabsContent value="overview" className="space-y-4">
+                          {/* Quick Actions */}
+                          <div className="flex flex-wrap gap-2">
+                            {canCancel(booking.status) && (
+                              <>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setRescheduleBooking(booking)}
+                                >
+                                  <Calendar className="w-4 h-4 mr-2" />
+                                  {t("booking.reschedule")}
+                                </Button>
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => setCancelBookingId(booking.id)}
+                                >
+                                  <XCircle className="w-4 h-4 mr-2" />
+                                  {t("actions.cancel")}
+                                </Button>
+                              </>
+                            )}
+                            {booking.status === "completed" && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setReviewBooking(booking)}
+                              >
+                                <Star className="w-4 h-4 mr-2" />
+                                Review
+                              </Button>
+                            )}
+                          </div>
+
+                          {/* Booking Details */}
                           <div>
                             <h3 className="font-semibold text-sm text-muted-foreground mb-3">
                               {t("booking.details")}
@@ -207,7 +237,7 @@ export default function BookingsList() {
                                 <span className="text-sm">
                                   {booking.scheduledDate
                                     ? formatDate(new Date(booking.scheduledDate))
-                                     : t("bookings.dateNotScheduled")}
+                                    : t("bookings.dateNotScheduled")}
                                 </span>
                               </div>
                               {booking.scheduledTime && (
@@ -220,13 +250,14 @@ export default function BookingsList() {
                                 <div className="flex items-center gap-2">
                                   <DollarSign className="w-4 h-4 text-muted-foreground" />
                                   <span className="text-sm font-semibold">
-                                     {formatCurrency(parseFloat(booking.price) || 0)}
+                                    {formatCurrency(parseFloat(booking.price) || 0)}
                                   </span>
                                 </div>
                               )}
                             </div>
                           </div>
 
+                          {/* Service Description */}
                           {booking.serviceDescription && (
                             <div>
                               <h3 className="font-semibold text-sm text-muted-foreground mb-2">
@@ -236,6 +267,7 @@ export default function BookingsList() {
                             </div>
                           )}
 
+                          {/* Requirements */}
                           {booking.requirements && (
                             <div>
                               <h3 className="font-semibold text-sm text-muted-foreground mb-2">
@@ -244,10 +276,89 @@ export default function BookingsList() {
                               <p className="text-sm whitespace-pre-wrap">{booking.requirements}</p>
                             </div>
                           )}
-                        </div>
 
-                        {/* Right Column - Office Information */}
-                        <div className="space-y-4">
+                          {/* Booking Timeline */}
+                          <Separator className="my-4" />
+                          <BookingStatusTimeline
+                            booking={{
+                              id: booking.id,
+                              status: booking.status,
+                              createdAt: new Date(booking.createdAt),
+                              updatedAt: new Date(booking.updatedAt),
+                              scheduledDate: booking.scheduledDate ? new Date(booking.scheduledDate) : undefined,
+                              scheduledTime: booking.scheduledTime,
+                              completedAt: booking.completedAt ? new Date(booking.completedAt) : undefined,
+                              cancelledAt: booking.cancelledAt ? new Date(booking.cancelledAt) : undefined,
+                              cancelReason: booking.cancellationReason,
+                            }}
+                          />
+
+                          {/* Cancellation Info */}
+                          {booking.status === "cancelled" && booking.cancellationReason && (
+                            <>
+                              <Separator className="my-4" />
+                              <div className="p-4 bg-red-50 rounded-lg border border-red-200">
+                                <div className="flex items-start gap-2 mb-2">
+                                  <XCircle className="w-5 h-5 text-red-600 mt-0.5" />
+                                  <div className="flex-1">
+                                    <p className="text-sm font-semibold text-red-900">
+                                      Booking Cancelled
+                                    </p>
+                                    {booking.cancelledAt && (
+                                      <p className="text-xs text-red-700 mt-1">
+                                        Cancelled on{" "}
+                                        {new Date(booking.cancelledAt).toLocaleDateString()}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                                <p className="text-sm text-red-800 mt-2">{booking.cancellationReason}</p>
+                                {booking.refundAmount && (
+                                  <div className="mt-3 pt-3 border-t border-red-300">
+                                    <p className="text-sm font-medium text-green-700">
+                                      Refund Amount: {booking.refundAmount} OMR
+                                    </p>
+                                    {booking.cancellationPenalty && booking.cancellationPenalty > 0 && (
+                                      <p className="text-xs text-red-600 mt-1">
+                                        Cancellation Fee: {booking.cancellationPenalty} OMR
+                                      </p>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </>
+                          )}
+
+                          {/* Notes */}
+                          {booking.notes && (
+                            <>
+                              <Separator className="my-4" />
+                              <div className="flex items-start gap-2">
+                                <MessageSquare className="w-4 h-4 text-muted-foreground mt-0.5" />
+                                <div>
+                                  <p className="text-sm font-medium text-muted-foreground">Notes</p>
+                                  <p className="text-sm mt-1">{booking.notes}</p>
+                                </div>
+                              </div>
+                            </>
+                          )}
+
+                          {/* Timestamps */}
+                          <Separator className="my-4" />
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>
+                              {t("booking.created")} {new Date(booking.createdAt).toLocaleDateString()}
+                            </span>
+                            {booking.updatedAt && booking.updatedAt !== booking.createdAt && (
+                              <span>
+                                {t("booking.updated")} {new Date(booking.updatedAt).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                        </TabsContent>
+
+                        {/* Office Details Tab */}
+                        <TabsContent value="office" className="space-y-4">
                           <div>
                             <h3 className="font-semibold text-sm text-muted-foreground mb-3">
                               {t("booking.officeInformation")}
@@ -304,131 +415,76 @@ export default function BookingsList() {
                             <Building2 className="w-4 h-4 mr-2" />
                             {t("actions.viewOfficeProfile")}
                           </Button>
-                        </div>
-                      </div>
+                        </TabsContent>
 
-                      {/* Booking Timeline */}
-                      <Separator className="my-4" />
-                      <BookingStatusTimeline
-                        booking={{
-                          id: booking.id,
-                          status: booking.status,
-                          createdAt: new Date(booking.createdAt),
-                          updatedAt: new Date(booking.updatedAt),
-                          scheduledDate: booking.scheduledDate ? new Date(booking.scheduledDate) : undefined,
-                          scheduledTime: booking.scheduledTime,
-                          completedAt: booking.completedAt ? new Date(booking.completedAt) : undefined,
-                          cancelledAt: booking.cancelledAt ? new Date(booking.cancelledAt) : undefined,
-                          cancelReason: booking.cancellationReason,
-                        }}
-                      />
-
-                      {/* Customer Chat */}
-                      {(booking.status === "confirmed" || booking.status === "pending") && (
-                        <>
-                          <Separator className="my-4" />
-                          <CustomerChatInterface
-                            bookingId={booking.id}
-                            officeId={booking.officeId}
-                            officeName={booking.officeName}
-                          />
-                        </>
-                      )}
-
-                      {/* Document Delivery */}
-                      {(booking.status === "completed" || booking.status === "confirmed") && (
-                        <>
-                          <Separator className="my-4" />
-                          <DocumentDeliverySection bookingId={booking.id} />
-                        </>
-                      )}
-
-                      {/* Payment Information */}
-                      {booking.price && (
-                        <>
-                          <Separator className="my-4" />
-                          <PaymentInformationCard
-                            bookingId={booking.id}
-                            price={booking.price}
-                            status={booking.status}
-                          />
-                        </>
-                      )}
-
-                      {/* Booking Reminders */}
-                      {booking.scheduledDate && (booking.status === "confirmed" || booking.status === "pending") && (
-                        <>
-                          <Separator className="my-4" />
-                          <BookingRemindersCard
-                            bookingId={booking.id}
-                            scheduledDate={new Date(booking.scheduledDate)}
-                            status={booking.status}
-                          />
-                        </>
-                      )}
-
-                      {/* Cancellation Info */}
-                      {booking.status === "cancelled" && booking.cancellationReason && (
-                        <>
-                          <Separator className="my-4" />
-                          <div className="p-4 bg-red-50 rounded-lg border border-red-200">
-                            <div className="flex items-start gap-2 mb-2">
-                              <XCircle className="w-5 h-5 text-red-600 mt-0.5" />
-                              <div className="flex-1">
-                                <p className="text-sm font-semibold text-red-900">
-                                  Booking Cancelled
-                                </p>
-                                {booking.cancelledAt && (
-                                  <p className="text-xs text-red-700 mt-1">
-                                    Cancelled on{" "}
-                                    {new Date(booking.cancelledAt).toLocaleDateString()}
-                                  </p>
-                                )}
-                              </div>
+                        {/* Communication Tab */}
+                        <TabsContent value="communication" className="space-y-4">
+                          {(booking.status === "confirmed" || booking.status === "pending") ? (
+                            <CustomerChatInterface
+                              bookingId={booking.id}
+                              officeId={booking.officeId}
+                              officeName={booking.officeName}
+                            />
+                          ) : (
+                            <div className="text-center py-8 text-muted-foreground">
+                              <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                              <p className="text-sm">
+                                Chat is only available for confirmed or pending bookings
+                              </p>
                             </div>
-                            <p className="text-sm text-red-800 mt-2">{booking.cancellationReason}</p>
-                            {booking.refundAmount && (
-                              <div className="mt-3 pt-3 border-t border-red-300">
-                                <p className="text-sm font-medium text-green-700">
-                                  Refund Amount: {booking.refundAmount} OMR
-                                </p>
-                                {booking.cancellationPenalty && booking.cancellationPenalty > 0 && (
-                                  <p className="text-xs text-red-600 mt-1">
-                                    Cancellation Fee: {booking.cancellationPenalty} OMR
-                                  </p>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </>
-                      )}
+                          )}
+                        </TabsContent>
 
-                      {/* Notes */}
-                      {booking.notes && (
-                        <>
-                          <Separator className="my-4" />
-                          <div className="flex items-start gap-2">
-                            <MessageSquare className="w-4 h-4 text-muted-foreground mt-0.5" />
-                            <div>
-                              <p className="text-sm font-medium text-muted-foreground">Notes</p>
-                              <p className="text-sm mt-1">{booking.notes}</p>
+                        {/* Documents Tab */}
+                        <TabsContent value="documents" className="space-y-4">
+                          {(booking.status === "completed" || booking.status === "confirmed") ? (
+                            <DocumentDeliverySection bookingId={booking.id} />
+                          ) : (
+                            <div className="text-center py-8 text-muted-foreground">
+                              <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                              <p className="text-sm">
+                                Documents will be available once the booking is confirmed or completed
+                              </p>
                             </div>
-                          </div>
-                        </>
-                      )}
+                          )}
+                        </TabsContent>
 
-                      {/* Booking Timeline */}
-                      <Separator className="my-4" />
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>
-                          {t("booking.created")} {new Date(booking.createdAt).toLocaleDateString()}
-                        </span>
-                        {booking.updatedAt && booking.updatedAt !== booking.createdAt && (
-                          <span>
-                            {t("booking.updated")} {new Date(booking.updatedAt).toLocaleDateString()}
-                          </span>
-                        )}
-                      </div>
+                        {/* Payment & Reminders Tab */}
+                        <TabsContent value="payment" className="space-y-4">
+                          {/* Payment Information */}
+                          {booking.price && (
+                            <>
+                              <PaymentInformationCard
+                                bookingId={booking.id}
+                                price={booking.price}
+                                status={booking.status}
+                              />
+                            </>
+                          )}
+
+                          {/* Booking Reminders */}
+                          {booking.scheduledDate && (booking.status === "confirmed" || booking.status === "pending") && (
+                            <>
+                              {booking.price && <Separator className="my-4" />}
+                              <BookingRemindersCard
+                                bookingId={booking.id}
+                                scheduledDate={new Date(booking.scheduledDate)}
+                                status={booking.status}
+                              />
+                            </>
+                          )}
+
+                          {/* Empty State */}
+                          {!booking.price && (!booking.scheduledDate || (booking.status !== "confirmed" && booking.status !== "pending")) && (
+                            <div className="text-center py-8 text-muted-foreground">
+                              <CreditCard className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                              <p className="text-sm">
+                                No payment or reminder information available
+                              </p>
+                            </div>
+                          )}
+                        </TabsContent>
+                      </Tabs>
                     </CardContent>
                   </Card>
                 ))}
