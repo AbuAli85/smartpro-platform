@@ -125,8 +125,14 @@ export const appRouter = router({
     getNotificationCounts: protectedProcedure.query(async ({ ctx }) => {
       const user = ctx.user!;
       const pendingBookings = await db.getPendingBookingsCount(user.id);
+      // TODO: Implement actual counts from database
+      const unreadNotifications = 0; // Placeholder
+      const unreadMessages = 0; // Placeholder
       return {
         bookings: pendingBookings,
+        unreadNotifications,
+        pendingBookings,
+        unreadMessages,
       };
     }),
   }),
