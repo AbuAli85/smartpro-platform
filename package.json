@@ -101,8 +101,6 @@
     "react-swipeable": "^7.0.2",
     "recharts": "^2.15.4",
     "resend": "^6.6.0",
-    "socket.io": "^4.8.3",
-    "socket.io-client": "^4.8.3",
     "sonner": "^2.0.7",
     "speakeasy": "^2.0.0",
     "streamdown": "^1.4.0",
