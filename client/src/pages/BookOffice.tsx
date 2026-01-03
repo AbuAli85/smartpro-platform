@@ -2,8 +2,10 @@ import { useState } from "react";
 import { useRoute, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Star, Award, CheckCircle2, MapPin, Phone, Mail, Clock } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useHapticFeedback } from "@/hooks/useHapticFeedback";
 import ChatWidget from "@/components/ChatWidget";
@@ -294,33 +296,92 @@ export default function BookOffice() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="bg-card border-b">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+      {/* Enhanced Header with Office Branding */}
+      <div className="bg-card border-b shadow-sm">
         <div className="container py-6">
           <Button
             variant="ghost"
             onClick={() => setLocation(`/offices/${officeId}`)}
-            className="mb-4"
+            className="mb-6 hover:bg-accent/50 transition-colors"
             aria-label={t("booking.backToOfficeProfile")}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             {t("booking.backToOfficeProfile")}
           </Button>
-          <h1 className="text-3xl font-bold">{t("booking.bookService")}</h1>
-          <p className="text-muted-foreground mt-2">{office.officeName}</p>
+          
+          {/* Office Identity Section */}
+          <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
+            {/* Office Logo */}
+            <div className="flex-shrink-0">
+              <div className="w-20 h-20 rounded-xl bg-primary/10 flex items-center justify-center border-2 border-primary/20">
+                <span className="text-3xl font-bold text-primary">
+                  {office.officeName.charAt(0)}
+                </span>
+              </div>
+            </div>
+            
+            {/* Office Info */}
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl font-bold">{office.officeName}</h1>
+                {office.isVerified && (
+                  <Badge variant="default" className="gap-1">
+                    <CheckCircle2 className="h-3 w-3" />
+                    {t("office.verified")}
+                  </Badge>
+                )}
+              </div>
+              
+              {/* Trust Signals */}
+              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  <span className="font-medium">4.8</span>
+                  <span>({office.reviewsCount || 0} {t("office.reviews")})</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Award className="h-4 w-4 text-primary" />
+                  <span>{t("office.certified")}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <MapPin className="h-4 w-4" />
+                  <span>{office.governorate}, {office.wilayat}</span>
+                </div>
+              </div>
+              
+              {/* Contact Info */}
+              <div className="flex flex-wrap items-center gap-4 mt-3 text-sm">
+                {office.phone && (
+                  <div className="flex items-center gap-1 text-muted-foreground">
+                    <Phone className="h-3 w-3" />
+                    <span>{office.phone}</span>
+                  </div>
+                )}
+                {office.email && (
+                  <div className="flex items-center gap-1 text-muted-foreground">
+                    <Mail className="h-3 w-3" />
+                    <span>{office.email}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="container py-8">
-        <BookingWizard
-          steps={WIZARD_STEPS}
-          currentStep={currentStep}
-          onStepChange={setCurrentStep}
-          onNext={handleNext}
-          onSubmit={handleSubmit}
-          isSubmitting={createBookingMutation.isPending}
-        >
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Booking Wizard */}
+          <div className="lg:col-span-2">
+            <BookingWizard
+              steps={WIZARD_STEPS}
+              currentStep={currentStep}
+              onStepChange={setCurrentStep}
+              onNext={handleNext}
+              onSubmit={handleSubmit}
+              isSubmitting={createBookingMutation.isPending}
+            >
           {currentStep === 1 && (
             <>
               <Step1ServiceSelection
@@ -402,7 +463,112 @@ export default function BookOffice() {
               onTermsAccepted={setTermsAccepted}
             />
           )}
-        </BookingWizard>
+            </BookingWizard>
+          </div>
+          
+          {/* Booking Summary Sidebar */}
+          <div className="lg:col-span-1">
+            <Card className="p-6 sticky top-6 shadow-lg border-2">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Clock className="h-5 w-5 text-primary" />
+                {t("booking.bookingSummary")}
+              </h3>
+              
+              {/* Office Summary */}
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">{t("booking.office")}</p>
+                  <p className="font-medium">{office.officeName}</p>
+                </div>
+                
+                {/* Selected Service */}
+                {selectedService && (
+                  <div className="pt-4 border-t">
+                    <p className="text-sm text-muted-foreground mb-1">{t("booking.selectedService")}</p>
+                    <p className="font-medium">{selectedService.serviceName}</p>
+                    <p className="text-lg font-bold text-primary mt-2">
+                      {selectedService.price} {t("common.omr")}
+                    </p>
+                  </div>
+                )}
+                
+                {/* Selected Date & Time */}
+                {selectedDate && selectedTime && (
+                  <div className="pt-4 border-t">
+                    <p className="text-sm text-muted-foreground mb-1">{t("booking.dateTime")}</p>
+                    <p className="font-medium">
+                      {selectedDate.toLocaleDateString("ar-OM", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">{selectedTime}</p>
+                  </div>
+                )}
+                
+                {/* Loyalty Points Discount */}
+                {usePoints && discount > 0 && (
+                  <div className="pt-4 border-t">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">{t("booking.pointsDiscount")}</span>
+                      <span className="text-green-600 font-medium">-{discount} {t("common.omr")}</span>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Total Price */}
+                {selectedService && (
+                  <div className="pt-4 border-t">
+                    <div className="flex justify-between items-center">
+                      <span className="font-semibold">{t("booking.total")}</span>
+                      <span className="text-2xl font-bold text-primary">
+                        {(basePrice - discount).toFixed(3)} {t("common.omr")}
+                      </span>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Progress Indicator */}
+                <div className="pt-4 border-t">
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {t("booking.step")} {currentStep} {t("booking.of")} {WIZARD_STEPS.length}
+                  </p>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div
+                      className="bg-primary rounded-full h-2 transition-all duration-300"
+                      style={{ width: `${(currentStep / WIZARD_STEPS.length) * 100}%` }}
+                    />
+                  </div>
+                </div>
+                
+                {/* Help Section */}
+                <div className="pt-4 border-t bg-muted/50 -mx-6 -mb-6 p-6 rounded-b-lg">
+                  <p className="text-sm font-medium mb-2">{t("booking.needHelp")}</p>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    {t("booking.contactOffice")}
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => {
+                      // Open chat widget
+                      const chatButton = document.querySelector('[data-chat-widget]');
+                      if (chatButton instanceof HTMLElement) {
+                        chatButton.click();
+                      }
+                    }}
+                  >
+                    <Phone className="h-4 w-4 mr-2" />
+                    {t("booking.chatWithOffice")}
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
       </div>
 
       {office && <ChatWidget officeId={office.id} officeName={office.officeName} />}
