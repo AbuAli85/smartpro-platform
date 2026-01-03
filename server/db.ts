@@ -8,6 +8,7 @@ import {
   documentTemplates,
   generatedDocuments,
   bookings,
+  bookingAnalytics,
   reviews,
   activityLog,
   officeAvailability,
@@ -7232,4 +7233,257 @@ export async function isTimeSlotBlocked(
   }
 
   return false;
+}
+
+
+// ============================================================================
+// Booking Analytics Functions
+// ============================================================================
+
+/**
+ * Get booking analytics for a specific office and date range
+ */
+export async function getBookingAnalytics(officeId: number, startDate: Date, endDate: Date) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(bookingAnalytics)
+    .where(
+      and(
+        eq(bookingAnalytics.officeId, officeId),
+        gte(bookingAnalytics.date, startDate.toISOString()),
+        lte(bookingAnalytics.date, endDate.toISOString())
+      )
+    )
+    .orderBy(asc(bookingAnalytics.date));
+}
+
+/**
+ * Calculate booking conversion rate for an office
+ */
+export async function calculateBookingConversionRate(officeId: number, startDate: Date, endDate: Date) {
+  const db = await getDb();
+  if (!db) return { conversionRate: 0, totalViews: 0, totalBookings: 0 };
+
+  const analytics = await db
+    .select({
+      totalViews: sql<number>`SUM(${bookingAnalytics.totalViews})`,
+      totalBookings: sql<number>`SUM(${bookingAnalytics.totalBookings})`,
+    })
+    .from(bookingAnalytics)
+    .where(
+      and(
+        eq(bookingAnalytics.officeId, officeId),
+        gte(bookingAnalytics.date, startDate.toISOString()),
+        lte(bookingAnalytics.date, endDate.toISOString())
+      )
+    );
+
+  const result = analytics[0];
+  const totalViews = Number(result?.totalViews) || 0;
+  const totalBookings = Number(result?.totalBookings) || 0;
+  const conversionRate = totalViews > 0 ? (totalBookings / totalViews) * 100 : 0;
+
+  return {
+    conversionRate: Math.round(conversionRate * 100) / 100,
+    totalViews,
+    totalBookings,
+  };
+}
+
+/**
+ * Get popular time slots for an office based on booking data
+ */
+export async function getPopularTimeSlots(officeId: number, startDate: Date, endDate: Date) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const bookingData = await db
+    .select({
+      scheduledTime: bookings.scheduledTime,
+      count: sql<number>`COUNT(*)`,
+    })
+    .from(bookings)
+    .where(
+      and(
+        eq(bookings.officeId, officeId),
+        gte(bookings.scheduledDate, startDate.toISOString()),
+        lte(bookings.scheduledDate, endDate.toISOString()),
+        ne(bookings.status, 'cancelled')
+      )
+    )
+    .groupBy(bookings.scheduledTime)
+    .orderBy(desc(sql`COUNT(*)`))
+    .limit(10);
+
+  return bookingData.map(slot => ({
+    timeSlot: slot.scheduledTime || 'Not specified',
+    bookingCount: Number(slot.count),
+  }));
+}
+
+/**
+ * Get cancellation patterns for an office
+ */
+export async function getCancellationPatterns(officeId: number, startDate: Date, endDate: Date) {
+  const db = await getDb();
+  if (!db) return { totalCancellations: 0, reasons: [] };
+
+  const cancellations = await db
+    .select({
+      cancellationReason: bookings.cancellationReason,
+      count: sql<number>`COUNT(*)`,
+    })
+    .from(bookings)
+    .where(
+      and(
+        eq(bookings.officeId, officeId),
+        eq(bookings.status, 'cancelled'),
+        gte(bookings.cancelledAt, startDate.toISOString()),
+        lte(bookings.cancelledAt, endDate.toISOString())
+      )
+    )
+    .groupBy(bookings.cancellationReason);
+
+  const totalCancellations = cancellations.reduce((sum, item) => sum + Number(item.count), 0);
+  const reasons = cancellations.map(item => ({
+    reason: item.cancellationReason || 'No reason provided',
+    count: Number(item.count),
+    percentage: totalCancellations > 0 ? Math.round((Number(item.count) / totalCancellations) * 100) : 0,
+  }));
+
+  return {
+    totalCancellations,
+    reasons: reasons.sort((a, b) => b.count - a.count),
+  };
+}
+
+/**
+ * Update or create booking analytics record
+ */
+export async function upsertBookingAnalytics(data: {
+  officeId: number;
+  date: Date;
+  totalViews?: number;
+  totalBookings?: number;
+  totalCancellations?: number;
+  conversionRate?: number;
+  popularTimeSlots?: any;
+  cancellationReasons?: any;
+  avgBookingValue?: number;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const dateStr = data.date.toISOString().split('T')[0] + ' 00:00:00';
+
+  // Check if record exists
+  const existing = await db
+    .select()
+    .from(bookingAnalytics)
+    .where(
+      and(
+        eq(bookingAnalytics.officeId, data.officeId),
+        eq(bookingAnalytics.date, dateStr)
+      )
+    )
+    .limit(1);
+
+  if (existing.length > 0) {
+    // Update existing record
+    await db
+      .update(bookingAnalytics)
+      .set({
+        totalViews: data.totalViews ?? existing[0].totalViews,
+        totalBookings: data.totalBookings ?? existing[0].totalBookings,
+        totalCancellations: data.totalCancellations ?? existing[0].totalCancellations,
+        conversionRate: data.conversionRate?.toString() ?? existing[0].conversionRate,
+        popularTimeSlots: data.popularTimeSlots ?? existing[0].popularTimeSlots,
+        cancellationReasons: data.cancellationReasons ?? existing[0].cancellationReasons,
+        avgBookingValue: data.avgBookingValue?.toString() ?? existing[0].avgBookingValue,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(bookingAnalytics.id, existing[0].id));
+
+    return existing[0].id;
+  } else {
+    // Insert new record
+    const result = await db.insert(bookingAnalytics).values({
+      officeId: data.officeId,
+      date: dateStr,
+      totalViews: data.totalViews ?? 0,
+      totalBookings: data.totalBookings ?? 0,
+      totalCancellations: data.totalCancellations ?? 0,
+      conversionRate: data.conversionRate?.toString() ?? '0.00',
+      popularTimeSlots: data.popularTimeSlots ?? null,
+      cancellationReasons: data.cancellationReasons ?? null,
+      avgBookingValue: data.avgBookingValue?.toString() ?? '0.000',
+    });
+
+    return result.insertId;
+  }
+}
+
+/**
+ * Track office page view for analytics
+ */
+export async function trackOfficeView(officeId: number) {
+  const db = await getDb();
+  if (!db) return;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  await upsertBookingAnalytics({
+    officeId,
+    date: today,
+    totalViews: 1,
+  });
+}
+
+/**
+ * Get booking metrics summary for an office
+ */
+export async function getBookingMetricsSummary(officeId: number, days: number = 30) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const endDate = new Date();
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+
+  const [conversionData, popularSlots, cancellationData] = await Promise.all([
+    calculateBookingConversionRate(officeId, startDate, endDate),
+    getPopularTimeSlots(officeId, startDate, endDate),
+    getCancellationPatterns(officeId, startDate, endDate),
+  ]);
+
+  // Calculate average booking value
+  const bookingValues = await db
+    .select({
+      avgValue: sql<number>`AVG(${bookings.price})`,
+    })
+    .from(bookings)
+    .where(
+      and(
+        eq(bookings.officeId, officeId),
+        gte(bookings.createdAt, startDate.toISOString()),
+        lte(bookings.createdAt, endDate.toISOString()),
+        ne(bookings.status, 'cancelled')
+      )
+    );
+
+  const avgBookingValue = Number(bookingValues[0]?.avgValue) || 0;
+
+  return {
+    conversionRate: conversionData.conversionRate,
+    totalViews: conversionData.totalViews,
+    totalBookings: conversionData.totalBookings,
+    popularTimeSlots: popularSlots,
+    totalCancellations: cancellationData.totalCancellations,
+    cancellationReasons: cancellationData.reasons,
+    avgBookingValue: Math.round(avgBookingValue * 1000) / 1000,
+  };
 }

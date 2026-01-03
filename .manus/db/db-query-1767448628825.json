@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `booking_analytics` (\n\t`id` int AUTO_INCREMENT NOT NULL PRIMARY KEY,\n\t`office_id` int NOT NULL,\n\t`date` timestamp NOT NULL,\n\t`total_views` int NOT NULL DEFAULT 0,\n\t`total_bookings` int NOT NULL DEFAULT 0,\n\t`total_cancellations` int NOT NULL DEFAULT 0,\n\t`conversion_rate` decimal(5, 2) NOT NULL DEFAULT '0.00',\n\t`popular_time_slots` json,\n\t`cancellation_reasons` json,\n\t`avg_booking_value` decimal(10, 3) NOT NULL DEFAULT '0.000',\n\t`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n\t`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n\tINDEX `office_date_idx` (`office_id`, `date`),\n\tINDEX `office_idx` (`office_id`),\n\tINDEX `date_idx` (`date`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute CREATE TABLE IF NOT EXISTS `booking_analytics` (\n\t`id` int AUTO_INCREMENT NOT NULL PRIMARY KEY,\n\t`office_id` int NOT NULL,\n\t`date` timestamp NOT NULL,\n\t`total_views` int NOT NULL DEFAULT 0,\n\t`total_bookings` int NOT NULL DEFAULT 0,\n\t`total_cancellations` int NOT NULL DEFAULT 0,\n\t`conversion_rate` decimal(5, 2) NOT NULL DEFAULT '0.00',\n\t`popular_time_slots` json,\n\t`cancellation_reasons` json,\n\t`avg_booking_value` decimal(10, 3) NOT NULL DEFAULT '0.000',\n\t`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n\t`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n\tINDEX `office_date_idx` (`office_id`, `date`),\n\tINDEX `office_idx` (`office_id`),\n\tINDEX `date_idx` (`date`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1717
+}

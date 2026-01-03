@@ -91,6 +91,26 @@ export const batchTranslationJobs = mysqlTable("batch_translation_jobs", {
 	index("created_at_idx").on(table.createdAt),
 ]);
 
+export const bookingAnalytics = mysqlTable("booking_analytics", {
+	id: int().autoincrement().notNull(),
+	officeId: int().notNull(),
+	date: timestamp({ mode: 'string' }).notNull(),
+	totalViews: int().default(0).notNull(),
+	totalBookings: int().default(0).notNull(),
+	totalCancellations: int().default(0).notNull(),
+	conversionRate: decimal({ precision: 5, scale: 2 }).default('0.00').notNull(),
+	popularTimeSlots: json(),
+	cancellationReasons: json(),
+	avgBookingValue: decimal({ precision: 10, scale: 3 }).default('0.000').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("office_date_idx").on(table.officeId, table.date),
+	index("office_idx").on(table.officeId),
+	index("date_idx").on(table.date),
+]);
+
 export const bookings = mysqlTable("bookings", {
 	id: int().autoincrement().notNull(),
 	officeId: int().notNull(),
@@ -1179,6 +1199,7 @@ export const officeBlockedSlots = mysqlTable("office_blocked_slots", {
 	isAllDay: tinyint("is_all_day").default(0).notNull(),
 	reason: text(),
 	createdBy: int("created_by").notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 },
 (table) => [
 	index("office_date_idx").on(table.officeId, table.blockedDate),

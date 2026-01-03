@@ -35,6 +35,7 @@ import CannedResponses from "./pages/CannedResponses";
 import StaffManagement from "./pages/StaffManagement";
 import StaffPerformance from "./pages/StaffPerformance";
 import FollowUpSettings from "./pages/FollowUpSettings";
+import BookingAnalyticsDashboard from "./pages/BookingAnalyticsDashboard";
 import ContentTranslation from "./pages/ContentTranslation";
 import TranslationRequestQueue from "./pages/TranslationRequestQueue";
 import TranslationAnalytics from "./pages/TranslationAnalytics";
@@ -328,6 +329,13 @@ function Router() {
       <Route path="/owner/follow-up-settings">
         <ProtectedRoute requirePermission="canManageOffice">
           <FollowUpSettings />
+        </ProtectedRoute>
+      </Route>
+
+      {/* Booking Analytics */}
+      <Route path="/owner/booking-analytics">
+        <ProtectedRoute requirePermission="canManageOffice">
+          <BookingAnalyticsDashboard />
         </ProtectedRoute>
       </Route>
       

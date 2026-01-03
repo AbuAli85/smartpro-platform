@@ -56,9 +56,11 @@ import { staffManagementRouter } from "./routers/staffManagement";
 import { financialManagementRouter } from "./routers/financialManagement";
 import { draftFormsRouter } from "./routers/draftForms";
 import { availabilityRouter } from "./routers/availability";
+import { bookingAnalyticsRouter } from "./routers/bookingAnalytics";
 
 export const appRouter = router({
   system: systemRouter,
+  bookingAnalytics: bookingAnalyticsRouter,
   
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
