@@ -1,0 +1,35 @@
+{
+  "query": "SELECT \n  id,\n  officeName,\n  verificationStatus\nFROM sanad_offices\nWHERE ownerId = (SELECT id FROM users WHERE email = 'luxsess2001@gmail.com' LIMIT 1)\nLIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute SELECT \n  id,\n  officeName,\n  verificationStatus\nFROM sanad_offices\nWHERE ownerId = (SELECT id FROM users WHERE email = 'luxsess2001@gmail.com' LIMIT 1)\nLIMIT 5",
+  "rows": [
+    {
+      "id": "1",
+      "officeName": "Muscat Business Hub",
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "2",
+      "officeName": "Salalah Trade Center",
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "3",
+      "officeName": "Sohar Industrial Services",
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "4",
+      "officeName": "Nizwa Heritage Business Center",
+      "verificationStatus": "verified"
+    },
+    {
+      "id": "60001",
+      "officeName": "Test Review Office",
+      "verificationStatus": "verified"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tofficeName\tverificationStatus\n1\tMuscat Business Hub\tverified\n2\tSalalah Trade Center\tverified\n3\tSohar Industrial Services\tverified\n4\tNizwa Heritage Business Center\tverified\n60001\tTest Review Office\tverified\n",
+  "stderr": "",
+  "execution_time_ms": 1518
+}

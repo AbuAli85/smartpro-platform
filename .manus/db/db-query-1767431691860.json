@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, officeName FROM sanad_offices WHERE id IN (60003, 120003);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute SELECT id, officeName FROM sanad_offices WHERE id IN (60003, 120003);",
+  "rows": [
+    {
+      "id": "60003",
+      "officeName": "Premium Legal Services"
+    },
+    {
+      "id": "120003",
+      "officeName": "Premium Legal Services"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tofficeName\n60003\tPremium Legal Services\n120003\tPremium Legal Services\n",
+  "stderr": "",
+  "execution_time_ms": 1492
+}

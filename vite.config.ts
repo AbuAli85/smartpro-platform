@@ -36,6 +36,12 @@ export default defineConfig({
       "localhost",
       "127.0.0.1",
     ],
+    hmr: {
+      clientPort: 443,
+      protocol: 'wss',
+      host: process.env.VITE_HMR_HOST || undefined,
+      timeout: 30000,
+    },
     fs: {
       strict: true,
       deny: ["**/.*"],

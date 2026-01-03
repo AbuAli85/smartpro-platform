@@ -1,0 +1,45 @@
+{
+  "query": "SELECT id, name, role FROM users WHERE role = 'sanad_owner';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute SELECT id, name, role FROM users WHERE role = 'sanad_owner';",
+  "rows": [
+    {
+      "id": "150811",
+      "name": "Test Enhancement User",
+      "role": "sanad_owner"
+    },
+    {
+      "id": "423576",
+      "name": "Mohammed Al-Harthi",
+      "role": "sanad_owner"
+    },
+    {
+      "id": "423577",
+      "name": "Aisha Al-Kindi",
+      "role": "sanad_owner"
+    },
+    {
+      "id": "423578",
+      "name": "Salem Al-Rashdi",
+      "role": "sanad_owner"
+    },
+    {
+      "id": "510002",
+      "name": "Test Enhancement User",
+      "role": "sanad_owner"
+    },
+    {
+      "id": "510010",
+      "name": "Mohammed Al-Balushi",
+      "role": "sanad_owner"
+    },
+    {
+      "id": "510011",
+      "name": "Fatima Al-Hinai",
+      "role": "sanad_owner"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\trole\n150811\tTest Enhancement User\tsanad_owner\n423576\tMohammed Al-Harthi\tsanad_owner\n423577\tAisha Al-Kindi\tsanad_owner\n423578\tSalem Al-Rashdi\tsanad_owner\n510002\tTest Enhancement User\tsanad_owner\n510010\tMohammed Al-Balushi\tsanad_owner\n510011\tFatima Al-Hinai\tsanad_owner\n",
+  "stderr": "",
+  "execution_time_ms": 1617
+}

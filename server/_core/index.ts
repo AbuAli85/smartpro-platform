@@ -7,6 +7,15 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { initializeSocket } from "./socket";
+import { initializeCronJobs } from "./cronJobs";
+import sseRouter from "../routes/sse";
+import { startReminderScheduler } from "./reminderScheduler";
+import { startFollowUpJob } from "../jobs/followUpJob";
+import { initializeScheduledJobs } from "../jobs/scheduler";
+import { startQualityMonitoringScheduler } from "./qualityMonitoringJob";
+import { initializeWorkflowMonitoringJob } from "./workflowMonitoringJob";
+import { apiLimiter } from "./rateLimiter";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -30,11 +39,19 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
+  // Trust proxy for rate limiting behind reverse proxy
+  app.set('trust proxy', 1);
+  
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  
+  // Apply rate limiting to all API routes
+  app.use("/api", apiLimiter);
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+  // SSE notifications endpoint
+  app.use("/api/sse", sseRouter);
   // tRPC API
   app.use(
     "/api/trpc",
@@ -50,6 +67,21 @@ async function startServer() {
     serveStatic(app);
   }
 
+  // Initialize WebSocket server
+  initializeSocket(server);
+
+  // Initialize cron jobs for scheduled tasks
+  initializeCronJobs();
+  
+  // Start booking reminder scheduler
+  startReminderScheduler();
+  
+  // Start quality monitoring scheduler
+  startQualityMonitoringScheduler();
+  
+  // Start workflow monitoring job (daily untranslated content scan)
+  initializeWorkflowMonitoringJob();
+
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);
 
@@ -59,6 +91,12 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
+    
+    // Start background jobs
+    startFollowUpJob();
+    
+    // Initialize scheduled jobs
+    initializeScheduledJobs();
   });
 }
 

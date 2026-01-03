@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE `active_sessions` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`sessionId` varchar(255) NOT NULL,\n\t`userId` int NOT NULL,\n\t`deviceInfo` json,\n\t`ipAddress` varchar(45),\n\t`userAgent` text,\n\t`lastActive` timestamp NOT NULL DEFAULT (now()),\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`expiresAt` timestamp,\n\t`isActive` boolean NOT NULL DEFAULT true,\n\tCONSTRAINT `active_sessions_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `active_sessions_sessionId_unique` UNIQUE(`sessionId`)\n);\nCREATE INDEX `user_id_idx` ON `active_sessions` (`userId`);\nCREATE INDEX `session_id_idx` ON `active_sessions` (`sessionId`);\nCREATE INDEX `last_active_idx` ON `active_sessions` (`lastActive`);\nCREATE INDEX `is_active_idx` ON `active_sessions` (`isActive`);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute CREATE TABLE `active_sessions` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`sessionId` varchar(255) NOT NULL,\n\t`userId` int NOT NULL,\n\t`deviceInfo` json,\n\t`ipAddress` varchar(45),\n\t`userAgent` text,\n\t`lastActive` timestamp NOT NULL DEFAULT (now()),\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`expiresAt` timestamp,\n\t`isActive` boolean NOT NULL DEFAULT true,\n\tCONSTRAINT `active_sessions_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `active_sessions_sessionId_unique` UNIQUE(`sessionId`)\n);\nCREATE INDEX `user_id_idx` ON `active_sessions` (`userId`);\nCREATE INDEX `session_id_idx` ON `active_sessions` (`sessionId`);\nCREATE INDEX `last_active_idx` ON `active_sessions` (`lastActive`);\nCREATE INDEX `is_active_idx` ON `active_sessions` (`isActive`);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 4660
+}

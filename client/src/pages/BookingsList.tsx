@@ -1,0 +1,556 @@
+import { useState } from "react";
+import { trpc } from "@/lib/trpc";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  XCircle,
+  Star,
+  CalendarDays,
+  List,
+  Phone,
+  Mail,
+  Building2,
+  FileText,
+  DollarSign,
+  User,
+  MessageSquare,
+  Info,
+  CreditCard,
+  Bell,
+} from "lucide-react";
+import { BookingCalendar } from "@/components/BookingCalendar";
+import CancellationDialog from "@/components/CancellationDialog";
+import ReviewDialog from "@/components/ReviewDialog";
+import { RescheduleBookingDialog } from "@/components/RescheduleBookingDialog";
+import { BookingStatusTimeline } from "@/components/BookingStatusTimeline";
+import { CustomerChatInterface } from "@/components/CustomerChatInterface";
+import { DocumentDeliverySection } from "@/components/DocumentDeliverySection";
+import { PaymentInformationCard } from "@/components/PaymentInformationCard";
+import { BookingRemindersCard } from "@/components/BookingRemindersCard";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useFormatNumber } from "@/hooks/useFormatNumber";
+import { useLocation } from "wouter";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { PullToRefreshIndicator } from "@/components/PullToRefreshIndicator";
+
+export default function BookingsList() {
+  const { t } = useLanguage();
+  const { formatNumber, formatCurrency, formatDate, formatTime } = useFormatNumber();
+  const [, setLocation] = useLocation();
+  const [cancelBookingId, setCancelBookingId] = useState<number | null>(null);
+  const [reviewBooking, setReviewBooking] = useState<any | null>(null);
+  const [rescheduleBooking, setRescheduleBooking] = useState<any | null>(null);
+  
+  const { data: bookings, isLoading, refetch } = trpc.booking.getMyBookings.useQuery();
+
+  // Pull-to-refresh functionality
+  const pullToRefreshState = usePullToRefresh({
+    onRefresh: async () => {
+      await refetch();
+    },
+    enabled: !isLoading,
+  });
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "confirmed":
+        return "bg-green-500";
+      case "pending":
+        return "bg-yellow-500";
+      case "completed":
+        return "bg-blue-500";
+      case "cancelled":
+        return "bg-red-500";
+      default:
+        return "bg-gray-500";
+    }
+  };
+
+  const canCancel = (status: string) => {
+    return status === "pending" || status === "confirmed";
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <div className="container py-8">
+          <Breadcrumb items={[{ label: t("bookings.title") }]} className="mb-6" />
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#003366]"></div>
+            <span className="ml-3 text-gray-600">{t("common.loading")}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      {/* Pull-to-refresh indicator */}
+      <PullToRefreshIndicator {...pullToRefreshState} />
+      <div className="container py-8">
+        <Breadcrumb items={[{ label: t("bookings.title") }]} className="mb-6" />
+        <h1 className="text-4xl font-bold mb-8">{t("bookings.title")}</h1>
+        
+        <Tabs defaultValue="list" className="w-full">
+          <TabsList className="mb-6">
+            <TabsTrigger value="list" className="flex items-center gap-2">
+              <List className="h-4 w-4" />
+              {t("bookings.listView")}
+            </TabsTrigger>
+            <TabsTrigger value="calendar" className="flex items-center gap-2">
+              <CalendarDays className="h-4 w-4" />
+              {t("bookings.calendarView")}
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="list">
+            {!bookings || bookings.length === 0 ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t("bookings.history")}</CardTitle>
+                  <CardDescription>{t("bookings.historyDesc")}</CardDescription>
+                </CardHeader>
+                <CardContent className="py-12 text-center">
+                  <Calendar className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground mb-6">{t("bookings.noBookings")}</p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                    <Button 
+                      onClick={() => setLocation('/offices')}
+                      size="lg"
+                      className="bg-[#003366] hover:bg-[#002244]"
+                    >
+                      <Building2 className="w-4 h-4 mr-2" />
+                      {t("bookings.browseOffices")}
+                    </Button>
+                    <Button 
+                      onClick={() => setLocation('/marketplace')}
+                      variant="outline"
+                      size="lg"
+                    >
+                      <FileText className="w-4 h-4 mr-2" />
+                      {t("bookings.requestService")}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-6">
+                {bookings.map((booking: any) => (
+                  <Card key={booking.id} className="overflow-hidden">
+                    <CardHeader className="bg-muted/50">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <Building2 className="w-5 h-5 text-primary" />
+                            <CardTitle className="text-xl">
+                              {booking.serviceName || t("bookings.serviceBookingDefault")}
+                            </CardTitle>
+                            <Badge className={getStatusColor(booking.status)}>
+                              {booking.status}
+                            </Badge>
+                          </div>
+                          <CardDescription className="text-base">
+                            {booking.officeName}
+                          </CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="pt-6">
+                      {/* Tabbed Interface for Booking Details */}
+                      <Tabs defaultValue="overview" className="w-full">
+                        <TabsList className="grid w-full grid-cols-5 mb-4">
+                          <TabsTrigger value="overview" className="flex items-center gap-1 text-xs sm:text-sm">
+                            <Info className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span className="hidden sm:inline">Overview</span>
+                          </TabsTrigger>
+                          <TabsTrigger value="office" className="flex items-center gap-1 text-xs sm:text-sm">
+                            <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span className="hidden sm:inline">Office</span>
+                          </TabsTrigger>
+                          <TabsTrigger value="communication" className="flex items-center gap-1 text-xs sm:text-sm">
+                            <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span className="hidden sm:inline">Chat</span>
+                          </TabsTrigger>
+                          <TabsTrigger value="documents" className="flex items-center gap-1 text-xs sm:text-sm">
+                            <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span className="hidden sm:inline">Docs</span>
+                          </TabsTrigger>
+                          <TabsTrigger value="payment" className="flex items-center gap-1 text-xs sm:text-sm">
+                            <CreditCard className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span className="hidden sm:inline">Payment</span>
+                          </TabsTrigger>
+                        </TabsList>
+
+                        {/* Overview Tab */}
+                        <TabsContent value="overview" className="space-y-4">
+                          {/* Quick Actions */}
+                          <div className="flex flex-wrap gap-2">
+                            {canCancel(booking.status) && (
+                              <>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setRescheduleBooking(booking)}
+                                >
+                                  <Calendar className="w-4 h-4 mr-2" />
+                                  {t("booking.reschedule")}
+                                </Button>
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => setCancelBookingId(booking.id)}
+                                >
+                                  <XCircle className="w-4 h-4 mr-2" />
+                                  {t("actions.cancel")}
+                                </Button>
+                              </>
+                            )}
+                            {booking.status === "completed" && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setReviewBooking(booking)}
+                              >
+                                <Star className="w-4 h-4 mr-2" />
+                                Review
+                              </Button>
+                            )}
+                          </div>
+
+                          {/* Booking Details */}
+                          <div>
+                            <h3 className="font-semibold text-sm text-muted-foreground mb-3">
+                              {t("booking.details")}
+                            </h3>
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-muted-foreground" />
+                                <span className="text-sm">
+                                  {booking.scheduledDate
+                                    ? formatDate(new Date(booking.scheduledDate))
+                                    : t("bookings.dateNotScheduled")}
+                                </span>
+                              </div>
+                              {booking.scheduledTime && (
+                                <div className="flex items-center gap-2">
+                                  <Clock className="w-4 h-4 text-muted-foreground" />
+                                  <span className="text-sm">{formatTime(booking.scheduledTime)}</span>
+                                </div>
+                              )}
+                              {booking.price && (
+                                <div className="flex items-center gap-2">
+                                  <DollarSign className="w-4 h-4 text-muted-foreground" />
+                                  <span className="text-sm font-semibold">
+                                    {formatCurrency(parseFloat(booking.price) || 0)}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Service Description */}
+                          {booking.serviceDescription && (
+                            <div>
+                              <h3 className="font-semibold text-sm text-muted-foreground mb-2">
+                                {t("booking.serviceDescription")}
+                              </h3>
+                              <p className="text-sm">{booking.serviceDescription}</p>
+                            </div>
+                          )}
+
+                          {/* Requirements */}
+                          {booking.requirements && (
+                            <div>
+                              <h3 className="font-semibold text-sm text-muted-foreground mb-2">
+                                Requirements
+                              </h3>
+                              <p className="text-sm whitespace-pre-wrap">{booking.requirements}</p>
+                            </div>
+                          )}
+
+                          {/* Booking Timeline */}
+                          <Separator className="my-4" />
+                          <BookingStatusTimeline
+                            booking={{
+                              id: booking.id,
+                              status: booking.status,
+                              createdAt: new Date(booking.createdAt),
+                              updatedAt: new Date(booking.updatedAt),
+                              scheduledDate: booking.scheduledDate ? new Date(booking.scheduledDate) : undefined,
+                              scheduledTime: booking.scheduledTime,
+                              completedAt: booking.completedAt ? new Date(booking.completedAt) : undefined,
+                              cancelledAt: booking.cancelledAt ? new Date(booking.cancelledAt) : undefined,
+                              cancelReason: booking.cancellationReason,
+                            }}
+                          />
+
+                          {/* Cancellation Info */}
+                          {booking.status === "cancelled" && booking.cancellationReason && (
+                            <>
+                              <Separator className="my-4" />
+                              <div className="p-4 bg-red-50 rounded-lg border border-red-200">
+                                <div className="flex items-start gap-2 mb-2">
+                                  <XCircle className="w-5 h-5 text-red-600 mt-0.5" />
+                                  <div className="flex-1">
+                                    <p className="text-sm font-semibold text-red-900">
+                                      Booking Cancelled
+                                    </p>
+                                    {booking.cancelledAt && (
+                                      <p className="text-xs text-red-700 mt-1">
+                                        Cancelled on{" "}
+                                        {new Date(booking.cancelledAt).toLocaleDateString()}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                                <p className="text-sm text-red-800 mt-2">{booking.cancellationReason}</p>
+                                {booking.refundAmount && (
+                                  <div className="mt-3 pt-3 border-t border-red-300">
+                                    <p className="text-sm font-medium text-green-700">
+                                      Refund Amount: {booking.refundAmount} OMR
+                                    </p>
+                                    {booking.cancellationPenalty && booking.cancellationPenalty > 0 && (
+                                      <p className="text-xs text-red-600 mt-1">
+                                        Cancellation Fee: {booking.cancellationPenalty} OMR
+                                      </p>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </>
+                          )}
+
+                          {/* Notes */}
+                          {booking.notes && (
+                            <>
+                              <Separator className="my-4" />
+                              <div className="flex items-start gap-2">
+                                <MessageSquare className="w-4 h-4 text-muted-foreground mt-0.5" />
+                                <div>
+                                  <p className="text-sm font-medium text-muted-foreground">Notes</p>
+                                  <p className="text-sm mt-1">{booking.notes}</p>
+                                </div>
+                              </div>
+                            </>
+                          )}
+
+                          {/* Timestamps */}
+                          <Separator className="my-4" />
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>
+                              {t("booking.created")} {new Date(booking.createdAt).toLocaleDateString()}
+                            </span>
+                            {booking.updatedAt && booking.updatedAt !== booking.createdAt && (
+                              <span>
+                                {t("booking.updated")} {new Date(booking.updatedAt).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                        </TabsContent>
+
+                        {/* Office Details Tab */}
+                        <TabsContent value="office" className="space-y-4">
+                          <div>
+                            <h3 className="font-semibold text-sm text-muted-foreground mb-3">
+                              {t("booking.officeInformation")}
+                            </h3>
+                            <div className="space-y-2">
+                              {booking.officePhone && (
+                                <div className="flex items-center gap-2">
+                                  <Phone className="w-4 h-4 text-muted-foreground" />
+                                  <a
+                                    href={`tel:${booking.officePhone}`}
+                                    className="text-sm text-primary hover:underline"
+                                  >
+                                    {booking.officePhone}
+                                  </a>
+                                </div>
+                              )}
+                              {booking.officeEmail && (
+                                <div className="flex items-center gap-2">
+                                  <Mail className="w-4 h-4 text-muted-foreground" />
+                                  <a
+                                    href={`mailto:${booking.officeEmail}`}
+                                    className="text-sm text-primary hover:underline"
+                                  >
+                                    {booking.officeEmail}
+                                  </a>
+                                </div>
+                              )}
+                              {booking.officeAddress && (
+                                <div className="flex items-start gap-2">
+                                  <MapPin className="w-4 h-4 text-muted-foreground mt-0.5" />
+                                  <span className="text-sm">
+                                    {booking.officeAddress}
+                                    {booking.officeWilayat && `, ${booking.officeWilayat}`}
+                                    {booking.officeGovernorate && `, ${booking.officeGovernorate}`}
+                                  </span>
+                                </div>
+                              )}
+                              {booking.officeRating && (
+                                <div className="flex items-center gap-2">
+                                  <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                                  <span className="text-sm font-medium">
+                                    {booking.officeRating} / 5.0
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => setLocation(`/offices/${booking.officeId}`)}
+                          >
+                            <Building2 className="w-4 h-4 mr-2" />
+                            {t("actions.viewOfficeProfile")}
+                          </Button>
+                        </TabsContent>
+
+                        {/* Communication Tab */}
+                        <TabsContent value="communication" className="space-y-4">
+                          {(booking.status === "confirmed" || booking.status === "pending") ? (
+                            <CustomerChatInterface
+                              bookingId={booking.id}
+                              officeId={booking.officeId}
+                              officeName={booking.officeName}
+                            />
+                          ) : (
+                            <div className="text-center py-8 text-muted-foreground">
+                              <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                              <p className="text-sm">
+                                Chat is only available for confirmed or pending bookings
+                              </p>
+                            </div>
+                          )}
+                        </TabsContent>
+
+                        {/* Documents Tab */}
+                        <TabsContent value="documents" className="space-y-4">
+                          {(booking.status === "completed" || booking.status === "confirmed") ? (
+                            <DocumentDeliverySection bookingId={booking.id} />
+                          ) : (
+                            <div className="text-center py-8 text-muted-foreground">
+                              <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                              <p className="text-sm">
+                                Documents will be available once the booking is confirmed or completed
+                              </p>
+                            </div>
+                          )}
+                        </TabsContent>
+
+                        {/* Payment & Reminders Tab */}
+                        <TabsContent value="payment" className="space-y-4">
+                          {/* Payment Information */}
+                          {booking.price && (
+                            <>
+                              <PaymentInformationCard
+                                bookingId={booking.id}
+                                price={booking.price}
+                                status={booking.status}
+                              />
+                            </>
+                          )}
+
+                          {/* Booking Reminders */}
+                          {booking.scheduledDate && (booking.status === "confirmed" || booking.status === "pending") && (
+                            <>
+                              {booking.price && <Separator className="my-4" />}
+                              <BookingRemindersCard
+                                bookingId={booking.id}
+                                scheduledDate={new Date(booking.scheduledDate)}
+                                status={booking.status}
+                              />
+                            </>
+                          )}
+
+                          {/* Empty State */}
+                          {!booking.price && (!booking.scheduledDate || (booking.status !== "confirmed" && booking.status !== "pending")) && (
+                            <div className="text-center py-8 text-muted-foreground">
+                              <CreditCard className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                              <p className="text-sm">
+                                No payment or reminder information available
+                              </p>
+                            </div>
+                          )}
+                        </TabsContent>
+                      </Tabs>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="calendar">
+            <BookingCalendar bookings={bookings || []} />
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Dialogs */}
+      {cancelBookingId !== null && (
+        <CancellationDialog
+          bookingId={cancelBookingId}
+          open={true}
+          onOpenChange={(open) => {
+            if (!open) {
+              setCancelBookingId(null);
+              refetch();
+            }
+          }}
+          onSuccess={() => {
+            setCancelBookingId(null);
+            refetch();
+          }}
+        />
+      )}
+      {reviewBooking && (
+        <ReviewDialog
+          bookingId={reviewBooking.id}
+          officeId={reviewBooking.officeId}
+          officeName={reviewBooking.officeName || t("bookings.office")}
+          open={true}
+          onOpenChange={(open) => {
+            if (!open) {
+              setReviewBooking(null);
+              refetch();
+            }
+          }}
+          onSuccess={() => {
+            setReviewBooking(null);
+            refetch();
+          }}
+        />
+      )}
+      {rescheduleBooking && (
+        <RescheduleBookingDialog
+          bookingId={rescheduleBooking.id}
+          currentDate={new Date(rescheduleBooking.scheduledDate)}
+          currentTime={rescheduleBooking.scheduledTime}
+          officeId={rescheduleBooking.officeId}
+          open={true}
+          onOpenChange={(open) => {
+            if (!open) {
+              setRescheduleBooking(null);
+            }
+          }}
+          onSuccess={() => {
+            setRescheduleBooking(null);
+            refetch();
+          }}
+        />
+      )}
+    </div>
+  );
+}

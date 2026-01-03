@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS translation_activity_log (\n  id int AUTO_INCREMENT NOT NULL,\n  entityType enum('office','template') NOT NULL,\n  entityId int NOT NULL,\n  entityName varchar(255) NOT NULL,\n  translatorId int NOT NULL,\n  translatorName varchar(255) NOT NULL,\n  actionType enum('created','updated','bulk_import') NOT NULL,\n  fieldChanged varchar(50),\n  previousValue text,\n  newValue text,\n  source enum('manual','bulk_import','request_approval') NOT NULL DEFAULT 'manual',\n  requestId int,\n  createdAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY(id),\n  INDEX entity_idx (entityType, entityId),\n  INDEX translator_idx (translatorId),\n  INDEX action_idx (actionType),\n  INDEX source_idx (source),\n  INDEX date_idx (createdAt)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute CREATE TABLE IF NOT EXISTS translation_activity_log (\n  id int AUTO_INCREMENT NOT NULL,\n  entityType enum('office','template') NOT NULL,\n  entityId int NOT NULL,\n  entityName varchar(255) NOT NULL,\n  translatorId int NOT NULL,\n  translatorName varchar(255) NOT NULL,\n  actionType enum('created','updated','bulk_import') NOT NULL,\n  fieldChanged varchar(50),\n  previousValue text,\n  newValue text,\n  source enum('manual','bulk_import','request_approval') NOT NULL DEFAULT 'manual',\n  requestId int,\n  createdAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY(id),\n  INDEX entity_idx (entityType, entityId),\n  INDEX translator_idx (translatorId),\n  INDEX action_idx (actionType),\n  INDEX source_idx (source),\n  INDEX date_idx (createdAt)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1732
+}

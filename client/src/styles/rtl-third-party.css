@@ -1,0 +1,500 @@
+/* RTL Styles for Third-Party Components */
+
+/* ===============================================
+   FullCalendar RTL Styles
+   =============================================== */
+
+.fc.fc-direction-rtl {
+  direction: rtl;
+}
+
+.fc.fc-direction-rtl .fc-toolbar {
+  direction: rtl;
+}
+
+.fc.fc-direction-rtl .fc-toolbar-chunk {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.fc.fc-direction-rtl .fc-button-group {
+  flex-direction: row-reverse;
+}
+
+.fc.fc-direction-rtl .fc-daygrid-day-number {
+  text-align: left;
+  padding-right: 0;
+  padding-left: 4px;
+}
+
+.fc.fc-direction-rtl .fc-event-time {
+  text-align: right;
+}
+
+.fc.fc-direction-rtl .fc-event-title {
+  text-align: right;
+}
+
+.fc.fc-direction-rtl .fc-col-header-cell-cushion {
+  text-align: center;
+}
+
+.fc.fc-direction-rtl .fc-timegrid-slot-label {
+  text-align: left;
+}
+
+.fc.fc-direction-rtl .fc-timegrid-event {
+  text-align: right;
+}
+
+/* Button icon flipping for RTL */
+.fc.fc-direction-rtl .fc-icon-chevron-left:before {
+  content: "\e901"; /* chevron-right */
+}
+
+.fc.fc-direction-rtl .fc-icon-chevron-right:before {
+  content: "\e900"; /* chevron-left */
+}
+
+/* Event positioning in RTL */
+.fc.fc-direction-rtl .fc-daygrid-event {
+  text-align: right;
+}
+
+.fc.fc-direction-rtl .fc-daygrid-event-harness {
+  margin-left: 0;
+  margin-right: 2px;
+}
+
+/* Week numbers on right side in RTL */
+.fc.fc-direction-rtl .fc-daygrid-week-number {
+  left: auto;
+  right: 0;
+}
+
+/* Popover positioning in RTL */
+.fc.fc-direction-rtl .fc-popover {
+  direction: rtl;
+}
+
+.fc.fc-direction-rtl .fc-popover-header {
+  text-align: right;
+}
+
+.fc.fc-direction-rtl .fc-popover-body {
+  text-align: right;
+}
+
+/* ===============================================
+   React DatePicker RTL Styles
+   =============================================== */
+
+.rtl-datepicker {
+  direction: rtl;
+  font-family: 'Cairo', sans-serif;
+}
+
+.rtl-datepicker .react-datepicker__header {
+  text-align: right;
+}
+
+.rtl-datepicker .react-datepicker__current-month {
+  text-align: right;
+}
+
+.rtl-datepicker .react-datepicker__day-name,
+.rtl-datepicker .react-datepicker__day,
+.rtl-datepicker .react-datepicker__time-name {
+  text-align: center;
+}
+
+.rtl-datepicker .react-datepicker__navigation {
+  top: 10px;
+}
+
+.rtl-datepicker .react-datepicker__navigation--previous {
+  right: 0;
+  left: auto;
+  border-right-color: #ccc;
+  border-left-color: transparent;
+}
+
+.rtl-datepicker .react-datepicker__navigation--next {
+  left: 0;
+  right: auto;
+  border-left-color: #ccc;
+  border-right-color: transparent;
+}
+
+.rtl-datepicker .react-datepicker__navigation-icon::before {
+  transform: scaleX(-1);
+}
+
+.rtl-datepicker .react-datepicker__month-container {
+  float: right;
+}
+
+.rtl-datepicker .react-datepicker__day--keyboard-selected,
+.rtl-datepicker .react-datepicker__month-text--keyboard-selected,
+.rtl-datepicker .react-datepicker__quarter-text--keyboard-selected,
+.rtl-datepicker .react-datepicker__year-text--keyboard-selected {
+  background-color: #003366;
+}
+
+.rtl-datepicker-popper {
+  direction: rtl;
+}
+
+.rtl-datepicker-popper[data-placement^="bottom"] .react-datepicker__triangle {
+  left: auto;
+  right: 50px;
+}
+
+.rtl-datepicker-popper[data-placement^="top"] .react-datepicker__triangle {
+  left: auto;
+  right: 50px;
+}
+
+/* Mobile DatePicker RTL */
+.mobile-datepicker.rtl-datepicker {
+  width: 100%;
+}
+
+.mobile-datepicker.rtl-datepicker .react-datepicker__month-container {
+  width: 100%;
+}
+
+/* ===============================================
+   Chart.js RTL Styles
+   =============================================== */
+
+[dir="rtl"] .chartjs-render-monitor {
+  direction: rtl;
+}
+
+[dir="rtl"] .chartjs-render-monitor canvas {
+  direction: rtl;
+}
+
+/* Legend RTL styles */
+.chartjs-legend[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+.chartjs-legend[dir="rtl"] ul {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.chartjs-legend[dir="rtl"] li {
+  float: right;
+  margin-right: 0;
+  margin-left: 10px;
+}
+
+/* Tooltip RTL styles */
+.chartjs-tooltip[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+.chartjs-tooltip[dir="rtl"] .chartjs-tooltip-key {
+  float: right;
+  margin-right: 0;
+  margin-left: 10px;
+}
+
+/* ===============================================
+   Shadcn UI Calendar RTL Enhancements
+   =============================================== */
+
+[dir="rtl"] .rdp {
+  direction: rtl;
+}
+
+[dir="rtl"] .rdp-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+[dir="rtl"] .rdp-nav {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .rdp-button_previous {
+  order: 2;
+}
+
+[dir="rtl"] .rdp-button_next {
+  order: 1;
+}
+
+[dir="rtl"] .rdp-weeknumber {
+  text-align: left;
+}
+
+[dir="rtl"] .rdp-day {
+  text-align: center;
+}
+
+/* ===============================================
+   Dropdown Menu RTL Styles
+   =============================================== */
+
+[dir="rtl"] [data-radix-popper-content-wrapper] {
+  direction: rtl;
+}
+
+[dir="rtl"] .dropdown-menu-content {
+  direction: rtl;
+}
+
+[dir="rtl"] .dropdown-menu-item {
+  text-align: right;
+}
+
+/* ===============================================
+   Select Component RTL Styles
+   =============================================== */
+
+[dir="rtl"] [data-radix-select-viewport] {
+  direction: rtl;
+}
+
+[dir="rtl"] .select-item {
+  text-align: right;
+}
+
+[dir="rtl"] .select-trigger svg {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+/* ===============================================
+   Popover RTL Styles
+   =============================================== */
+
+[dir="rtl"] [data-radix-popover-content] {
+  direction: rtl;
+}
+
+[dir="rtl"] .popover-content {
+  text-align: right;
+}
+
+/* ===============================================
+   Dialog RTL Styles
+   =============================================== */
+
+[dir="rtl"] [data-radix-dialog-content] {
+  direction: rtl;
+}
+
+[dir="rtl"] .dialog-header {
+  text-align: right;
+}
+
+[dir="rtl"] .dialog-footer {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .dialog-close {
+  left: 1rem;
+  right: auto;
+}
+
+/* ===============================================
+   Toast RTL Styles
+   =============================================== */
+
+[dir="rtl"] [data-radix-toast-viewport] {
+  left: 0;
+  right: auto;
+}
+
+[dir="rtl"] .toast {
+  direction: rtl;
+}
+
+[dir="rtl"] .toast-title {
+  text-align: right;
+}
+
+[dir="rtl"] .toast-description {
+  text-align: right;
+}
+
+[dir="rtl"] .toast-close {
+  left: 0.5rem;
+  right: auto;
+}
+
+/* ===============================================
+   Accordion RTL Styles
+   =============================================== */
+
+[dir="rtl"] .accordion-trigger svg {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+[dir="rtl"] .accordion-content {
+  text-align: right;
+}
+
+/* ===============================================
+   Tabs RTL Styles
+   =============================================== */
+
+[dir="rtl"] .tabs-list {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .tabs-content {
+  text-align: right;
+}
+
+/* ===============================================
+   Table RTL Styles
+   =============================================== */
+
+[dir="rtl"] table {
+  direction: rtl;
+}
+
+[dir="rtl"] th,
+[dir="rtl"] td {
+  text-align: right;
+}
+
+[dir="rtl"] .table-actions {
+  text-align: left;
+}
+
+/* ===============================================
+   Pagination RTL Styles
+   =============================================== */
+
+[dir="rtl"] .pagination {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .pagination-previous {
+  order: 2;
+}
+
+[dir="rtl"] .pagination-next {
+  order: 1;
+}
+
+/* ===============================================
+   Breadcrumb RTL Styles
+   =============================================== */
+
+[dir="rtl"] .breadcrumb {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .breadcrumb-separator {
+  transform: scaleX(-1);
+}
+
+/* ===============================================
+   Badge RTL Styles
+   =============================================== */
+
+[dir="rtl"] .badge {
+  direction: rtl;
+}
+
+/* ===============================================
+   Alert RTL Styles
+   =============================================== */
+
+[dir="rtl"] .alert {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .alert-title {
+  text-align: right;
+}
+
+[dir="rtl"] .alert-description {
+  text-align: right;
+}
+
+/* ===============================================
+   Card RTL Styles
+   =============================================== */
+
+[dir="rtl"] .card {
+  direction: rtl;
+}
+
+[dir="rtl"] .card-header {
+  text-align: right;
+}
+
+[dir="rtl"] .card-content {
+  text-align: right;
+}
+
+[dir="rtl"] .card-footer {
+  flex-direction: row-reverse;
+}
+
+/* ===============================================
+   Form RTL Styles
+   =============================================== */
+
+[dir="rtl"] .form-label {
+  text-align: right;
+}
+
+[dir="rtl"] .form-description {
+  text-align: right;
+}
+
+[dir="rtl"] .form-message {
+  text-align: right;
+}
+
+[dir="rtl"] input[type="checkbox"],
+[dir="rtl"] input[type="radio"] {
+  margin-left: 0.5rem;
+  margin-right: 0;
+}
+
+/* ===============================================
+   Utility Classes
+   =============================================== */
+
+[dir="rtl"] .text-left {
+  text-align: right !important;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left !important;
+}
+
+[dir="rtl"] .float-left {
+  float: right !important;
+}
+
+[dir="rtl"] .float-right {
+  float: left !important;
+}
+
+[dir="rtl"] .mr-auto {
+  margin-right: 0 !important;
+  margin-left: auto !important;
+}
+
+[dir="rtl"] .ml-auto {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}

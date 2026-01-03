@@ -1,0 +1,24 @@
+{
+  "query": "SELECT id, officeName, officeNameAr, LEFT(description, 80) as description, LEFT(descriptionAr, 80) as descriptionAr FROM sanad_offices WHERE officeName LIKE '%Muscat%' OR officeName LIKE '%Salalah%' LIMIT 3",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute SELECT id, officeName, officeNameAr, LEFT(description, 80) as description, LEFT(descriptionAr, 80) as descriptionAr FROM sanad_offices WHERE officeName LIKE '%Muscat%' OR officeName LIKE '%Salalah%' LIMIT 3",
+  "rows": [
+    {
+      "id": "1",
+      "officeName": "Muscat Business Hub",
+      "officeNameAr": "مركز مسقط للأعمال",
+      "description": "Premier business services center in the heart of Muscat, offering comprehensive ",
+      "descriptionAr": "مركز خدمات الأعمال الرائد في قلب مسقط"
+    },
+    {
+      "id": "2",
+      "officeName": "Salalah Trade Center",
+      "officeNameAr": "مركز صلالة التجاري",
+      "description": "Leading business facilitation center in Salalah, specializing in import/export d",
+      "descriptionAr": "مركز تسهيل الأعمال الرائد في صلالة"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tofficeName\tofficeNameAr\tdescription\tdescriptionAr\n1\tMuscat Business Hub\tمركز مسقط للأعمال\tPremier business services center in the heart of Muscat, offering comprehensive \tمركز خدمات الأعمال الرائد في قلب مسقط\n2\tSalalah Trade Center\tمركز صلالة التجاري\tLeading business facilitation center in Salalah, specializing in import/export d\tمركز تسهيل الأعمال الرائد في صلالة\n",
+  "stderr": "",
+  "execution_time_ms": 1519
+}

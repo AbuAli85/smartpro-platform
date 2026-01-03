@@ -1,0 +1,35 @@
+{
+  "query": "SELECT id, slug, officeName FROM sanad_offices WHERE slug LIKE '%test-office-filters%' LIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute SELECT id, slug, officeName FROM sanad_offices WHERE slug LIKE '%test-office-filters%' LIMIT 5",
+  "rows": [
+    {
+      "id": "30001",
+      "slug": "test-office-filters-1766742414827",
+      "officeName": "Test Office for Filters"
+    },
+    {
+      "id": "30002",
+      "slug": "test-office-filters-1766742452391",
+      "officeName": "Test Office for Filters"
+    },
+    {
+      "id": "30003",
+      "slug": "test-office-filters-1766742499059",
+      "officeName": "Test Office for Filters"
+    },
+    {
+      "id": "30004",
+      "slug": "test-office-filters-1766742575087",
+      "officeName": "Test Office for Filters"
+    },
+    {
+      "id": "30005",
+      "slug": "test-office-filters-1766743535293",
+      "officeName": "Test Office for Filters"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tslug\tofficeName\n30001\ttest-office-filters-1766742414827\tTest Office for Filters\n30002\ttest-office-filters-1766742452391\tTest Office for Filters\n30003\ttest-office-filters-1766742499059\tTest Office for Filters\n30004\ttest-office-filters-1766742575087\tTest Office for Filters\n30005\ttest-office-filters-1766743535293\tTest Office for Filters\n",
+  "stderr": "",
+  "execution_time_ms": 1609
+}

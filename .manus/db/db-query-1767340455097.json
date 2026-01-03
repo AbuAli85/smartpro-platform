@@ -1,0 +1,16 @@
+{
+  "query": "SELECT \n  (SELECT COUNT(*) FROM users) as user_count,\n  (SELECT COUNT(*) FROM sanad_offices) as office_count,\n  (SELECT COUNT(*) FROM bookings) as booking_count,\n  (SELECT COUNT(*) FROM sanad_office_services) as service_count;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute SELECT \n  (SELECT COUNT(*) FROM users) as user_count,\n  (SELECT COUNT(*) FROM sanad_offices) as office_count,\n  (SELECT COUNT(*) FROM bookings) as booking_count,\n  (SELECT COUNT(*) FROM sanad_office_services) as service_count;",
+  "rows": [
+    {
+      "user_count": "123",
+      "office_count": "43",
+      "booking_count": "77",
+      "service_count": "78"
+    }
+  ],
+  "messages": [],
+  "stdout": "user_count\toffice_count\tbooking_count\tservice_count\n123\t43\t77\t78\n",
+  "stderr": "",
+  "execution_time_ms": 1677
+}
