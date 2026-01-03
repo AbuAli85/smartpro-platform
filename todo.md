@@ -1979,3 +1979,43 @@ Improve bookings page UX by implementing a tabbed interface within each booking 
 
 **Timeline:** 30 minutes
 
+
+---
+
+## 🎯 NEW FEATURES - Booking Management Enhancements (Jan 3, 2026)
+
+### Feature 1: Booking Cancellation & Rescheduling
+- [x] Add booking status field to handle cancellation/rescheduling states
+- [x] Create backend API for booking cancellation
+- [x] Create backend API for booking rescheduling
+- [x] Add cancellation policy logic (time-based restrictions)
+- [x] Build cancel booking UI in bookings list
+- [x] Build reschedule booking UI with date/time picker
+- [x] Add confirmation dialogs for cancel/reschedule actions
+- [x] Test cancellation and rescheduling flows
+
+### Feature 2: Automated Booking Notifications
+- [x] Create notification scheduler system
+- [x] Implement 24-hour reminder logic
+- [x] Build email notification template for reminders
+- [x] Build SMS notification template for reminders
+- [x] Create scheduled job to check upcoming bookings
+- [x] Send email reminders via Resend API
+- [x] Send SMS reminders via Twilio API
+- [x] Add notification preferences for users
+- [x] Test notification delivery and timing
+
+### Feature 3: Provider Availability Calendar
+- [x] Create availability schema (working hours, blocked slots)
+- [x] Build backend API for setting availability
+- [x] Build backend API for blocking time slots
+- [x] Create calendar UI component for providers
+- [x] Add weekly schedule editor
+- [x] Add date-specific blocking functionality
+- [x] Integrate availability with booking creation flow
+- [x] Prevent bookings during unavailable slots
+- [x] Test availability calendar and booking restrictions
+
+**Priority:** High  
+**Timeline:** 4-5 hours  
+**Impact:** High - Significantly improves booking management and user experience

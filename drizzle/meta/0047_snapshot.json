@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "08ac8930-b889-443f-b18d-ac761c0a3bb8",
-  "prevId": "46d42035-c640-4c19-a4f7-6726a84f8a12",
+  "id": "9b845a34-fe1a-4bbe-9e8c-f76f22f01b60",
+  "prevId": "9e782f0b-89dc-4968-b22b-e1e20714be63",
   "tables": {
     "active_sessions": {
       "name": "active_sessions",
@@ -3304,14 +3304,6 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'CURRENT_TIMESTAMP'"
         }
       },
       "indexes": {

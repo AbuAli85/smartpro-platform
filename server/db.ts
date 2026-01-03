@@ -29,6 +29,7 @@ import {
   securityAlerts,
   bookingReminders,
   bookingDocuments,
+  officeBlockedSlots,
   type User,
   type InsertUser,
   type SanadOffice,
@@ -871,6 +872,11 @@ export async function getAvailableTimeSlots(officeId: number, date: Date) {
   
   const { startTime, endTime, slotDuration } = availability[0];
   
+  // Check if date is blocked (all day)
+  const dateStr = formatDateForDB(date);
+  const isDateBlocked = await isTimeSlotBlocked(officeId, dateStr);
+  if (isDateBlocked) return [];
+  
   // Get existing bookings for this date
   const startOfDay = new Date(date);
   startOfDay.setHours(0, 0, 0, 0);
@@ -906,7 +912,10 @@ export async function getAvailableTimeSlots(officeId: number, date: Date) {
       return bookingTime === slotTime;
     });
     
-    if (!isBooked) {
+    // Check if this specific time slot is blocked
+    const isSlotBlocked = await isTimeSlotBlocked(officeId, dateStr, slotTime);
+    
+    if (!isBooked && !isSlotBlocked) {
       slots.push({
         time: slotTime,
         available: true,
@@ -917,6 +926,13 @@ export async function getAvailableTimeSlots(officeId: number, date: Date) {
   }
   
   return slots;
+}
+
+function formatDateForDB(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 // ============================================================================
@@ -7084,4 +7100,136 @@ export async function deleteBookingDocument(documentId: number, officeId: number
     console.error("[Database] Failed to delete booking document:", error);
     return false;
   }
+}
+
+// ============================================================================
+// OFFICE BLOCKED SLOTS MANAGEMENT
+// ============================================================================
+
+/**
+ * Create a blocked time slot for an office
+ */
+export async function createBlockedSlot(data: {
+  officeId: number;
+  blockedDate: string; // YYYY-MM-DD format
+  startTime?: string;
+  endTime?: string;
+  isAllDay: boolean;
+  reason?: string;
+  createdBy: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(officeBlockedSlots).values({
+    officeId: data.officeId,
+    blockedDate: data.blockedDate,
+    startTime: data.startTime,
+    endTime: data.endTime,
+    isAllDay: data.isAllDay ? 1 : 0,
+    reason: data.reason,
+    createdBy: data.createdBy,
+  });
+
+  // Drizzle returns [ResultSetHeader, FieldPacket[]] for MySQL
+  const insertId = (result as any)[0]?.insertId || result.insertId;
+  return Number(insertId);
+}
+
+/**
+ * Get all blocked slots for an office
+ */
+export async function getOfficeBlockedSlots(officeId: number, startDate?: string, endDate?: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  let query = db
+    .select()
+    .from(officeBlockedSlots)
+    .where(eq(officeBlockedSlots.officeId, officeId));
+
+  if (startDate && endDate) {
+    query = query.where(
+      and(
+        eq(officeBlockedSlots.officeId, officeId),
+        gte(officeBlockedSlots.blockedDate, startDate),
+        lte(officeBlockedSlots.blockedDate, endDate)
+      )
+    );
+  }
+
+  const slots = await query.orderBy(officeBlockedSlots.blockedDate);
+  return slots;
+}
+
+/**
+ * Get blocked slots for a specific date
+ */
+export async function getBlockedSlotsForDate(officeId: number, date: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const slots = await db
+    .select()
+    .from(officeBlockedSlots)
+    .where(
+      and(
+        eq(officeBlockedSlots.officeId, officeId),
+        eq(officeBlockedSlots.blockedDate, date)
+      )
+    );
+
+  return slots;
+}
+
+/**
+ * Delete a blocked slot
+ */
+export async function deleteBlockedSlot(slotId: number, officeId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Verify the slot belongs to this office
+  const [slot] = await db
+    .select()
+    .from(officeBlockedSlots)
+    .where(eq(officeBlockedSlots.id, slotId))
+    .limit(1);
+
+  if (!slot || slot.officeId !== officeId) {
+    throw new Error("Blocked slot not found or access denied");
+  }
+
+  await db.delete(officeBlockedSlots).where(eq(officeBlockedSlots.id, slotId));
+  return true;
+}
+
+/**
+ * Check if a time slot is blocked
+ */
+export async function isTimeSlotBlocked(
+  officeId: number,
+  date: string,
+  time?: string
+): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  const blockedSlots = await getBlockedSlotsForDate(officeId, date);
+
+  for (const slot of blockedSlots) {
+    // If it's an all-day block, the entire day is blocked
+    if (slot.isAllDay) {
+      return true;
+    }
+
+    // If time is provided and slot has time range, check if time falls within
+    if (time && slot.startTime && slot.endTime) {
+      if (time >= slot.startTime && time < slot.endTime) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }

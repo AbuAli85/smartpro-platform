@@ -1170,6 +1170,20 @@ export const bookingReminders = mysqlTable("booking_reminders", {
 	index("booking_id_idx").on(table.bookingId),
 ]);
 
+export const officeBlockedSlots = mysqlTable("office_blocked_slots", {
+	id: int().autoincrement().notNull(),
+	officeId: int("office_id").notNull(),
+	blockedDate: date("blocked_date").notNull(),
+	startTime: varchar("start_time", { length: 10 }),
+	endTime: varchar("end_time", { length: 10 }),
+	isAllDay: tinyint("is_all_day").default(0).notNull(),
+	reason: text(),
+	createdBy: int("created_by").notNull(),
+},
+(table) => [
+	index("office_date_idx").on(table.officeId, table.blockedDate),
+]);
+
 export const bookingDocuments = mysqlTable("booking_documents", {
 	id: int().autoincrement().notNull(),
 	bookingId: int("booking_id").notNull(),
