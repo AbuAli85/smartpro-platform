@@ -11,6 +11,9 @@ import { DraggablePhotoGrid } from '@/components/DraggablePhotoGrid';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 import { Loader2, ArrowLeft, Save } from 'lucide-react';
+import { PhotoGalleryManager } from '@/components/PhotoGalleryManager';
+import { OfficeProfilePreview } from '@/components/OfficeProfilePreview';
+import { OfficeVersionHistory } from '@/components/OfficeVersionHistory';
 
 export function OfficeEditPage() {
   const [, params] = useRoute('/provider/office/:id/edit');
@@ -24,6 +27,10 @@ export function OfficeEditPage() {
     { id: officeId! },
     { enabled: !!officeId }
   );
+
+  // Track changes for preview
+  const [originalData, setOriginalData] = useState<any>(null);
+  const [hasChanges, setHasChanges] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -41,7 +48,7 @@ export function OfficeEditPage() {
   // Populate form when office data loads
   useEffect(() => {
     if (office) {
-      setFormData({
+      const data = {
         nameAr: office.nameAr || '',
         nameEn: office.nameEn || '',
         descriptionAr: office.descriptionAr || '',
@@ -51,9 +58,21 @@ export function OfficeEditPage() {
         email: office.email || '',
         phone: office.phone || '',
         whatsapp: office.whatsapp || '',
-      });
+      };
+      setFormData(data);
+      setOriginalData(data);
     }
   }, [office]);
+
+  // Track changes
+  useEffect(() => {
+    if (originalData) {
+      const changed = Object.keys(formData).some(
+        key => JSON.stringify(formData[key as keyof typeof formData]) !== JSON.stringify(originalData[key])
+      );
+      setHasChanges(changed);
+    }
+  }, [formData, originalData]);
 
   // Update mutation
   const updateOfficeMutation = trpc.sanadOffice.updateOffice.useMutation({
@@ -79,6 +98,32 @@ export function OfficeEditPage() {
 
   const handleInputChange = (field: string, value: string | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const getChanges = () => {
+    if (!originalData) return {};
+    const changes: Record<string, any> = {};
+    Object.keys(formData).forEach(key => {
+      if (JSON.stringify(formData[key as keyof typeof formData]) !== JSON.stringify(originalData[key])) {
+        changes[key] = formData[key as keyof typeof formData];
+      }
+    });
+    return changes;
+  };
+
+  const handleSaveWithPreview = () => {
+    if (!officeId) return;
+    updateOfficeMutation.mutate({
+      id: officeId,
+      ...formData,
+    });
+  };
+
+  const handleDiscardChanges = () => {
+    if (originalData) {
+      setFormData(originalData);
+      toast.info(language === 'ar' ? 'تم تجاهل التغييرات' : 'Changes discarded');
+    }
   };
 
   if (isLoading) {
@@ -110,17 +155,30 @@ export function OfficeEditPage() {
   return (
     <div className="container mx-auto py-8 max-w-4xl">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setLocation(`/provider/office/${officeId}`)}
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">{t('office.edit.title')}</h1>
-          <p className="text-muted-foreground">{t('office.edit.description')}</p>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setLocation(`/provider/office/${officeId}`)}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">{t('office.edit.title')}</h1>
+            <p className="text-muted-foreground">{t('office.edit.description')}</p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <OfficeVersionHistory officeId={officeId!} onRevert={() => window.location.reload()} />
+          {hasChanges && (
+            <OfficeProfilePreview
+              officeId={officeId!}
+              changes={getChanges()}
+              onSave={handleSaveWithPreview}
+              onDiscard={handleDiscardChanges}
+            />
+          )}
         </div>
       </div>
 
@@ -224,6 +282,18 @@ export function OfficeEditPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Photo Gallery Manager - Bulk Operations */}
+        {formData.images.length > 0 && (
+          <PhotoGalleryManager
+            officeId={officeId!}
+            images={formData.images}
+            onUpdate={() => {
+              // Refetch office data after bulk operations
+              window.location.reload();
+            }}
+          />
+        )}
 
         {/* Contact Information */}
         <Card>

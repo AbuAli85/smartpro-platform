@@ -102,7 +102,7 @@ export const bookingAnalytics = mysqlTable("booking_analytics", {
 	popularTimeSlots: json(),
 	cancellationReasons: json(),
 	avgBookingValue: decimal({ precision: 10, scale: 3 }).default('0.000').notNull(),
-	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 },
 (table) => [
@@ -1205,6 +1205,29 @@ export const officeBlockedSlots = mysqlTable("office_blocked_slots", {
 	index("office_date_idx").on(table.officeId, table.blockedDate),
 ]);
 
+export const officeProfileVersions = mysqlTable("office_profile_versions", {
+	id: int().autoincrement().notNull(),
+	officeId: int("office_id").notNull(),
+	versionNumber: int("version_number").notNull(),
+	versionLabel: varchar("version_label", { length: 255 }),
+	changedBy: int("changed_by").notNull(),
+	changedByName: varchar("changed_by_name", { length: 255 }).notNull(),
+	changeDescription: text("change_description"),
+	// Store complete snapshot of office profile at this version
+	snapshotData: json("snapshot_data").notNull(), // Full office data
+	// Track specific fields that changed
+	changedFields: json("changed_fields"), // Array of field names that changed
+	previousValues: json("previous_values"), // Object with previous values
+	newValues: json("new_values"), // Object with new values
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("office_id_idx").on(table.officeId),
+	index("version_number_idx").on(table.versionNumber),
+	index("changed_by_idx").on(table.changedBy),
+	index("created_at_idx").on(table.createdAt),
+]);
+
 export const bookingDocuments = mysqlTable("booking_documents", {
 	id: int().autoincrement().notNull(),
 	bookingId: int("booking_id").notNull(),
@@ -1247,3 +1270,5 @@ export type ServiceRequest = InferSelectModel<typeof serviceRequests>;
 export type InsertServiceRequest = InferInsertModel<typeof serviceRequests>;
 export type ServiceBid = InferSelectModel<typeof serviceBids>;
 export type InsertServiceBid = InferInsertModel<typeof serviceBids>;
+export type OfficeProfileVersion = InferSelectModel<typeof officeProfileVersions>;
+export type InsertOfficeProfileVersion = InferInsertModel<typeof officeProfileVersions>;

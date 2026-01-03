@@ -1,4 +1,4 @@
-import { and, desc, eq, like, or, sql, gte, lte, not, isNull, ne, lt, asc } from "drizzle-orm";
+import { and, desc, eq, like, or, sql, gte, lte, not, isNull, ne, lt, asc, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   users,
@@ -31,6 +31,7 @@ import {
   bookingReminders,
   bookingDocuments,
   officeBlockedSlots,
+  officeProfileVersions,
   type User,
   type InsertUser,
   type SanadOffice,
@@ -7532,4 +7533,216 @@ export async function getBookingMetricsSummary(officeId: number, days: number = 
     cancellationReasons: cancellationData.reasons,
     avgBookingValue: Math.round(avgBookingValue * 1000) / 1000,
   };
+}
+
+
+// ============================================================================
+// OFFICE PROFILE VERSION CONTROL
+// ============================================================================
+
+/**
+ * Create a new version snapshot of office profile
+ */
+export async function createOfficeProfileVersion(data: {
+  officeId: number;
+  changedBy: number;
+  changedByName: string;
+  versionLabel?: string;
+  changeDescription?: string;
+  snapshotData: any; // Complete office data snapshot
+  changedFields?: string[]; // Array of field names that changed
+  previousValues?: Record<string, any>; // Previous values of changed fields
+  newValues?: Record<string, any>; // New values of changed fields
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Get the latest version number for this office
+  const latestVersion = await db
+    .select({ versionNumber: officeProfileVersions.versionNumber })
+    .from(officeProfileVersions)
+    .where(eq(officeProfileVersions.officeId, data.officeId))
+    .orderBy(desc(officeProfileVersions.versionNumber))
+    .limit(1);
+
+  const nextVersionNumber = latestVersion.length > 0 ? latestVersion[0].versionNumber + 1 : 1;
+
+  const [result] = await db.insert(officeProfileVersions).values({
+    officeId: data.officeId,
+    versionNumber: nextVersionNumber,
+    versionLabel: data.versionLabel,
+    changedBy: data.changedBy,
+    changedByName: data.changedByName,
+    changeDescription: data.changeDescription,
+    snapshotData: data.snapshotData,
+    changedFields: data.changedFields,
+    previousValues: data.previousValues,
+    newValues: data.newValues,
+  });
+
+  return { versionNumber: nextVersionNumber, id: result.insertId };
+}
+
+/**
+ * Get all versions for an office
+ */
+export async function getOfficeProfileVersions(officeId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(officeProfileVersions)
+    .where(eq(officeProfileVersions.officeId, officeId))
+    .orderBy(desc(officeProfileVersions.createdAt));
+}
+
+/**
+ * Get a specific version by ID
+ */
+export async function getOfficeProfileVersionById(versionId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const [version] = await db
+    .select()
+    .from(officeProfileVersions)
+    .where(eq(officeProfileVersions.id, versionId))
+    .limit(1);
+
+  return version || null;
+}
+
+/**
+ * Get a specific version by office ID and version number
+ */
+export async function getOfficeProfileVersionByNumber(officeId: number, versionNumber: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const [version] = await db
+    .select()
+    .from(officeProfileVersions)
+    .where(
+      and(
+        eq(officeProfileVersions.officeId, officeId),
+        eq(officeProfileVersions.versionNumber, versionNumber)
+      )
+    )
+    .limit(1);
+
+  return version || null;
+}
+
+/**
+ * Revert office to a previous version
+ */
+export async function revertOfficeToVersion(
+  officeId: number,
+  versionId: number,
+  revertedBy: number,
+  revertedByName: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Get the version to revert to
+  const version = await getOfficeProfileVersionById(versionId);
+  if (!version) {
+    throw new Error("Version not found");
+  }
+
+  if (version.officeId !== officeId) {
+    throw new Error("Version does not belong to this office");
+  }
+
+  // Get current office data before reverting
+  const currentOffice = await getSanadOfficeById(officeId);
+  if (!currentOffice) {
+    throw new Error("Office not found");
+  }
+
+  // Update the office with the snapshot data
+  const snapshotData = version.snapshotData as any;
+  await db.update(sanadOffices).set(snapshotData).where(eq(sanadOffices.id, officeId));
+
+  // Create a new version record for the revert action
+  await createOfficeProfileVersion({
+    officeId,
+    changedBy: revertedBy,
+    changedByName: revertedByName,
+    versionLabel: `Reverted to version ${version.versionNumber}`,
+    changeDescription: `Reverted office profile to version ${version.versionNumber} (${version.versionLabel || 'Unnamed version'})`,
+    snapshotData,
+    changedFields: Object.keys(snapshotData),
+    previousValues: currentOffice as any,
+    newValues: snapshotData,
+  });
+
+  return true;
+}
+
+/**
+ * Delete old versions (keep only recent N versions)
+ */
+export async function cleanupOldVersions(officeId: number, keepCount: number = 50) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Get all versions ordered by creation date
+  const versions = await db
+    .select({ id: officeProfileVersions.id })
+    .from(officeProfileVersions)
+    .where(eq(officeProfileVersions.officeId, officeId))
+    .orderBy(desc(officeProfileVersions.createdAt));
+
+  // If we have more than keepCount versions, delete the oldest ones
+  if (versions.length > keepCount) {
+    const versionsToDelete = versions.slice(keepCount).map(v => v.id);
+    await db
+      .delete(officeProfileVersions)
+      .where(
+        and(
+          eq(officeProfileVersions.officeId, officeId),
+          inArray(officeProfileVersions.id, versionsToDelete)
+        )
+      );
+  }
+
+  return versions.length - keepCount;
+}
+
+// ============================================================================
+// PHOTO GALLERY BULK OPERATIONS
+// ============================================================================
+
+/**
+ * Update office images (for bulk operations)
+ */
+export async function updateOfficeImages(officeId: number, images: any[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(sanadOffices)
+    .set({ images: images })
+    .where(eq(sanadOffices.id, officeId));
+
+  return true;
+}
+
+/**
+ * Get office images
+ */
+export async function getOfficeImages(officeId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const [office] = await db
+    .select({ images: sanadOffices.images })
+    .from(sanadOffices)
+    .where(eq(sanadOffices.id, officeId))
+    .limit(1);
+
+  return office?.images || [];
 }

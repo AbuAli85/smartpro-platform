@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE office_profile_versions (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  office_id INT NOT NULL,\n  version_number INT NOT NULL,\n  version_label VARCHAR(255),\n  changed_by INT NOT NULL,\n  changed_by_name VARCHAR(255) NOT NULL,\n  change_description TEXT,\n  snapshot_data JSON NOT NULL,\n  changed_fields JSON,\n  previous_values JSON,\n  new_values JSON,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX office_id_idx (office_id),\n  INDEX version_number_idx (version_number),\n  INDEX changed_by_idx (changed_by),\n  INDEX created_at_idx (created_at)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute CREATE TABLE office_profile_versions (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  office_id INT NOT NULL,\n  version_number INT NOT NULL,\n  version_label VARCHAR(255),\n  changed_by INT NOT NULL,\n  changed_by_name VARCHAR(255) NOT NULL,\n  change_description TEXT,\n  snapshot_data JSON NOT NULL,\n  changed_fields JSON,\n  previous_values JSON,\n  new_values JSON,\n  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX office_id_idx (office_id),\n  INDEX version_number_idx (version_number),\n  INDEX changed_by_idx (changed_by),\n  INDEX created_at_idx (created_at)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1651
+}
