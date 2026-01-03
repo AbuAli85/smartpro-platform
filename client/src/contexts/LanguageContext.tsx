@@ -733,23 +733,10 @@ export const translations: Record<Language, Record<string, string>> = {
     "templates.allCategories": "All Categories",
     "templates.language": "Language",
     "templates.useTemplate": "Use Template",
-    "templates.preview": "Preview",
     "templates.download": "Download",
-    "templates.fillForm": "Fill Form",
     "templates.generate": "Generate Document",
     "templates.generating": "Generating...",
     "templates.noResults": "No templates found",
-    "templates.estimatedTime": "Estimated Time",
-    "templates.requiredFields": "Required",
-    "templates.usedBy": "Used by",
-    "templates.requiredInformation": "Required Information",
-    "templates.optionalInformation": "Optional Information",
-    "templates.sampleContent": "Sample Content",
-    "templates.whatYouGet": "What You Get",
-    "templates.professionalDocument": "Professional document ready to use",
-    "templates.editableFormat": "Editable DOCX format for customization",
-    "templates.instantDownload": "Instant download after completion",
-    "templates.officiallyRecognized": "Officially recognized format",
     
     
     // Bookings
@@ -1443,7 +1430,6 @@ export const translations: Record<Language, Record<string, string>> = {
     "home.templates": "قوالب المستندات",
     "home.templatesDesc": "الوصول إلى آلاف قوالب مستندات الأعمال",
     "home.browseTemplates": "تصفح القوالب",
-    "home.browseOffices": "تصفح المكاتب",
     "home.offices": "مكاتب موثوقة",
     "home.officesDesc": "تواصل مع مكاتب سند معتمدة عبر عمان",
     "office.exploreOffices": "استكشف المكاتب",
@@ -1694,11 +1680,6 @@ export const translations: Record<Language, Record<string, string>> = {
     "message.updateSuccess": "تم التحديث بنجاح",
     "message.createSuccess": "تم الإنشاء بنجاح",
     
-    // Affordability Section
-    "home.affordability.subtitle": "أسعار ذكية",
-    "home.affordability.title": "خدمات أعمال ميسورة لكل مشروع صغير ومتوسط",
-    "home.affordability.description": "تقلل منصة SmartPro الرقمية من التكاليف العامة، مما يسمح لمكاتب سند بتقديم أسعار تنافسية. وفر حتى 73٪ مقارنة بمقدمي الخدمات التقليديين مع الحفاظ على أعلى معايير الجودة.",
-    
     // Empty States
     "empty.noServiceRequestsYet": "لا توجد طلبات خدمة بعد",
     "empty.noServiceRequestsYetDesc": "لم تنشر أي طلبات خدمة. ابدأ بنشر طلب لاستلام عروض تنافسية من المكاتب.",
@@ -1784,8 +1765,7 @@ export const translations: Record<Language, Record<string, string>> = {
     "analytics.popularServices": "الخدمات الشائعة",
     
     
-    // How It Works Section
-    "home.how.badge": "اطلب خدمة",
+    // Marketplace Section
     "marketplace.requestSubtitle": "انشر احتياجاتك للخدمة واستلم عروضًا تنافسية من مكاتب سند مؤهلة",
     "marketplace.serviceTitle": "عنوان الخدمة",
     "marketplace.serviceTitlePlaceholder": "مثلاً: أحتاج تسجيل تجاري لمطعم جديد",
@@ -2115,41 +2095,21 @@ export const translations: Record<Language, Record<string, string>> = {
     "reviews.writeOwn": "اكتب ردي الخاص",
     
     // Common UI Elements
-    "common.loading": "جاري التحميل...",
     "common.loadingData": "جاري تحميل البيانات...",
     "common.noData": "لا توجد بيانات",
     "common.noDataAvailable": "لا توجد بيانات متاحة",
-    "common.error": "خطأ",
-    "common.success": "نجح",
     "common.failed": "فشل",
     "common.pending": "قيد الانتظار",
     "common.active": "نشط",
     "common.inactive": "غير نشط",
     "common.enabled": "مفعّل",
     "common.disabled": "معطّل",
-    "common.yes": "نعم",
-    "common.no": "لا",
-    "common.confirm": "تأكيد",
-    "common.cancel": "إلغاء",
-    "common.save": "حفظ",
-    "common.delete": "حذف",
-    "common.edit": "تعديل",
-    "common.view": "عرض",
-    "common.close": "إغلاق",
-    "common.back": "رجوع",
-    "common.next": "التالي",
     "common.previous": "السابق",
-    "common.submit": "إرسال",
-    "common.search": "بحث",
-    "common.filter": "تصفية",
-    "common.sort": "ترتيب",
     "common.download": "تحميل",
     "common.upload": "رفع",
     "common.select": "اختيار",
     "common.selectAll": "تحديد الكل",
     "common.clearAll": "مسح الكل",
-    "common.apply": "تطبيق",
-    "common.reset": "إعادة تعيين",
     "common.refresh": "تحديث",
     "common.retry": "إعادة المحاولة",
     "common.continue": "متابعة",
@@ -2262,7 +2222,6 @@ export const translations: Record<Language, Record<string, string>> = {
     "common.unavailable": "غير متاح",
     "common.online": "متصل",
     "common.offline": "غير متصل",
-    "common.connected": "متصل",
     "common.disconnected": "غير متصل",
     "common.synced": "متزامن",
     "common.syncing": "جاري المزامنة...",
@@ -2820,7 +2779,6 @@ export const translations: Record<Language, Record<string, string>> = {
     "analytics.toDate": "إلى تاريخ",
     "analytics.last7Days": "آخر 7 أيام",
     "analytics.last14Days": "آخر 14 يومًا",
-    "analytics.last30Days": "آخر 30 يومًا",
     "analytics.last90Days": "آخر 90 يومًا",
     "analytics.last6Months": "آخر 6 أشهر",
     "analytics.last12Months": "آخر 12 شهرًا",
@@ -2830,7 +2788,6 @@ export const translations: Record<Language, Record<string, string>> = {
     "analytics.thisYear": "هذا العام",
     "analytics.previousPeriod": "الفترة السابقة",
     "analytics.comparedTo": "مقارنة بـ",
-    "analytics.vsLastPeriod": "مقابل الفترة السابقة",
     "analytics.noDataForPeriod": "لا توجد بيانات لهذه الفترة",
     "analytics.insufficientData": "بيانات غير كافية",
     "analytics.dataUnavailable": "البيانات غير متاحة",
@@ -3181,7 +3138,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   const t = (key: string): string => {
-    return translations[language][key] || key;
+    const currentLang: Language = language;
+    const langTranslations: Record<string, string> = translations[currentLang];
+    const translation = langTranslations[key];
+    return translation ?? key;
   };
 
   const dir = language === "ar" ? "rtl" : "ltr";
