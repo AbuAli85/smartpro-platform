@@ -1221,7 +1221,7 @@ export async function getUnreadNotificationsCount(userId: number): Promise<numbe
       .where(
         and(
           eq(notifications.userId, userId),
-          eq(notifications.read, 0)
+          eq(notifications.isRead, 0)
         )
       );
     
