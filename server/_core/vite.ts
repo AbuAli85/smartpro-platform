@@ -48,20 +48,61 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath =
-    process.env.NODE_ENV === "development"
-      ? path.resolve(import.meta.dirname, "../..", "dist", "public")
-      : path.resolve(import.meta.dirname, "public");
-  if (!fs.existsSync(distPath)) {
+  // In production, serve from dist/public (build output)
+  // Note: serveStatic is only called when NODE_ENV !== "development"
+  // When bundled with esbuild, the server runs from project root or dist/
+  // Try multiple possible paths to handle different deployment scenarios
+  const possiblePaths = [
+    path.resolve(process.cwd(), "dist", "public"), // Primary: from project root (most reliable)
+    path.resolve(process.cwd(), "public"), // Alternative: if running from dist/
+    typeof import.meta.url !== "undefined" && typeof import.meta.dirname !== "undefined"
+      ? path.resolve(import.meta.dirname, "public") // When bundled to dist/index.js
+      : null,
+  ].filter((p): p is string => p !== null);
+  
+  const distPath = possiblePaths.find(p => fs.existsSync(p));
+  
+  if (!distPath) {
     console.error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`
+      `[ERROR] Could not find the build directory. Tried: ${possiblePaths.join(", ")}`
+    );
+    console.error(
+      `Current working directory: ${process.cwd()}`
+    );
+    console.error(
+      `Make sure to run 'pnpm build' before starting the production server`
+    );
+    // Don't crash, but log the error clearly
+    return;
+  }
+  
+  console.log(`[INFO] Serving static files from: ${distPath}`);
+  
+  if (!fs.existsSync(path.resolve(distPath, "index.html"))) {
+    console.error(
+      `[ERROR] index.html not found in ${distPath}. Build may be incomplete.`
     );
   }
 
   app.use(express.static(distPath));
 
-  // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+  // fall through to index.html if the file doesn't exist (SPA routing)
+  app.use("*", (req, res) => {
+    const indexPath = path.resolve(distPath, "index.html");
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      res.status(404).send(`
+        <!DOCTYPE html>
+        <html>
+          <head><title>404 - Not Found</title></head>
+          <body>
+            <h1>404 - Not Found</h1>
+            <p>The application build files are missing.</p>
+            <p>Please ensure the build completed successfully by running: <code>pnpm build</code></p>
+          </body>
+        </html>
+      `);
+    }
   });
 }
