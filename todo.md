@@ -2,6 +2,21 @@
 
 ---
 
+## ✅ RESOLVED - SSE Connection Error (Jan 3, 2026 - 14:07 GMT+4)
+
+- [x] Fix SSE (Server-Sent Events) connection error for real-time notifications
+- [x] Debug authentication flow in SSE endpoint
+- [x] Verify token passing from frontend to backend
+- [x] Test SSE connection after fix
+
+**Root Cause:** The SSE endpoint was using `sdk.authenticateRequest(req)` which expects the authentication token in a cookie header, but the frontend was passing it as a query parameter (`?token=...`). This caused authentication to fail and the SSE connection to error out.
+
+**Resolution:** Updated `/server/routes/sse.ts` to use `sdk.verifySession(token)` directly, which properly validates the JWT token from the query parameter, then fetches the user from the database using the verified session's openId.
+
+**Status:** ✅ FIXED - SSE connection now shows "Connected" badge and real-time notifications are working
+
+---
+
 ## 🔴 CRITICAL - UI Bug Fixes from User Review (Jan 2, 2026 - 14:50 GMT+4)
 
 - [x] Fix office cards showing incorrect data structure (offices.reviewsCount instead of proper count)

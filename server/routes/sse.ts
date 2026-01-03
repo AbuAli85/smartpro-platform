@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { SSEConnection } from "../_core/notifications";
 import { sdk } from "../_core/sdk";
+import * as db from "../db";
 
 const router = Router();
 
@@ -14,10 +15,16 @@ router.get("/notifications", async (req, res) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    // Authenticate user
-    const user = await sdk.authenticateRequest(req);
-    if (!user) {
+    // Verify the session token directly
+    const session = await sdk.verifySession(token);
+    if (!session) {
       return res.status(401).json({ error: "Invalid token" });
+    }
+
+    // Get user from database
+    const user = await db.getUserByOpenId(session.openId);
+    if (!user) {
+      return res.status(401).json({ error: "User not found" });
     }
 
     const userId = user.id;
