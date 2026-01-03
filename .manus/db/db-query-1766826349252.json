@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS `review_votes` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `reviewId` int NOT NULL,\n  `userId` int NOT NULL,\n  `voteType` enum('helpful','not_helpful') NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT `review_votes_id` PRIMARY KEY(`id`),\n  INDEX `review_user_idx` (`reviewId`,`userId`),\n  INDEX `review_idx` (`reviewId`)\n);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute CREATE TABLE IF NOT EXISTS `review_votes` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `reviewId` int NOT NULL,\n  `userId` int NOT NULL,\n  `voteType` enum('helpful','not_helpful') NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT `review_votes_id` PRIMARY KEY(`id`),\n  INDEX `review_user_idx` (`reviewId`,`userId`),\n  INDEX `review_idx` (`reviewId`)\n);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1634
-}

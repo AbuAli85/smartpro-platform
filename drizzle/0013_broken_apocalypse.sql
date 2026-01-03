@@ -1,2 +1,0 @@
-ALTER TABLE `canned_responses` MODIFY COLUMN `category` enum('greeting','faq','closing','pricing','hours','services','general') NOT NULL DEFAULT 'general';--> statement-breakpoint
-ALTER TABLE `canned_responses` ADD `shortcut` varchar(50);

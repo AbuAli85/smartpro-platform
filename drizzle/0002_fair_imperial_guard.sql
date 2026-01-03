@@ -1,1 +1,0 @@
-ALTER TABLE `document_templates` ADD `tags` json;

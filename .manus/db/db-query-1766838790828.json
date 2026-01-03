@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS `bundle_services` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `bundle_id` int NOT NULL,\n  `service_id` int NOT NULL,\n  `service_name` varchar(200) NOT NULL,\n  `service_price` decimal(10,2) NOT NULL,\n  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,\n  INDEX `bundle_idx` (`bundle_id`),\n  INDEX `service_idx` (`service_id`)\n);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute CREATE TABLE IF NOT EXISTS `bundle_services` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `bundle_id` int NOT NULL,\n  `service_id` int NOT NULL,\n  `service_name` varchar(200) NOT NULL,\n  `service_price` decimal(10,2) NOT NULL,\n  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,\n  INDEX `bundle_idx` (`bundle_id`),\n  INDEX `service_idx` (`service_id`)\n);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1713
-}

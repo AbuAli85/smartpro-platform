@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE `office_blocked_slots` (\n  `id` int AUTO_INCREMENT NOT NULL PRIMARY KEY,\n  `office_id` int NOT NULL,\n  `blocked_date` date NOT NULL,\n  `start_time` varchar(10),\n  `end_time` varchar(10),\n  `is_all_day` tinyint NOT NULL DEFAULT 0,\n  `reason` text,\n  `created_by` int NOT NULL,\n  KEY `office_date_idx` (`office_id`, `blocked_date`)\n)",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute CREATE TABLE `office_blocked_slots` (\n  `id` int AUTO_INCREMENT NOT NULL PRIMARY KEY,\n  `office_id` int NOT NULL,\n  `blocked_date` date NOT NULL,\n  `start_time` varchar(10),\n  `end_time` varchar(10),\n  `is_all_day` tinyint NOT NULL DEFAULT 0,\n  `reason` text,\n  `created_by` int NOT NULL,\n  KEY `office_date_idx` (`office_id`, `blocked_date`)\n)",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1679
-}

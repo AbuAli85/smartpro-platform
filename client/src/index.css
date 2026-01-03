@@ -1,7 +1,5 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "./mobile-optimizations.css";
-@import "./rtl-enhancements.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -45,10 +43,10 @@
 }
 
 :root {
-  --primary: oklch(0.35 0.08 250); /* Elegant navy blue */
-  --primary-foreground: oklch(0.98 0.001 250);
-  --sidebar-primary: oklch(0.35 0.08 250);
-  --sidebar-primary-foreground: oklch(0.98 0.001 250);
+  --primary: var(--color-blue-700);
+  --primary-foreground: var(--color-blue-50);
+  --sidebar-primary: var(--color-blue-600);
+  --sidebar-primary-foreground: var(--color-blue-50);
   --chart-1: var(--color-blue-300);
   --chart-2: var(--color-blue-500);
   --chart-3: var(--color-blue-600);
@@ -65,8 +63,8 @@
   --secondary-foreground: oklch(0.4 0.015 65);
   --muted: oklch(0.967 0.001 286.375);
   --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.65 0.15 70); /* Elegant gold accent */
-  --accent-foreground: oklch(0.98 0.001 70);
+  --accent: oklch(0.967 0.001 286.375);
+  --accent-foreground: oklch(0.141 0.005 285.823);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(0.92 0.004 286.32);
@@ -81,8 +79,8 @@
 }
 
 .dark {
-  --primary: oklch(0.35 0.08 250); /* Elegant navy blue */
-  --primary-foreground: oklch(0.98 0.001 250);
+  --primary: var(--color-blue-700);
+  --primary-foreground: var(--color-blue-50);
   --sidebar-primary: var(--color-blue-500);
   --sidebar-primary-foreground: var(--color-blue-50);
   --background: oklch(0.141 0.005 285.823);
@@ -95,8 +93,8 @@
   --secondary-foreground: oklch(0.7 0.005 65);
   --muted: oklch(0.274 0.006 286.033);
   --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.70 0.15 70); /* Elegant gold accent for dark mode */
-  --accent-foreground:  oklch(0.15 0.005 70);
+  --accent: oklch(0.274 0.006 286.033);
+  --accent-foreground:  oklch(0.92 0.005 65);
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(1 0 0 / 10%);
@@ -176,177 +174,4 @@
       max-width: 1280px; /* Standard content width */
     }
   }
-}
-
-/* RTL Layout Utilities */
-[dir="rtl"] {
-  direction: rtl;
-}
-
-[dir="rtl"] .rtl\:flex-row-reverse {
-  flex-direction: row-reverse;
-}
-
-[dir="rtl"] .rtl\:text-right {
-  text-align: right;
-}
-
-[dir="rtl"] .rtl\:text-left {
-  text-align: left;
-}
-
-/* Icon positioning in RTL - flip horizontal arrows */
-[dir="rtl"] .lucide-arrow-right,
-[dir="rtl"] .lucide-arrow-left,
-[dir="rtl"] .lucide-chevron-right,
-[dir="rtl"] .lucide-chevron-left {
-  transform: scaleX(-1);
-}
-
-/* Table alignment in RTL */
-[dir="rtl"] table {
-  direction: rtl;
-}
-
-[dir="rtl"] th,
-[dir="rtl"] td {
-  text-align: right;
-}
-
-/* Form field icons in RTL */
-[dir="rtl"] .relative .absolute.left-3 {
-  left: auto;
-  right: 0.75rem;
-}
-
-[dir="rtl"] .pl-10 {
-  padding-left: 0.75rem;
-  padding-right: 2.5rem;
-}
-
-/* Dropdown menu alignment */
-[dir="rtl"] [role="menu"],
-[dir="rtl"] [role="listbox"] {
-  text-align: right;
-}
-
-/* Card layouts in RTL */
-[dir="rtl"] .flex.items-center.gap-2,
-[dir="rtl"] .flex.items-center.gap-3,
-[dir="rtl"] .flex.items-center.gap-4 {
-  flex-direction: row-reverse;
-}
-
-/* RTL-aware component styling for complex components */
-[dir="rtl"] .dropdown-menu {
-  left: auto;
-  right: 0;
-}
-
-[dir="rtl"] .modal-dialog {
-  text-align: right;
-}
-
-[dir="rtl"] .form-control-icon {
-  left: auto;
-  right: 0.75rem;
-  padding-left: 0;
-  padding-right: 2.5rem;
-}
-
-[dir="rtl"] .toast {
-  left: auto;
-  right: 1rem;
-}
-
-[dir="rtl"] .breadcrumb-item + .breadcrumb-item::before {
-  float: right;
-  padding-right: 0.5rem;
-  padding-left: 0;
-  content: "/";
-}
-
-[dir="rtl"] .input-group-prepend {
-  margin-right: 0;
-  margin-left: -1px;
-}
-
-[dir="rtl"] .input-group-append {
-  margin-left: 0;
-  margin-right: -1px;
-}
-
-/* RTL date picker adjustments */
-[dir="rtl"] .react-datepicker {
-  direction: rtl;
-}
-
-[dir="rtl"] .react-datepicker__navigation--previous {
-  right: 0;
-  left: auto;
-}
-
-[dir="rtl"] .react-datepicker__navigation--next {
-  left: 0;
-  right: auto;
-}
-
-/* RTL dropdown menu positioning */
-[dir="rtl"] .dropdown-menu-end {
-  right: auto !important;
-  left: 0 !important;
-}
-
-/* RTL modal close button */
-[dir="rtl"] .modal-header .btn-close {
-  margin-right: auto;
-  margin-left: -0.5rem;
-}
-
-/* RTL form labels and inputs */
-[dir="rtl"] .form-label {
-  text-align: right;
-}
-
-[dir="rtl"] .form-check {
-  padding-left: 0;
-  padding-right: 1.5em;
-}
-
-[dir="rtl"] .form-check-input {
-  float: right;
-  margin-left: 0;
-  margin-right: -1.5em;
-}
-
-/* RTL badge positioning */
-[dir="rtl"] .badge {
-  margin-left: 0;
-  margin-right: 0.25rem;
-}
-
-/* RTL icon spacing */
-[dir="rtl"] .icon-left {
-  margin-right: 0;
-  margin-left: 0.5rem;
-}
-
-[dir="rtl"] .icon-right {
-  margin-left: 0;
-  margin-right: 0.5rem;
-}
-
-/* RTL calendar component */
-[dir="rtl"] .calendar-grid {
-  direction: rtl;
-}
-
-/* RTL toast notifications */
-[dir="rtl"] .Toaster {
-  left: auto !important;
-  right: 1rem !important;
-}
-
-[dir="rtl"] [data-sonner-toast] {
-  direction: rtl;
 }

@@ -1,1 +1,0 @@
-ALTER TABLE `users` ADD `preferredLanguage` varchar(10) DEFAULT 'en';

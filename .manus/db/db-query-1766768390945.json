@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS translation_versions (\n  id INT PRIMARY KEY AUTO_INCREMENT,\n  entityType ENUM('office', 'template') NOT NULL,\n  entityId INT NOT NULL,\n  fieldName VARCHAR(50) NOT NULL,\n  oldValue TEXT,\n  newValue TEXT,\n  changedBy INT NOT NULL,\n  changedByName VARCHAR(255) NOT NULL,\n  changeReason TEXT,\n  source ENUM('manual', 'bulk_import', 'request_approval', 'auto_translate') NOT NULL DEFAULT 'manual',\n  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX entity_idx (entityType, entityId),\n  INDEX changed_by_idx (changedBy),\n  INDEX date_idx (createdAt)\n)",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute CREATE TABLE IF NOT EXISTS translation_versions (\n  id INT PRIMARY KEY AUTO_INCREMENT,\n  entityType ENUM('office', 'template') NOT NULL,\n  entityId INT NOT NULL,\n  fieldName VARCHAR(50) NOT NULL,\n  oldValue TEXT,\n  newValue TEXT,\n  changedBy INT NOT NULL,\n  changedByName VARCHAR(255) NOT NULL,\n  changeReason TEXT,\n  source ENUM('manual', 'bulk_import', 'request_approval', 'auto_translate') NOT NULL DEFAULT 'manual',\n  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX entity_idx (entityType, entityId),\n  INDEX changed_by_idx (changedBy),\n  INDEX date_idx (createdAt)\n)",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1616
-}

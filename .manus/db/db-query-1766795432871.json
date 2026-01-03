@@ -1,9 +1,0 @@
-{
-  "query": "INSERT INTO sanad_office_services (officeId, serviceName, serviceNameAr, description, descriptionAr, category, price, estimatedDeliveryDays) VALUES \n(30001, 'Company Registration', 'تسجيل شركة', 'Complete company registration with all required documents', 'تسجيل شركة كامل مع جميع المستندات المطلوبة', 'business', 500, 7),\n(30001, 'Legal Consultation', 'استشارة قانونية', 'One-hour legal consultation for business matters', 'استشارة قانونية لمدة ساعة واحدة للأمور التجارية', 'legal', 100, 1),\n(30001, 'Contract Drafting', 'صياغة عقد', 'Professional contract drafting and review', 'صياغة ومراجعة عقود احترافية', 'legal', 200, 3),\n(30001, 'Tax Registration', 'التسجيل الضريبي', 'VAT and tax registration services', 'خدمات التسجيل في ضريبة القيمة المضافة والضرائب', 'business', 150, 5)",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute INSERT INTO sanad_office_services (officeId, serviceName, serviceNameAr, description, descriptionAr, category, price, estimatedDeliveryDays) VALUES \n(30001, 'Company Registration', 'تسجيل شركة', 'Complete company registration with all required documents', 'تسجيل شركة كامل مع جميع المستندات المطلوبة', 'business', 500, 7),\n(30001, 'Legal Consultation', 'استشارة قانونية', 'One-hour legal consultation for business matters', 'استشارة قانونية لمدة ساعة واحدة للأمور التجارية', 'legal', 100, 1),\n(30001, 'Contract Drafting', 'صياغة عقد', 'Professional contract drafting and review', 'صياغة ومراجعة عقود احترافية', 'legal', 200, 3),\n(30001, 'Tax Registration', 'التسجيل الضريبي', 'VAT and tax registration services', 'خدمات التسجيل في ضريبة القيمة المضافة والضرائب', 'business', 150, 5)",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1632
-}

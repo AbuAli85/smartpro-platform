@@ -1,9 +1,0 @@
-{
-  "query": "INSERT INTO office_availability (officeId, dayOfWeek, startTime, endTime, isActive)\nSELECT id, 1, '09:00:00', '17:00:00', true FROM sanad_offices WHERE slug = 'test-office-filters-1766758228421'\nUNION ALL\nSELECT id, 2, '09:00:00', '17:00:00', true FROM sanad_offices WHERE slug = 'test-office-filters-1766758228421'\nUNION ALL\nSELECT id, 3, '09:00:00', '17:00:00', true FROM sanad_offices WHERE slug = 'test-office-filters-1766758228421'\nUNION ALL\nSELECT id, 4, '09:00:00', '17:00:00', true FROM sanad_offices WHERE slug = 'test-office-filters-1766758228421'\nUNION ALL\nSELECT id, 5, '09:00:00', '17:00:00', true FROM sanad_offices WHERE slug = 'test-office-filters-1766758228421'",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user ihzfUTY3fkQrUHE.be3078012d32 --database BQjjpahxwnxSsco8Xduspr --execute INSERT INTO office_availability (officeId, dayOfWeek, startTime, endTime, isActive)\nSELECT id, 1, '09:00:00', '17:00:00', true FROM sanad_offices WHERE slug = 'test-office-filters-1766758228421'\nUNION ALL\nSELECT id, 2, '09:00:00', '17:00:00', true FROM sanad_offices WHERE slug = 'test-office-filters-1766758228421'\nUNION ALL\nSELECT id, 3, '09:00:00', '17:00:00', true FROM sanad_offices WHERE slug = 'test-office-filters-1766758228421'\nUNION ALL\nSELECT id, 4, '09:00:00', '17:00:00', true FROM sanad_offices WHERE slug = 'test-office-filters-1766758228421'\nUNION ALL\nSELECT id, 5, '09:00:00', '17:00:00', true FROM sanad_offices WHERE slug = 'test-office-filters-1766758228421'",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1602
-}

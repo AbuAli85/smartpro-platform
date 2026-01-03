@@ -1,2 +1,0 @@
--- Migration already applied to database
--- Tags column already exists in chat_conversations

@@ -1,2 +1,0 @@
--- Migration already applied to database
--- Tags column modification already done

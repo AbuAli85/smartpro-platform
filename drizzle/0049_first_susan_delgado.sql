@@ -1,1 +1,0 @@
-ALTER TABLE `office_blocked_slots` ADD `created_at` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL;
