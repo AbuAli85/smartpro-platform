@@ -1958,3 +1958,24 @@ Improve bookings page UX by implementing a tabbed interface within each booking 
 **Priority:** Medium  
 **Timeline:** 1-2 hours  
 **Impact:** High - Improves user experience and reduces visual clutter
+
+---
+
+## 🔴 CRITICAL - Connection Error Fixes (Jan 3, 2026 - 10:54 GMT+4)
+
+### Socket.IO and SSE Connection Issues
+- [x] Remove unused Socket.IO client dependency (socket.io-client package)
+- [x] Improve SSE reconnection logic to reduce console spam
+- [x] Add better error handling for SSE connection timeouts
+- [x] Implement exponential backoff with max retry limit
+- [x] Suppress non-critical SSE error logs in production
+- [ ] Add connection state UI indicator improvements (optional enhancement)
+
+**Root Cause:** Socket.IO client library is installed but never used (app uses SSE instead). SSE connections experience timeouts during sandbox idle periods, causing excessive console errors.
+
+**Impact:** Medium - Console spam from connection retries, but functionality works correctly
+
+**Priority:** High - Should fix to improve developer experience and reduce log noise
+
+**Timeline:** 30 minutes
+

@@ -15,6 +15,7 @@ export function useNotifications() {
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const reconnectAttemptsRef = useRef(0);
+  const maxReconnectAttempts = 5; // Stop after 5 failed attempts
 
   const connect = () => {
     if (!user) {
@@ -34,7 +35,9 @@ export function useNotifications() {
         ?.split("=")[1];
 
       if (!token) {
-        console.warn("No auth token found for SSE connection");
+        if (import.meta.env.DEV) {
+          console.warn("SSE: No auth token found");
+        }
         return;
       }
 
@@ -43,7 +46,9 @@ export function useNotifications() {
       eventSourceRef.current = eventSource;
 
       eventSource.onopen = () => {
-        console.log("SSE connection established");
+        if (import.meta.env.DEV) {
+          console.log("SSE connection established");
+        }
         setIsConnected(true);
         reconnectAttemptsRef.current = 0;
       };
@@ -57,18 +62,32 @@ export function useNotifications() {
         }
       };
 
-      eventSource.onerror = () => {
-        console.error("SSE connection error");
+      eventSource.onerror = (error) => {
+        // Only log errors in development
+        if (import.meta.env.DEV) {
+          console.warn("SSE connection error - will retry", error);
+        }
+        
         setIsConnected(false);
         eventSource.close();
         eventSourceRef.current = null;
+
+        // Stop reconnecting after max attempts
+        if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
+          if (import.meta.env.DEV) {
+            console.warn(`SSE: Max reconnection attempts (${maxReconnectAttempts}) reached. Stopping reconnection.`);
+          }
+          return;
+        }
 
         // Attempt to reconnect with exponential backoff
         const delay = Math.min(1000 * Math.pow(2, reconnectAttemptsRef.current), 30000);
         reconnectAttemptsRef.current++;
 
         reconnectTimeoutRef.current = setTimeout(() => {
-          console.log(`Attempting to reconnect (attempt ${reconnectAttemptsRef.current})...`);
+          if (import.meta.env.DEV) {
+            console.log(`SSE: Reconnecting (attempt ${reconnectAttemptsRef.current}/${maxReconnectAttempts})...`);
+          }
           connect();
         }, delay);
       };
