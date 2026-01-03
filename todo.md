@@ -60,6 +60,7 @@
 - [x] Fix triple .toISOString() calls in server/db.ts (33 instances) - ✅ FIXED (reduced errors by 37)
 - [x] Fix isActive in db.ts (all function signatures and comparisons) - ✅ FIXED
 - [x] Fix isActive in test files (staffManagement, threeFeatures, marketplaceEnhancements) - ✅ FIXED
+- [x] Fix reviews.ts TypeScript errors (ctx.schema and ctx.eq references) - ✅ FIXED (Jan 3, 2026)
 - [ ] Fix Date type mismatches in campaigns router (Date vs string)
 - [ ] Fix chat router type errors (Property 'id' does not exist on line 169)
 - [ ] Fix CustomerChatInterface missing officeId parameter

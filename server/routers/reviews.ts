@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import { invokeLLM } from "../_core/llm";
+import * as db from "../db";
+import { eq, and } from "drizzle-orm";
+import { reviews, sanadOffices, officeStaff, notifications } from "../../drizzle/schema";
 
 export const reviewsRouter = router({
   /**
@@ -121,66 +124,68 @@ Example format: [{"text": "Response 1..."}, {"text": "Response 2..."}, {"text": 
     )
     .mutation(async ({ ctx, input }) => {
       const user = ctx.user!;
+      const database = await db.getDb();
+      if (!database) throw new Error("Database not available");
       
       // Get review details to verify ownership
-      const review = await ctx.db
+      const [review] = await database
         .select()
-        .from(ctx.schema.reviews)
-        .where(ctx.eq(ctx.schema.reviews.id, input.reviewId))
+        .from(reviews)
+        .where(eq(reviews.id, input.reviewId))
         .limit(1);
       
-      if (!review || review.length === 0) {
+      if (!review) {
         throw new Error("Review not found");
       }
       
       // Check if user owns the office
-      const office = await ctx.db
+      const [office] = await database
         .select()
-        .from(ctx.schema.sanadOffices)
-        .where(ctx.eq(ctx.schema.sanadOffices.id, review[0].officeId))
+        .from(sanadOffices)
+        .where(eq(sanadOffices.id, review.officeId))
         .limit(1);
       
-      if (!office || office.length === 0) {
+      if (!office) {
         throw new Error("Office not found");
       }
       
       // Verify ownership or staff membership
-      const isOwner = office[0].ownerId === user.id;
-      const isStaff = await ctx.db
+      const isOwner = office.ownerId === user.id;
+      const staffMember = await database
         .select()
-        .from(ctx.schema.officeStaff)
+        .from(officeStaff)
         .where(
-          ctx.and(
-            ctx.eq(ctx.schema.officeStaff.officeId, office[0].id),
-            ctx.eq(ctx.schema.officeStaff.userId, user.id),
-            ctx.eq(ctx.schema.officeStaff.isActive, 1)
+          and(
+            eq(officeStaff.officeId, office.id),
+            eq(officeStaff.userId, user.id),
+            eq(officeStaff.isActive, 1)
           )
         )
         .limit(1);
       
-      if (!isOwner && (!isStaff || isStaff.length === 0)) {
+      if (!isOwner && staffMember.length === 0) {
         throw new Error("You don't have permission to reply to this review");
       }
       
       // Update review with reply
-      await ctx.db
-        .update(ctx.schema.reviews)
+      await database
+        .update(reviews)
         .set({
           responseText: input.responseText,
           respondedAt: new Date().toISOString(),
           respondedBy: user.id,
         })
-        .where(ctx.eq(ctx.schema.reviews.id, input.reviewId));
+        .where(eq(reviews.id, input.reviewId));
       
       // Send notification to reviewer
-      const reviewer = review[0].userId;
-      await ctx.db.insert(ctx.schema.notifications).values({
+      const reviewer = review.userId;
+      await database.insert(notifications).values({
         userId: reviewer,
         type: "review",
         title: "Office replied to your review",
-        message: `${office[0].officeName} has responded to your review.`,
+        message: `${office.officeName} has responded to your review.`,
         reviewId: input.reviewId,
-        actionUrl: `/offices/${office[0].slug}#review-${input.reviewId}`,
+        actionUrl: `/offices/${office.slug}#review-${input.reviewId}`,
         isRead: 0,
       });
       
@@ -199,31 +204,29 @@ Example format: [{"text": "Response 1..."}, {"text": "Response 2..."}, {"text": 
     )
     .mutation(async ({ ctx, input }) => {
       const user = ctx.user!;
+      const database = await db.getDb();
+      if (!database) throw new Error("Database not available");
       
       // Get review details
-      const review = await ctx.db
-        .select()
-        .from(ctx.schema.reviews)
-        .where(ctx.eq(ctx.schema.reviews.id, input.reviewId))
-        .limit(1);
+      const review = await db.getReviewById(input.reviewId);
       
-      if (!review || review.length === 0) {
+      if (!review) {
         throw new Error("Review not found");
       }
       
       // Verify user is the one who replied
-      if (review[0].respondedBy !== user.id) {
+      if (review.respondedBy !== user.id) {
         throw new Error("You can only edit your own replies");
       }
       
       // Update reply
-      await ctx.db
-        .update(ctx.schema.reviews)
+      await database
+        .update(reviews)
         .set({
           responseText: input.responseText,
           respondedAt: new Date().toISOString(),
         })
-        .where(ctx.eq(ctx.schema.reviews.id, input.reviewId));
+        .where(eq(reviews.id, input.reviewId));
       
       return { success: true };
     }),
@@ -235,32 +238,30 @@ Example format: [{"text": "Response 1..."}, {"text": "Response 2..."}, {"text": 
     .input(z.object({ reviewId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       const user = ctx.user!;
+      const database = await db.getDb();
+      if (!database) throw new Error("Database not available");
       
       // Get review details
-      const review = await ctx.db
-        .select()
-        .from(ctx.schema.reviews)
-        .where(ctx.eq(ctx.schema.reviews.id, input.reviewId))
-        .limit(1);
+      const review = await db.getReviewById(input.reviewId);
       
-      if (!review || review.length === 0) {
+      if (!review) {
         throw new Error("Review not found");
       }
       
       // Verify user is the one who replied
-      if (review[0].respondedBy !== user.id) {
+      if (review.respondedBy !== user.id) {
         throw new Error("You can only delete your own replies");
       }
       
       // Remove reply
-      await ctx.db
-        .update(ctx.schema.reviews)
+      await database
+        .update(reviews)
         .set({
           responseText: null,
           respondedAt: null,
           respondedBy: null,
         })
-        .where(ctx.eq(ctx.schema.reviews.id, input.reviewId));
+        .where(eq(reviews.id, input.reviewId));
       
       return { success: true };
     }),
