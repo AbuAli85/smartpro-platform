@@ -557,4 +557,43 @@ export const sanadOfficeRouter = router({
       await db.updateOfficeTranslation(officeId, translations);
       return { success: true };
     }),
+
+  // Update office details (for office owners)
+  updateOffice: protectedProcedure
+    .input(z.object({
+      id: z.number(),
+      nameAr: z.string().optional(),
+      nameEn: z.string().optional(),
+      descriptionAr: z.string().optional(),
+      descriptionEn: z.string().optional(),
+      logoUrl: z.string().optional(),
+      images: z.array(z.string()).optional(),
+      email: z.string().email().optional(),
+      phone: z.string().optional(),
+      whatsapp: z.string().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const { id, ...updateData } = input;
+      
+      // Verify office ownership
+      const office = await db.getOfficeById(id);
+      if (!office) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Office not found",
+        });
+      }
+      
+      if (office.ownerId !== ctx.user!.id && ctx.user!.role !== "admin") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You don't have permission to update this office",
+        });
+      }
+
+      // Update office
+      await db.updateOffice(id, updateData);
+      
+      return { success: true };
+    }),
 });

@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { ImageCropDialog } from './ImageCropDialog';
 
 interface ImageUploadProps {
   value?: string | string[];
@@ -12,6 +13,8 @@ interface ImageUploadProps {
   label?: string;
   helperText?: string;
   disabled?: boolean;
+  enableCrop?: boolean;
+  cropAspectRatio?: number; // e.g., 1 for square, 16/9 for landscape
 }
 
 export function ImageUpload({
@@ -23,11 +26,17 @@ export function ImageUpload({
   label,
   helperText,
   disabled = false,
+  enableCrop = false,
+  cropAspectRatio,
 }: ImageUploadProps) {
   const { t } = useLanguage();
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [cropDialogOpen, setCropDialogOpen] = useState(false);
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [currentFileIndex, setCurrentFileIndex] = useState(0);
 
   const currentImages = multiple
     ? Array.isArray(value) ? value : []
@@ -52,6 +61,25 @@ export function ImageUpload({
     }
 
     setError(null);
+
+    // If crop is enabled, show crop dialog for first image
+    if (enableCrop) {
+      setPendingFiles(files);
+      setCurrentFileIndex(0);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImageToCrop(e.target?.result as string);
+        setCropDialogOpen(true);
+      };
+      reader.readAsDataURL(files[0]);
+      return;
+    }
+
+    // Otherwise, upload directly
+    await uploadFiles(files);
+  };
+
+  const uploadFiles = async (files: File[] | Blob[]) => {
     setUploading(true);
 
     try {
@@ -88,6 +116,29 @@ export function ImageUpload({
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+    }
+  };
+
+  const handleCropComplete = async (croppedBlob: Blob) => {
+    const nextIndex = currentFileIndex + 1;
+    const croppedFiles = [...pendingFiles.slice(0, currentFileIndex), croppedBlob, ...pendingFiles.slice(nextIndex)];
+
+    // If there are more files to crop and we're in multiple mode
+    if (multiple && nextIndex < pendingFiles.length) {
+      setCurrentFileIndex(nextIndex);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImageToCrop(e.target?.result as string);
+        setCropDialogOpen(true);
+      };
+      reader.readAsDataURL(pendingFiles[nextIndex]);
+    } else {
+      // All files cropped, upload them
+      setCropDialogOpen(false);
+      setImageToCrop(null);
+      setPendingFiles([]);
+      setCurrentFileIndex(0);
+      await uploadFiles(croppedFiles);
     }
   };
 
@@ -199,6 +250,31 @@ export function ImageUpload({
           </p>
         )}
       </div>
+
+      {/* Crop Dialog */}
+      {enableCrop && imageToCrop && (
+        <ImageCropDialog
+          open={cropDialogOpen}
+          onOpenChange={(open) => {
+            setCropDialogOpen(open);
+            if (!open) {
+              setImageToCrop(null);
+              setPendingFiles([]);
+              setCurrentFileIndex(0);
+              if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+              }
+            }
+          }}
+          imageSrc={imageToCrop}
+          onCropComplete={handleCropComplete}
+          aspectRatio={cropAspectRatio}
+          title={multiple && pendingFiles.length > 1 
+            ? `Crop Image ${currentFileIndex + 1} of ${pendingFiles.length}`
+            : 'Crop Image'
+          }
+        />
+      )}
     </div>
   );
 }

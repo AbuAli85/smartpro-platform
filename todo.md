@@ -2143,3 +2143,35 @@ Improve bookings page UX by implementing a tabbed interface within each booking 
   - Show current step and total steps
   - Display step names and completion status
   - Add visual progress bar
+
+
+---
+
+## 🎨 Provider Experience Enhancements (Jan 4, 2026)
+
+- [x] Image cropping/editing tool - Let providers crop and adjust uploaded logos and photos before saving
+  - Installed react-image-crop library
+  - Created ImageCropDialog component with crop controls (zoom, rotate)
+  - Integrated into ImageUpload component with enableCrop prop
+  - Added cropAspectRatio prop for different aspect ratios
+  - Handles cropped image data and uploads to S3
+
+- [x] Drag-and-drop photo reordering - Allow office owners to reorder gallery photos
+  - Installed @dnd-kit/core, @dnd-kit/sortable, @dnd-kit/utilities
+  - Created DraggablePhotoGrid component with sortable items
+  - Added reorder functionality with visual feedback
+  - Updates photos array order in parent component
+  - Shows position badges and drag handles
+
+- [x] Office edit page - Create dedicated page for providers to update office details
+  - Created /provider/office/:id/edit route
+  - Built OfficeEditPage component with sections for:
+    * Basic info (name AR/EN, description AR/EN)
+    * Logo upload with crop (1:1 aspect ratio)
+    * Photos upload with crop (16:9 aspect ratio)
+    * Photo reordering with DraggablePhotoGrid
+    * Contact info (email, phone, whatsapp)
+  - Added updateOffice tRPC procedure with ownership verification
+  - Added updateOffice database function
+  - Added English and Arabic translations
+  - Implemented save functionality with success/error notifications

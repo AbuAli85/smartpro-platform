@@ -19,6 +19,9 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.693.0",
     "@aws-sdk/s3-request-presigner": "^3.693.0",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@fullcalendar/daygrid": "^6.1.20",
     "@fullcalendar/interaction": "^6.1.20",
     "@fullcalendar/react": "^6.1.20",
@@ -95,6 +98,7 @@
     "react-dom": "^19.2.1",
     "react-hook-form": "^7.64.0",
     "react-i18next": "^16.5.0",
+    "react-image-crop": "^11.0.10",
     "react-markdown": "^10.1.0",
     "react-resizable-panels": "^3.0.6",
     "react-slider": "^2.0.6",

@@ -77,6 +77,7 @@ import LoginAnalytics from "./pages/admin/LoginAnalytics";
 import ClientList from "./pages/ClientList";
 import ClientProfile from "./pages/ClientProfile";
 import FinancialDashboard from "./pages/FinancialDashboard";
+import { OfficeEditPage } from "./pages/OfficeEditPage";
 import { useNotifications } from "./hooks/useNotifications";
 import { useMarketplaceNotifications } from "./hooks/useMarketplaceNotifications";
 import { SocketProvider } from "./contexts/SocketContext";
@@ -97,6 +98,11 @@ function Router() {
       <Route path="/onboarding" component={OnboardingWizard} />
       <Route path="/create-office" component={CreateOffice} />
       <Route path="/my-offices" component={MyOffices} />
+      <Route path="/provider/office/:id/edit">
+        <ProtectedRoute>
+          <OfficeEditPage />
+        </ProtectedRoute>
+      </Route>
       
       {/* Document Templates */}
       <Route path="/templates" component={Templates} />

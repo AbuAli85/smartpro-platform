@@ -1195,6 +1195,48 @@ export async function updateOfficeInfo(data: {
   return { success: true };
 }
 
+/**
+ * Update office details (for office edit page)
+ */
+export async function updateOffice(
+  officeId: number,
+  data: {
+    nameAr?: string;
+    nameEn?: string;
+    descriptionAr?: string;
+    descriptionEn?: string;
+    logoUrl?: string;
+    images?: string[];
+    email?: string;
+    phone?: string;
+    whatsapp?: string;
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const updateData: any = {
+    updatedAt: new Date().toISOString(),
+  };
+
+  if (data.nameAr !== undefined) updateData.nameAr = data.nameAr;
+  if (data.nameEn !== undefined) updateData.nameEn = data.nameEn;
+  if (data.descriptionAr !== undefined) updateData.descriptionAr = data.descriptionAr;
+  if (data.descriptionEn !== undefined) updateData.descriptionEn = data.descriptionEn;
+  if (data.logoUrl !== undefined) updateData.logoUrl = data.logoUrl;
+  if (data.images !== undefined) updateData.images = JSON.stringify(data.images);
+  if (data.email !== undefined) updateData.email = data.email;
+  if (data.phone !== undefined) updateData.phone = data.phone;
+  if (data.whatsapp !== undefined) updateData.whatsapp = data.whatsapp;
+
+  await db
+    .update(sanadOffices)
+    .set(updateData)
+    .where(eq(sanadOffices.id, officeId));
+
+  return { success: true };
+}
+
 // ============================================================================
 // NOTIFICATION COUNTS
 // ============================================================================
