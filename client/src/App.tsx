@@ -78,6 +78,10 @@ import ClientList from "./pages/ClientList";
 import ClientProfile from "./pages/ClientProfile";
 import FinancialDashboard from "./pages/FinancialDashboard";
 import { OfficeEditPage } from "./pages/OfficeEditPage";
+import SuccessStories from "./pages/SuccessStories";
+import SuccessStoryDetail from "./pages/SuccessStoryDetail";
+import Regulations from "./pages/Regulations";
+import GovernorateDetail from "./pages/GovernorateDetail";
 import { useNotifications } from "./hooks/useNotifications";
 import { useMarketplaceNotifications } from "./hooks/useMarketplaceNotifications";
 import { SocketProvider } from "./contexts/SocketContext";
@@ -123,6 +127,12 @@ function Router() {
       <Route path="/marketplace/requests/:id/success" component={RequestSuccessPage} />
       <Route path="/my-requests" component={MyServiceRequests} />
       <Route path="/my-service-requests" component={MyServiceRequests} />
+      
+      {/* Oman-Specific Features */}
+      <Route path="/success-stories" component={SuccessStories} />
+      <Route path="/success-stories/:id" component={SuccessStoryDetail} />
+      <Route path="/regulations" component={Regulations} />
+      <Route path="/governorates/:slug" component={GovernorateDetail} />
       
       {/* Documents */}
       <Route path="/documents" component={MyDocuments} />

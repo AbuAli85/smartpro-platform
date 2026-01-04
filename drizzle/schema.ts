@@ -1272,3 +1272,258 @@ export type ServiceBid = InferSelectModel<typeof serviceBids>;
 export type InsertServiceBid = InferInsertModel<typeof serviceBids>;
 export type OfficeProfileVersion = InferSelectModel<typeof officeProfileVersions>;
 export type InsertOfficeProfileVersion = InferInsertModel<typeof officeProfileVersions>;
+// ============================================
+// OMAN-SPECIFIC FEATURES TABLES
+// ============================================
+
+// Success Stories Table
+export const successStories = mysqlTable("success_stories", {
+	id: int().autoincrement().notNull(),
+	businessName: varchar("business_name", { length: 255 }).notNull(),
+	businessNameAr: varchar("business_name_ar", { length: 255 }),
+	ownerName: varchar("owner_name", { length: 255 }).notNull(),
+	ownerNameAr: varchar("owner_name_ar", { length: 255 }),
+	governorate: varchar({ length: 100 }).notNull(),
+	wilayat: varchar({ length: 100 }),
+	industry: varchar({ length: 100 }).notNull(),
+	serviceType: varchar("service_type", { length: 100 }),
+	yearEstablished: int(),
+	officeId: int("office_id"), // Link to sanad_offices if applicable
+	
+	// Story Content
+	challenge: text().notNull(), // The problem/challenge they faced
+	challengeAr: text("challenge_ar"),
+	solution: text().notNull(), // How they solved it
+	solutionAr: text("solution_ar"),
+	results: text().notNull(), // The outcomes achieved
+	resultsAr: text("results_ar"),
+	testimonial: text(), // Quote from the business owner
+	testimonialAr: text("testimonial_ar"),
+	
+	// Impact Metrics
+	jobsCreated: int("jobs_created"),
+	revenueGrowth: varchar("revenue_growth", { length: 50 }), // e.g., "150%", "RO 50,000"
+	customersServed: int("customers_served"),
+	awardsReceived: json("awards_received"), // Array of awards
+	
+	// Media
+	ownerPhotoUrl: text("owner_photo_url"),
+	businessPhotoUrl: text("business_photo_url"),
+	additionalPhotos: json("additional_photos"), // Array of photo URLs
+	videoUrl: text("video_url"),
+	
+	// SmartPro Connection
+	smartproServicesUsed: json("smartpro_services_used"), // Array of services
+	smartproImpact: text("smartpro_impact"), // How SmartPro helped
+	smartproImpactAr: text("smartpro_impact_ar"),
+	
+	// Metadata
+	featured: tinyint().default(0).notNull(), // Featured on homepage
+	displayOrder: int("display_order").default(0),
+	status: mysqlEnum(['draft','published','archived']).default('draft').notNull(),
+	publishedAt: timestamp("published_at", { mode: 'string' }),
+	viewCount: int("view_count").default(0).notNull(),
+	
+	createdBy: int("created_by"),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("governorate_idx").on(table.governorate),
+	index("industry_idx").on(table.industry),
+	index("status_idx").on(table.status),
+	index("featured_idx").on(table.featured),
+	index("office_idx").on(table.officeId),
+	index("display_order_idx").on(table.displayOrder),
+]);
+
+export type SuccessStory = InferSelectModel<typeof successStories>;
+export type NewSuccessStory = InferInsertModel<typeof successStories>;
+
+// Regulations and Compliance Table
+export const regulations = mysqlTable("regulations", {
+	id: int().autoincrement().notNull(),
+	title: varchar({ length: 255 }).notNull(),
+	titleAr: varchar("title_ar", { length: 255 }),
+	slug: varchar({ length: 255 }).notNull(),
+	
+	// Categorization
+	category: mysqlEnum(['business_registration','licensing','tax','labor','sme_support','industry_specific','general']).notNull(),
+	subcategory: varchar({ length: 100 }),
+	applicableIndustries: json("applicable_industries"), // Array of industries
+	applicableBusinessTypes: json("applicable_business_types"), // LLC, sole proprietorship, etc.
+	
+	// Content
+	summary: text().notNull(), // Brief overview
+	summaryAr: text("summary_ar"),
+	description: text().notNull(), // Detailed explanation
+	descriptionAr: text("description_ar"),
+	requirements: json().notNull(), // Array of requirement objects
+	requirementsAr: json("requirements_ar"),
+	
+	// Authority Information
+	issuingAuthority: varchar("issuing_authority", { length: 255 }).notNull(), // MOCIIP, PASI, etc.
+	issuingAuthorityAr: varchar("issuing_authority_ar", { length: 255 }),
+	authorityWebsite: text("authority_website"),
+	authorityContact: json("authority_contact"), // Phone, email, address
+	
+	// Compliance Details
+	complianceSteps: json("compliance_steps"), // Step-by-step guide
+	complianceStepsAr: json("compliance_steps_ar"),
+	requiredDocuments: json("required_documents"), // List of documents
+	requiredDocumentsAr: json("required_documents_ar"),
+	estimatedCost: varchar("estimated_cost", { length: 100 }), // e.g., "OMR 100-500"
+	estimatedDuration: varchar("estimated_duration", { length: 100 }), // e.g., "2-4 weeks"
+	renewalRequired: tinyint("renewal_required").default(0),
+	renewalPeriod: varchar("renewal_period", { length: 50 }), // e.g., "Annual", "5 years"
+	
+	// Resources
+	downloadableGuideUrl: text("downloadable_guide_url"),
+	downloadableGuideUrlAr: text("downloadable_guide_url_ar"),
+	relatedForms: json("related_forms"), // Array of form URLs
+	externalLinks: json("external_links"), // Array of helpful links
+	
+	// Metadata
+	priority: mysqlEnum(['critical','high','medium','low']).default('medium'),
+	featured: tinyint().default(0).notNull(),
+	displayOrder: int("display_order").default(0),
+	status: mysqlEnum(['draft','published','archived']).default('draft').notNull(),
+	publishedAt: timestamp("published_at", { mode: 'string' }),
+	lastUpdated: timestamp("last_updated", { mode: 'string' }),
+	viewCount: int("view_count").default(0).notNull(),
+	
+	createdBy: int("created_by"),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("regulations_slug_unique").on(table.slug),
+	index("category_idx").on(table.category),
+	index("priority_idx").on(table.priority),
+	index("status_idx").on(table.status),
+	index("featured_idx").on(table.featured),
+	index("display_order_idx").on(table.displayOrder),
+]);
+
+export type Regulation = InferSelectModel<typeof regulations>;
+export type NewRegulation = InferInsertModel<typeof regulations>;
+
+// Governorate Information Table
+export const governorates = mysqlTable("governorates", {
+	id: int().autoincrement().notNull(),
+	name: varchar({ length: 100 }).notNull(),
+	nameAr: varchar("name_ar", { length: 100 }).notNull(),
+	slug: varchar({ length: 100 }).notNull(),
+	
+	// Geographic Information
+	region: mysqlEnum(['north','south','central','coastal','interior']).notNull(),
+	capitalCity: varchar("capital_city", { length: 100 }),
+	capitalCityAr: varchar("capital_city_ar", { length: 100 }),
+	area: decimal({ precision: 10, scale: 2 }), // in square kilometers
+	coordinates: json(), // {lat, lng} for map center
+	
+	// Demographics
+	population: int(),
+	populationYear: int("population_year"), // Year of census
+	majorCities: json("major_cities"), // Array of city objects
+	wilayats: json(), // Array of wilayat objects
+	
+	// Economic Data
+	keyIndustries: json("key_industries"), // Array of industries
+	keyIndustriesAr: json("key_industries_ar"),
+	economicSectors: json("economic_sectors"), // Services, industrial, agricultural
+	totalBusinesses: int("total_businesses"),
+	smeCount: int("sme_count"),
+	
+	// Description
+	overview: text().notNull(),
+	overviewAr: text("overview_ar"),
+	economicProfile: text("economic_profile"),
+	economicProfileAr: text("economic_profile_ar"),
+	historicalSignificance: text("historical_significance"),
+	historicalSignificanceAr: text("historical_significance_ar"),
+	touristAttractions: json("tourist_attractions"),
+	touristAttractionsAr: json("tourist_attractions_ar"),
+	
+	// Business Environment
+	businessOpportunities: json("business_opportunities"),
+	businessOpportunitiesAr: json("business_opportunities_ar"),
+	investmentZones: json("investment_zones"), // Free zones, industrial areas
+	investmentZonesAr: json("investment_zones_ar"),
+	
+	// SmartPro Presence
+	registeredOfficesCount: int("registered_offices_count").default(0),
+	topServiceCategories: json("top_service_categories"), // Most popular services
+	averageServicePrice: decimal("average_service_price", { precision: 10, scale: 2 }),
+	
+	// Media
+	coverImageUrl: text("cover_image_url"),
+	galleryImages: json("gallery_images"), // Array of image URLs
+	mapImageUrl: text("map_image_url"),
+	
+	// Contact Information
+	governmentOfficeAddress: text("government_office_address"),
+	governmentOfficeAddressAr: text("government_office_address_ar"),
+	governmentOfficePhone: varchar("government_office_phone", { length: 20 }),
+	governmentOfficeEmail: varchar("government_office_email", { length: 320 }),
+	
+	// SEO
+	metaTitle: varchar("meta_title", { length: 255 }),
+	metaTitleAr: varchar("meta_title_ar", { length: 255 }),
+	metaDescription: text("meta_description"),
+	metaDescriptionAr: text("meta_description_ar"),
+	keywords: json(), // Array of SEO keywords
+	
+	// Metadata
+	featured: tinyint().default(0).notNull(),
+	displayOrder: int("display_order").default(0),
+	status: mysqlEnum(['active','inactive']).default('active').notNull(),
+	viewCount: int("view_count").default(0).notNull(),
+	
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("governorates_slug_unique").on(table.slug),
+	index("governorates_name_unique").on(table.name),
+	index("region_idx").on(table.region),
+	index("status_idx").on(table.status),
+	index("featured_idx").on(table.featured),
+	index("display_order_idx").on(table.displayOrder),
+]);
+
+export type Governorate = InferSelectModel<typeof governorates>;
+export type NewGovernorate = InferInsertModel<typeof governorates>;
+
+// User Compliance Checklist (tracks user progress through regulations)
+export const userComplianceChecklists = mysqlTable("user_compliance_checklists", {
+	id: int().autoincrement().notNull(),
+	userId: int("user_id").notNull(),
+	officeId: int("office_id"), // Optional: link to specific office
+	regulationId: int("regulation_id").notNull(),
+	
+	// Progress Tracking
+	status: mysqlEnum(['not_started','in_progress','completed','not_applicable']).default('not_started').notNull(),
+	completedSteps: json("completed_steps"), // Array of completed step IDs
+	notes: text(), // User's personal notes
+	documentsUploaded: json("documents_uploaded"), // Array of document URLs
+	
+	// Dates
+	startedAt: timestamp("started_at", { mode: 'string' }),
+	completedAt: timestamp("completed_at", { mode: 'string' }),
+	dueDate: timestamp("due_date", { mode: 'string' }),
+	reminderDate: timestamp("reminder_date", { mode: 'string' }),
+	
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("user_idx").on(table.userId),
+	index("office_idx").on(table.officeId),
+	index("regulation_idx").on(table.regulationId),
+	index("status_idx").on(table.status),
+	index("user_regulation_idx").on(table.userId, table.regulationId),
+]);
+
+export type UserComplianceChecklist = InferSelectModel<typeof userComplianceChecklists>;
+export type NewUserComplianceChecklist = InferInsertModel<typeof userComplianceChecklists>;
