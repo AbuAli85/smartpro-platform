@@ -70,18 +70,18 @@ export const translations: Record<Language, Record<string, string>> = {
     "sidebar.sectionRewardsProfile": "REWARDS & PROFILE",
     
     // Home page
-    "home.hero.title": "Everything You Need for Business Services",
-    "home.hero.subtitle": "A unified platform connecting SMEs with professional Sanad offices. Get your business licenses, permits, and registrations done faster.",
+    "home.hero.title": "Everything You Need for Business Services in Oman",
+    "home.hero.subtitle": "Oman's unified digital platform connecting SMEs with professional Sanad offices. Get your business licenses, permits, and registrations done faster across all governorates.",
     "home.hero.myBookings": "My Bookings",
     "home.hero.browseServices": "Browse Services",
     "home.hero.badge": "The Future of Business Services",
     "home.hero.registerOffice": "Register Your Office",
-    "home.hero.impactStatement": "Simplifying business, strengthening Omanization, and securing the future of Omani employment.",
+    "home.hero.impactStatement": "Empowering Omani businesses, strengthening Omanization, and securing the future of employment in Oman.",
     "home.stats.avgRating": "Average Rating",
     "home.stats.servicesCompleted": "Services Completed",
     "home.stats.verifiedOffices": "Verified Offices",
-    "home.title": "Everything You Need for Business Services",
-    "home.subtitle": "A unified platform connecting SMEs with professional Sanad offices",
+    "home.title": "Everything You Need for Business Services in Oman",
+    "home.subtitle": "Oman's unified digital platform connecting SMEs with professional Sanad offices",
     "home.popularServices": "Popular Services",
     "home.popularServicesSubtitle": "Discover the most requested business services in your region",
     "home.findOffices": "Find Offices",
@@ -747,7 +747,7 @@ export const translations: Record<Language, Record<string, string>> = {
     "home.cta.button": "Register Your Office Now",
     
     // Footer
-    "home.footer.tagline": "The unified platform for business services in Oman",
+    "home.footer.tagline": "Oman's National Digital Infrastructure for Business Services",
     "home.footer.forCustomers": "For Customers",
     "home.footer.browseOffices": "Browse Offices",
     "home.footer.documentTemplates": "Document Templates",
@@ -1145,8 +1145,8 @@ export const translations: Record<Language, Record<string, string>> = {
     
     // Affordability Section
     "home.affordability.subtitle": "Smart Pricing",
-    "home.affordability.title": "Affordable Business Services for Every SME",
-    "home.affordability.description": "SmartPro's digital platform reduces overhead costs, allowing Sanad offices to offer competitive pricing. Save up to 73% compared to traditional service providers while maintaining the highest quality standards.",
+    "home.affordability.title": "Affordable Business Services for Oman's 26,000+ SMEs",
+    "home.affordability.description": "SmartPro's digital platform reduces overhead costs, allowing Sanad offices across Oman to offer competitive pricing. Save up to 73% compared to traditional service providers while maintaining the highest quality standards and full compliance with Omani regulations.",
     
     // Empty States
     "empty.noServiceRequestsYet": "No Service Requests Yet",
@@ -1406,13 +1406,13 @@ export const translations: Record<Language, Record<string, string>> = {
     "SIDEBAR.SECTION.SETTINGS": "الإعدادات",
     
     // Home page
-    "home.hero.title": "كل ما تحتاجه لخدمات الأعمال",
-    "home.hero.subtitle": "منصة موحدة تربط المشاريع الصغيرة والمتوسطة بمكاتب سند المحترفة. أنجز تراخيص عملك وتصاريحك وتسجيلاتك بشكل أسرع.",
+    "home.hero.title": "كل ما تحتاجه لخدمات الأعمال في عُمان",
+    "home.hero.subtitle": "المنصة الرقمية الموحدة لسلطنة عُمان تربط المشاريع الصغيرة والمتوسطة بمكاتب سند المحترفة. أنجز تراخيص عملك وتصاريحك وتسجيلاتك بشكل أسرع في جميع المحافظات.",
     "home.hero.myBookings": "حجوزاتي",
     "home.hero.browseServices": "تصفح الخدمات",
     "home.hero.badge": "مستقبل خدمات الأعمال",
     "home.hero.registerOffice": "سجل مكتبك",
-    "home.hero.impactStatement": "تبسيط الأعمال، تعزيز التعمين، وتأمين مستقبل التوظيف العماني.",
+    "home.hero.impactStatement": "تمكين الأعمال العمانية، تعزيز التعمين، وتأمين مستقبل التوظيف في عُمان.",
     "home.stats.avgRating": "متوسط التقييم",
     "home.stats.servicesCompleted": "الخدمات المكتملة",
     "home.stats.verifiedOffices": "المكاتب الموثقة",
@@ -1516,8 +1516,8 @@ export const translations: Record<Language, Record<string, string>> = {
     
     // Affordability Section
     "home.affordability.subtitle": "تسعير ذكي",
-    "home.affordability.title": "خدمات أعمال ميسورة لكل مشروع صغير ومتوسط",
-    "home.affordability.description": "تقلل منصة سمارت برو الرقمية من التكاليف العامة، مما يسمح لمكاتب سند بتقديم أسعار تنافسية. وفر حتى 73٪ مقارنة بمقدمي الخدمات التقليديين مع الحفاظ على أعلى معايير الجودة.",
+    "home.affordability.title": "خدمات أعمال ميسورة لأكثر من 26,000 مشروع صغير ومتوسط في عُمان",
+    "home.affordability.description": "تقلل منصة سمارت برو الرقمية من التكاليف العامة، مما يسمح لمكاتب سند في جميع أنحاء عُمان بتقديم أسعار تنافسية. وفر حتى 73٪ مقارنة بمقدمي الخدمات التقليديين مع الحفاظ على أعلى معايير الجودة والامتثال الكامل لللوائح العمانية.",
     
     // Services
     "services.popularInRegion": "الخدمات الشائعة في",
@@ -2154,7 +2154,7 @@ export const translations: Record<Language, Record<string, string>> = {
     "home.cta.button": "سجل مكتبك الآن",
     
     // Footer
-    "home.footer.tagline": "المنصة الموحدة لخدمات الأعمال في عمان",
+    "home.footer.tagline": "البنية التحتية الرقمية الوطنية لخدمات الأعمال في عُمان",
     "home.footer.forCustomers": "للعملاء",
     "home.footer.browseOffices": "تصفح المكاتب",
     "home.footer.documentTemplates": "قوالب المستندات",
