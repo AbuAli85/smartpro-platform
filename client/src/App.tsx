@@ -74,6 +74,9 @@ import { ResetPassword } from "./pages/ResetPassword";
 import { SessionManagement } from "./pages/SessionManagement";
 import SecurityDashboard from "./pages/admin/SecurityDashboard";
 import LoginAnalytics from "./pages/admin/LoginAnalytics";
+import SuccessStoriesManagement from "./pages/admin/SuccessStoriesManagement";
+import RegulationsManagement from "./pages/admin/RegulationsManagement";
+import GovernoratesManagement from "./pages/admin/GovernoratesManagement";
 import ClientList from "./pages/ClientList";
 import ClientProfile from "./pages/ClientProfile";
 import FinancialDashboard from "./pages/FinancialDashboard";
@@ -81,6 +84,7 @@ import { OfficeEditPage } from "./pages/OfficeEditPage";
 import SuccessStories from "./pages/SuccessStories";
 import SuccessStoryDetail from "./pages/SuccessStoryDetail";
 import Regulations from "./pages/Regulations";
+import RegulationDetail from "./pages/RegulationDetail";
 import GovernorateDetail from "./pages/GovernorateDetail";
 import { useNotifications } from "./hooks/useNotifications";
 import { useMarketplaceNotifications } from "./hooks/useMarketplaceNotifications";
@@ -132,6 +136,7 @@ function Router() {
       <Route path="/success-stories" component={SuccessStories} />
       <Route path="/success-stories/:id" component={SuccessStoryDetail} />
       <Route path="/regulations" component={Regulations} />
+      <Route path="/regulations/:id" component={RegulationDetail} />
       <Route path="/governorates/:slug" component={GovernorateDetail} />
       
       {/* Documents */}
@@ -211,6 +216,21 @@ function Router() {
       <Route path="/admin/login-analytics">
         <ProtectedRoute requirePermission="canAccessAdminPanel">
           <LoginAnalytics />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/success-stories">
+        <ProtectedRoute requirePermission="canAccessAdminPanel">
+          <SuccessStoriesManagement />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/regulations">
+        <ProtectedRoute requirePermission="canAccessAdminPanel">
+          <RegulationsManagement />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/governorates">
+        <ProtectedRoute requirePermission="canAccessAdminPanel">
+          <GovernoratesManagement />
         </ProtectedRoute>
       </Route>
       

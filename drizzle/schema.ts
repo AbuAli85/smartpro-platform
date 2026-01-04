@@ -102,7 +102,7 @@ export const bookingAnalytics = mysqlTable("booking_analytics", {
 	popularTimeSlots: json(),
 	cancellationReasons: json(),
 	avgBookingValue: decimal({ precision: 10, scale: 3 }).default('0.000').notNull(),
-	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 },
 (table) => [
@@ -659,7 +659,7 @@ export const sanadOffices = mysqlTable("sanad_offices", {
 	locationLng: decimal({ precision: 10, scale: 7 }),
 	description: text(),
 	descriptionAr: text(),
-	yearEstablished: int(),
+	yearEstablished: int("year_established"),
 	employeeCount: int().default(1).notNull(),
 	status: mysqlEnum(['pending','active','suspended','inactive']).default('pending').notNull(),
 	verificationStatus: mysqlEnum(['unverified','pending_verification','verified','rejected']).default('unverified').notNull(),
@@ -1287,7 +1287,7 @@ export const successStories = mysqlTable("success_stories", {
 	wilayat: varchar({ length: 100 }),
 	industry: varchar({ length: 100 }).notNull(),
 	serviceType: varchar("service_type", { length: 100 }),
-	yearEstablished: int(),
+	yearEstablished: int("year_established"),
 	officeId: int("office_id"), // Link to sanad_offices if applicable
 	
 	// Story Content

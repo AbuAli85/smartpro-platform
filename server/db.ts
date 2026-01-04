@@ -7746,3 +7746,372 @@ export async function getOfficeImages(officeId: number) {
 
   return office?.images || [];
 }
+
+
+// ============================================================================
+// CONTENT MANAGEMENT - SUCCESS STORIES
+// ============================================================================
+
+export async function getAllSuccessStories(filters?: {
+  status?: string;
+  featured?: number;
+  governorate?: string;
+  industry?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const { successStories } = await import('../drizzle/schema');
+    let query = db.select().from(successStories);
+
+    const conditions = [];
+    if (filters?.status) {
+      conditions.push(eq(successStories.status, filters.status));
+    }
+    if (filters?.featured !== undefined) {
+      conditions.push(eq(successStories.featured, filters.featured));
+    }
+    if (filters?.governorate) {
+      conditions.push(eq(successStories.governorate, filters.governorate));
+    }
+    if (filters?.industry) {
+      conditions.push(eq(successStories.industry, filters.industry));
+    }
+    if (filters?.search) {
+      conditions.push(
+        or(
+          like(successStories.businessName, `%${filters.search}%`),
+          like(successStories.ownerName, `%${filters.search}%`)
+        )
+      );
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as any;
+    }
+
+    query = query.orderBy(desc(successStories.displayOrder), desc(successStories.createdAt)) as any;
+
+    if (filters?.limit) {
+      query = query.limit(filters.limit) as any;
+    }
+    if (filters?.offset) {
+      query = query.offset(filters.offset) as any;
+    }
+
+    return await query;
+  } catch (error) {
+    console.error('[Database] Failed to get success stories:', error);
+    return [];
+  }
+}
+
+export async function getSuccessStoryById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const { successStories } = await import('../drizzle/schema');
+    const results = await db
+      .select()
+      .from(successStories)
+      .where(eq(successStories.id, id))
+      .limit(1);
+    
+    return results[0] || null;
+  } catch (error) {
+    console.error('[Database] Failed to get success story:', error);
+    return null;
+  }
+}
+
+export async function createSuccessStory(data: any) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  try {
+    const { successStories } = await import('../drizzle/schema');
+    const result = await db.insert(successStories).values(data);
+    return result;
+  } catch (error) {
+    console.error('[Database] Failed to create success story:', error);
+    throw error;
+  }
+}
+
+export async function updateSuccessStory(id: number, data: any) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  try {
+    const { successStories } = await import('../drizzle/schema');
+    await db
+      .update(successStories)
+      .set(data)
+      .where(eq(successStories.id, id));
+  } catch (error) {
+    console.error('[Database] Failed to update success story:', error);
+    throw error;
+  }
+}
+
+export async function deleteSuccessStory(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  try {
+    const { successStories } = await import('../drizzle/schema');
+    await db.delete(successStories).where(eq(successStories.id, id));
+  } catch (error) {
+    console.error('[Database] Failed to delete success story:', error);
+    throw error;
+  }
+}
+
+// ============================================================================
+// CONTENT MANAGEMENT - REGULATIONS
+// ============================================================================
+
+export async function getAllRegulations(filters?: {
+  status?: string;
+  category?: string;
+  featured?: number;
+  priority?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const { regulations } = await import('../drizzle/schema');
+    let query = db.select().from(regulations);
+
+    const conditions = [];
+    if (filters?.status) {
+      conditions.push(eq(regulations.status, filters.status));
+    }
+    if (filters?.category) {
+      conditions.push(eq(regulations.category, filters.category));
+    }
+    if (filters?.featured !== undefined) {
+      conditions.push(eq(regulations.featured, filters.featured));
+    }
+    if (filters?.priority) {
+      conditions.push(eq(regulations.priority, filters.priority));
+    }
+    if (filters?.search) {
+      conditions.push(
+        or(
+          like(regulations.title, `%${filters.search}%`),
+          like(regulations.summary, `%${filters.search}%`)
+        )
+      );
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as any;
+    }
+
+    query = query.orderBy(desc(regulations.displayOrder), desc(regulations.createdAt)) as any;
+
+    if (filters?.limit) {
+      query = query.limit(filters.limit) as any;
+    }
+    if (filters?.offset) {
+      query = query.offset(filters.offset) as any;
+    }
+
+    return await query;
+  } catch (error) {
+    console.error('[Database] Failed to get regulations:', error);
+    return [];
+  }
+}
+
+export async function getRegulationById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const { regulations } = await import('../drizzle/schema');
+    const results = await db
+      .select()
+      .from(regulations)
+      .where(eq(regulations.id, id))
+      .limit(1);
+    
+    return results[0] || null;
+  } catch (error) {
+    console.error('[Database] Failed to get regulation:', error);
+    return null;
+  }
+}
+
+export async function createRegulation(data: any) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  try {
+    const { regulations } = await import('../drizzle/schema');
+    const result = await db.insert(regulations).values(data);
+    return result;
+  } catch (error) {
+    console.error('[Database] Failed to create regulation:', error);
+    throw error;
+  }
+}
+
+export async function updateRegulation(id: number, data: any) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  try {
+    const { regulations } = await import('../drizzle/schema');
+    await db
+      .update(regulations)
+      .set(data)
+      .where(eq(regulations.id, id));
+  } catch (error) {
+    console.error('[Database] Failed to update regulation:', error);
+    throw error;
+  }
+}
+
+export async function deleteRegulation(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  try {
+    const { regulations } = await import('../drizzle/schema');
+    await db.delete(regulations).where(eq(regulations.id, id));
+  } catch (error) {
+    console.error('[Database] Failed to delete regulation:', error);
+    throw error;
+  }
+}
+
+// ============================================================================
+// CONTENT MANAGEMENT - GOVERNORATES
+// ============================================================================
+
+export async function getAllGovernorates(filters?: {
+  status?: string;
+  region?: string;
+  featured?: number;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const { governorates } = await import('../drizzle/schema');
+    let query = db.select().from(governorates);
+
+    const conditions = [];
+    if (filters?.status) {
+      conditions.push(eq(governorates.status, filters.status));
+    }
+    if (filters?.region) {
+      conditions.push(eq(governorates.region, filters.region));
+    }
+    if (filters?.featured !== undefined) {
+      conditions.push(eq(governorates.featured, filters.featured));
+    }
+    if (filters?.search) {
+      conditions.push(
+        or(
+          like(governorates.name, `%${filters.search}%`),
+          like(governorates.nameAr, `%${filters.search}%`)
+        )
+      );
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as any;
+    }
+
+    query = query.orderBy(desc(governorates.displayOrder), desc(governorates.createdAt)) as any;
+
+    if (filters?.limit) {
+      query = query.limit(filters.limit) as any;
+    }
+    if (filters?.offset) {
+      query = query.offset(filters.offset) as any;
+    }
+
+    return await query;
+  } catch (error) {
+    console.error('[Database] Failed to get governorates:', error);
+    return [];
+  }
+}
+
+export async function getGovernorateById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const { governorates } = await import('../drizzle/schema');
+    const results = await db
+      .select()
+      .from(governorates)
+      .where(eq(governorates.id, id))
+      .limit(1);
+    
+    return results[0] || null;
+  } catch (error) {
+    console.error('[Database] Failed to get governorate:', error);
+    return null;
+  }
+}
+
+export async function createGovernorate(data: any) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  try {
+    const { governorates } = await import('../drizzle/schema');
+    const result = await db.insert(governorates).values(data);
+    return result;
+  } catch (error) {
+    console.error('[Database] Failed to create governorate:', error);
+    throw error;
+  }
+}
+
+export async function updateGovernorate(id: number, data: any) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  try {
+    const { governorates } = await import('../drizzle/schema');
+    await db
+      .update(governorates)
+      .set(data)
+      .where(eq(governorates.id, id));
+  } catch (error) {
+    console.error('[Database] Failed to update governorate:', error);
+    throw error;
+  }
+}
+
+export async function deleteGovernorate(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  try {
+    const { governorates } = await import('../drizzle/schema');
+    await db.delete(governorates).where(eq(governorates.id, id));
+  } catch (error) {
+    console.error('[Database] Failed to delete governorate:', error);
+    throw error;
+  }
+}

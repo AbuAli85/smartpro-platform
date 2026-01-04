@@ -181,7 +181,8 @@ export default function Regulations() {
                 const category = CATEGORIES.find(c => c.value === reg.category);
                 
                 return (
-                  <Card key={reg.id} className="hover:shadow-lg transition-shadow">
+                  <Link href={`/regulations/${reg.id}`}>
+                    <Card key={reg.id} className="hover:shadow-lg transition-shadow cursor-pointer">
                     <CardHeader>
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
@@ -232,6 +233,7 @@ export default function Regulations() {
                       </div>
                     </CardContent>
                   </Card>
+                  </Link>
                 );
               })}
             </div>
