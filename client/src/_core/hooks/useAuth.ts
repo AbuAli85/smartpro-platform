@@ -9,8 +9,21 @@ type UseAuthOptions = {
 };
 
 export function useAuth(options?: UseAuthOptions) {
-  const { redirectOnUnauthenticated = false, redirectPath = getLoginUrl() } =
-    options ?? {};
+  const { redirectOnUnauthenticated = false } = options ?? {};
+  
+  // Lazy evaluation: only call getLoginUrl() when redirectPath is actually needed
+  const getRedirectPath = useCallback(() => {
+    if (options?.redirectPath) {
+      return options.redirectPath;
+    }
+    try {
+      return getLoginUrl();
+    } catch (error) {
+      console.error('[Auth] Failed to get login URL:', error);
+      // Return a fallback path
+      return '/login';
+    }
+  }, [options?.redirectPath]);
   const utils = trpc.useUtils();
 
   const meQuery = trpc.auth.me.useQuery(undefined, {
@@ -68,12 +81,14 @@ export function useAuth(options?: UseAuthOptions) {
     if (meQuery.isLoading || logoutMutation.isPending) return;
     if (state.user) return;
     if (typeof window === "undefined") return;
+    
+    const redirectPath = getRedirectPath();
     if (window.location.pathname === redirectPath) return;
 
-    window.location.href = redirectPath
+    window.location.href = redirectPath;
   }, [
     redirectOnUnauthenticated,
-    redirectPath,
+    getRedirectPath,
     logoutMutation.isPending,
     meQuery.isLoading,
     state.user,
