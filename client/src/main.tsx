@@ -10,6 +10,7 @@ import "./index.css";
 import "./styles/datepicker.css";
 import "./lib/i18n"; // Initialize i18n
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { initializeAnalytics } from "./utils/analytics";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,9 @@ const trpcClient = trpc.createClient({
     }),
   ],
 });
+
+// Initialize analytics if configured
+initializeAnalytics();
 
 createRoot(document.getElementById("root")!).render(
   <trpc.Provider client={trpcClient} queryClient={queryClient}>
