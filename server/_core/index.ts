@@ -58,24 +58,58 @@ async function startServer() {
     }
     (res as any)._htmlGuardWrapped = true;
     
+    // Log API request entry for debugging
+    const requestId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    (req as any)._apiRequestId = requestId;
+    console.log(`[API Guard] [${requestId}] Request started: ${req.method} ${req.originalUrl}`, {
+      path: req.path,
+      query: Object.keys(req.query).length > 0 ? req.query : undefined,
+      headers: {
+        'content-type': req.headers['content-type'],
+        'accept': req.headers['accept'],
+        'user-agent': req.headers['user-agent']?.substring(0, 50),
+      },
+    });
+    
     const originalEnd = res.end.bind(res);
     const originalJson = res.json.bind(res);
     const originalSend = res.send.bind(res);
     
+    // Track response method calls
+    let responseMethodCalled = false;
+    const trackResponse = (method: string) => {
+      if (!responseMethodCalled) {
+        responseMethodCalled = true;
+        console.log(`[API Guard] [${requestId}] Response sent via ${method}`, {
+          statusCode: res.statusCode,
+          contentType: res.getHeader('Content-Type'),
+          headersSent: res.headersSent,
+        });
+      }
+    };
+    
     // Wrap res.end to catch HTML being sent
     res.end = function(chunk?: any, encoding?: any, cb?: any) {
+      trackResponse('res.end');
+      
       if (chunk && typeof chunk === 'string') {
         const trimmed = chunk.trim().toLowerCase();
         if (trimmed.startsWith('<!doctype') || trimmed.startsWith('<html')) {
-          console.error(`[API Guard] CRITICAL: HTML detected in res.end for ${req.originalUrl}`);
-          console.error(`[API Guard] First 200 chars:`, chunk.substring(0, 200));
-          console.error(`[API Guard] Stack trace:`, new Error().stack);
+          console.error(`[API Guard] [${requestId}] CRITICAL: HTML detected in res.end for ${req.originalUrl}`);
+          console.error(`[API Guard] [${requestId}] First 200 chars:`, chunk.substring(0, 200));
+          console.error(`[API Guard] [${requestId}] Stack trace:`, new Error().stack);
+          console.error(`[API Guard] [${requestId}] Response state:`, {
+            statusCode: res.statusCode,
+            headersSent: res.headersSent,
+            contentType: res.getHeader('Content-Type'),
+          });
           
           // Replace with JSON error
           const errorResponse = JSON.stringify({
             error: "Internal server error: HTML response detected for API route",
             originalPath: req.originalUrl,
             detectedAt: "res.end",
+            requestId,
           });
           res.setHeader('Content-Type', 'application/json');
           res.status(500);
@@ -87,18 +121,26 @@ async function startServer() {
     
     // Wrap res.json to ensure Content-Type is set
     res.json = function(body?: any) {
+      trackResponse('res.json');
       res.setHeader('Content-Type', 'application/json');
       return originalJson(body);
     };
     
     // Wrap res.send to catch HTML being sent via res.send
     res.send = function(body?: any) {
+      trackResponse('res.send');
+      
       if (typeof body === 'string') {
         const trimmed = body.trim().toLowerCase();
         if (trimmed.startsWith('<!doctype') || trimmed.startsWith('<html')) {
-          console.error(`[API Guard] CRITICAL: HTML detected in res.send for ${req.originalUrl}`);
-          console.error(`[API Guard] First 200 chars:`, body.substring(0, 200));
-          console.error(`[API Guard] Stack trace:`, new Error().stack);
+          console.error(`[API Guard] [${requestId}] CRITICAL: HTML detected in res.send for ${req.originalUrl}`);
+          console.error(`[API Guard] [${requestId}] First 200 chars:`, body.substring(0, 200));
+          console.error(`[API Guard] [${requestId}] Stack trace:`, new Error().stack);
+          console.error(`[API Guard] [${requestId}] Response state:`, {
+            statusCode: res.statusCode,
+            headersSent: res.headersSent,
+            contentType: res.getHeader('Content-Type'),
+          });
           
           // Replace with JSON error
           res.setHeader('Content-Type', 'application/json');
@@ -107,11 +149,21 @@ async function startServer() {
             error: "Internal server error: HTML response detected for API route",
             originalPath: req.originalUrl,
             detectedAt: "res.send",
+            requestId,
           });
         }
       }
       return originalSend(body);
     };
+    
+    // Log when request completes without response (shouldn't happen)
+    res.on('finish', () => {
+      console.log(`[API Guard] [${requestId}] Request completed: ${req.method} ${req.originalUrl}`, {
+        statusCode: res.statusCode,
+        contentType: res.getHeader('Content-Type'),
+        responseMethodCalled,
+      });
+    });
     
     next();
   });
@@ -151,20 +203,26 @@ async function startServer() {
     createExpressMiddleware({
       router: appRouter,
       createContext: async (opts) => {
+        const requestId = (opts.req as any)._apiRequestId || 'unknown';
         try {
           const ctx = await createContext(opts);
-          console.log(`[TRPC Context] User: ${ctx.user ? `${ctx.user.id} (role: ${ctx.user.role})` : 'null'}`);
+          console.log(`[TRPC Context] [${requestId}] Context created:`, {
+            user: ctx.user ? `${ctx.user.id} (role: ${ctx.user.role})` : 'null',
+            language: ctx.language,
+            hasAuth: !!ctx.user,
+          });
           return ctx;
         } catch (error) {
-          console.error(`[TRPC Context Error]:`, error);
+          console.error(`[TRPC Context Error] [${requestId}]:`, error);
           throw error;
         }
       },
       onError: ({ error, path, type, ctx, input, req, res }) => {
+        const requestId = (req as any)._apiRequestId || 'unknown';
         const contentType = res.getHeader('Content-Type');
         const isJson = contentType && String(contentType).includes('application/json');
         
-        console.error(`[TRPC Error] ${type} ${path}:`, {
+        console.error(`[TRPC Error] [${requestId}] ${type} ${path}:`, {
           code: error.code,
           message: error.message,
           cause: error.cause,
@@ -181,16 +239,16 @@ async function startServer() {
         if (res.headersSent) {
           // Headers already sent - verify Content-Type is correct
           if (!isJson) {
-            console.error(`[TRPC Error] CRITICAL: Headers sent but Content-Type is NOT JSON: ${contentType}`);
-            console.error(`[TRPC Error] This will cause HTML to be served! Attempting to intercept...`);
+            console.error(`[TRPC Error] [${requestId}] CRITICAL: Headers sent but Content-Type is NOT JSON: ${contentType}`);
+            console.error(`[TRPC Error] [${requestId}] This will cause HTML to be served! Attempting to intercept...`);
             // Unfortunately, we can't change headers after they're sent, but we've already
             // wrapped res.end earlier, so that should catch it
           } else {
-            console.log(`[TRPC Error] Response already sent with correct Content-Type: ${contentType}`);
+            console.log(`[TRPC Error] [${requestId}] Response already sent with correct Content-Type: ${contentType}`);
           }
         } else {
           // Headers not sent - send JSON response ourselves
-          console.log(`[TRPC Error] Sending JSON error response for ${path}`);
+          console.log(`[TRPC Error] [${requestId}] Sending JSON error response for ${path}`);
           const statusCode = error.code === 'UNAUTHORIZED' ? 401 :
                            error.code === 'FORBIDDEN' ? 403 :
                            error.code === 'NOT_FOUND' ? 404 :
@@ -209,11 +267,32 @@ async function startServer() {
             },
           });
           
-          console.log(`[TRPC Error] JSON error response sent for ${path} with status ${statusCode}`);
+          console.log(`[TRPC Error] [${requestId}] JSON error response sent for ${path} with status ${statusCode}`);
         }
       },
     })
   );
+  
+  // Test endpoint to verify API responses are JSON (for debugging)
+  app.get("/api/test/json-response", (req, res) => {
+    res.json({
+      success: true,
+      message: "API endpoint is returning JSON correctly",
+      timestamp: new Date().toISOString(),
+      path: req.originalUrl,
+    });
+  });
+  
+  // Test endpoint to verify HTML interception works
+  app.get("/api/test/html-interception", (req, res) => {
+    // This should never actually send HTML due to our guards, but tests the interception
+    console.log(`[Test Endpoint] Testing HTML interception for ${req.originalUrl}`);
+    res.status(200).json({
+      success: true,
+      message: "HTML interception middleware is active",
+      note: "If you see HTML here, the middleware failed",
+    });
+  });
   
   // Explicit 404 handler for unmatched API routes to prevent HTML fallback
   app.use("/api/*", (req, res) => {
