@@ -48,6 +48,74 @@ async function startServer() {
   
   // Apply rate limiting to all API routes
   app.use("/api", apiLimiter);
+  
+  // CRITICAL: Wrap res.end EARLY for all API routes to catch HTML responses
+  // This must happen BEFORE any other API middleware to intercept ALL responses
+  app.use("/api", (req, res, next) => {
+    // Only wrap once per request
+    if ((res as any)._htmlGuardWrapped) {
+      return next();
+    }
+    (res as any)._htmlGuardWrapped = true;
+    
+    const originalEnd = res.end.bind(res);
+    const originalJson = res.json.bind(res);
+    const originalSend = res.send.bind(res);
+    
+    // Wrap res.end to catch HTML being sent
+    res.end = function(chunk?: any, encoding?: any, cb?: any) {
+      if (chunk && typeof chunk === 'string') {
+        const trimmed = chunk.trim().toLowerCase();
+        if (trimmed.startsWith('<!doctype') || trimmed.startsWith('<html')) {
+          console.error(`[API Guard] CRITICAL: HTML detected in res.end for ${req.originalUrl}`);
+          console.error(`[API Guard] First 200 chars:`, chunk.substring(0, 200));
+          console.error(`[API Guard] Stack trace:`, new Error().stack);
+          
+          // Replace with JSON error
+          const errorResponse = JSON.stringify({
+            error: "Internal server error: HTML response detected for API route",
+            originalPath: req.originalUrl,
+            detectedAt: "res.end",
+          });
+          res.setHeader('Content-Type', 'application/json');
+          res.status(500);
+          return originalEnd(errorResponse, encoding, cb);
+        }
+      }
+      return originalEnd(chunk, encoding, cb);
+    };
+    
+    // Wrap res.json to ensure Content-Type is set
+    res.json = function(body?: any) {
+      res.setHeader('Content-Type', 'application/json');
+      return originalJson(body);
+    };
+    
+    // Wrap res.send to catch HTML being sent via res.send
+    res.send = function(body?: any) {
+      if (typeof body === 'string') {
+        const trimmed = body.trim().toLowerCase();
+        if (trimmed.startsWith('<!doctype') || trimmed.startsWith('<html')) {
+          console.error(`[API Guard] CRITICAL: HTML detected in res.send for ${req.originalUrl}`);
+          console.error(`[API Guard] First 200 chars:`, body.substring(0, 200));
+          console.error(`[API Guard] Stack trace:`, new Error().stack);
+          
+          // Replace with JSON error
+          res.setHeader('Content-Type', 'application/json');
+          res.status(500);
+          return originalJson({
+            error: "Internal server error: HTML response detected for API route",
+            originalPath: req.originalUrl,
+            detectedAt: "res.send",
+          });
+        }
+      }
+      return originalSend(body);
+    };
+    
+    next();
+  });
+  
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   // SSE notifications endpoint
@@ -79,6 +147,9 @@ async function startServer() {
         }
       },
       onError: ({ error, path, type, ctx, input, req, res }) => {
+        const contentType = res.getHeader('Content-Type');
+        const isJson = contentType && String(contentType).includes('application/json');
+        
         console.error(`[TRPC Error] ${type} ${path}:`, {
           code: error.code,
           message: error.message,
@@ -87,32 +158,44 @@ async function startServer() {
           user: ctx?.user ? `${ctx.user.id} (role: ${ctx.user.role})` : 'null',
           headersSent: res.headersSent,
           statusCode: res.statusCode,
-          contentType: res.getHeader('Content-Type'),
+          contentType: contentType,
+          isJson: isJson,
         });
         
-        // CRITICAL: If TRPC didn't send a response (shouldn't happen), send one ourselves
-        // This acts as a safety net to prevent HTML fallback
-        if (!res.headersSent) {
-          console.error(`[TRPC Error] CRITICAL: Response not sent by TRPC for ${path}, sending manually`);
+        // CRITICAL: Always ensure JSON response for API errors
+        // Even if headers are sent, verify and fix Content-Type if needed
+        if (res.headersSent) {
+          // Headers already sent - verify Content-Type is correct
+          if (!isJson) {
+            console.error(`[TRPC Error] CRITICAL: Headers sent but Content-Type is NOT JSON: ${contentType}`);
+            console.error(`[TRPC Error] This will cause HTML to be served! Attempting to intercept...`);
+            // Unfortunately, we can't change headers after they're sent, but we've already
+            // wrapped res.end earlier, so that should catch it
+          } else {
+            console.log(`[TRPC Error] Response already sent with correct Content-Type: ${contentType}`);
+          }
+        } else {
+          // Headers not sent - send JSON response ourselves
+          console.log(`[TRPC Error] Sending JSON error response for ${path}`);
           const statusCode = error.code === 'UNAUTHORIZED' ? 401 :
                            error.code === 'FORBIDDEN' ? 403 :
                            error.code === 'NOT_FOUND' ? 404 :
                            error.code === 'BAD_REQUEST' ? 400 : 500;
           
-          res.status(statusCode).setHeader('Content-Type', 'application/json').json({
+          // Explicitly set Content-Type and status before sending
+          res.status(statusCode);
+          res.setHeader('Content-Type', 'application/json');
+          
+          // Use res.json to ensure proper JSON formatting
+          res.json({
             error: {
               message: error.message,
               code: error.code,
               data: error.cause,
             },
           });
-        } else {
-          // Verify the response is JSON - if not, log a critical error
-          const contentType = res.getHeader('Content-Type');
-          if (contentType && !String(contentType).includes('application/json')) {
-            console.error(`[TRPC Error] CRITICAL: Invalid Content-Type for API error response: ${contentType}`);
-            console.error(`[TRPC Error] This indicates HTML may be served instead of JSON!`);
-          }
+          
+          console.log(`[TRPC Error] JSON error response sent for ${path} with status ${statusCode}`);
         }
       },
     })
@@ -124,35 +207,14 @@ async function startServer() {
     res.status(404).json({ error: "API endpoint not found" });
   });
   
-  // CRITICAL: Defensive middleware to prevent HTML responses for API routes
-  // This runs after TRPC but before Vite, ensuring API routes never get HTML
+  // Secondary check: If an API route reaches here without a response, something is wrong
+  // (Primary HTML protection is now done earlier in the middleware chain)
   app.use((req, res, next) => {
-    if (req.originalUrl.startsWith("/api/")) {
-      // Wrap res.end to detect if HTML is being sent for API routes
-      const originalEnd = res.end.bind(res);
-      res.end = function(chunk?: any, encoding?: any, cb?: any) {
-        if (chunk && typeof chunk === 'string' && chunk.trim().toLowerCase().startsWith('<!doctype')) {
-          console.error(`[API Guard] CRITICAL: HTML detected being sent for API route ${req.originalUrl}`);
-          console.error(`[API Guard] First 200 chars of response:`, chunk.substring(0, 200));
-          // Replace HTML with JSON error
-          const errorResponse = JSON.stringify({
-            error: "Internal server error: HTML response detected for API route",
-            originalPath: req.originalUrl,
-          });
-          res.setHeader('Content-Type', 'application/json');
-          res.status(500);
-          return originalEnd(errorResponse, encoding, cb);
-        }
-        return originalEnd(chunk, encoding, cb);
-      };
-      
-      // If an API route reaches here without a response, something is wrong
-      if (!res.headersSent) {
-        console.error(`[API Guard] API route reached post-TRPC middleware without response: ${req.originalUrl}`);
-        return res.status(500).json({ 
-          error: "Internal server error: API route was not handled properly" 
-        });
-      }
+    if (req.originalUrl.startsWith("/api/") && !res.headersSent) {
+      console.error(`[API Guard] API route reached post-TRPC middleware without response: ${req.originalUrl}`);
+      return res.status(500).json({ 
+        error: "Internal server error: API route was not handled properly" 
+      });
     }
     next();
   });
