@@ -85,13 +85,34 @@ async function startServer() {
           cause: error.cause,
           stack: error.stack,
           user: ctx?.user ? `${ctx.user.id} (role: ${ctx.user.role})` : 'null',
+          headersSent: res.headersSent,
+          statusCode: res.statusCode,
+          contentType: res.getHeader('Content-Type'),
         });
-        // Ensure JSON response is sent for API routes
-        // TRPC should handle sending the response, but we ensure content-type is set
+        
+        // CRITICAL: If TRPC didn't send a response (shouldn't happen), send one ourselves
+        // This acts as a safety net to prevent HTML fallback
         if (!res.headersSent) {
-          res.setHeader('Content-Type', 'application/json');
+          console.error(`[TRPC Error] CRITICAL: Response not sent by TRPC for ${path}, sending manually`);
+          const statusCode = error.code === 'UNAUTHORIZED' ? 401 :
+                           error.code === 'FORBIDDEN' ? 403 :
+                           error.code === 'NOT_FOUND' ? 404 :
+                           error.code === 'BAD_REQUEST' ? 400 : 500;
+          
+          res.status(statusCode).setHeader('Content-Type', 'application/json').json({
+            error: {
+              message: error.message,
+              code: error.code,
+              data: error.cause,
+            },
+          });
         } else {
-          console.warn(`[TRPC Error] Response already sent for ${path}, headers:`, res.getHeaders());
+          // Verify the response is JSON - if not, log a critical error
+          const contentType = res.getHeader('Content-Type');
+          if (contentType && !String(contentType).includes('application/json')) {
+            console.error(`[TRPC Error] CRITICAL: Invalid Content-Type for API error response: ${contentType}`);
+            console.error(`[TRPC Error] This indicates HTML may be served instead of JSON!`);
+          }
         }
       },
     })
@@ -107,6 +128,24 @@ async function startServer() {
   // This runs after TRPC but before Vite, ensuring API routes never get HTML
   app.use((req, res, next) => {
     if (req.originalUrl.startsWith("/api/")) {
+      // Wrap res.end to detect if HTML is being sent for API routes
+      const originalEnd = res.end.bind(res);
+      res.end = function(chunk?: any, encoding?: any, cb?: any) {
+        if (chunk && typeof chunk === 'string' && chunk.trim().toLowerCase().startsWith('<!doctype')) {
+          console.error(`[API Guard] CRITICAL: HTML detected being sent for API route ${req.originalUrl}`);
+          console.error(`[API Guard] First 200 chars of response:`, chunk.substring(0, 200));
+          // Replace HTML with JSON error
+          const errorResponse = JSON.stringify({
+            error: "Internal server error: HTML response detected for API route",
+            originalPath: req.originalUrl,
+          });
+          res.setHeader('Content-Type', 'application/json');
+          res.status(500);
+          return originalEnd(errorResponse, encoding, cb);
+        }
+        return originalEnd(chunk, encoding, cb);
+      };
+      
       // If an API route reaches here without a response, something is wrong
       if (!res.headersSent) {
         console.error(`[API Guard] API route reached post-TRPC middleware without response: ${req.originalUrl}`);
