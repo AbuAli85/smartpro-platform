@@ -67,7 +67,8 @@ export default function RevenueModelsPage() {
 
   const getEffectiveFrom = (modelId: number) => {
     const v = getLatestVersion(modelId);
-    return v?.effectiveFrom ?? "—";
+    const date = v?.effectiveFrom;
+    return date && date.trim() ? date : "—";
   };
 
   return (

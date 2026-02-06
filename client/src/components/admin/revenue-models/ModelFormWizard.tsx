@@ -25,6 +25,7 @@ interface ModelFormWizardProps {
 
 export function ModelFormWizard({ onSuccess }: ModelFormWizardProps) {
   const { t } = useTranslation();
+  const utils = trpc.useUtils();
   const [step, setStep] = useState(1);
   const [streamType, setStreamType] = useState<RevenueStreamType>("subscription");
   const [nameEn, setNameEn] = useState("");
@@ -33,7 +34,8 @@ export function ModelFormWizard({ onSuccess }: ModelFormWizardProps) {
   const [rulesJson, setRulesJson] = useState<Record<string, unknown>>({ streamType });
 
   const createModel = trpc.revenueModels.createModel.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
+      await utils.revenueModels.listModels.invalidate();
       toast.success(t("admin.revenueModels.createSuccess"));
       onSuccess();
     },
