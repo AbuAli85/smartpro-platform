@@ -54,16 +54,39 @@ async function startServer() {
   app.use("/api/sse", sseRouter);
   // tRPC API - add logging middleware before TRPC
   app.use("/api/trpc", (req, res, next) => {
-    console.log(`[TRPC Request] ${req.method} ${req.path}`, req.query);
+    console.log(`[TRPC Request] ${req.method} ${req.originalUrl}`, {
+      path: req.path,
+      query: req.query,
+      headers: {
+        cookie: req.headers.cookie ? 'present' : 'missing',
+        'content-type': req.headers['content-type'],
+      },
+    });
     next();
   });
   app.use(
     "/api/trpc",
     createExpressMiddleware({
       router: appRouter,
-      createContext,
-      onError: ({ error, path, type }) => {
-        console.error(`[TRPC Error] ${type} ${path}:`, error);
+      createContext: async (opts) => {
+        try {
+          const ctx = await createContext(opts);
+          console.log(`[TRPC Context] User: ${ctx.user ? `${ctx.user.id} (role: ${ctx.user.role})` : 'null'}`);
+          return ctx;
+        } catch (error) {
+          console.error(`[TRPC Context Error]:`, error);
+          throw error;
+        }
+      },
+      onError: ({ error, path, type, ctx, input }) => {
+        console.error(`[TRPC Error] ${type} ${path}:`, {
+          code: error.code,
+          message: error.message,
+          cause: error.cause,
+          stack: error.stack,
+          user: ctx?.user ? `${ctx.user.id} (role: ${ctx.user.role})` : 'null',
+        });
+        // TRPC automatically sends JSON error responses, so we just log here
       },
     })
   );
