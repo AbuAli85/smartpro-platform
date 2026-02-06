@@ -201,7 +201,46 @@
       },
       "preview": {
         "afterCreate": "المعاينة متاحة من القائمة بعد إنشاء النموذج.",
-        "useList": "استخدم صفحة القائمة للمعاينة حسب الإصدار."
+        "useList": "استخدم صفحة القائمة للمعاينة حسب الإصدار.",
+        "button": "معاينة",
+        "title": "معاينة حساب الإيرادات",
+        "description": "أدخل قيم السيناريو لحساب تفصيل الإيرادات لإصدار هذا النموذج.",
+        "scenarioInput": "إدخال السيناريو",
+        "results": "نتائج الحساب",
+        "warnings": "تحذيرات",
+        "breakdown": "التفصيل",
+        "calculate": "حساب",
+        "fields": {
+          "subscribers": "المشتركون",
+          "seats": "المقاعد",
+          "seatsOptional": "اختياري",
+          "period": "الفترة",
+          "periodMonthly": "شهري",
+          "periodAnnual": "سنوي",
+          "gmvOMR": "إجمالي قيمة السوق (ر.ع)",
+          "txnType": "نوع المعاملة",
+          "txnCount": "العدد",
+          "feeOMR": "الرسوم (ر.ع)",
+          "hours": "الساعات",
+          "hoursOptional": "اختياري (للرسوم بالساعة)",
+          "hourlyRateOMR": "المعدل بالساعة (ر.ع)",
+          "fixedFeeOMR": "الرسوم الثابتة (ر.ع)",
+          "fixedFeeOptional": "اختياري (للرسوم الثابتة)",
+          "passThroughOMR": "الرسوم المرور (ر.ع)",
+          "passThroughOptional": "اختياري",
+          "addTxn": "إضافة معاملة"
+        },
+        "validation": {
+          "subscribersRequired": "يجب أن يكون عدد المشتركين على الأقل 1",
+          "gmvRequired": "يجب أن تكون قيمة السوق رقمًا صالحًا",
+          "sanadTxnsRequired": "يُطلب معاملة واحدة صالحة على الأقل",
+          "proHoursOrFixedRequired": "يجب توفير إما الساعات أو الرسوم الثابتة"
+        },
+        "totals": {
+          "platformRevenue": "إيرادات المنصة",
+          "passThrough": "الرسوم المرور",
+          "gross": "الإجمالي الكلي"
+        }
       }
     }
   },

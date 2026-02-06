@@ -20,8 +20,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DollarSign, Plus } from "lucide-react";
+import { DollarSign, Plus, Eye } from "lucide-react";
 import { ExportButton } from "@/components/admin/revenue-models/ExportButton";
+import { PreviewDialog } from "@/components/admin/revenue-models/PreviewDialog";
 import type { RevenueStreamType, RevenueModelStatus } from "@shared/revenue-models";
 
 const STREAM_OPTIONS: { value: RevenueStreamType | "all"; labelKey: string }[] = [
@@ -44,6 +45,9 @@ export default function RevenueModelsPage() {
   const isRTL = i18n.language === "ar";
   const [streamFilter, setStreamFilter] = useState<RevenueStreamType | "all">("all");
   const [statusFilter, setStatusFilter] = useState<RevenueModelStatus | "all">("all");
+  const [previewModelId, setPreviewModelId] = useState<number | null>(null);
+  const [previewModelVersionId, setPreviewModelVersionId] = useState<number | null>(null);
+  const [previewStreamType, setPreviewStreamType] = useState<RevenueStreamType | null>(null);
 
   const { data, isLoading, error } = trpc.revenueModels.listModels.useQuery({
     streamType: streamFilter === "all" ? undefined : streamFilter,
@@ -158,7 +162,26 @@ export default function RevenueModelsPage() {
                     </TableCell>
                     <TableCell>{getEffectiveFrom(model.id)}</TableCell>
                     <TableCell className="text-right">
-                      <ExportButton modelId={model.id} variant="ghost" size="sm" />
+                      <div className="flex items-center justify-end gap-2">
+                        {getLatestVersion(model.id) && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              const latest = getLatestVersion(model.id);
+                              if (latest) {
+                                setPreviewModelId(model.id);
+                                setPreviewModelVersionId(latest.id);
+                                setPreviewStreamType(model.streamType);
+                              }
+                            }}
+                          >
+                            <Eye className="h-4 w-4 mr-1" />
+                            {t("admin.revenueModels.preview.button")}
+                          </Button>
+                        )}
+                        <ExportButton modelId={model.id} variant="ghost" size="sm" />
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -167,6 +190,22 @@ export default function RevenueModelsPage() {
           )}
         </CardContent>
       </Card>
+
+      {previewModelId !== null && previewModelVersionId !== null && previewStreamType !== null && (
+        <PreviewDialog
+          modelId={previewModelId}
+          modelVersionId={previewModelVersionId}
+          streamType={previewStreamType}
+          isOpen={true}
+          onOpenChange={(open) => {
+            if (!open) {
+              setPreviewModelId(null);
+              setPreviewModelVersionId(null);
+              setPreviewStreamType(null);
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -201,7 +201,46 @@
       },
       "preview": {
         "afterCreate": "Preview is available from the list after you create the model.",
-        "useList": "Use the list page to preview by version."
+        "useList": "Use the list page to preview by version.",
+        "button": "Preview",
+        "title": "Preview Revenue Calculation",
+        "description": "Enter scenario values to calculate revenue breakdown for this model version.",
+        "scenarioInput": "Scenario Input",
+        "results": "Calculation Results",
+        "warnings": "Warnings",
+        "breakdown": "Breakdown",
+        "calculate": "Calculate",
+        "fields": {
+          "subscribers": "Subscribers",
+          "seats": "Seats",
+          "seatsOptional": "Optional",
+          "period": "Period",
+          "periodMonthly": "Monthly",
+          "periodAnnual": "Annual",
+          "gmvOMR": "GMV (OMR)",
+          "txnType": "Transaction Type",
+          "txnCount": "Count",
+          "feeOMR": "Fee (OMR)",
+          "hours": "Hours",
+          "hoursOptional": "Optional (for hourly)",
+          "hourlyRateOMR": "Hourly Rate (OMR)",
+          "fixedFeeOMR": "Fixed Fee (OMR)",
+          "fixedFeeOptional": "Optional (for fixed)",
+          "passThroughOMR": "Pass-through (OMR)",
+          "passThroughOptional": "Optional",
+          "addTxn": "Add Transaction"
+        },
+        "validation": {
+          "subscribersRequired": "Subscribers must be at least 1",
+          "gmvRequired": "GMV must be a valid number",
+          "sanadTxnsRequired": "At least one valid transaction is required",
+          "proHoursOrFixedRequired": "Either hours or fixed fee must be provided"
+        },
+        "totals": {
+          "platformRevenue": "Platform Revenue",
+          "passThrough": "Pass-through",
+          "gross": "Gross Total"
+        }
       }
     }
   },
