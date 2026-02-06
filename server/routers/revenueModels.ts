@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { protectedProcedure, router } from "../_core/trpc";
 import { enforceMFAForAdmin } from "../_core/mfaEnforcement";
 import { getDb } from "../db";
+import * as db from "../db";
 import { revenueModels, revenueModelVersions } from "../../drizzle/schema";
 import { eq, desc, and, inArray } from "drizzle-orm";
 import { computeRevenue } from "../../shared/revenue-engine";
@@ -186,7 +187,7 @@ export const revenueModelsRouter = router({
 
   activateModel: adminProcedure
     .input(z.object({ modelId: z.number() }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
 
@@ -203,12 +204,22 @@ export const revenueModelsRouter = router({
       if (!latest) throw new TRPCError({ code: "BAD_REQUEST", message: "No version found" });
 
       await db.update(revenueModels).set({ status: "active" }).where(eq(revenueModels.id, input.modelId));
+
+      await db.logActivity({
+        userId: ctx.user!.id,
+        action: "activated",
+        entityType: "revenue_model",
+        entityId: input.modelId,
+        description: `Activated revenue model ${input.modelId} (${model.streamType})`,
+        metadata: { streamType: model.streamType, version: latest.version },
+      });
+
       return { success: true };
     }),
 
   archiveModel: adminProcedure
     .input(z.object({ modelId: z.number() }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
 
@@ -216,6 +227,16 @@ export const revenueModelsRouter = router({
       if (!model) throw new TRPCError({ code: "NOT_FOUND", message: "Revenue model not found" });
 
       await db.update(revenueModels).set({ status: "archived" }).where(eq(revenueModels.id, input.modelId));
+
+      await db.logActivity({
+        userId: ctx.user!.id,
+        action: "archived",
+        entityType: "revenue_model",
+        entityId: input.modelId,
+        description: `Archived revenue model ${input.modelId} (${model.streamType})`,
+        metadata: { streamType: model.streamType },
+      });
+
       return { success: true };
     }),
 
@@ -244,7 +265,7 @@ export const revenueModelsRouter = router({
 
   exportModel: adminProcedure
     .input(z.object({ modelId: z.number() }))
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
 
@@ -256,6 +277,16 @@ export const revenueModelsRouter = router({
         .from(revenueModelVersions)
         .where(eq(revenueModelVersions.modelId, input.modelId))
         .orderBy(revenueModelVersions.version);
+
+      await db.logActivity({
+        userId: ctx.user!.id,
+        action: "exported",
+        entityType: "revenue_model",
+        entityId: input.modelId,
+        description: `Exported revenue model ${input.modelId} configuration (${model.streamType})`,
+        metadata: { streamType: model.streamType, versionCount: versions.length },
+      });
+
       return { model, versions };
     }),
 });
