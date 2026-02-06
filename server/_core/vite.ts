@@ -31,9 +31,25 @@ export async function setupVite(app: Express, server: Server) {
   });
   
   app.use("*", async (req, res, next) => {
-    // Skip API routes - they should be handled by their respective middleware
-    // Also check if response was already sent (e.g., by TRPC error handler)
-    if (req.originalUrl.startsWith("/api/") || res.headersSent) {
+    // CRITICAL: Skip API routes completely - they should NEVER reach this catch-all
+    if (req.originalUrl.startsWith("/api/")) {
+      // If we reach here for an API route, something went wrong
+      // Log it but don't send HTML - let the request fail naturally
+      console.error(`[Vite Catch-All] Unexpected API route reached catch-all: ${req.originalUrl}`, {
+        headersSent: res.headersSent,
+        method: req.method,
+      });
+      // If response wasn't sent, something is wrong - but don't send HTML
+      if (!res.headersSent) {
+        return res.status(500).json({ 
+          error: "Internal server error: API route reached catch-all handler" 
+        });
+      }
+      return next();
+    }
+    
+    // Also skip if response was already sent by another middleware
+    if (res.headersSent) {
       return next();
     }
 

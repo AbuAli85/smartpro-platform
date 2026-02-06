@@ -87,10 +87,12 @@ async function startServer() {
           user: ctx?.user ? `${ctx.user.id} (role: ${ctx.user.role})` : 'null',
         });
         // Ensure JSON response is sent for API routes
+        // TRPC should handle sending the response, but we ensure content-type is set
         if (!res.headersSent) {
           res.setHeader('Content-Type', 'application/json');
+        } else {
+          console.warn(`[TRPC Error] Response already sent for ${path}, headers:`, res.getHeaders());
         }
-        // TRPC automatically sends JSON error responses, but we ensure content-type is set
       },
     })
   );
@@ -100,6 +102,22 @@ async function startServer() {
     console.warn(`[API 404] Unmatched API route: ${req.originalUrl}`);
     res.status(404).json({ error: "API endpoint not found" });
   });
+  
+  // CRITICAL: Defensive middleware to prevent HTML responses for API routes
+  // This runs after TRPC but before Vite, ensuring API routes never get HTML
+  app.use((req, res, next) => {
+    if (req.originalUrl.startsWith("/api/")) {
+      // If an API route reaches here without a response, something is wrong
+      if (!res.headersSent) {
+        console.error(`[API Guard] API route reached post-TRPC middleware without response: ${req.originalUrl}`);
+        return res.status(500).json({ 
+          error: "Internal server error: API route was not handled properly" 
+        });
+      }
+    }
+    next();
+  });
+  
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
@@ -107,6 +125,25 @@ async function startServer() {
     serveStatic(app);
   }
 
+  // Global error handler - MUST be after all routes but before server starts
+  // This ensures any unhandled errors return JSON for API routes
+  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error(`[Global Error Handler] Unhandled error for ${req.originalUrl}:`, err);
+    
+    // For API routes, always return JSON
+    if (req.originalUrl.startsWith("/api/")) {
+      if (!res.headersSent) {
+        return res.status(err.status || 500).json({
+          error: err.message || "Internal server error",
+          code: err.code,
+        });
+      }
+    }
+    
+    // For non-API routes, pass to default error handler
+    next(err);
+  });
+  
   // Initialize WebSocket server
   initializeSocket(server);
 
