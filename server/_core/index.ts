@@ -78,7 +78,7 @@ async function startServer() {
           throw error;
         }
       },
-      onError: ({ error, path, type, ctx, input }) => {
+      onError: ({ error, path, type, ctx, input, req, res }) => {
         console.error(`[TRPC Error] ${type} ${path}:`, {
           code: error.code,
           message: error.message,
@@ -86,10 +86,20 @@ async function startServer() {
           stack: error.stack,
           user: ctx?.user ? `${ctx.user.id} (role: ${ctx.user.role})` : 'null',
         });
-        // TRPC automatically sends JSON error responses, so we just log here
+        // Ensure JSON response is sent for API routes
+        if (!res.headersSent) {
+          res.setHeader('Content-Type', 'application/json');
+        }
+        // TRPC automatically sends JSON error responses, but we ensure content-type is set
       },
     })
   );
+  
+  // Explicit 404 handler for unmatched API routes to prevent HTML fallback
+  app.use("/api/*", (req, res) => {
+    console.warn(`[API 404] Unmatched API route: ${req.originalUrl}`);
+    res.status(404).json({ error: "API endpoint not found" });
+  });
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);

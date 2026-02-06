@@ -20,10 +20,20 @@ export async function setupVite(app: Express, server: Server) {
     appType: "custom",
   });
 
-  app.use(vite.middlewares);
-  app.use("*", async (req, res, next) => {
+  // Wrap vite.middlewares to skip API routes
+  app.use((req, res, next) => {
     // Skip API routes - they should be handled by their respective middleware
     if (req.originalUrl.startsWith("/api/")) {
+      return next();
+    }
+    // Delegate to vite.middlewares for non-API routes
+    vite.middlewares(req, res, next);
+  });
+  
+  app.use("*", async (req, res, next) => {
+    // Skip API routes - they should be handled by their respective middleware
+    // Also check if response was already sent (e.g., by TRPC error handler)
+    if (req.originalUrl.startsWith("/api/") || res.headersSent) {
       return next();
     }
 
