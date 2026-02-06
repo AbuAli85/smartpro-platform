@@ -122,14 +122,28 @@ async function startServer() {
   app.use("/api/sse", sseRouter);
   // tRPC API - add logging middleware before TRPC
   app.use("/api/trpc", (req, res, next) => {
+    const queryString = req.url.split('?')[1] || '';
+    const isBatchRequest = queryString.includes('batch=1');
+    const isListModels = queryString.includes('revenue-models') && queryString.includes('listModels');
+    
     console.log(`[TRPC Request] ${req.method} ${req.originalUrl}`, {
       path: req.path,
       query: req.query,
+      queryString: queryString.substring(0, 200), // First 200 chars
+      isBatchRequest,
+      isListModels,
       headers: {
         cookie: req.headers.cookie ? 'present' : 'missing',
         'content-type': req.headers['content-type'],
       },
     });
+    
+    // Special logging for the problematic request pattern
+    if (isBatchRequest && queryString.includes('input=%7B%220%22%3A%7B%22json%22%3Anull')) {
+      console.log(`[TRPC Request] DETECTED PROBLEMATIC REQUEST PATTERN - listModels with null input`);
+      console.log(`[TRPC Request] Full query string:`, queryString);
+    }
+    
     next();
   });
   app.use(
