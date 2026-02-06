@@ -280,6 +280,7 @@ async function startServer() {
       message: "API endpoint is returning JSON correctly",
       timestamp: new Date().toISOString(),
       path: req.originalUrl,
+      middlewareVersion: "2.0",
     });
   });
   
@@ -291,6 +292,17 @@ async function startServer() {
       success: true,
       message: "HTML interception middleware is active",
       note: "If you see HTML here, the middleware failed",
+      middlewareVersion: "2.0",
+    });
+  });
+  
+  // Health check endpoint that also verifies middleware is working
+  app.get("/api/health", (req, res) => {
+    res.json({
+      status: "ok",
+      timestamp: new Date().toISOString(),
+      middleware: "active",
+      version: "2.0",
     });
   });
   
