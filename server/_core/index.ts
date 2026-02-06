@@ -52,12 +52,19 @@ async function startServer() {
   registerOAuthRoutes(app);
   // SSE notifications endpoint
   app.use("/api/sse", sseRouter);
-  // tRPC API
+  // tRPC API - add logging middleware before TRPC
+  app.use("/api/trpc", (req, res, next) => {
+    console.log(`[TRPC Request] ${req.method} ${req.path}`, req.query);
+    next();
+  });
   app.use(
     "/api/trpc",
     createExpressMiddleware({
       router: appRouter,
       createContext,
+      onError: ({ error, path, type }) => {
+        console.error(`[TRPC Error] ${type} ${path}:`, error);
+      },
     })
   );
   // development mode uses Vite, production mode uses static files
