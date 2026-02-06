@@ -77,6 +77,8 @@ import LoginAnalytics from "./pages/admin/LoginAnalytics";
 import SuccessStoriesManagement from "./pages/admin/SuccessStoriesManagement";
 import RegulationsManagement from "./pages/admin/RegulationsManagement";
 import GovernoratesManagement from "./pages/admin/GovernoratesManagement";
+import RevenueModelsPage from "./pages/admin/revenue-models/RevenueModelsPage";
+import RevenueModelCreatePage from "./pages/admin/revenue-models/RevenueModelCreatePage";
 import ClientList from "./pages/ClientList";
 import ClientProfile from "./pages/ClientProfile";
 import FinancialDashboard from "./pages/FinancialDashboard";
@@ -233,7 +235,17 @@ function Router() {
           <GovernoratesManagement />
         </ProtectedRoute>
       </Route>
-      
+      <Route path="/admin/revenue-models/new">
+        <ProtectedRoute requirePermission="canAccessAdminPanel">
+          <RevenueModelCreatePage />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/revenue-models">
+        <ProtectedRoute requirePermission="canAccessAdminPanel">
+          <RevenueModelsPage />
+        </ProtectedRoute>
+      </Route>
+
       {/* Office Dashboard */}
       <Route path="/office-dashboard">
         <ProtectedRoute requirePermission="canManageOffice">

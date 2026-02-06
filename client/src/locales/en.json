@@ -140,7 +140,70 @@
     "bookings": "Bookings",
     "completed": "Completed",
     "avgRating": "Avg Rating",
-    "completionPercent": "Completion %"
+    "completionPercent": "Completion %",
+    "revenueModels": {
+      "navTitle": "Revenue Models",
+      "title": "Revenue Models",
+      "subtitle": "Configure revenue streams and rules",
+      "new": "New Revenue Model",
+      "createSubtitle": "Create a new revenue model (draft). Preview and export from the list after creation.",
+      "noModels": "No revenue models yet.",
+      "filters": {
+        "title": "Filters",
+        "streamType": "Stream Type",
+        "status": "Status",
+        "allStreamTypes": "All types",
+        "allStatuses": "All statuses"
+      },
+      "streamTypes": {
+        "subscription": "Subscription",
+        "marketplace": "Marketplace",
+        "sanad": "Sanad",
+        "pro": "PRO"
+      },
+      "statuses": {
+        "draft": "Draft",
+        "active": "Active",
+        "archived": "Archived"
+      },
+      "fields": {
+        "nameEn": "Name (English)",
+        "nameAr": "Name (Arabic)",
+        "streamType": "Stream Type",
+        "currency": "Currency",
+        "effectiveFrom": "Effective From (YYYY-MM-DD)"
+      },
+      "actions": {
+        "title": "Actions",
+        "preview": "Preview",
+        "export": "Export",
+        "activate": "Activate",
+        "create": "Create model"
+      },
+      "wizard": {
+        "title": "Create revenue model",
+        "reviewHint": "Review the details above. Click Create model to save as draft, then use the list to preview and export."
+      },
+      "validation": {
+        "nameEnRequired": "Name (English) is required",
+        "nameArRequired": "Name (Arabic) is required",
+        "effectiveFromFormat": "Effective From must be YYYY-MM-DD"
+      },
+      "createSuccess": "Revenue model created.",
+      "exportSuccess": "Export downloaded.",
+      "exportError": "Export failed.",
+      "rules": {
+        "basePriceOMR": "Base price (OMR)",
+        "period": "Period",
+        "commissionPct": "Commission %",
+        "sanadHint": "Configure transaction types and fees (simplified in v1).",
+        "fixedFeeOMR": "Fixed fee (OMR)"
+      },
+      "preview": {
+        "afterCreate": "Preview is available from the list after you create the model.",
+        "useList": "Use the list page to preview by version."
+      }
+    }
   },
   "notifications": {
     "title": "Notifications",

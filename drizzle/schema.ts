@@ -1,4 +1,4 @@
-import { mysqlTable, mysqlSchema, AnyMySqlColumn, index, int, varchar, json, text, timestamp, mysqlEnum, decimal, foreignKey, tinyint, date, InferSelectModel, InferInsertModel } from "drizzle-orm/mysql-core"
+import { mysqlTable, mysqlSchema, AnyMySqlColumn, index, uniqueIndex, int, varchar, json, text, timestamp, mysqlEnum, decimal, foreignKey, tinyint, date, InferSelectModel, InferInsertModel } from "drizzle-orm/mysql-core"
 import { sql } from "drizzle-orm"
 
 export const activeSessions = mysqlTable("active_sessions", {
@@ -552,6 +552,37 @@ export const requestMessages = mysqlTable("request_messages", {
 	index("request_idx").on(table.requestId),
 	index("sender_idx").on(table.senderId),
 	index("created_at_idx").on(table.createdAt),
+]);
+
+export const revenueModels = mysqlTable("revenue_models", {
+	id: int().autoincrement().notNull(),
+	streamType: mysqlEnum("stream_type", ['subscription','marketplace','sanad','pro']).notNull(),
+	status: mysqlEnum("status", ['draft','active','archived']).default('draft').notNull(),
+	currency: varchar({ length: 3 }).default('OMR').notNull(),
+	createdByUserId: int("created_by_user_id").notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("revenue_models_stream_status_idx").on(table.streamType, table.status),
+	index("revenue_models_created_at_idx").on(table.createdAt),
+]);
+
+export const revenueModelVersions = mysqlTable("revenue_model_versions", {
+	id: int().autoincrement().notNull(),
+	modelId: int("model_id").notNull(),
+	version: int().notNull(),
+	nameEn: varchar("name_en", { length: 255 }).notNull(),
+	nameAr: varchar("name_ar", { length: 255 }).notNull(),
+	effectiveFrom: date("effective_from").notNull(),
+	rulesJson: json("rules_json").notNull(),
+	notes: text(),
+	createdByUserId: int("created_by_user_id").notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	uniqueIndex("revenue_model_versions_model_version_unique").on(table.modelId, table.version),
+	index("revenue_model_versions_model_effective_idx").on(table.modelId, table.effectiveFrom),
 ]);
 
 export const reviewPhotos = mysqlTable("review_photos", {

@@ -61,7 +61,8 @@ export const translations: Record<Language, Record<string, string>> = {
     "nav.securityDashboard": "Security Dashboard",
     "nav.loginAnalytics": "Login Analytics",
     "nav.clients": "Clients",
-    
+    "admin.revenueModels.navTitle": "Revenue Models",
+
     // Sidebar section headers
     "sidebar.sectionMain": "MAIN",
     "sidebar.sectionMyServices": "MY SERVICES",
@@ -1392,6 +1393,7 @@ export const translations: Record<Language, Record<string, string>> = {
     "nav.securityDashboard": "لوحة الأمان",
     "nav.loginAnalytics": "تحليلات تسجيل الدخول",
     "nav.clients": "العملاء",
+    "admin.revenueModels.navTitle": "نماذج الإيرادات",
     "nav.officeMessages": "رسائل المكتب",
     "nav.translationManagement": "إدارة الترجمة",
     "nav.languageSettings": "إعدادات اللغة",

@@ -5,6 +5,22 @@
 
 ---
 
+## Work Order Header
+
+**Feature:** Revenue Models v1 (config + rules engine, no billing)
+**Users:** Admin
+**Must-have:** Bilingual (EN/AR), Oman compliance (OMR default, pass-through gov fees separated)
+
+## Definition of Done
+
+* CRUD + versioning works for 4 stream types
+* Preview returns breakdown and warnings
+* Export returns JSON
+* Admin-only enforcement at API level
+* Verification block completed in PR (pnpm check/test/dev)
+
+---
+
 ## Rule
 
 Each task **must** list:
@@ -15,51 +31,113 @@ Each task **must** list:
 
 ---
 
-## Feature: [Title from PRD]
+## PR1 — Docs only (Orchestrator)
 
-### Backend
+- [ ] Fill/confirm `docs/PRD.md` scope and acceptance
+- [ ] Fill/confirm `docs/ARCH.md` schema and API plan
+- [ ] Update `docs/ACCEPTANCE.md` sign-off criteria
 
-- [ ] **Task B1:**  
-  - Files:  
-  - Commands: `pnpm db:push` (if schema), `pnpm check`, `pnpm test`  
-  - Expected:  
+**Files:** `docs/*`
+**Verify:** N/A (docs)
+**Expected:** Stakeholder-approved plan
 
-- [ ] **Task B2:**  
-  - Files:  
-  - Commands:  
-  - Expected:  
+---
 
-### Frontend
+## PR2 — Shared types + engine skeleton (Backend scope + shared)
 
-- [ ] **Task F1:**  
-  - Files:  
-  - Commands: `pnpm check`, `pnpm dev` (smoke)  
-  - Expected:  
+- [ ] Add `shared/revenue-models.ts` (rules schema types)
+- [ ] Add `shared/revenue-engine/index.ts` with `computeRevenue()` skeleton
+- [ ] Add unit tests for engine (tier/percent/flat computations)
 
-- [ ] **Task F2:**  
-  - Files:  
-  - Commands:  
-  - Expected:  
+**Files:** `shared/**`, `server/*.test.ts` (if tests live server-side)
+**Verify:**
 
-### Shared
+* `pnpm check` → pass
+* `pnpm test` → pass
 
-- [ ] **Task S1:** (if types/constants added)  
-  - Files: `shared/*`  
-  - Commands: `pnpm check`  
-  - Expected:  
+**Expected:** engine + types compile and test
+
+---
+
+## PR3 — DB schema (Backend)
+
+- [ ] Add Drizzle tables `revenue_models`, `revenue_model_versions`
+- [ ] Add indexes + constraints
+- [ ] Ensure `pnpm db:push` applies cleanly
+
+**Files:** `drizzle/**`
+**Verify:**
+
+* `pnpm check` → pass
+* `pnpm db:push` → succeeds
+
+**Expected:** tables created
+
+**Rollback note:**
+
+* Document drop statements or migration rollback approach (if you use migration files)
+
+---
+
+## PR4 — API router (Backend)
+
+- [ ] Create `server/routers/revenueModels.ts`
+- [ ] Add procedures: list/get/create/createVersion/activate/archive/preview/export
+- [ ] Enforce admin middleware
+- [ ] Add router wiring in main router index
+- [ ] Add tests for permission gating + basic preview outputs
+
+**Files:** `server/**`, `shared/**`
+**Verify:**
+
+* `pnpm check` → pass
+* `pnpm test` → pass
+
+**Expected:** all procedures reachable + gated
+
+---
+
+## PR5 — Admin UI (Frontend)
+
+- [ ] Add admin page listing models with filters
+- [ ] Add create wizard with rule builder per stream type
+- [ ] Add preview panel calling `preview` endpoint
+- [ ] Add export JSON download
+- [ ] Add navigation entry + route guards
+- [ ] Add i18n keys for EN/AR labels
+
+**Files:** `client/src/**`, `shared/**` (types only)
+**Verify:**
+
+* `pnpm check` → pass
+* `pnpm dev` → admin page loads, CRUD works
+
+**Expected:** full admin flow functional
+
+---
+
+## PR6 — QA + Security gates
 
 ### QA
 
-- [ ] **Task Q1:**  
-  - Files: `server/*.test.ts` or test folders  
-  - Commands: `pnpm test`  
-  - Expected:  
+- [ ] Update `docs/TESTPLAN.md` with regression steps for Revenue Models
+- [ ] Add at least: create/activate/version/export scenarios
 
 ### Security
 
-- [ ] **Task Sec1:** Checklist + risk register in `docs/SECURITY.md`  
-  - Files: `docs/SECURITY.md`  
-  - Expected: Checklist and risk register updated  
+- [ ] Update `docs/SECURITY.md` risk register for this module:
+
+  * unauthorized access
+  * tampering with active models
+  * export data exposure
+- [ ] Confirm admin check is server-side and not UI-only
+
+**Files:** `docs/TESTPLAN.md`, `docs/SECURITY.md`, tests as needed
+**Verify:**
+
+* `pnpm test` → pass
+
+**Expected:** release-ready gate completion
 
 ---
 
@@ -70,69 +148,3 @@ Before marking feature done:
 - `pnpm check`
 - `pnpm test`
 - `pnpm dev` — smoke test
-
----
-
-## Example: First end-to-end run — "Add a new revenue model type"
-
-Use this as a 30–60 min run to exercise the full workflow (Orchestrator → Architect → Backend → Frontend → QA → Security).
-
-### Backend (drizzle + server)
-
-- [ ] **B1** Add/enum revenue model type in schema  
-  - Files: `drizzle/schema.ts`  
-  - Commands: `pnpm db:push`, `pnpm check`  
-  - Expected: Migration applies; no type errors  
-
-- [ ] **B2** Add tRPC procedure to read/update revenue model config  
-  - Files: `server/routers/*.ts` (e.g. admin or new router)  
-  - Commands: `pnpm check`, `pnpm test`  
-  - Expected: Procedure callable; tests pass  
-
-- [ ] **B3** Restrict procedure to Admin (auth context)  
-  - Files: Same router  
-  - Commands: `pnpm test`  
-  - Expected: Non-admin cannot call  
-
-### Shared
-
-- [ ] **S1** Add shared type for revenue model config (if used by client)  
-  - Files: `shared/types.ts` (or new file in `shared/`)  
-  - Commands: `pnpm check`  
-  - Expected: Client and server both type-check  
-
-### Frontend (client)
-
-- [ ] **F1** Admin page or section for revenue model config  
-  - Files: `client/src/pages/*` or `client/src/components/*`  
-  - Commands: `pnpm check`, `pnpm dev`  
-  - Expected: Page loads; RTL/LTR and bilingual  
-
-- [ ] **F2** Form/UI to select and save revenue model type  
-  - Files: `client/src/components/*`  
-  - Commands: `pnpm dev`  
-  - Expected: Can save and see success/error  
-
-- [ ] **F3** Translation keys for new labels  
-  - Files: `client/src/**` (locales/translations)  
-  - Commands: `pnpm dev`  
-  - Expected: Arabic and English show correct copy  
-
-### QA
-
-- [ ] **Q1** Unit test for new router procedure  
-  - Files: `server/*.test.ts`  
-  - Commands: `pnpm test`  
-  - Expected: New test passes  
-
-- [ ] **Q2** Regression: Customer / Sanad Office cannot access admin revenue config  
-  - Files: `docs/TESTPLAN.md`  
-  - Commands: Manual or automated  
-  - Expected: Steps in TESTPLAN.md  
-
-### Security
-
-- [ ] **Sec1** Auth and risk check  
-  - Files: `docs/SECURITY.md`  
-  - Commands: N/A  
-  - Expected: Checklist and risk register updated for new admin procedure

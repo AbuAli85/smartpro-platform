@@ -32,6 +32,7 @@ import {
   Package,
   Search,
   Trophy,
+  DollarSign,
 } from "lucide-react";
 import { useState } from "react";
 import { useSwipeable } from "react-swipeable";
@@ -150,6 +151,7 @@ export function Sidebar({ className }: SidebarProps) {
         { name: t("nav.adminAnalytics"), href: "/admin/analytics", icon: BarChart3, requiresAuth: true, requirePermission: "canViewSystemAnalytics" as const },
         { name: t("nav.securityDashboard"), href: "/admin/security-dashboard", icon: Shield, requiresAuth: true, requirePermission: "canAccessAdminPanel" as const },
         { name: t("nav.loginAnalytics"), href: "/admin/login-analytics", icon: Activity, requiresAuth: true, requirePermission: "canAccessAdminPanel" as const },
+        { name: t("admin.revenueModels.navTitle"), href: "/admin/revenue-models", icon: DollarSign, requiresAuth: true, requirePermission: "canAccessAdminPanel" as const },
         { name: t("nav.regionalStatistics"), href: "/admin/regional-statistics", icon: MapPin, requiresAuth: true, requirePermission: "canViewSystemAnalytics" as const },
         { name: "Translation Management", href: "/admin/translation-management", icon: Languages, requiresAuth: true, requirePermission: "canManageTranslations" as const },
         { name: t("nav.translationRequests"), href: "/admin/translation-requests", icon: MessageSquareText, requiresAuth: true, requirePermission: "canManageTranslations" as const },

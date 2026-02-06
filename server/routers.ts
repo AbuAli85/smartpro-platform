@@ -60,6 +60,7 @@ import { bookingAnalyticsRouter } from "./routers/bookingAnalytics";
 import { officeProfileRouter } from "./routers/officeProfile";
 import { omanRouter } from "./routers/oman";
 import { contentManagementRouter } from "./routers/contentManagement";
+import { revenueModelsRouter } from "./routers/revenueModels";
 
 export const appRouter = router({
   system: systemRouter,
@@ -67,7 +68,8 @@ export const appRouter = router({
   officeProfile: officeProfileRouter,
   oman: omanRouter,
   contentManagement: contentManagementRouter,
-  
+  revenueModels: revenueModelsRouter,
+
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(async ({ ctx }) => {

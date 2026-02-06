@@ -140,7 +140,70 @@
     "bookings": "الحجوزات",
     "completed": "مكتمل",
     "avgRating": "متوسط التقييم",
-    "completionPercent": "نسبة الإنجاز"
+    "completionPercent": "نسبة الإنجاز",
+    "revenueModels": {
+      "navTitle": "نماذج الإيرادات",
+      "title": "نماذج الإيرادات",
+      "subtitle": "إعداد مصادر الإيرادات والقواعد",
+      "new": "نموذج إيراد جديد",
+      "createSubtitle": "إنشاء نموذج إيراد جديد (مسودة). المعاينة والتصدير من القائمة بعد الإنشاء.",
+      "noModels": "لا توجد نماذج إيرادات بعد.",
+      "filters": {
+        "title": "الفلاتر",
+        "streamType": "نوع المصدر",
+        "status": "الحالة",
+        "allStreamTypes": "جميع الأنواع",
+        "allStatuses": "جميع الحالات"
+      },
+      "streamTypes": {
+        "subscription": "اشتراك",
+        "marketplace": "السوق",
+        "sanad": "سند",
+        "pro": "برو"
+      },
+      "statuses": {
+        "draft": "مسودة",
+        "active": "نشط",
+        "archived": "أرشفة"
+      },
+      "fields": {
+        "nameEn": "الاسم (إنجليزي)",
+        "nameAr": "الاسم (عربي)",
+        "streamType": "نوع المصدر",
+        "currency": "العملة",
+        "effectiveFrom": "ساري من (YYYY-MM-DD)"
+      },
+      "actions": {
+        "title": "إجراءات",
+        "preview": "معاينة",
+        "export": "تصدير",
+        "activate": "تفعيل",
+        "create": "إنشاء النموذج"
+      },
+      "wizard": {
+        "title": "إنشاء نموذج إيرادات",
+        "reviewHint": "راجع التفاصيل أعلاه. انقر إنشاء النموذج للحفظ كمسودة، ثم استخدم القائمة للمعاينة والتصدير."
+      },
+      "validation": {
+        "nameEnRequired": "الاسم (الإنجليزي) مطلوب",
+        "nameArRequired": "الاسم (العربي) مطلوب",
+        "effectiveFromFormat": "ساري من يجب أن يكون YYYY-MM-DD"
+      },
+      "createSuccess": "تم إنشاء نموذج الإيرادات.",
+      "exportSuccess": "تم تنزيل التصدير.",
+      "exportError": "فشل التصدير.",
+      "rules": {
+        "basePriceOMR": "السعر الأساسي (ر.ع)",
+        "period": "الفترة",
+        "commissionPct": "نسبة العمولة",
+        "sanadHint": "إعداد أنواع المعاملات والرسوم (مبسطة في الإصدار 1).",
+        "fixedFeeOMR": "الرسوم الثابتة (ر.ع)"
+      },
+      "preview": {
+        "afterCreate": "المعاينة متاحة من القائمة بعد إنشاء النموذج.",
+        "useList": "استخدم صفحة القائمة للمعاينة حسب الإصدار."
+      }
+    }
   },
   "notifications": {
     "title": "الإشعارات",
