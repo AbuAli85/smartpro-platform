@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import cors from "cors";
 import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
@@ -57,21 +58,21 @@ async function startServer() {
   // Trust proxy for rate limiting behind reverse proxy
   app.set('trust proxy', 1);
 
-  // CORS: allow frontend origin so browser permits API requests
+  // CORS: allow frontend origin so browser permits API requests (preflight + credentials)
   const allowedOrigins = getAllowedOrigins();
-  app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    if (origin && allowedOrigins.includes(origin)) {
-      res.setHeader("Access-Control-Allow-Origin", origin);
-    }
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    if (req.method === "OPTIONS") {
-      return res.sendStatus(204);
-    }
-    next();
-  });
+  app.use(
+    cors({
+      origin: (origin, cb) => {
+        // Allow requests with no origin (e.g. same-origin, Postman)
+        if (!origin) return cb(null, true);
+        if (allowedOrigins.includes(origin)) return cb(null, true);
+        cb(null, false);
+      },
+      credentials: true,
+      methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization", "trpc-batch-mode", "Accept"],
+    })
+  );
   
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
