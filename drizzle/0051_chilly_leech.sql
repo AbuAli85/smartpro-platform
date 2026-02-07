@@ -10,12 +10,7 @@ CREATE TABLE IF NOT EXISTS `office_blocked_slots` (
 	`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 --> statement-breakpoint
-ALTER TABLE `batch_translation_jobs` MODIFY COLUMN `created_at` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP';--> statement-breakpoint
-ALTER TABLE `booking_reminders` MODIFY COLUMN `created_at` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP';--> statement-breakpoint
-ALTER TABLE `expenses` MODIFY COLUMN `created_at` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP';--> statement-breakpoint
-ALTER TABLE `invoices` MODIFY COLUMN `created_at` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP';--> statement-breakpoint
-ALTER TABLE `payments` MODIFY COLUMN `created_at` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP';--> statement-breakpoint
-ALTER TABLE `sanad_office_services` MODIFY COLUMN `createdAt` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP';--> statement-breakpoint
-ALTER TABLE `translation_review_comments` MODIFY COLUMN `created_at` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP';--> statement-breakpoint
-CREATE INDEX `office_date_idx` ON `office_blocked_slots` (`office_id`,`blocked_date`);--> statement-breakpoint
-ALTER TABLE `sanad_offices` DROP COLUMN `photos`;
+DROP PROCEDURE IF EXISTS _d51_create_office_date_idx;--> statement-breakpoint
+CREATE PROCEDURE _d51_create_office_date_idx() BEGIN IF (SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema=DATABASE() AND table_name='office_blocked_slots' AND index_name='office_date_idx')=0 THEN CREATE INDEX `office_date_idx` ON `office_blocked_slots` (`office_id`,`blocked_date`); END IF; END--> statement-breakpoint
+CALL _d51_create_office_date_idx();--> statement-breakpoint
+DROP PROCEDURE IF EXISTS _d51_create_office_date_idx;

@@ -211,7 +211,6 @@ CREATE INDEX `region_idx` ON `governorates` (`region`);--> statement-breakpoint
 CREATE INDEX `status_idx` ON `governorates` (`status`);--> statement-breakpoint
 CREATE INDEX `featured_idx` ON `governorates` (`featured`);--> statement-breakpoint
 CREATE INDEX `display_order_idx` ON `governorates` (`display_order`);--> statement-breakpoint
-CREATE INDEX `office_date_idx` ON `office_blocked_slots` (`office_id`,`blocked_date`);--> statement-breakpoint
 CREATE INDEX `office_id_idx` ON `office_profile_versions` (`office_id`);--> statement-breakpoint
 CREATE INDEX `version_number_idx` ON `office_profile_versions` (`version_number`);--> statement-breakpoint
 CREATE INDEX `changed_by_idx` ON `office_profile_versions` (`changed_by`);--> statement-breakpoint
