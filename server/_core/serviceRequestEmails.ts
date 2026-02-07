@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const resendClient: Resend | null = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'noreply@thesmartpro.io';
 
 /**
@@ -218,7 +219,11 @@ export async function sendRequestConfirmationEmail(params: {
   `;
 
   try {
-    const result = await resend.emails.send({
+    if (!resendClient) {
+      console.warn("Resend API key not configured. Request confirmation email not sent.");
+      return { success: false, error: "Email service not configured" };
+    }
+    const result = await resendClient.emails.send({
       from: FROM_EMAIL,
       to,
       subject,
@@ -376,7 +381,11 @@ export async function sendNewBidNotificationEmail(params: {
   `;
 
   try {
-    const result = await resend.emails.send({
+    if (!resendClient) {
+      console.warn("Resend API key not configured. New bid notification email not sent.");
+      return { success: false, error: "Email service not configured" };
+    }
+    const result = await resendClient.emails.send({
       from: FROM_EMAIL,
       to,
       subject,
@@ -551,7 +560,11 @@ export async function sendNewRequestNotificationToOffice(params: {
   `;
 
   try {
-    const result = await resend.emails.send({
+    if (!resendClient) {
+      console.warn("Resend API key not configured. New request notification email not sent.");
+      return { success: false, error: "Email service not configured" };
+    }
+    const result = await resendClient.emails.send({
       from: FROM_EMAIL,
       to,
       subject,
@@ -747,7 +760,11 @@ export async function sendBidAcceptedNotificationEmail(params: {
   `;
 
   try {
-    const result = await resend.emails.send({
+    if (!resendClient) {
+      console.warn("Resend API key not configured. Bid accepted notification email not sent.");
+      return { success: false, error: "Email service not configured" };
+    }
+    const result = await resendClient.emails.send({
       from: FROM_EMAIL,
       to,
       subject,
@@ -942,7 +959,11 @@ export async function sendServiceCompletionEmail(params: {
   `;
 
   try {
-    const result = await resend.emails.send({
+    if (!resendClient) {
+      console.warn("Resend API key not configured. Service completion notification email not sent.");
+      return { success: false, error: "Email service not configured" };
+    }
+    const result = await resendClient.emails.send({
       from: FROM_EMAIL,
       to,
       subject,

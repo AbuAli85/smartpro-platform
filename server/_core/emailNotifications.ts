@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const resendClient: Resend | null = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
 // Email templates in English and Arabic
 const templates = {
@@ -171,7 +172,11 @@ export async function sendBilingualEmail(
       emailPayload.attachments = attachments;
     }
 
-    const result = await resend.emails.send(emailPayload);
+    if (!resendClient) {
+      console.warn("Resend API key not configured. Bilingual notification email not sent.");
+      return { success: false, error: "Email service not configured" };
+    }
+    const result = await resendClient.emails.send(emailPayload);
 
     console.log(`Email sent successfully to ${to} in ${language}:`, result);
     return { success: true, result };

@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const resendClient: Resend | null = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "noreply@thesmartpro.io";
 
 // Email templates for account recovery in English and Arabic
@@ -161,7 +162,11 @@ export async function sendPasswordResetEmail(
     const expiryMinutes = 60; // 1 hour
 
     const template = templates.passwordReset[lang];
-    const { data, error } = await resend.emails.send({
+    if (!resendClient) {
+      console.warn("[Account Recovery] Resend API key not configured. Password reset email not sent.");
+      return { success: false, error: "Email service not configured" };
+    }
+    const { data, error } = await resendClient.emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: template.subject,
@@ -194,7 +199,7 @@ export async function sendEmailVerificationEmail(
     const expiryMinutes = 1440; // 24 hours
 
     const template = templates.emailVerification[lang];
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await resendClient.emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: template.subject,
@@ -227,7 +232,11 @@ export async function sendRecoveryEmailVerification(
     const verificationLink = `${process.env.VITE_FRONTEND_FORGE_API_URL || "https://smartpro.manus.space"}/verify-recovery-email?token=${verificationToken}`;
 
     const template = templates.recoveryEmailVerification[lang];
-    const { data, error } = await resend.emails.send({
+    if (!resendClient) {
+      console.warn("[Account Recovery] Resend API key not configured. Recovery email verification not sent.");
+      return { success: false, error: "Email service not configured" };
+    }
+    const { data, error } = await resendClient.emails.send({
       from: FROM_EMAIL,
       to: recoveryEmail,
       subject: template.subject,
