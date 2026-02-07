@@ -1,7 +1,8 @@
 import { Resend } from "resend";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const resendClient: Resend | null = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
+const resendClient: Resend | null =
+  typeof RESEND_API_KEY === "string" && RESEND_API_KEY.length > 0 ? new Resend(RESEND_API_KEY) : null;
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "noreply@thesmartpro.io";
 
 // Email templates for account recovery in English and Arabic

@@ -6,7 +6,7 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "SmartPro <noreply@smartpro.om>";
 
 let resendClient: Resend | null = null;
-if (RESEND_API_KEY) {
+if (typeof RESEND_API_KEY === "string" && RESEND_API_KEY.length > 0) {
   resendClient = new Resend(RESEND_API_KEY);
 }
 
