@@ -10,7 +10,9 @@ export function initializeAnalytics() {
 
   // Only initialize if both values are provided and valid
   if (!analyticsEndpoint || !websiteId) {
-    console.log('[Analytics] Environment variables not configured, skipping analytics initialization');
+    if (import.meta.env.DEV) {
+      console.debug('[Analytics] Environment variables not configured, skipping analytics initialization');
+    }
     return;
   }
 

@@ -1,5 +1,4 @@
 import { trpc } from "@/lib/trpc";
-import { UNAUTHED_ERR_MSG } from '@shared/const';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, TRPCClientError } from "@trpc/client";
 import { createRoot } from "react-dom/client";
@@ -14,13 +13,16 @@ import { initializeAnalytics } from "./utils/analytics";
 
 const queryClient = new QueryClient();
 
-const redirectToLoginIfUnauthorized = (error: unknown) => {
+const isAuthError = (error: unknown): boolean => {
+  if (!(error instanceof TRPCClientError)) return false;
+  const code = error.data?.code;
+  return code === "UNAUTHORIZED" || code === "FORBIDDEN";
+};
+
+const redirectToLoginIfAuthError = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;
   if (typeof window === "undefined") return;
-
-  const isUnauthorized = error.message === UNAUTHED_ERR_MSG;
-
-  if (!isUnauthorized) return;
+  if (!isAuthError(error)) return;
 
   const loginUrl = getLoginUrl();
   window.location.href = loginUrl ?? "/login";
@@ -29,16 +31,22 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
 queryClient.getQueryCache().subscribe(event => {
   if (event.type === "updated" && event.action.type === "error") {
     const error = event.query.state.error;
-    redirectToLoginIfUnauthorized(error);
-    console.error("[API Query Error]", error);
+    if (isAuthError(error)) {
+      redirectToLoginIfAuthError(error);
+    } else {
+      console.error("[API Query Error]", error);
+    }
   }
 });
 
 queryClient.getMutationCache().subscribe(event => {
   if (event.type === "updated" && event.action.type === "error") {
     const error = event.mutation.state.error;
-    redirectToLoginIfUnauthorized(error);
-    console.error("[API Mutation Error]", error);
+    if (isAuthError(error)) {
+      redirectToLoginIfAuthError(error);
+    } else {
+      console.error("[API Mutation Error]", error);
+    }
   }
 });
 
