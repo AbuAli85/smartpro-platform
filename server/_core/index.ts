@@ -36,11 +36,42 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
   throw new Error(`No available port found starting from ${startPort}`);
 }
 
+/** Allowed CORS origins (comma-separated in CORS_ORIGIN, or default list) */
+function getAllowedOrigins(): string[] {
+  const env = process.env.CORS_ORIGIN;
+  if (env && env.trim()) {
+    return env.split(",").map((o) => o.trim()).filter(Boolean);
+  }
+  return [
+    "https://sanad.thesmartpro.io",
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
+  ];
+}
+
 async function startServer() {
   const app = express();
   const server = createServer(app);
   // Trust proxy for rate limiting behind reverse proxy
   app.set('trust proxy', 1);
+
+  // CORS: allow frontend origin so browser permits API requests
+  const allowedOrigins = getAllowedOrigins();
+  app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin && allowedOrigins.includes(origin)) {
+      res.setHeader("Access-Control-Allow-Origin", origin);
+    }
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    if (req.method === "OPTIONS") {
+      return res.sendStatus(204);
+    }
+    next();
+  });
   
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
