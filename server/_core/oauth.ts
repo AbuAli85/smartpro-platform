@@ -110,7 +110,8 @@ export function registerOAuthRoutes(app: Express) {
         severity: "info",
       });
 
-      res.redirect(302, "/");
+      const frontendBase = (process.env.FRONTEND_URL ?? "").replace(/\/$/, "");
+      res.redirect(302, frontendBase || "/");
     } catch (error) {
       console.error("[OAuth] Callback failed", error);
       console.error("[OAuth] Error details:", {
@@ -156,8 +157,9 @@ export function registerOAuthRoutes(app: Express) {
         : "oauth_failed";
       
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      const redirectUrl = `/auth-error?type=${encodeURIComponent(errorType)}&message=${encodeURIComponent(errorMessage)}`;
-      
+      const authErrorPath = `/auth-error?type=${encodeURIComponent(errorType)}&message=${encodeURIComponent(errorMessage)}`;
+      const frontendBase = (process.env.FRONTEND_URL ?? "").replace(/\/$/, "");
+      const redirectUrl = frontendBase ? `${frontendBase}${authErrorPath}` : authErrorPath;
       res.redirect(302, redirectUrl);
       return;
     }

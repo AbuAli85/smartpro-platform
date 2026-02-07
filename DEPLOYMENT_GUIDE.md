@@ -195,6 +195,17 @@ The platform runs the following scheduled tasks:
 
 ---
 
+### Split Hosting (Vercel Frontend + Railway/Manus Backend)
+
+If the **frontend** is on **Vercel** (or another static host) and the **API** is on **Railway** or Manus:
+
+- **Frontend (Vercel):** Set `VITE_API_URL` (your API base URL), `VITE_OAUTH_PORTAL_URL`, and `VITE_APP_ID`. See [client/.env.example](../client/.env.example).
+- **Backend (Railway):** Set `FRONTEND_URL` (your frontend URL, e.g. `https://sanad.thesmartpro.io`) and `CORS_ORIGIN` to include that frontend origin. OAuth callback will be on the API; after login the server redirects to `FRONTEND_URL`.
+
+Full step-by-step: **[docs/SPLIT_HOSTING.md](docs/SPLIT_HOSTING.md)**.
+
+---
+
 ### Support & Troubleshooting
 
 **Common Issues:**

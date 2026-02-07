@@ -1,10 +1,12 @@
 export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 
-// Generate login URL at runtime so redirect URI reflects the current origin.
+// Generate login URL at runtime. When frontend is on a different host than the API (e.g. Vercel
+// frontend + Railway API), redirect URI must point to the API so the OAuth callback hits the server.
 // Returns null when OAuth is not configured (no throw).
 export const getLoginUrl = (): string | null => {
   const oauthPortalUrl = import.meta.env.VITE_OAUTH_PORTAL_URL;
   const appId = import.meta.env.VITE_APP_ID;
+  const apiBase = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
 
   if (!oauthPortalUrl || typeof oauthPortalUrl !== "string" || oauthPortalUrl.trim() === "") {
     return null;
@@ -18,7 +20,9 @@ export const getLoginUrl = (): string | null => {
     return null;
   }
 
-  const redirectUri = `${window.location.origin}/api/oauth/callback`;
+  const redirectUri = apiBase
+    ? `${apiBase}/api/oauth/callback`
+    : `${window.location.origin}/api/oauth/callback`;
   const state = btoa(redirectUri);
   const url = new URL(`${oauthPortalUrl}/app-auth`);
   url.searchParams.set("appId", appId);

@@ -79,18 +79,19 @@ export function ProtectedRoute({
 function LoginRequiredDialog({ fallbackPath }: { fallbackPath: string }) {
   const [open, setOpen] = useState(true);
   const [shouldRedirect, setShouldRedirect] = useState(false);
+  const loginUrl = getLoginUrl();
+  const signInConfigured = Boolean(loginUrl);
 
   if (shouldRedirect) {
     return <Redirect to={fallbackPath} />;
   }
 
+  const goBack = () => setTimeout(() => setShouldRedirect(true), 0);
+
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
       setOpen(isOpen);
-      if (!isOpen) {
-        // Defer redirect so the close button's handler returns quickly and doesn't block UI
-        setTimeout(() => setShouldRedirect(true), 0);
-      }
+      if (!isOpen) setTimeout(() => setShouldRedirect(true), 0);
     }}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
@@ -99,29 +100,31 @@ function LoginRequiredDialog({ fallbackPath }: { fallbackPath: string }) {
           </div>
           <DialogTitle className="text-center">Login Required</DialogTitle>
           <DialogDescription className="text-center">
-            You need to be logged in to access this feature. Please sign in to continue.
+            {signInConfigured
+              ? "You need to be logged in to access this feature. Please sign in to continue."
+              : "You need to be logged in to access this feature. Sign-in is not configured for this environment. Set VITE_OAUTH_PORTAL_URL and VITE_APP_ID in your frontend build environment to enable login (see DEPLOYMENT_GUIDE). Use Go Back to return."}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex-col sm:flex-col gap-2">
-          {(() => {
-            const loginUrl = getLoginUrl();
-            return (
+          {signInConfigured ? (
+            <>
               <Button
                 onClick={() => { if (loginUrl) window.location.href = loginUrl; }}
                 className="w-full bg-[#003366] hover:bg-[#002244]"
-                disabled={!loginUrl}
               >
-                {loginUrl ? "Sign In" : "Sign-in not configured"}
+                Sign In
               </Button>
-            );
-          })()}
-          <Button
-            variant="outline"
-            onClick={() => setTimeout(() => setShouldRedirect(true), 0)}
-            className="w-full"
-          >
-            Go Back
-          </Button>
+              <Button variant="outline" onClick={goBack} className="w-full">
+                Go Back
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button onClick={goBack} className="w-full bg-[#003366] hover:bg-[#002244]">
+                Go Back
+              </Button>
+            </>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
