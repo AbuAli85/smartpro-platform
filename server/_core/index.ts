@@ -250,7 +250,12 @@ async function startServer() {
         }
       },
       onError: ({ error, path, type, ctx, input, req, res }) => {
-        const requestId = (req as any)._apiRequestId || 'unknown';
+        const requestId = (req as any)?._apiRequestId || 'unknown';
+        // OPTIONS/CORS preflight or other edge cases may invoke onError without res (e.g. node-http adapter)
+        if (!res || typeof res.getHeader !== 'function') {
+          console.error(`[TRPC Error] [${requestId}] ${type} ${path} (no res):`, error.message);
+          return;
+        }
         const contentType = res.getHeader('Content-Type');
         const isJson = contentType && String(contentType).includes('application/json');
         
