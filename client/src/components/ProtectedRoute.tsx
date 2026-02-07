@@ -102,14 +102,18 @@ function LoginRequiredDialog({ fallbackPath }: { fallbackPath: string }) {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex-col sm:flex-col gap-2">
-          <Button
-            onClick={() => {
-              window.location.href = getLoginUrl();
-            }}
-            className="w-full bg-[#003366] hover:bg-[#002244]"
-          >
-            Sign In
-          </Button>
+          {(() => {
+            const loginUrl = getLoginUrl();
+            return (
+              <Button
+                onClick={() => { if (loginUrl) window.location.href = loginUrl; }}
+                className="w-full bg-[#003366] hover:bg-[#002244]"
+                disabled={!loginUrl}
+              >
+                {loginUrl ? "Sign In" : "Sign-in not configured"}
+              </Button>
+            );
+          })()}
           <Button
             variant="outline"
             onClick={() => setShouldRedirect(true)}

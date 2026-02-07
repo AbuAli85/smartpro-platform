@@ -97,7 +97,9 @@ export default function AuthError() {
   ];
 
   const handleTryAgain = () => {
-    window.location.href = getLoginUrl();
+    const loginUrl = getLoginUrl();
+    if (loginUrl) window.location.href = loginUrl;
+    else setLocation("/");
   };
 
   const handleGoHome = () => {

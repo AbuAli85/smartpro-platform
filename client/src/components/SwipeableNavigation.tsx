@@ -86,11 +86,16 @@ export function SwipeableNavigation() {
                   Logout
                 </Button>
               </div>
-            ) : (
-              <Button asChild variant="default" size="sm" className="hidden lg:flex">
-                <a href={getLoginUrl()}>Sign In</a>
-              </Button>
-            )}
+            ) : (() => {
+              const loginUrl = getLoginUrl();
+              return loginUrl ? (
+                <Button asChild variant="default" size="sm" className="hidden lg:flex">
+                  <a href={loginUrl}>Sign In</a>
+                </Button>
+              ) : (
+                <Button disabled variant="outline" size="sm" className="hidden lg:flex">Sign-in not configured</Button>
+              );
+            })()}
 
             {/* Mobile Menu Button */}
             <Button 
@@ -228,11 +233,16 @@ export function SwipeableNavigation() {
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
               </Button>
-            ) : (
-              <Button asChild className="w-full">
-                <a href={getLoginUrl()}>Sign In</a>
-              </Button>
-            )}
+            ) : (() => {
+              const loginUrl = getLoginUrl();
+              return loginUrl ? (
+                <Button asChild className="w-full">
+                  <a href={loginUrl}>Sign In</a>
+                </Button>
+              ) : (
+                <Button disabled variant="outline" className="w-full">Sign-in not configured</Button>
+              );
+            })()}
           </div>
         </div>
       </div>

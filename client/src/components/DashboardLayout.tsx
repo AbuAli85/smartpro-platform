@@ -70,15 +70,19 @@ export default function DashboardLayout({
               Access to this dashboard requires authentication. Continue to launch the login flow.
             </p>
           </div>
-          <Button
-            onClick={() => {
-              window.location.href = getLoginUrl();
-            }}
-            size="lg"
-            className="w-full shadow-lg hover:shadow-xl transition-all"
-          >
-            Sign in
-          </Button>
+          {(() => {
+            const loginUrl = getLoginUrl();
+            return (
+              <Button
+                onClick={() => { if (loginUrl) window.location.href = loginUrl; }}
+                size="lg"
+                className="w-full shadow-lg hover:shadow-xl transition-all"
+                disabled={!loginUrl}
+              >
+                {loginUrl ? "Sign in" : "Sign-in not configured"}
+              </Button>
+            );
+          })()}
         </div>
       </div>
     );

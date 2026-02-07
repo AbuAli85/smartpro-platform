@@ -110,11 +110,16 @@ export function Navigation() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : (
-            <Button asChild>
-              <a href={getLoginUrl()}>Sign In</a>
-            </Button>
-          )}
+          ) : (() => {
+            const loginUrl = getLoginUrl();
+            return loginUrl ? (
+              <Button asChild>
+                <a href={loginUrl}>Sign In</a>
+              </Button>
+            ) : (
+              <Button disabled variant="outline">Sign-in not configured</Button>
+            );
+          })()}
 
           {/* Mobile Menu */}
           <DropdownMenu>
