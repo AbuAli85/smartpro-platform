@@ -1,5 +1,5 @@
-CREATE TABLE `governorates` (
-	`id` int AUTO_INCREMENT NOT NULL,
+CREATE TABLE IF NOT EXISTS `governorates` (
+	`id` int AUTO_INCREMENT NOT NULL PRIMARY KEY,
 	`name` varchar(100) NOT NULL,
 	`name_ar` varchar(100) NOT NULL,
 	`slug` varchar(100) NOT NULL,
@@ -48,12 +48,12 @@ CREATE TABLE `governorates` (
 	`display_order` int DEFAULT 0,
 	`status` enum('active','inactive') NOT NULL DEFAULT 'active',
 	`view_count` int NOT NULL DEFAULT 0,
-	`created_at` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
-	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP
+	`created_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+	`updated_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP) ON UPDATE CURRENT_TIMESTAMP
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS `office_blocked_slots` (
-	`id` int AUTO_INCREMENT NOT NULL,
+	`id` int AUTO_INCREMENT NOT NULL PRIMARY KEY,
 	`office_id` int NOT NULL,
 	`blocked_date` date NOT NULL,
 	`start_time` varchar(10),
@@ -64,8 +64,8 @@ CREATE TABLE IF NOT EXISTS `office_blocked_slots` (
 	`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 --> statement-breakpoint
-CREATE TABLE `office_profile_versions` (
-	`id` int AUTO_INCREMENT NOT NULL,
+CREATE TABLE IF NOT EXISTS `office_profile_versions` (
+	`id` int AUTO_INCREMENT NOT NULL PRIMARY KEY,
 	`office_id` int NOT NULL,
 	`version_number` int NOT NULL,
 	`version_label` varchar(255),
@@ -76,11 +76,11 @@ CREATE TABLE `office_profile_versions` (
 	`changed_fields` json,
 	`previous_values` json,
 	`new_values` json,
-	`created_at` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP'
+	`created_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP)
 );
 --> statement-breakpoint
-CREATE TABLE `regulations` (
-	`id` int AUTO_INCREMENT NOT NULL,
+CREATE TABLE IF NOT EXISTS `regulations` (
+	`id` int AUTO_INCREMENT NOT NULL PRIMARY KEY,
 	`title` varchar(255) NOT NULL,
 	`title_ar` varchar(255),
 	`slug` varchar(255) NOT NULL,
@@ -118,12 +118,12 @@ CREATE TABLE `regulations` (
 	`last_updated` timestamp,
 	`view_count` int NOT NULL DEFAULT 0,
 	`created_by` int,
-	`created_at` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
-	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP
+	`created_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+	`updated_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP) ON UPDATE CURRENT_TIMESTAMP
 );
 --> statement-breakpoint
-CREATE TABLE `revenue_model_versions` (
-	`id` int AUTO_INCREMENT NOT NULL,
+CREATE TABLE IF NOT EXISTS `revenue_model_versions` (
+	`id` int AUTO_INCREMENT NOT NULL PRIMARY KEY,
 	`model_id` int NOT NULL,
 	`version` int NOT NULL,
 	`name_en` varchar(255) NOT NULL,
@@ -132,22 +132,22 @@ CREATE TABLE `revenue_model_versions` (
 	`rules_json` json NOT NULL,
 	`notes` text,
 	`created_by_user_id` int NOT NULL,
-	`created_at` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
+	`created_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
 	CONSTRAINT `revenue_model_versions_model_version_unique` UNIQUE(`model_id`,`version`)
 );
 --> statement-breakpoint
-CREATE TABLE `revenue_models` (
-	`id` int AUTO_INCREMENT NOT NULL,
+CREATE TABLE IF NOT EXISTS `revenue_models` (
+	`id` int AUTO_INCREMENT NOT NULL PRIMARY KEY,
 	`stream_type` enum('subscription','marketplace','sanad','pro') NOT NULL,
 	`status` enum('draft','active','archived') NOT NULL DEFAULT 'draft',
 	`currency` varchar(3) NOT NULL DEFAULT 'OMR',
 	`created_by_user_id` int NOT NULL,
-	`created_at` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
-	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP
+	`created_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+	`updated_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP) ON UPDATE CURRENT_TIMESTAMP
 );
 --> statement-breakpoint
-CREATE TABLE `success_stories` (
-	`id` int AUTO_INCREMENT NOT NULL,
+CREATE TABLE IF NOT EXISTS `success_stories` (
+	`id` int AUTO_INCREMENT NOT NULL PRIMARY KEY,
 	`business_name` varchar(255) NOT NULL,
 	`business_name_ar` varchar(255),
 	`owner_name` varchar(255) NOT NULL,
@@ -183,12 +183,12 @@ CREATE TABLE `success_stories` (
 	`published_at` timestamp,
 	`view_count` int NOT NULL DEFAULT 0,
 	`created_by` int,
-	`created_at` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
-	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP
+	`created_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+	`updated_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP) ON UPDATE CURRENT_TIMESTAMP
 );
 --> statement-breakpoint
-CREATE TABLE `user_compliance_checklists` (
-	`id` int AUTO_INCREMENT NOT NULL,
+CREATE TABLE IF NOT EXISTS `user_compliance_checklists` (
+	`id` int AUTO_INCREMENT NOT NULL PRIMARY KEY,
 	`user_id` int NOT NULL,
 	`office_id` int,
 	`regulation_id` int NOT NULL,
@@ -200,40 +200,40 @@ CREATE TABLE `user_compliance_checklists` (
 	`completed_at` timestamp,
 	`due_date` timestamp,
 	`reminder_date` timestamp,
-	`created_at` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
-	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP
+	`created_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+	`updated_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP) ON UPDATE CURRENT_TIMESTAMP
 );
 --> statement-breakpoint
-ALTER TABLE `sanad_offices` ADD `year_established` int;--> statement-breakpoint
-CREATE INDEX `governorates_slug_unique` ON `governorates` (`slug`);--> statement-breakpoint
-CREATE INDEX `governorates_name_unique` ON `governorates` (`name`);--> statement-breakpoint
-CREATE INDEX `region_idx` ON `governorates` (`region`);--> statement-breakpoint
-CREATE INDEX `status_idx` ON `governorates` (`status`);--> statement-breakpoint
-CREATE INDEX `featured_idx` ON `governorates` (`featured`);--> statement-breakpoint
-CREATE INDEX `display_order_idx` ON `governorates` (`display_order`);--> statement-breakpoint
-CREATE INDEX `office_id_idx` ON `office_profile_versions` (`office_id`);--> statement-breakpoint
-CREATE INDEX `version_number_idx` ON `office_profile_versions` (`version_number`);--> statement-breakpoint
-CREATE INDEX `changed_by_idx` ON `office_profile_versions` (`changed_by`);--> statement-breakpoint
-CREATE INDEX `created_at_idx` ON `office_profile_versions` (`created_at`);--> statement-breakpoint
-CREATE INDEX `regulations_slug_unique` ON `regulations` (`slug`);--> statement-breakpoint
-CREATE INDEX `category_idx` ON `regulations` (`category`);--> statement-breakpoint
-CREATE INDEX `priority_idx` ON `regulations` (`priority`);--> statement-breakpoint
-CREATE INDEX `status_idx` ON `regulations` (`status`);--> statement-breakpoint
-CREATE INDEX `featured_idx` ON `regulations` (`featured`);--> statement-breakpoint
-CREATE INDEX `display_order_idx` ON `regulations` (`display_order`);--> statement-breakpoint
-CREATE INDEX `revenue_model_versions_model_effective_idx` ON `revenue_model_versions` (`model_id`,`effective_from`);--> statement-breakpoint
-CREATE INDEX `revenue_models_stream_status_idx` ON `revenue_models` (`stream_type`,`status`);--> statement-breakpoint
-CREATE INDEX `revenue_models_created_at_idx` ON `revenue_models` (`created_at`);--> statement-breakpoint
-CREATE INDEX `governorate_idx` ON `success_stories` (`governorate`);--> statement-breakpoint
-CREATE INDEX `industry_idx` ON `success_stories` (`industry`);--> statement-breakpoint
-CREATE INDEX `status_idx` ON `success_stories` (`status`);--> statement-breakpoint
-CREATE INDEX `featured_idx` ON `success_stories` (`featured`);--> statement-breakpoint
-CREATE INDEX `office_idx` ON `success_stories` (`office_id`);--> statement-breakpoint
-CREATE INDEX `display_order_idx` ON `success_stories` (`display_order`);--> statement-breakpoint
-CREATE INDEX `user_idx` ON `user_compliance_checklists` (`user_id`);--> statement-breakpoint
-CREATE INDEX `office_idx` ON `user_compliance_checklists` (`office_id`);--> statement-breakpoint
-CREATE INDEX `regulation_idx` ON `user_compliance_checklists` (`regulation_id`);--> statement-breakpoint
-CREATE INDEX `status_idx` ON `user_compliance_checklists` (`status`);--> statement-breakpoint
-CREATE INDEX `user_regulation_idx` ON `user_compliance_checklists` (`user_id`,`regulation_id`);--> statement-breakpoint
-ALTER TABLE `sanad_offices` DROP COLUMN `yearEstablished`;--> statement-breakpoint
-ALTER TABLE `sanad_offices` DROP COLUMN `photos`;
+DROP PROCEDURE IF EXISTS _d54_ci;--> statement-breakpoint
+CREATE PROCEDURE _d54_ci(IN t VARCHAR(64), IN i VARCHAR(64), IN c VARCHAR(512)) BEGIN IF (SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema=DATABASE() AND table_name=t AND index_name=i)=0 THEN SET @s=CONCAT('CREATE INDEX `',i,'` ON `',t,'` ',c); PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; END IF; END--> statement-breakpoint
+CALL _d54_ci('governorates','governorates_slug_unique','(`slug`)');--> statement-breakpoint
+CALL _d54_ci('governorates','governorates_name_unique','(`name`)');--> statement-breakpoint
+CALL _d54_ci('governorates','region_idx','(`region`)');--> statement-breakpoint
+CALL _d54_ci('governorates','status_idx','(`status`)');--> statement-breakpoint
+CALL _d54_ci('governorates','featured_idx','(`featured`)');--> statement-breakpoint
+CALL _d54_ci('governorates','display_order_idx','(`display_order`)');--> statement-breakpoint
+CALL _d54_ci('office_profile_versions','office_id_idx','(`office_id`)');--> statement-breakpoint
+CALL _d54_ci('office_profile_versions','version_number_idx','(`version_number`)');--> statement-breakpoint
+CALL _d54_ci('office_profile_versions','changed_by_idx','(`changed_by`)');--> statement-breakpoint
+CALL _d54_ci('office_profile_versions','created_at_idx','(`created_at`)');--> statement-breakpoint
+CALL _d54_ci('regulations','regulations_slug_unique','(`slug`)');--> statement-breakpoint
+CALL _d54_ci('regulations','category_idx','(`category`)');--> statement-breakpoint
+CALL _d54_ci('regulations','priority_idx','(`priority`)');--> statement-breakpoint
+CALL _d54_ci('regulations','status_idx','(`status`)');--> statement-breakpoint
+CALL _d54_ci('regulations','featured_idx','(`featured`)');--> statement-breakpoint
+CALL _d54_ci('regulations','display_order_idx','(`display_order`)');--> statement-breakpoint
+CALL _d54_ci('revenue_model_versions','revenue_model_versions_model_effective_idx','(`model_id`,`effective_from`)');--> statement-breakpoint
+CALL _d54_ci('revenue_models','revenue_models_stream_status_idx','(`stream_type`,`status`)');--> statement-breakpoint
+CALL _d54_ci('revenue_models','revenue_models_created_at_idx','(`created_at`)');--> statement-breakpoint
+CALL _d54_ci('success_stories','governorate_idx','(`governorate`)');--> statement-breakpoint
+CALL _d54_ci('success_stories','industry_idx','(`industry`)');--> statement-breakpoint
+CALL _d54_ci('success_stories','status_idx','(`status`)');--> statement-breakpoint
+CALL _d54_ci('success_stories','featured_idx','(`featured`)');--> statement-breakpoint
+CALL _d54_ci('success_stories','office_idx','(`office_id`)');--> statement-breakpoint
+CALL _d54_ci('success_stories','display_order_idx','(`display_order`)');--> statement-breakpoint
+CALL _d54_ci('user_compliance_checklists','user_idx','(`user_id`)');--> statement-breakpoint
+CALL _d54_ci('user_compliance_checklists','office_idx','(`office_id`)');--> statement-breakpoint
+CALL _d54_ci('user_compliance_checklists','regulation_idx','(`regulation_id`)');--> statement-breakpoint
+CALL _d54_ci('user_compliance_checklists','status_idx','(`status`)');--> statement-breakpoint
+CALL _d54_ci('user_compliance_checklists','user_regulation_idx','(`user_id`,`regulation_id`)');--> statement-breakpoint
+DROP PROCEDURE IF EXISTS _d54_ci;
