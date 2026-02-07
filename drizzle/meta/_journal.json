@@ -372,6 +372,20 @@
       "when": 1770496495334,
       "tag": "0053_good_deathstrike",
       "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "5",
+      "when": 1770496637220,
+      "tag": "0054_fast_captain_midlands",
+      "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "5",
+      "when": 1770496740771,
+      "tag": "0055_aromatic_bucky",
+      "breakpoints": true
     }
   ]
 }
