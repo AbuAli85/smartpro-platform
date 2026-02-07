@@ -7,17 +7,14 @@ export const getLoginUrl = (): string | null => {
   const appId = import.meta.env.VITE_APP_ID;
 
   if (!oauthPortalUrl || typeof oauthPortalUrl !== "string" || oauthPortalUrl.trim() === "") {
-    console.error("[Auth] VITE_OAUTH_PORTAL_URL is not configured");
     return null;
   }
   if (!appId || typeof appId !== "string" || appId.trim() === "") {
-    console.error("[Auth] VITE_APP_ID is not configured");
     return null;
   }
   try {
     new URL(oauthPortalUrl);
   } catch {
-    console.error("[Auth] Invalid OAuth portal URL:", oauthPortalUrl);
     return null;
   }
 
