@@ -15,7 +15,7 @@ export function startFollowUpJob() {
       
       const db = await getDb();
       if (!db) {
-        console.error("[FollowUp Job] Database not initialized");
+        console.warn("[FollowUp Job] Database not available, skipping check.");
         return;
       }
 
