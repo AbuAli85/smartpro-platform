@@ -1,4 +1,4 @@
-CREATE TABLE `office_blocked_slots` (
+CREATE TABLE IF NOT EXISTS `office_blocked_slots` (
 	`id` int AUTO_INCREMENT NOT NULL PRIMARY KEY,
 	`office_id` int NOT NULL,
 	`blocked_date` date NOT NULL,

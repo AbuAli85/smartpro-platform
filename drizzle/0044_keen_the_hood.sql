@@ -1,5 +1,5 @@
 CREATE TABLE `expenses` (
-	`id` int AUTO_INCREMENT NOT NULL,
+	`id` int AUTO_INCREMENT NOT NULL PRIMARY KEY,
 	`office_id` int NOT NULL,
 	`category` enum('rent','utilities','salaries','supplies','marketing','travel','insurance','maintenance','software','other') NOT NULL,
 	`description` text NOT NULL,
@@ -11,12 +11,12 @@ CREATE TABLE `expenses` (
 	`notes` text,
 	`created_by` int NOT NULL,
 	`created_by_name` varchar(255) NOT NULL,
-	`created_at` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
-	`updated_at` timestamp DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP
+	`created_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+	`updated_at` timestamp DEFAULT (CURRENT_TIMESTAMP) ON UPDATE CURRENT_TIMESTAMP
 );
 --> statement-breakpoint
 CREATE TABLE `invoices` (
-	`id` int AUTO_INCREMENT NOT NULL,
+	`id` int AUTO_INCREMENT NOT NULL PRIMARY KEY,
 	`invoice_number` varchar(50) NOT NULL,
 	`office_id` int NOT NULL,
 	`client_id` int,
@@ -36,12 +36,12 @@ CREATE TABLE `invoices` (
 	`items` json,
 	`created_by` int NOT NULL,
 	`created_by_name` varchar(255) NOT NULL,
-	`created_at` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
-	`updated_at` timestamp DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP
+	`created_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+	`updated_at` timestamp DEFAULT (CURRENT_TIMESTAMP) ON UPDATE CURRENT_TIMESTAMP
 );
 --> statement-breakpoint
 CREATE TABLE `payments` (
-	`id` int AUTO_INCREMENT NOT NULL,
+	`id` int AUTO_INCREMENT NOT NULL PRIMARY KEY,
 	`invoice_id` int NOT NULL,
 	`office_id` int NOT NULL,
 	`amount` decimal(10,2) NOT NULL,
@@ -51,7 +51,7 @@ CREATE TABLE `payments` (
 	`notes` text,
 	`created_by` int NOT NULL,
 	`created_by_name` varchar(255) NOT NULL,
-	`created_at` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP'
+	`created_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP)
 );
 --> statement-breakpoint
 CREATE INDEX `office_id_idx` ON `expenses` (`office_id`);--> statement-breakpoint

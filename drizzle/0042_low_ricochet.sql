@@ -12,8 +12,7 @@ CREATE TABLE IF NOT EXISTS `office_notification_preferences` (
 	`updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );--> statement-breakpoint
 DROP PROCEDURE IF EXISTS _d42_drop_idx;--> statement-breakpoint
-CREATE PROCEDURE _d42_drop_idx(IN t VARCHAR(64), IN i VARCHAR(64)) BEGIN IF (SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema=DATABASE() AND table_name=t AND index_name=i)>0 THEN SET @s=CONCAT('ALTER TABLE `',t,'` DROP INDEX `',i,'`'); PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; END IF; END
---> statement-breakpoint
+CREATE PROCEDURE _d42_drop_idx(IN t VARCHAR(64), IN i VARCHAR(64)) BEGIN IF (SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema=DATABASE() AND table_name=t AND index_name=i)>0 THEN SET @s=CONCAT('ALTER TABLE `',t,'` DROP INDEX `',i,'`'); PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; END IF; END--> statement-breakpoint
 CALL _d42_drop_idx('active_sessions','active_sessions_sessionId_unique');--> statement-breakpoint
 CALL _d42_drop_idx('referrals','referrals_referralCode_unique');--> statement-breakpoint
 CALL _d42_drop_idx('sanad_office_staff','unique_office_user');--> statement-breakpoint
@@ -22,8 +21,7 @@ CALL _d42_drop_idx('sanad_offices','sanad_offices_commercialRegistration_unique'
 CALL _d42_drop_idx('users','users_openId_unique');--> statement-breakpoint
 CALL _d42_drop_idx('users','users_referralCode_unique');--> statement-breakpoint
 DROP PROCEDURE IF EXISTS _d42_drop_fk;--> statement-breakpoint
-CREATE PROCEDURE _d42_drop_fk(IN t VARCHAR(64), IN c VARCHAR(64)) BEGIN IF (SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE table_schema=DATABASE() AND table_name=t AND constraint_name=c AND constraint_type='FOREIGN KEY')>0 THEN SET @s=CONCAT('ALTER TABLE `',t,'` DROP FOREIGN KEY `',c,'`'); PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; END IF; END
---> statement-breakpoint
+CREATE PROCEDURE _d42_drop_fk(IN t VARCHAR(64), IN c VARCHAR(64)) BEGIN IF (SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE table_schema=DATABASE() AND table_name=t AND constraint_name=c AND constraint_type='FOREIGN KEY')>0 THEN SET @s=CONCAT('ALTER TABLE `',t,'` DROP FOREIGN KEY `',c,'`'); PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; END IF; END--> statement-breakpoint
 CALL _d42_drop_fk('quiz_attempts','quiz_attempts_quiz_id_training_quizzes_id_fk');--> statement-breakpoint
 CALL _d42_drop_fk('quiz_options','quiz_options_question_id_quiz_questions_id_fk');--> statement-breakpoint
 CALL _d42_drop_fk('quiz_questions','quiz_questions_quiz_id_training_quizzes_id_fk');--> statement-breakpoint
@@ -33,8 +31,7 @@ CALL _d42_drop_idx('sanad_offices','leaderboard_idx');--> statement-breakpoint
 CALL _d42_drop_idx('translation_requests','entity_idx');--> statement-breakpoint
 DROP PROCEDURE IF EXISTS _d42_drop_idx;--> statement-breakpoint
 DROP PROCEDURE IF EXISTS _d42_alter_pk_if_exists;--> statement-breakpoint
-CREATE PROCEDURE _d42_alter_pk_if_exists(IN tname VARCHAR(64)) BEGIN IF (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name=tname)>0 AND (SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE table_schema=DATABASE() AND table_name=tname AND constraint_type='PRIMARY KEY')>0 THEN SET @s=CONCAT('ALTER TABLE `',tname,'` MODIFY COLUMN `id` int NOT NULL'); PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; SET @s=CONCAT('ALTER TABLE `',tname,'` DROP PRIMARY KEY'); PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; END IF; END
---> statement-breakpoint
+CREATE PROCEDURE _d42_alter_pk_if_exists(IN tname VARCHAR(64)) BEGIN IF (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name=tname)>0 AND (SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE table_schema=DATABASE() AND table_name=tname AND constraint_type='PRIMARY KEY')>0 THEN SET @s=CONCAT('ALTER TABLE `',tname,'` MODIFY COLUMN `id` int NOT NULL'); PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; SET @s=CONCAT('ALTER TABLE `',tname,'` DROP PRIMARY KEY'); PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; END IF; END--> statement-breakpoint
 CALL _d42_alter_pk_if_exists('active_sessions');--> statement-breakpoint
 CALL _d42_alter_pk_if_exists('activity_log');--> statement-breakpoint
 CALL _d42_alter_pk_if_exists('auth_audit_log');--> statement-breakpoint
@@ -85,20 +82,15 @@ CALL _d42_alter_pk_if_exists('untranslated_content_alerts');--> statement-breakp
 CALL _d42_alter_pk_if_exists('users');--> statement-breakpoint
 DROP PROCEDURE IF EXISTS _d42_alter_pk_if_exists;--> statement-breakpoint
 DROP PROCEDURE IF EXISTS _d42_run_alter_if_exists;--> statement-breakpoint
-CREATE PROCEDURE _d42_run_alter_if_exists(IN tname VARCHAR(64), IN alter_suffix VARCHAR(1024)) BEGIN IF (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name=tname)>0 THEN SET @s=CONCAT('ALTER TABLE `',tname,'` ',alter_suffix); PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; END IF; END
---> statement-breakpoint
+CREATE PROCEDURE _d42_run_alter_if_exists(IN tname VARCHAR(64), IN alter_suffix VARCHAR(1024)) BEGIN IF (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name=tname)>0 THEN SET @s=CONCAT('ALTER TABLE `',tname,'` ',alter_suffix); PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; END IF; END--> statement-breakpoint
 DROP PROCEDURE IF EXISTS _d42_add_col_if_not_exists;--> statement-breakpoint
-CREATE PROCEDURE _d42_add_col_if_not_exists(IN tname VARCHAR(64), IN colname VARCHAR(64), IN add_clause VARCHAR(512)) BEGIN IF (SELECT COUNT(*) FROM information_schema.COLUMNS WHERE table_schema=DATABASE() AND table_name=tname AND column_name=colname)=0 THEN SET @s=CONCAT('ALTER TABLE `',tname,'` ',add_clause); PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; END IF; END
---> statement-breakpoint
+CREATE PROCEDURE _d42_add_col_if_not_exists(IN tname VARCHAR(64), IN colname VARCHAR(64), IN add_clause VARCHAR(512)) BEGIN IF (SELECT COUNT(*) FROM information_schema.COLUMNS WHERE table_schema=DATABASE() AND table_name=tname AND column_name=colname)=0 THEN SET @s=CONCAT('ALTER TABLE `',tname,'` ',add_clause); PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; END IF; END--> statement-breakpoint
 DROP PROCEDURE IF EXISTS _d42_drop_col_if_exists;--> statement-breakpoint
-CREATE PROCEDURE _d42_drop_col_if_exists(IN tname VARCHAR(64), IN colname VARCHAR(64)) BEGIN IF (SELECT COUNT(*) FROM information_schema.COLUMNS WHERE table_schema=DATABASE() AND table_name=tname AND column_name=colname)>0 THEN SET @s=CONCAT('ALTER TABLE `',tname,'` DROP COLUMN `',colname,'`'); PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; END IF; END
---> statement-breakpoint
+CREATE PROCEDURE _d42_drop_col_if_exists(IN tname VARCHAR(64), IN colname VARCHAR(64)) BEGIN IF (SELECT COUNT(*) FROM information_schema.COLUMNS WHERE table_schema=DATABASE() AND table_name=tname AND column_name=colname)>0 THEN SET @s=CONCAT('ALTER TABLE `',tname,'` DROP COLUMN `',colname,'`'); PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; END IF; END--> statement-breakpoint
 DROP PROCEDURE IF EXISTS _d42_create_idx_if_not_exists;--> statement-breakpoint
-CREATE PROCEDURE _d42_create_idx_if_not_exists(IN tname VARCHAR(64), IN idx_name VARCHAR(64), IN cols VARCHAR(256)) BEGIN IF (SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema=DATABASE() AND table_name=tname AND index_name=idx_name)=0 THEN SET @s=CONCAT('CREATE INDEX `',idx_name,'` ON `',tname,'` ',cols); PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; END IF; END
---> statement-breakpoint
+CREATE PROCEDURE _d42_create_idx_if_not_exists(IN tname VARCHAR(64), IN idx_name VARCHAR(64), IN cols VARCHAR(256)) BEGIN IF (SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema=DATABASE() AND table_name=tname AND index_name=idx_name)=0 THEN SET @s=CONCAT('CREATE INDEX `',idx_name,'` ON `',tname,'` ',cols); PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; END IF; END--> statement-breakpoint
 DROP PROCEDURE IF EXISTS _d42_add_quiz_fk_if_ref_has_pk;--> statement-breakpoint
-CREATE PROCEDURE _d42_add_quiz_fk_if_ref_has_pk() BEGIN IF (SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE table_schema=DATABASE() AND table_name='training_quizzes' AND constraint_type='PRIMARY KEY')>0 AND (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name='quiz_attempts')>0 AND (SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE table_schema=DATABASE() AND table_name='quiz_attempts' AND constraint_name='quiz_attempts_quiz_id_training_quizzes_id_fk')=0 THEN SET @s='ALTER TABLE `quiz_attempts` ADD CONSTRAINT `quiz_attempts_quiz_id_training_quizzes_id_fk` FOREIGN KEY (`quiz_id`) REFERENCES `training_quizzes`(`id`) ON DELETE cascade ON UPDATE no action'; PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; END IF; END
---> statement-breakpoint
+CREATE PROCEDURE _d42_add_quiz_fk_if_ref_has_pk() BEGIN IF (SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE table_schema=DATABASE() AND table_name='training_quizzes' AND constraint_type='PRIMARY KEY')>0 AND (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name='quiz_attempts')>0 AND (SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE table_schema=DATABASE() AND table_name='quiz_attempts' AND constraint_name='quiz_attempts_quiz_id_training_quizzes_id_fk')=0 THEN SET @s='ALTER TABLE `quiz_attempts` ADD CONSTRAINT `quiz_attempts_quiz_id_training_quizzes_id_fk` FOREIGN KEY (`quiz_id`) REFERENCES `training_quizzes`(`id`) ON DELETE cascade ON UPDATE no action'; PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; END IF; END--> statement-breakpoint
 CALL _d42_run_alter_if_exists('active_sessions','MODIFY COLUMN `lastActive` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP)');--> statement-breakpoint
 CALL _d42_run_alter_if_exists('active_sessions','MODIFY COLUMN `createdAt` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP)');--> statement-breakpoint
 CALL _d42_run_alter_if_exists('active_sessions','MODIFY COLUMN `isActive` tinyint NOT NULL DEFAULT 1');--> statement-breakpoint
@@ -221,4 +213,4 @@ DROP PROCEDURE IF EXISTS _d42_create_idx_if_not_exists;--> statement-breakpoint
 DROP PROCEDURE IF EXISTS _d42_add_quiz_fk_if_ref_has_pk;--> statement-breakpoint
 DROP PROCEDURE IF EXISTS _d42_drop_col_if_exists;--> statement-breakpoint
 DROP PROCEDURE IF EXISTS _d42_add_col_if_not_exists;--> statement-breakpoint
-DROP PROCEDURE IF EXISTS _d42_run_alter_if_exists;--> statement-breakpoint
+DROP PROCEDURE IF EXISTS _d42_run_alter_if_exists;
