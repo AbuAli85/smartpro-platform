@@ -190,8 +190,8 @@ async function startServer() {
       },
     });
     
-    // Special logging for the problematic request pattern
-    if (isBatchRequest && queryString.includes('input=%7B%220%22%3A%7B%22json%22%3Anull')) {
+    // Special logging only for revenue-models listModels with null input (not auth.me)
+    if (isListModels && queryString.includes('input=%7B%220%22%3A%7B%22json%22%3Anull')) {
       console.log(`[TRPC Request] DETECTED PROBLEMATIC REQUEST PATTERN - listModels with null input`);
       console.log(`[TRPC Request] Full query string:`, queryString);
     }

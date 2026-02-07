@@ -344,6 +344,11 @@ export async function runWorkflowMonitoring(): Promise<void> {
     
     console.log("[Workflow Monitoring] Daily content scan completed successfully");
   } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    if (msg === "Database not available") {
+      console.warn("[Workflow Monitoring] Database not available, skipping scan.");
+      return;
+    }
     console.error("[Workflow Monitoring] Error during content scan:", error);
     throw error;
   }

@@ -20,7 +20,12 @@ export async function runQualityMonitoringJob() {
       console.log(`[Quality Monitoring] ⚠️  ${alertsCreated} quality alert(s) created and sent`);
     }
   } catch (error) {
-    console.error("[Quality Monitoring] Error during quality check:", error);
+    const msg = error instanceof Error ? error.message : String(error);
+    if (msg === "Database not available") {
+      console.warn("[Quality Monitoring] Database not available, skipping check.");
+    } else {
+      console.error("[Quality Monitoring] Error during quality check:", error);
+    }
   }
 }
 
