@@ -26,10 +26,20 @@ function loadEnv(filePath) {
   }
 }
 
-loadEnv(path.join(root, ".env"));
+const rootEnv = path.join(root, ".env");
+const cwdEnv = path.join(process.cwd(), ".env");
+loadEnv(rootEnv);
+if (!process.env.DATABASE_URL) loadEnv(cwdEnv);
 
 if (!process.env.DATABASE_URL) {
-  console.error("DATABASE_URL is required. Add it to the project root .env file.");
+  console.error("DATABASE_URL is required for drizzle.");
+  console.error("");
+  console.error("Create a .env file in the project root with:");
+  console.error("  DATABASE_URL=mysql://USER:PASSWORD@HOST:3306/DATABASE");
+  console.error("");
+  console.error("Tried loading from:");
+  console.error("  " + rootEnv + "  " + (fs.existsSync(rootEnv) ? "(exists)" : "(not found)"));
+  if (cwdEnv !== rootEnv) console.error("  " + cwdEnv + "  " + (fs.existsSync(cwdEnv) ? "(exists)" : "(not found)"));
   process.exit(1);
 }
 

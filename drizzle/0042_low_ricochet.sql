@@ -1,5 +1,5 @@
 CREATE TABLE `office_notification_preferences` (
-	`id` int AUTO_INCREMENT NOT NULL,
+	`id` int AUTO_INCREMENT NOT NULL PRIMARY KEY,
 	`officeId` int NOT NULL,
 	`serviceTypes` json NOT NULL,
 	`governorates` json NOT NULL,
@@ -8,8 +8,8 @@ CREATE TABLE `office_notification_preferences` (
 	`emailNotifications` tinyint NOT NULL DEFAULT 1,
 	`inAppNotifications` tinyint NOT NULL DEFAULT 1,
 	`isActive` tinyint NOT NULL DEFAULT 1,
-	`createdAt` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
-	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP
+	`createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 --> statement-breakpoint
 ALTER TABLE `active_sessions` DROP INDEX `active_sessions_sessionId_unique`;--> statement-breakpoint

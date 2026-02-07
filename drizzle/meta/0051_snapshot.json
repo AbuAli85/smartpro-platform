@@ -2,7 +2,7 @@
   "version": "5",
   "dialect": "mysql",
   "id": "2516e30e-4b1a-4be2-8956-9d819b9e90d9",
-  "prevId": "24e6ba0f-3270-487d-9e07-b0583fdf4cd3",
+  "prevId": "6451d7ca-c2ad-486f-9156-38242da8b677",
   "tables": {
     "active_sessions": {
       "name": "active_sessions",
