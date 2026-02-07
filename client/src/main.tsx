@@ -47,10 +47,17 @@ queryClient.getMutationCache().subscribe(event => {
   }
 });
 
+// When the frontend is served from static hosting (e.g. Vercel) without the Node API,
+// set VITE_API_URL to your API origin (e.g. https://api.example.com) so TRPC requests
+// go to the API instead of the same origin (which would return index.html and cause
+// "Unexpected token '<'" / TRPCClientError).
+const apiBase = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
+const trpcUrl = apiBase ? `${apiBase}/api/trpc` : "/api/trpc";
+
 const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
-      url: "/api/trpc",
+      url: trpcUrl,
       transformer: superjson,
       fetch(input, init) {
         // Get current language from localStorage

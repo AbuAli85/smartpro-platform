@@ -80,6 +80,8 @@ pnpm db:push  # Ensure database is up to date
 
 ### Step 2: Configure Production Environment
 
+**If you deploy the frontend to Vercel (or any static host) without the Node API on the same origin:** set `VITE_API_URL` to your API origin (e.g. `https://api.yourdomain.com`). Otherwise the app will request `/api/trpc` from the static host and receive HTML (index.html) instead of JSON, causing `TRPCClientError: Unexpected token '<', "<!doctype "... is not valid JSON` and repeated [API Query Error] logs. The API must be deployed separately (e.g. Railway, Render) and CORS must allow the frontend origin.
+
 The platform uses Manus built-in hosting with automatic environment management. Key configurations:
 
 1. **Database**: Automatically provisioned MySQL/TiDB
