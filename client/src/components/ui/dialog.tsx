@@ -20,6 +20,7 @@ export const useDialogComposition = () =>
   React.useContext(DialogCompositionContext);
 
 function Dialog({
+  onOpenChange,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {
   const composingRef = React.useRef(false);
@@ -46,9 +47,24 @@ function Dialog({
     []
   );
 
+  const handleOpenChange = React.useCallback(
+    (open: boolean) => {
+      if (open) {
+        onOpenChange?.(open);
+      } else {
+        setTimeout(() => onOpenChange?.(open), 0);
+      }
+    },
+    [onOpenChange]
+  );
+
   return (
     <DialogCompositionContext.Provider value={contextValue}>
-      <DialogPrimitive.Root data-slot="dialog" {...props} />
+      <DialogPrimitive.Root
+        data-slot="dialog"
+        onOpenChange={onOpenChange != null ? handleOpenChange : undefined}
+        {...props}
+      />
     </DialogCompositionContext.Provider>
   );
 }

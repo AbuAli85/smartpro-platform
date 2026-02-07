@@ -88,7 +88,8 @@ function LoginRequiredDialog({ fallbackPath }: { fallbackPath: string }) {
     <Dialog open={open} onOpenChange={(isOpen) => {
       setOpen(isOpen);
       if (!isOpen) {
-        setShouldRedirect(true);
+        // Defer redirect so the close button's handler returns quickly and doesn't block UI
+        setTimeout(() => setShouldRedirect(true), 0);
       }
     }}>
       <DialogContent className="sm:max-w-md">
@@ -116,7 +117,7 @@ function LoginRequiredDialog({ fallbackPath }: { fallbackPath: string }) {
           })()}
           <Button
             variant="outline"
-            onClick={() => setShouldRedirect(true)}
+            onClick={() => setTimeout(() => setShouldRedirect(true), 0)}
             className="w-full"
           >
             Go Back
