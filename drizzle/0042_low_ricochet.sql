@@ -34,6 +34,7 @@ CALL _d42_drop_idx('translation_requests','entity_idx');--> statement-breakpoint
 DROP PROCEDURE IF EXISTS _d42_drop_idx;--> statement-breakpoint
 DROP PROCEDURE IF EXISTS _d42_alter_pk_if_exists;--> statement-breakpoint
 CREATE PROCEDURE _d42_alter_pk_if_exists(IN tname VARCHAR(64)) BEGIN IF (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name=tname)>0 AND (SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE table_schema=DATABASE() AND table_name=tname AND constraint_type='PRIMARY KEY')>0 THEN SET @s=CONCAT('ALTER TABLE `',tname,'` MODIFY COLUMN `id` int NOT NULL'); PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; SET @s=CONCAT('ALTER TABLE `',tname,'` DROP PRIMARY KEY'); PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st; END IF; END
+--> statement-breakpoint
 CALL _d42_alter_pk_if_exists('active_sessions');--> statement-breakpoint
 CALL _d42_alter_pk_if_exists('activity_log');--> statement-breakpoint
 CALL _d42_alter_pk_if_exists('auth_audit_log');--> statement-breakpoint
